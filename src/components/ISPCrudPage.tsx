@@ -2,30 +2,27 @@
 
 import type React from "react"
 import { useState, useEffect, useMemo } from "react"
-import { CSVLink } from "react-csv"
 import type { ColumnDef } from "@tanstack/react-table"
 import {
   Plus,
   Pencil,
   Trash2,
-  Eye,
-  FileDown,
-  LayoutDashboard,
-  ChevronRight,
-  Users,
+  Check,
+  X,
   CheckCircle2,
   XCircle,
-  Upload,
+  Users,
+  LayoutDashboard,
+  ChevronRight,
 } from "lucide-react"
 import { Table } from "./table/table.tsx"
-import { Modal } from "./customerModal.tsx"
+import { Modal } from "./modal.tsx"
 import { Topbar } from "./topNavbar.tsx"
 import { Sidebar } from "./sideNavbar.tsx"
 import { getToken } from "../utils/auth.ts"
-import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+import { toast } from "react-toastify"
 import axiosInstance from "../utils/axiosConfig.ts"
-import { EnhancedBulkAddModal } from "./modals/EnhancedBulkAddModal.tsx"
+import { CredentialsModal } from "./modals/CredentialsModal.tsx"
 
 interface CRUDPageProps<T> {
   title: string
@@ -34,15 +31,11 @@ interface CRUDPageProps<T> {
   FormComponent: React.ComponentType<{
     formData: Partial<T>
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
-    handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     isEditing: boolean
     validateBeforeSubmit?: (formData: Partial<T>) => string | null
-    supportsBulkAdd?: boolean
-    validationErrors?: Record<string, string>
   }>
   onDataChange?: () => void
   validateBeforeSubmit?: (formData: Partial<T>) => string | null
-  supportsBulkAdd?: boolean
 }
 
 export function CRUDPage<T extends { id: string; is_active?: boolean }>({
@@ -52,32 +45,33 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
   FormComponent,
   onDataChange,
   validateBeforeSubmit,
-  supportsBulkAdd = false,
 }: CRUDPageProps<T>) {
   const [data, setData] = useState<T[]>([])
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [editingItem, setEditingItem] = useState<T | null>(null)
   const [formData, setFormData] = useState<Partial<T>>({})
-  const [searchTerm, setSearchTerm] = useState("")
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [selectedRows, setSelectedRows] = useState<string[]>([])
-  const [isBulkAddModalVisible, setIsBulkAddModalVisible] = useState(false)
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false)
+  const [newEmployeeCredentials, setNewEmployeeCredentials] = useState<{
+    username: string
+    password: string
+    email: string
+  } | null>(null)
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
     inactive: 0,
   })
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
   const fetchData = async () => {
     setIsLoading(true)
     try {
-      const response = await axiosInstance.get(`/${endpoint}/list`)
+      const token = getToken()
+      const response = await axiosInstance.get(`/${endpoint}/list`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       setData(response.data)
 
       // Calculate stats
@@ -101,6 +95,31 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      const token = getToken()
+      await axiosInstance.put(
+        `/${endpoint}/update/${id}`,
+        { is_active: !currentStatus },
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      toast.success(`${title} status updated successfully`, {
+        style: { background: "#D1FAE5", color: "#10B981" },
+      })
+      await fetchData()
+    } catch (error) {
+      console.error(`Failed to update ${title} status`, error)
+      toast.error(`Failed to update ${title} status`, {
+        style: { background: "#FEE2E2", color: "#EF4444" },
+      })
+    }
+  }
+
   const handleBulkStatusChange = async (newStatus: boolean) => {
     if (selectedRows.length === 0) return
 
@@ -133,10 +152,10 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       setIsLoading(false)
     }
   }
+
   const showModal = (item: T | null) => {
     setEditingItem(item)
     setFormData(item || {})
-    setValidationErrors({})
     setIsModalVisible(true)
   }
 
@@ -144,95 +163,67 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     setIsModalVisible(false)
     setEditingItem(null)
     setFormData({})
-    setValidationErrors({})
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Form: ", formData)
     e.preventDefault()
+  
+    if (validateBeforeSubmit) {
+      const validationError = validateBeforeSubmit(formData)
+      if (validationError) {
+        toast.error(validationError, {
+          style: { background: "#FEE2E2", color: "#EF4444" },
+        })
+        return
+      }
+    }
+  
     setIsLoading(true)
-    setValidationErrors({})
   
     try {
       const token = getToken()
-      const formDataToSend = new FormData()
-  
-      // Add all form data to FormData object
-      Object.keys(formData).forEach((key) => {
-        const value = formData[key]
-        
-        if (value != null && value !== "") {
-          // For file fields, check if it's a File object or a string path
-          if (["cnic_front_image", "cnic_back_image", "agreement_document"].includes(key)) {
-            // If it's a File object, append it directly
-            // If it's a string (existing file path), also append it
-            formDataToSend.append(key, value)
-          } else {
-            // For non-file fields, append normally
-            formDataToSend.append(key, value)
-          }
-        }
-      })
-  
-      // Debug: Log what's being sent
-      console.log('FormData contents:')
-      for (let [key, value] of formDataToSend.entries()) {
-        console.log(key, value)
+      let response
+      
+      // Prepare data for submission (convert File objects to file paths)
+      const submissionData = { ...formData }
+      
+      // Handle file fields - ensure they are strings (file paths), not File objects
+      if (submissionData.payment_proof instanceof File) {
+        // This shouldn't happen with our new file upload approach, but as a fallback
+        console.warn("Payment proof is still a File object - should be file path string")
+        delete submissionData.payment_proof // Remove File object to avoid issues
       }
   
+      console.log("Submitting data:", submissionData)
+  
       if (editingItem) {
-        await axiosInstance.put(`/${endpoint}/update/${editingItem.id}`, formDataToSend, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+        response = await axiosInstance.put(`/${endpoint}/update/${editingItem.id}`, submissionData, {
+          headers: { Authorization: `Bearer ${token}` },
         })
         toast.success(`${title} updated successfully`, {
           style: { background: "#D1FAE5", color: "#10B981" },
         })
       } else {
-        await axiosInstance.post(`/${endpoint}/add`, formDataToSend, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+        response = await axiosInstance.post(`/${endpoint}/add`, submissionData, {
+          headers: { Authorization: `Bearer ${token}` },
         })
         toast.success(`${title} added successfully`, {
           style: { background: "#D1FAE5", color: "#10B981" },
         })
-      }
-      fetchData()
-      handleCancel()
-    } catch (error: any) {
-      console.error("Operation failed", error)
-
-      if (error.response?.data?.errors) {
-        // Field-specific validation errors
-        setValidationErrors(error.response.data.errors)
-        toast.error("Please fix the validation errors", {
-          style: { background: "#FEE2E2", color: "#EF4444" },
-        })
-      } else if (error.response?.data?.message) {
-        // General error message
-        toast.error(error.response.data.message, {
-          style: { background: "#FEE2E2", color: "#EF4444" },
-        })
-      } else if (error.response?.data?.error) {
-        // Error object with message
-        if (typeof error.response.data.error === "string") {
-          toast.error(error.response.data.error, {
-            style: { background: "#FEE2E2", color: "#EF4444" },
-          })
-        } else if (error.response.data.error.message) {
-          toast.error(error.response.data.error.message, {
-            style: { background: "#FEE2E2", color: "#EF4444" },
-          })
+        if (response.data.credentials) {
+          setNewEmployeeCredentials(response.data.credentials)
+          setShowCredentialsModal(true)
         }
-      } else {
-        // Generic error
-        toast.error("Operation failed. Please try again.", {
-          style: { background: "#FEE2E2", color: "#EF4444" },
-        })
       }
+      await fetchData()
+      handleCancel()
+    } catch (error) {
+      console.error("Operation failed", error)
+      toast.error("Operation failed", {
+        style: { background: "#FEE2E2", color: "#EF4444" },
+        hideProgressBar: false,
+      })
     } finally {
       setIsLoading(false)
     }
@@ -249,7 +240,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
         toast.success(`${title} deleted successfully`, {
           style: { background: "#D1FAE5", color: "#10B981" },
         })
-        fetchData()
+        await fetchData()
       } catch (error) {
         console.error("Delete operation failed", error)
         toast.error("Delete operation failed", {
@@ -261,46 +252,10 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     }
   }
 
-  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    try {
-      setIsLoading(true)
-      const token = getToken()
-      await axiosInstance.patch(
-        `/${endpoint}/toggle-status/${id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
-      toast.success(`${title} status updated successfully`, {
-        style: { background: "#D1FAE5", color: "#10B981" },
-      })
-      fetchData()
-    } catch (error) {
-      console.error("Toggle status failed", error)
-      toast.error(`Failed to update ${title} status`, {
-        style: { background: "#FEE2E2", color: "#EF4444" },
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target
-    
-    if (value) {
-      // This is a file path string from FileUploadField
-      setFormData((prev) => ({ ...prev, [name]: value }))
-    } else if (files && files.length > 0) {
-      // This is a direct file input (fallback)
-      setFormData((prev) => ({ ...prev, [name]: files[0] }))
-    }
+    console.log('Updated FOrm data: ',formData);
   }
 
   const toggleSidebar = () => {
@@ -354,13 +309,6 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
             >
               <Trash2 className="h-4 w-4" />
             </button>
-            <button
-              onClick={() => (window.location.href = `/customers/${info.row.original.id}`)}
-              className="p-2 text-white bg-deep-ocean rounded-md hover:bg-deep-ocean/80 transition-colors"
-              title="View Details"
-            >
-              <Eye className="h-4 w-4" />
-            </button>
           </div>
         ),
       },
@@ -396,29 +344,12 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
                   </h1>
                   <p className="text-slate-gray mt-1">Manage your {title.toLowerCase()} records efficiently</p>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  {supportsBulkAdd && (
-                    <button
-                      onClick={() => setIsBulkAddModalVisible(true)}
-                      className="bg-deep-ocean text-white px-4 py-2.5 rounded-lg hover:bg-deep-ocean/90 transition-colors flex items-center justify-center gap-2 shadow-sm"
-                    >
-                      <Upload className="h-5 w-5" /> Bulk Add
-                    </button>
-                  )}
-                  <CSVLink
-                    data={data}
-                    filename={`${title.toLowerCase()}.csv`}
-                    className="bg-golden-amber text-white px-4 py-2.5 rounded-lg hover:bg-golden-amber/90 transition-colors flex items-center gap-2 shadow-sm"
-                  >
-                    <FileDown className="h-5 w-5" /> Export CSV
-                  </CSVLink>
-                  <button
-                    onClick={() => showModal(null)}
-                    className="bg-electric-blue text-white px-4 py-2.5 rounded-lg hover:bg-btn-hover transition-colors flex items-center gap-2 shadow-sm"
-                  >
-                    <Plus className="h-5 w-5" /> Add New {title}
-                  </button>
-                </div>
+                <button
+                  onClick={() => showModal(null)}
+                  className="bg-electric-blue text-white px-4 py-2.5 rounded-lg hover:bg-btn-hover transition-colors flex items-center justify-center gap-2 shadow-sm self-start md:self-center"
+                >
+                  <Plus className="h-5 w-5" /> Add New {title}
+                </button>
               </div>
 
               {/* Stats Cards */}
@@ -459,6 +390,34 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
                   </div>
                 </div>
               </div>
+
+              {/* Bulk Actions */}
+              {selectedRows.length > 0 && (
+                <div className="bg-electric-blue/5 border border-electric-blue/20 rounded-lg p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-deep-ocean font-medium">
+                      {selectedRows.length} {title.toLowerCase()}
+                      {selectedRows.length > 1 ? "s" : ""} selected
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => handleBulkStatusChange(true)}
+                      disabled={selectedRows.length === 0 || isLoading}
+                      className="px-4 py-2 text-sm font-medium bg-emerald-green text-white rounded-md hover:bg-emerald-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-green disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                    >
+                      <Check className="h-4 w-4" /> Activate
+                    </button>
+                    <button
+                      onClick={() => handleBulkStatusChange(false)}
+                      disabled={selectedRows.length === 0 || isLoading}
+                      className="px-4 py-2 text-sm font-medium bg-coral-red text-white rounded-md hover:bg-coral-red/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral-red disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                    >
+                      <X className="h-4 w-4" /> Deactivate
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Table Section */}
@@ -483,14 +442,8 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
         title={editingItem ? `Edit ${title}` : `Add New ${title}`}
         isLoading={isLoading}
       >
-        <form onSubmit={handleSubmit}>
-          <FormComponent
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleFileChange={handleFileChange}
-            isEditing={!!editingItem}
-            validationErrors={validationErrors}
-          />
+        <form onSubmit={handleSubmit} className="bg-white">
+          <FormComponent formData={formData} handleInputChange={handleInputChange} isEditing={!!editingItem} />
           <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
@@ -530,7 +483,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
                 </>
               ) : editingItem ? (
                 <>
-                  <Pencil className="h-5 w-5" /> Update {title}
+                  <Check className="h-5 w-5" /> Update {title}
                 </>
               ) : (
                 <>
@@ -541,25 +494,15 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
           </div>
         </form>
       </Modal>
-      <EnhancedBulkAddModal
-        isVisible={isBulkAddModalVisible}
-        onClose={() => setIsBulkAddModalVisible(false)}
-        endpoint={endpoint}
-        entityName={title}
-        onSuccess={fetchData}
-      />
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+
+      {/* Credentials Modal */}
+      {newEmployeeCredentials && (
+        <CredentialsModal
+          isVisible={showCredentialsModal}
+          onClose={() => setShowCredentialsModal(false)}
+          credentials={newEmployeeCredentials}
+        />
+      )}
     </div>
   )
 }

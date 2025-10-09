@@ -115,7 +115,7 @@ export function PaymentForm({ formData, handleInputChange, handleSubmit, isEditi
       const filteredInvoices = isEditing 
         ? response.data 
         : response.data.filter((invoice: any) => 
-            invoice.status === 'pending' || invoice.status === 'Pending'
+            invoice.status === 'pending' || invoice.status === 'Pending' || invoice.status === 'partially_paid' || invoice.status === 'Partially Paid'
           )
       
       setInvoices(
@@ -195,9 +195,12 @@ export function PaymentForm({ formData, handleInputChange, handleSubmit, isEditi
     if (!formData.payment_method) newErrors.payment_method = "Payment method is required"
     if (!formData.status) newErrors.status = "Status is required"
     if (!formData.received_by) newErrors.received_by = "Receiver is required"
+    
+    // Only require bank account if payment method is bank transfer
     if (formData.payment_method === "bank_transfer" && !formData.bank_account_id) {
       newErrors.bank_account_id = "Bank account is required for bank transfers"
     }
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -234,7 +237,7 @@ export function PaymentForm({ formData, handleInputChange, handleSubmit, isEditi
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <DollarSign className="h-5 w-5 text-slate-gray/60" />
+              <span className="text-slate-gray/60 font-medium">PKR</span>
             </div>
             <input
               type="number"
