@@ -17,13 +17,13 @@ import {
   Eye,
   Share2,
 } from "lucide-react"
-import { Table } from "./InvoiceTable.tsx"
-import { Modal } from "../modal.tsx"
-import { Topbar } from "../topNavbar.tsx"
-import { Sidebar } from "../sideNavbar.tsx"
-import { getToken } from "../../utils/auth.ts"
+import { Table } from "./table/invoiceTable.tsx"
+import { Modal } from "./modal.tsx"
+import { Topbar } from "./topNavbar.tsx"
+import { Sidebar } from "./sideNavbar.tsx"
+import { getToken } from "../utils/auth.ts"
 import { toast } from "react-toastify"
-import axiosInstance from "../../utils/axiosConfig.ts"
+import axiosInstance from "../utils/axiosConfig.ts"
 
 interface CRUDPageProps<T> {
   title: string
