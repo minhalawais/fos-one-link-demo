@@ -244,30 +244,60 @@ export const FinancialKPIs: React.FC<FinancialKPIsProps> = ({ data }) => {
   }, [data])
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-      {kpis.map((kpi, index) => {
-        const IconComponent = kpi.icon
-        return (
-          <div
-            key={index}
-            className={`bg-white rounded-xl border ${kpi.borderColor} p-6 hover:shadow-lg transition-all duration-300 group`}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div
-                className={`w-12 h-12 rounded-lg flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 ${kpi.bgColor}`}
-                style={{ backgroundColor: kpi.color }}
-              >
-                <IconComponent className="w-6 h-6" />
+    <div className="mb-6">
+      {/* First row - 5 KPIs */}
+      <div className="grid grid-cols-5 gap-4 mb-4">
+        {kpis.slice(0, 5).map((kpi, index) => {
+          const IconComponent = kpi.icon
+          return (
+            <div
+              key={index}
+              className={`bg-white rounded-xl border ${kpi.borderColor} p-6 hover:shadow-lg transition-all duration-300 group`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 ${kpi.bgColor}`}
+                  style={{ backgroundColor: kpi.color }}
+                >
+                  <IconComponent className="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-[#6B7280] mb-2 leading-tight">{kpi.title}</h3>
+                <p className="text-2xl font-bold text-[#1F2937] mb-1 leading-none">{kpi.value}</p>
+                <p className="text-xs text-[#9CA3AF] leading-tight">{kpi.description}</p>
               </div>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-[#6B7280] mb-2 leading-tight">{kpi.title}</h3>
-              <p className="text-2xl font-bold text-[#1F2937] mb-1 leading-none">{kpi.value}</p>
-              <p className="text-xs text-[#9CA3AF] leading-tight">{kpi.description}</p>
+          )
+        })}
+      </div>
+      
+      {/* Remaining rows - 4 KPIs each */}
+      <div className="grid grid-cols-4 gap-4">
+        {kpis.slice(5).map((kpi, index) => {
+          const IconComponent = kpi.icon
+          return (
+            <div
+              key={index + 5}
+              className={`bg-white rounded-xl border ${kpi.borderColor} p-6 hover:shadow-lg transition-all duration-300 group`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div
+                  className={`w-12 h-12 rounded-lg flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 ${kpi.bgColor}`}
+                  style={{ backgroundColor: kpi.color }}
+                >
+                  <IconComponent className="w-6 h-6" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-[#6B7280] mb-2 leading-tight">{kpi.title}</h3>
+                <p className="text-2xl font-bold text-[#1F2937] mb-1 leading-none">{kpi.value}</p>
+                <p className="text-xs text-[#9CA3AF] leading-tight">{kpi.description}</p>
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }

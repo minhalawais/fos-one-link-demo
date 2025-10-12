@@ -2,12 +2,12 @@
 
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
-import { FinancialKPIs } from "./FinancialKPIs.tsx"
-import { CashFlowAnalysis } from "./CashFlowAnalysis.tsx"
-import { RevenueExpenseComparison } from "./RevenueExpenseComparison.tsx"
-import { BankPerformance } from "./BankPerformance.tsx"
-import { ISPPaymentAnalysis } from "./ISPPaymentAnalysis.tsx"
-import { AdvancedFilters } from "./AdvancedFilters.tsx"
+import { FinancialKPIs } from "./FinancialComponent/FinancialKPIs.tsx"
+import { CashFlowAnalysis } from "./FinancialComponent/CashFlowAnalysis.tsx"
+import { RevenueExpenseComparison } from "./FinancialComponent/RevenueExpenseComparison.tsx"
+import { BankPerformance } from "./FinancialComponent/BankPerformance.tsx"
+import { ISPPaymentAnalysis } from "./FinancialComponent/ISPPaymentAnalysis.tsx"
+import { AdvancedFilters } from "./FinancialComponent/AdvancedFilters.tsx"
 import axiosInstance from "../../utils/axiosConfig.ts"
 
 // Types

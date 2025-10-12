@@ -1,3 +1,4 @@
+// logsCrudPage.tsx
 "use client"
 
 import type React from "react"
@@ -11,8 +12,8 @@ import {
   XCircle,
   LayoutDashboard,
   ChevronRight,
-  DollarSign,
   FileDown,
+  Users,
 } from "lucide-react"
 import { Table } from "./table/PaymentTable.tsx"
 import { Modal } from "./modal.tsx"
@@ -37,9 +38,9 @@ interface CRUDPageProps<T> {
   validateBeforeSubmit?: (formData: Partial<T>) => string | null
 }
 
-type Summary = { total: number; active: number; inactive: number; totalAmount: number }
+type Summary = { total: number; active: number; inactive: number }
 
-export function CRUDPage<T extends { id: string; is_active?: boolean }>({
+export function LogsCRUDPage<T extends { id: string }>({
   title,
   endpoint,
   columns,
@@ -60,7 +61,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
   const [sorting, setSorting] = useState<{ id: string; desc: boolean }[]>([])
   const [globalSearch, setGlobalSearch] = useState("")
   const [columnFilters, setColumnFilters] = useState<{ id: string; value: string }[]>([])
-  const [stats, setStats] = useState<Summary>({ total: 0, active: 0, inactive: 0, totalAmount: 0 })
+  const [stats, setStats] = useState<Summary>({ total: 0, active: 0, inactive: 0 })
 
   const fetchSummary = useCallback(async () => {
     try {
@@ -72,11 +73,9 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       setStats({
         total: s.total || 0,
         active: s.active || 0,
-        inactive: (s.total || 0) - (s.active || 0),
-        totalAmount: s.totalAmount || 0,
+        inactive: s.inactive || 0,
       })
     } catch (e) {
-      // Fallback silently; don't block page
       console.warn("Failed to fetch summary", e)
     }
   }, [endpoint])
@@ -87,13 +86,13 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       const token = getToken()
       const sort = sorting[0]
       const params: Record<string, any> = {
-        page: pagination.pageIndex + 1, // backend 1-based
+        page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
         sort_by: sort?.id,
         sort_dir: sort?.desc ? "desc" : "asc",
         q: globalSearch || undefined,
       }
-      // column filters to query params (key=value)
+      
       columnFilters.forEach((f) => {
         if (f.value) params[`filter_${f.id}`] = f.value
       })
@@ -102,14 +101,11 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
         headers: { Authorization: `Bearer ${token}` },
         params,
       })
-      // Expected shape: { items: T[], total: number }
+      
       setData(res.data.items || [])
       const total = res.data.total || 0
       setPageCount(Math.ceil(total / pagination.pageSize))
-      if (!stats.total) {
-        // try lazy summary fill if backend doesn't provide /summary
-        setStats((prev) => ({ ...prev, total }))
-      }
+      
       if (onDataChange) onDataChange()
     } catch (error) {
       console.error(`Failed to fetch ${title}`, error)
@@ -119,7 +115,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     } finally {
       setIsLoading(false)
     }
-  }, [endpoint, title, sorting, globalSearch, columnFilters, pagination, onDataChange, stats.total])
+  }, [endpoint, title, sorting, globalSearch, columnFilters, pagination, onDataChange])
 
   useEffect(() => {
     fetchSummary()
@@ -129,63 +125,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     fetchPage()
   }, [fetchPage])
 
-  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    try {
-      const token = getToken()
-      await axiosInstance.put(
-        `/${endpoint}/update/${id}`,
-        { is_active: !currentStatus },
-        { headers: { Authorization: `Bearer ${token}` } },
-      )
-      toast.success(`${title} status updated successfully`, {
-        style: { background: "#D1FAE5", color: "#10B981" },
-      })
-      await fetchPage()
-    } catch (error) {
-      console.error(`Failed to update ${title} status`, error)
-      toast.error(`Failed to update ${title} status`, {
-        style: { background: "#FEE2E2", color: "#EF4444" },
-      })
-    }
-  }
-
-  const handleBulkStatusChange = async (newStatus: boolean) => {
-    if (selectedRows.length === 0) return
-
-    try {
-      setIsLoading(true)
-      const token = getToken()
-      await Promise.all(
-        selectedRows.map((id) =>
-          axiosInstance.put(
-            `/${endpoint}/update/${id}`,
-            { is_active: newStatus },
-            { headers: { Authorization: `Bearer ${token}` } },
-          ),
-        ),
-      )
-      toast.success(
-        `${selectedRows.length} ${title.toLowerCase()}${selectedRows.length > 1 ? "s" : ""} ${
-          newStatus ? "activated" : "deactivated"
-        } successfully`,
-        {
-          style: { background: "#D1FAE5", color: "#10B981" },
-        },
-      )
-      await fetchPage()
-      setSelectedRows([])
-    } catch (error) {
-      console.error(`Failed to update ${title} status`, error)
-      toast.error(`Failed to update ${title} status`, {
-        style: { background: "#FEE2E2", color: "#EF4444" },
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const showModal = (item: T | null) => {
-    console.log("showModal", item)
     setEditingItem(item)
     setFormData(item || {})
     setIsModalVisible(true)
@@ -202,61 +142,29 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     setIsLoading(true)
     try {
       const token = getToken()
-
-      // Create FormData for file uploads
-      const formDataToSend = new FormData()
-
-      // Append all form data with proper type conversion
-      Object.keys(formData).forEach((key) => {
-        if (formData[key] !== undefined && formData[key] !== null) {
-          const value = formData[key]
-
-          // Handle file separately
-          if (key === "payment_proof" && value instanceof File) {
-            formDataToSend.append(key, value)
-          }
-          // Convert boolean strings to actual booleans
-          else if (key === "is_active") {
-            if (typeof value === "string") {
-              formDataToSend.append(key, value.toLowerCase() === "true" ? "true" : "false")
-            } else {
-              formDataToSend.append(key, value ? "true" : "false")
-            }
-          }
-          // Handle other fields
-          else {
-            formDataToSend.append(key, value.toString())
-          }
-        }
-      })
-
       let response
+      
       if (editingItem) {
-        response = await axiosInstance.put(`/${endpoint}/update/${editingItem.id}`, formDataToSend, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+        response = await axiosInstance.put(`/${endpoint}/update/${editingItem.id}`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
         })
         toast.success(`${title} updated successfully`, {
           style: { background: "#D1FAE5", color: "#10B981" },
         })
       } else {
-        response = await axiosInstance.post(`/${endpoint}/add`, formDataToSend, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+        response = await axiosInstance.post(`/${endpoint}/add`, formData, {
+          headers: { Authorization: `Bearer ${token}` },
         })
         toast.success(`${title} added successfully`, {
           style: { background: "#D1FAE5", color: "#10B981" },
         })
       }
+      
       fetchPage()
       handleCancel()
     } catch (error) {
       console.error("Operation failed", error)
-      toast.error("Operation failed:" + error.toString(), {
+      toast.error("Operation failed", {
         style: { background: "#FEE2E2", color: "#EF4444" },
       })
     } finally {
@@ -298,32 +206,6 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     return [
       ...columns,
       {
-        header: "Status",
-        accessorKey: "is_active",
-        cell: (info: any) => (
-          <div className="flex items-center">
-            <button
-              onClick={() => handleToggleStatus(info.row.original.id, info.getValue())}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all ${
-                info.getValue()
-                  ? "bg-emerald-green/10 text-emerald-green hover:bg-emerald-green/20"
-                  : "bg-coral-red/10 text-coral-red hover:bg-coral-red/20"
-              }`}
-            >
-              {info.getValue() ? (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Active
-                </>
-              ) : (
-                <>
-                  <XCircle className="h-3.5 w-3.5" /> Inactive
-                </>
-              )}
-            </button>
-          </div>
-        ),
-      },
-      {
         header: "Actions",
         cell: (info: any) => (
           <div className="flex items-center gap-2">
@@ -345,7 +227,6 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
         ),
       },
     ]
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [columns])
 
   const handleExport = async () => {
@@ -360,11 +241,13 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       columnFilters.forEach((f) => {
         if (f.value) params[`filter_${f.id}`] = f.value
       })
+      
       const res = await axiosInstance.get(`/${endpoint}/export`, {
         headers: { Authorization: `Bearer ${token}` },
         params,
         responseType: "blob",
       })
+      
       const url = URL.createObjectURL(res.data)
       const a = document.createElement("a")
       a.href = url
@@ -402,7 +285,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                   <h1 className="text-2xl md:text-3xl font-bold text-deep-ocean flex items-center gap-2">
-                    <DollarSign className="h-7 w-7 text-electric-blue" />
+                    <Users className="h-7 w-7 text-electric-blue" />
                     {title} Management
                   </h1>
                   <p className="text-slate-gray mt-1">Manage your {title.toLowerCase()} records efficiently</p>
@@ -414,17 +297,11 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
                   >
                     <FileDown className="h-5 w-5" /> Export CSV
                   </button>
-                  <button
-                    onClick={() => showModal(null)}
-                    className="bg-electric-blue text-white px-4 py-2.5 rounded-lg hover:bg-btn-hover transition-colors flex items-center gap-2 shadow-sm"
-                  >
-                    <Plus className="h-5 w-5" /> Add New {title}
-                  </button>
                 </div>
               </div>
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="bg-light-sky/50 rounded-lg p-4 border border-slate-gray/10">
                   <div className="flex items-center justify-between">
                     <div>
@@ -432,7 +309,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
                       <h3 className="text-2xl font-bold text-deep-ocean mt-1">{stats.total}</h3>
                     </div>
                     <div className="bg-deep-ocean/10 p-3 rounded-full">
-                      <DollarSign className="h-6 w-6 text-deep-ocean" />
+                      <Users className="h-6 w-6 text-deep-ocean" />
                     </div>
                   </div>
                 </div>
@@ -460,78 +337,34 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
                     </div>
                   </div>
                 </div>
-
-                <div className="bg-electric-blue/5 rounded-lg p-4 border border-electric-blue/10">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-gray text-sm">Total Amount</p>
-                      <h3 className="text-2xl font-bold text-electric-blue mt-1">
-                        PKR{stats.totalAmount.toLocaleString()}
-                      </h3>
-                    </div>
-                    <div className="bg-electric-blue/10 p-3 rounded-full">
-                      <DollarSign className="h-6 w-6 text-electric-blue" />
-                    </div>
-                  </div>
-                </div>
               </div>
-
-              {/* Bulk Actions */}
-              {selectedRows.length > 0 && (
-                <div className="bg-electric-blue/5 border border-electric-blue/20 rounded-lg p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-deep-ocean font-medium">
-                      {selectedRows.length} {title.toLowerCase()}
-                      {selectedRows.length > 1 ? "s" : ""} selected
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => handleBulkStatusChange(true)}
-                      disabled={selectedRows.length === 0 || isLoading}
-                      className="px-4 py-2 text-sm font-medium bg-emerald-green text-white rounded-md hover:bg-emerald-green/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-green disabled:opacity-50 transition-colors flex items-center gap-1.5"
-                    >
-                      <CheckCircle2 className="h-4 w-4" /> Activate
-                    </button>
-                    <button
-                      onClick={() => handleBulkStatusChange(false)}
-                      disabled={selectedRows.length === 0 || isLoading}
-                      className="px-4 py-2 text-sm font-medium bg-coral-red text-white rounded-md hover:bg-coral-red/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-coral-red disabled:opacity-50 transition-colors flex items-center gap-1.5"
-                    >
-                      <XCircle className="h-4 w-4" /> Deactivate
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Table Section */}
             <div className="mb-8">
-            <Table
-  data={data}
-  columns={memoizedColumns}
-  selectedRows={selectedRows}
-  setSelectedRows={setSelectedRows}
-  handleToggleStatus={handleToggleStatus}
-  isLoading={isLoading}
-  manualPagination={true} // Explicitly set to true
-  pageCount={pageCount}
-  pagination={pagination}
-  onPaginationChange={(p) => {
-    setPagination(p)
-    // The fetchPage useEffect will trigger due to pagination dependency change
-  }}
-  sorting={sorting}
-  onSortingChange={(s) => setSorting(s as any)}
-  onGlobalFilterChangeExternal={(value) => {
-    setGlobalSearch(value)
-    setPagination((p) => ({ ...p, pageIndex: 0 }))
-  }}
-  onColumnFiltersChangeExternal={(filters) => {
-    setColumnFilters(filters as any)
-    setPagination((p) => ({ ...p, pageIndex: 0 }))
-  }}
-/>
+              <Table
+                data={data}
+                columns={memoizedColumns}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows}
+                isLoading={isLoading}
+                manualPagination={true}
+                pageCount={pageCount}
+                pagination={pagination}
+                onPaginationChange={(p) => {
+                  setPagination(p)
+                }}
+                sorting={sorting}
+                onSortingChange={(s) => setSorting(s as any)}
+                onGlobalFilterChangeExternal={(value) => {
+                  setGlobalSearch(value)
+                  setPagination((p) => ({ ...p, pageIndex: 0 }))
+                }}
+                onColumnFiltersChangeExternal={(filters) => {
+                  setColumnFilters(filters as any)
+                  setPagination((p) => ({ ...p, pageIndex: 0 }))
+                }}
+              />
             </div>
           </div>
         </main>

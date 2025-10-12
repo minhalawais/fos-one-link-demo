@@ -12,6 +12,7 @@ import {
   type RowSelectionState,
   type FilterFn,
   type ColumnFiltersState,
+  type PaginationState,
   type SortingState,
 } from "@tanstack/react-table"
 import { useVirtual } from "react-virtual"
@@ -47,15 +48,17 @@ interface TableProps<T> {
   setSelectedRows?: (rows: string[]) => void
   handleToggleStatus?: (id: string, currentStatus: boolean) => void
   isLoading?: boolean
-  serverMode?: boolean
-  totalCount?: number
-  pageIndex?: number
-  pageSize?: number
-  onPageChange?: (pageIndex: number) => void
-  onPageSizeChange?: (pageSize: number) => void
+
+  manualPagination?: boolean
+  pageCount?: number
+  pagination?: PaginationState
+  onPaginationChange?: (updater: PaginationState) => void
+
   sorting?: SortingState
   onSortingChange?: (sorting: SortingState) => void
-  onGlobalSearch?: (q: string) => void
+
+  onGlobalFilterChangeExternal?: (value: string) => void
+  onColumnFiltersChangeExternal?: (filters: ColumnFiltersState) => void
 }
 
 export function Table<T>({
@@ -65,15 +68,15 @@ export function Table<T>({
   setSelectedRows: setExternalSelectedRows,
   handleToggleStatus,
   isLoading = false,
-  serverMode = false,
-  totalCount,
-  pageIndex,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
+
+  manualPagination = false,
+  pageCount,
+  pagination: externalPagination,
+  onPaginationChange,
   sorting: externalSorting,
   onSortingChange,
-  onGlobalSearch,
+  onGlobalFilterChangeExternal,
+  onColumnFiltersChangeExternal,
 }: TableProps<T>) {
   const [globalFilter, setGlobalFilter] = useState("")
   const [localGlobalFilter, setLocalGlobalFilter] = useState("")
@@ -82,7 +85,12 @@ export function Table<T>({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [distinctValues, setDistinctValues] = useState<Record<string, Set<any>>>({})
   const [showFilters, setShowFilters] = useState(false)
-  const [sorting, setSorting] = useState<SortingState>(externalSorting ?? [])
+  const [localPagination, setLocalPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 20 })
+  const [localSorting, setLocalSorting] = useState<SortingState>([])
+
+  const paginationState = manualPagination && externalPagination ? externalPagination : localPagination
+  const sortingState = manualPagination && externalSorting ? externalSorting : localSorting
+  
 
   const table = useReactTable({
     data,
@@ -91,41 +99,64 @@ export function Table<T>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    filterFns: { fuzzy: fuzzyFilter },
-    onRowSelectionChange: setRowSelection,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onSortingChange: (updater) => {
-      const next = typeof updater === "function" ? (updater as any)(sorting) : (updater as SortingState)
-      setSorting(next)
-      if (serverMode && onSortingChange) onSortingChange(next)
+    filterFns: {
+      fuzzy: fuzzyFilter,
     },
-    globalFilterFn: fuzzyFilter,
+    onRowSelectionChange: setRowSelection,
+    manualPagination,
+    pageCount: manualPagination && typeof pageCount === "number" ? pageCount : undefined,
+    onPaginationChange: (updater) => {
+      if (manualPagination && onPaginationChange) {
+        // For manual pagination, call the external handler
+        const next = typeof updater === "function" ? updater(paginationState) : updater
+        onPaginationChange(next)
+      } else {
+        // For client-side pagination, update local state
+        const next = typeof updater === "function" ? updater(localPagination) : updater
+        setLocalPagination(next)
+      }
+    },
+    onSortingChange: (updater) => {
+      const next = typeof updater === "function" ? updater(sortingState) : updater
+      if (manualPagination && onSortingChange) {
+        onSortingChange(next)
+      } else {
+        setLocalSorting(next)
+      }
+    },
+    onColumnFiltersChange: (updater) => {
+      const next = typeof updater === "function" ? updater(columnFilters) : updater
+      setColumnFilters(next)
+      if (manualPagination && onColumnFiltersChangeExternal) {
+        onColumnFiltersChangeExternal(next)
+      }
+    },
+    onGlobalFilterChange: (value) => {
+      setGlobalFilter(value)
+      if (manualPagination && onGlobalFilterChangeExternal) {
+        onGlobalFilterChangeExternal(value)
+      }
+    },
     state: {
       rowSelection,
       globalFilter,
       columnFilters,
-      sorting,
-      pagination: serverMode && pageIndex !== undefined && pageSize !== undefined ? { pageIndex, pageSize } : undefined,
+      pagination: paginationState,
+      sorting: sortingState,
     },
-    manualPagination: serverMode,
-    pageCount:
-      serverMode && totalCount !== undefined && (pageSize ?? 10) > 0
-        ? Math.max(1, Math.ceil(totalCount / (pageSize as number)))
-        : undefined,
-    initialState: { pagination: { pageSize: pageSize ?? 20 } },
+    initialState: {
+      pagination: {
+        pageSize: 20,
+      },
+    },
   })
 
   const debouncedGlobalSearch = useMemo(
     () =>
       debounce((value: string) => {
-        if (serverMode && onGlobalSearch) {
-          onGlobalSearch(value)
-        } else {
-          setGlobalFilter(value)
-        }
-      }, 250),
-    [serverMode, onGlobalSearch],
+        setGlobalFilter(value)
+      }, 150),
+    [],
   )
 
   const debouncedColumnSearch = useMemo(
@@ -149,17 +180,28 @@ export function Table<T>({
   const handleGlobalFilterChange = useCallback(
     (value: string) => {
       setLocalGlobalFilter(value)
-      debouncedGlobalSearch(value)
+      if (manualPagination && onGlobalFilterChangeExternal) {
+        onGlobalFilterChangeExternal(value)
+      } else {
+        debouncedGlobalSearch(value)
+      }
     },
-    [debouncedGlobalSearch],
+    [debouncedGlobalSearch, manualPagination, onGlobalFilterChangeExternal],
   )
 
   const handleColumnFilterChange = useCallback(
     (columnId: string, value: string) => {
       setLocalColumnFilters((prev) => ({ ...prev, [columnId]: value }))
-      debouncedColumnSearch(columnId, value)
+      if (manualPagination && onColumnFiltersChangeExternal) {
+        const next: ColumnFiltersState = Object.entries({ ...localColumnFilters, [columnId]: value })
+          .filter(([, v]) => v !== "")
+          .map(([id, v]) => ({ id, value: v as string }))
+        onColumnFiltersChangeExternal(next)
+      } else {
+        debouncedColumnSearch(columnId, value)
+      }
     },
-    [debouncedColumnSearch],
+    [debouncedColumnSearch, manualPagination, onColumnFiltersChangeExternal, localColumnFilters],
   )
 
   useEffect(() => {
@@ -180,13 +222,6 @@ export function Table<T>({
     })
     setDistinctValues(newDistinctValues)
   }, [data, columns])
-
-  useEffect(() => {
-    if (!serverMode) return
-    const p = table.getState().pagination
-    if (onPageChange) onPageChange(p.pageIndex)
-    if (onPageSizeChange) onPageSizeChange(p.pageSize)
-  }, [serverMode, table.getState().pagination.pageIndex, table.getState().pagination.pageSize])
 
   useEffect(() => {
     if (setExternalSelectedRows) {
@@ -265,7 +300,7 @@ export function Table<T>({
         </div>
       </div>
 
-      {showFilters && !serverMode && (
+      {showFilters && (
         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-gray/10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {columns
             .filter((col) => col.accessorKey && col.header !== "Actions")
@@ -417,100 +452,66 @@ export function Table<T>({
           </tbody>
         </table>
       </div>
+
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm border border-slate-gray/10">
-  <div className="flex items-center gap-1 text-sm text-deep-ocean">
-    <span>Showing</span>
-    <select
-      value={table.getState().pagination.pageSize}
-      onChange={(e) => {
-        const newPageSize = Number(e.target.value);
-        table.setPageSize(newPageSize);
-        if (serverMode && onPageSizeChange) {
-          onPageSizeChange(newPageSize);
-          table.setPageIndex(0); // Reset to first page when page size changes
-        }
-      }}
-      className="mx-1 border rounded p-1 bg-white text-deep-ocean focus:outline-none focus:ring-1 focus:ring-electric-blue"
-    >
-      {[10, 20, 50, 100].map((ps) => (
-        <option key={ps} value={ps}>
-          {ps}
-        </option>
-      ))}
-    </select>
-    <span>
-      of {serverMode && totalCount !== undefined ? totalCount : table.getFilteredRowModel().rows.length} entries
-    </span>
-  </div>
+        <div className="flex items-center gap-1 text-sm text-deep-ocean">
+          <span>Showing</span>
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => {
+              table.setPageSize(Number(e.target.value))
+            }}
+            className="mx-1 border rounded p-1 bg-white text-deep-ocean focus:outline-none focus:ring-1 focus:ring-electric-blue"
+          >
+            {[10, 20, 50, 100].map((pageSize) => (
+              <option key={pageSize} value={pageSize}>
+                {pageSize}
+              </option>
+            ))}
+          </select>
+          <span>of {table.getFilteredRowModel().rows.length} entries</span>
+        </div>
 
-  <div className="flex items-center">
-    <div className="flex items-center gap-1 mr-4 text-sm text-deep-ocean">
-      <span>Page</span>
-      <strong>
-        {table.getState().pagination.pageIndex + 1} of{" "}
-        {serverMode && totalCount !== undefined && table.getState().pagination.pageSize > 0
-          ? Math.max(1, Math.ceil(totalCount / table.getState().pagination.pageSize))
-          : table.getPageCount()}
-      </strong>
-    </div>
+        <div className="flex items-center">
+          <div className="flex items-center gap-1 mr-4 text-sm text-deep-ocean">
+            <span>Page</span>
+            <strong>
+              {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </strong>
+          </div>
 
-    <div className="flex items-center gap-1">
-      <button
-        className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        onClick={() => {
-          table.setPageIndex(0);
-          if (serverMode && onPageChange) onPageChange(0);
-        }}
-        disabled={table.getState().pagination.pageIndex === 0}
-      >
-        <ChevronsLeft className="h-4 w-4" />
-      </button>
-      <button
-        className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        onClick={() => {
-          const newPageIndex = Math.max(0, table.getState().pagination.pageIndex - 1);
-          table.setPageIndex(newPageIndex);
-          if (serverMode && onPageChange) onPageChange(newPageIndex);
-        }}
-        disabled={table.getState().pagination.pageIndex === 0}
-      >
-        <ChevronLeft className="h-4 w-4" />
-      </button>
-      <button
-        className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        onClick={() => {
-          const newPageIndex = table.getState().pagination.pageIndex + 1;
-          table.setPageIndex(newPageIndex);
-          if (serverMode && onPageChange) onPageChange(newPageIndex);
-        }}
-        disabled={
-          serverMode && totalCount !== undefined
-            ? (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize >= totalCount
-            : !table.getCanNextPage()
-        }
-      >
-        <ChevronRight className="h-4 w-4" />
-      </button>
-      <button
-        className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        onClick={() => {
-          const lastPageIndex = serverMode && totalCount !== undefined
-            ? Math.max(0, Math.ceil(totalCount / table.getState().pagination.pageSize) - 1)
-            : table.getPageCount() - 1;
-          table.setPageIndex(lastPageIndex);
-          if (serverMode && onPageChange) onPageChange(lastPageIndex);
-        }}
-        disabled={
-          serverMode && totalCount !== undefined
-            ? (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize >= totalCount
-            : !table.getCanNextPage()
-        }
-      >
-        <ChevronsRight className="h-4 w-4" />
-      </button>
-    </div>
-  </div>
-</div>
+          <div className="flex items-center gap-1">
+            <button
+              className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </button>
+            <button
+              className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <button
+              className="p-1.5 rounded-md border border-slate-gray/20 text-deep-ocean hover:bg-light-sky disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
