@@ -63,6 +63,9 @@ export function CRUDPage<T extends { id: string }>({
   const [totalCount, setTotalCount] = useState<number>(0)
   const [sorting, setSorting] = useState<SortingState>([])
   const [search, setSearch] = useState<string>("")
+  // Add loading states for view and share operations
+  const [loadingViewId, setLoadingViewId] = useState<string | null>(null)
+  const [loadingShareId, setLoadingShareId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -210,90 +213,277 @@ export function CRUDPage<T extends { id: string }>({
     setIsSidebarOpen((prev) => !prev)
   }
 
-  const handleWhatsAppShare = (invoice: any) => {
-    console.log("invoice", invoice)
+  // Enhanced handleViewInvoice with loading and timeout
+  const handleViewInvoice = async (invoice: any) => {
+    setLoadingViewId(invoice.id)
+    
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Request timeout after 50 seconds')), 50000)
+    });
+    
+    // Create the actual request promise
+    const viewPromise = new Promise(async (resolve, reject) => {
+      try {
+        const token = getToken()
+        // Verify the invoice exists and is accessible
+        await axiosInstance.get(`/${endpoint}/${invoice.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 50000
+        })
+        resolve(true)
+      } catch (error) {
+        reject(error)
+      }
+    })
 
-    if (!invoice.customer_phone) {
-      toast.error("Customer phone number not available")
-      return
+    try {
+      // Race between the request and timeout
+      await Promise.race([viewPromise, timeoutPromise])
+      
+      // If we get here, the request was successful within timeout
+      window.open(`/${endpoint}/${invoice.id}`, "_blank")
+      toast.success("Invoice opened successfully", {
+        style: { background: "#D1FAE5", color: "#10B981" },
+      })
+    } catch (error: any) {
+      console.error("Failed to view invoice", error)
+      const errorMessage = error.message === 'Request timeout after 50 seconds' 
+        ? "Request timeout. Please try again."
+        : "Failed to load invoice. Please try again."
+      
+      toast.error(errorMessage, {
+        style: { background: "#FEE2E2", color: "#EF4444" },
+      })
+    } finally {
+      setLoadingViewId(null)
     }
-
-    // Normalize phone number
-    let phoneNumber = invoice.customer_phone.replace(/\D/g, "") // remove all non-digits
-
-    if (phoneNumber.startsWith("00")) {
-      phoneNumber = phoneNumber.substring(2) // remove leading 00
-    }
-
-    if (phoneNumber.startsWith("+92")) {
-      phoneNumber = phoneNumber.substring(1) // +92XXXXXXXXXX → 92XXXXXXXXXX
-    } else if (phoneNumber.startsWith("92")) {
-      // already correct
-    } else if (phoneNumber.startsWith("0")) {
-      phoneNumber = "92" + phoneNumber.substring(1) // 03XXXXXXXXX → 92XXXXXXXXXX
-    } else if (phoneNumber.startsWith("3")) {
-      phoneNumber = "92" + phoneNumber // 3XXXXXXXXX → 92XXXXXXXXXX
-    }
-
-    // Public invoice link
-    const publicInvoiceUrl = `${window.location.origin}/public/invoice/${invoice.id}`
-
-    // Formatted English-only message
-    const message = `Hello ${invoice.customer_name},
-  
-  Your invoice #${invoice.invoice_number} is now available.
-  
-  📋 Invoice Details:
-  • Amount: PKR ${Number.parseFloat(invoice.total_amount).toFixed(2)}
-  • Due Date: ${new Date(invoice.due_date).toLocaleDateString()}
-  • Status: ${invoice.status}
-  
-  📄 View your complete invoice here:
-  ${publicInvoiceUrl}
-  
-  Please review your invoice and make the payment if pending.
-  
-  Thank you for choosing MBA Communications!`
-
-    // WhatsApp URL
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-
-    // Open in new tab
-    window.open(whatsappUrl, "_blank")
   }
+
+  // Enhanced handleWhatsAppShare with loading and timeout
+ // Enhanced handleWhatsAppShare with loading and timeout
+const handleWhatsAppShare = async (invoice: any) => {
+  setLoadingShareId(invoice.id)
+  
+  // Create a timeout promise
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Request timeout after 50 seconds')), 50000)
+  });
+
+  // Create the actual request promise
+  const sharePromise = new Promise(async (resolve, reject) => {
+    try {
+      // Check both phone numbers
+      const phoneNumber1 = invoice.customer_phone || invoice.phone_1;
+      const phoneNumber2 = invoice.phone_2;
+      
+      if (!phoneNumber1 && !phoneNumber2) {
+        reject(new Error("Customer phone number not available"))
+        return
+      }
+
+      // Use phone number 1 if available, otherwise use phone number 2
+      const phoneNumberToUse = phoneNumber1 || phoneNumber2;
+
+      // Normalize phone number
+      let phoneNumber = phoneNumberToUse.replace(/\D/g, "") // remove all non-digits
+
+      if (phoneNumber.startsWith("00")) {
+        phoneNumber = phoneNumber.substring(2) // remove leading 00
+      }
+
+      if (phoneNumber.startsWith("+92")) {
+        phoneNumber = phoneNumber.substring(1) // +92XXXXXXXXXX → 92XXXXXXXXXX
+      } else if (phoneNumber.startsWith("92")) {
+        // already correct
+      } else if (phoneNumber.startsWith("0")) {
+        phoneNumber = "92" + phoneNumber.substring(1) // 03XXXXXXXXX → 92XXXXXXXXXX
+      } else if (phoneNumber.startsWith("3")) {
+        phoneNumber = "92" + phoneNumber // 3XXXXXXXXX → 92XXXXXXXXXX
+      }
+
+      // Verify invoice is accessible first
+      const token = getToken()
+      await axiosInstance.get(`/${endpoint}/${invoice.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 50000
+      })
+
+      // Public invoice link
+      const publicInvoiceUrl = `${window.location.origin}/public/invoice/${invoice.id}`
+
+      // Formatted English-only message
+      const message = `Hello ${invoice.customer_name},
+  
+Your invoice #${invoice.invoice_number} is now available.
+
+📋 Invoice Details:
+• Amount: PKR ${Number.parseFloat(invoice.total_amount).toFixed(2)}
+• Due Date: ${new Date(invoice.due_date).toLocaleDateString()}
+• Status: ${invoice.status}
+
+📄 View your complete invoice here:
+${publicInvoiceUrl}
+
+Please review your invoice and make the payment if pending.
+
+Thank you for choosing MBA Communications!`
+
+      // WhatsApp URL
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+
+      // Open in new tab
+      window.open(whatsappUrl, "_blank")
+      resolve(true)
+    } catch (error) {
+      reject(error)
+    }
+  })
+
+  try {
+    // Race between the request and timeout
+    await Promise.race([sharePromise, timeoutPromise])
+    
+    toast.success("Invoice shared via WhatsApp", {
+      style: { background: "#D1FAE5", color: "#10B981" },
+    })
+  } catch (error: any) {
+    console.error("Failed to share invoice", error)
+    
+    let errorMessage = "Failed to share invoice. Please try again."
+    
+    if (error?.message === 'Request timeout after 50 seconds') {
+      errorMessage = "Request timeout. Please try again."
+    } else if (error?.message === "Customer phone number not available") {
+      errorMessage = "Customer phone number not available"
+    } else if (error?.response?.status === 404) {
+      errorMessage = "Invoice not found or not accessible"
+    } else if (error?.response?.status === 401) {
+      errorMessage = "Authentication failed. Please login again."
+    }
+    
+    toast.error(errorMessage, {
+      style: { background: "#FEE2E2", color: "#EF4444" },
+    })
+  } finally {
+    setLoadingShareId(null)
+  }
+}
 
   const memoizedColumns = useMemo(() => {
     return [
       ...columns,
       {
         header: "View",
-        cell: (info: any) => (
-          <div className="flex justify-center">
-            <button
-              onClick={() => window.open(`/${endpoint}/${info.row.original.id}`, "_blank")}
-              className="flex items-center gap-2 px-4 py-2 bg-electric-blue text-white rounded-lg hover:bg-btn-hover transition-colors duration-200 text-sm shadow-sm"
-              title="View Invoice"
-            >
-              <Eye className="w-4 h-4" />
-              View Invoice
-            </button>
-          </div>
-        ),
+        cell: (info: any) => {
+          const invoice = info.row.original
+          const isLoading = loadingViewId === invoice.id
+          
+          return (
+            <div className="flex justify-center">
+              <button
+                onClick={() => handleViewInvoice(invoice)}
+                disabled={isLoading}
+                className={`flex items-center gap-2 px-4 py-2 bg-electric-blue text-white rounded-lg hover:bg-btn-hover transition-colors duration-200 text-sm shadow-sm ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                title="View Invoice"
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4" />
+                    View Invoice
+                  </>
+                )}
+              </button>
+            </div>
+          )
+        },
       },
       {
         header: "Share",
-        cell: (info: any) => (
-          <div className="flex justify-center">
-            <button
-              onClick={() => handleWhatsAppShare(info.row.original)}
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-green text-white rounded-lg hover:bg-emerald-green/90 transition-colors duration-200 text-sm shadow-sm"
-              title="Share via WhatsApp"
-            >
-              <Share2 className="w-4 h-4" />
-              Share
-            </button>
-          </div>
-        ),
+        cell: (info: any) => {
+          const invoice = info.row.original
+          console.log('Invoice: ',invoice)
+          const isLoading = loadingShareId === invoice.id
+          
+          // Check both phone numbers
+          const phoneNumber1 = invoice.customer_phone || invoice.phone_1;
+          const phoneNumber2 = invoice.phone_2;
+          const hasPhoneNumber = !!(phoneNumber1 || phoneNumber2);
+          
+          return (
+            <div className="flex justify-center">
+              <button
+                onClick={() => handleWhatsAppShare(invoice)}
+                disabled={isLoading || !hasPhoneNumber}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors duration-200 text-sm shadow-sm ${
+                  !hasPhoneNumber 
+                    ? "bg-gray-400 text-white cursor-not-allowed opacity-50" 
+                    : isLoading 
+                      ? "bg-emerald-green/50 text-white cursor-not-allowed" 
+                      : "bg-emerald-green text-white hover:bg-emerald-green/90"
+                }`}
+                title={!hasPhoneNumber ? "Phone number not available" : "Share via WhatsApp"}
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </>
+                )}
+              </button>
+            </div>
+          )
+        },
       },
       {
         header: "Actions",
@@ -317,7 +507,7 @@ export function CRUDPage<T extends { id: string }>({
         ),
       },
     ]
-  }, [columns])
+  }, [columns, loadingViewId, loadingShareId])
 
   return (
     <div className="flex h-screen bg-light-sky/50">
@@ -325,10 +515,11 @@ export function CRUDPage<T extends { id: string }>({
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar toggleSidebar={toggleSidebar} />
         <main
-          className={`flex-1 overflow-x-hidden overflow-y-auto bg-light-sky/50 p-6 pt-20 transition-all duration-300 ${
-            isSidebarOpen ? "ml-64" : "ml-20"
-          }`}
-        >
+  className={`flex-1 overflow-x-hidden overflow-y-auto bg-light-sky/50 p-0 sm:p-6 pt-20 transition-all duration-300 ${
+    isSidebarOpen ? "ml-64" : "ml-0 lg:ml-20"
+  }`}
+>
+
           <div className="container mx-auto">
             {/* Breadcrumb */}
             <div className="flex items-center text-sm text-slate-gray mb-6">
@@ -411,24 +602,22 @@ export function CRUDPage<T extends { id: string }>({
 
             {/* Table Section */}
             <div className="mb-8">
-            // In the CRUDPage component, update the Table props:
-
-<Table
-  data={data}
-  columns={memoizedColumns}
-  selectedRows={selectedRows}
-  setSelectedRows={setSelectedRows}
-  isLoading={isLoading}
-  serverMode={true} // Ensure this is explicitly true
-  totalCount={totalCount}
-  pageIndex={pageIndex}
-  pageSize={pageSize}
-  onPageChange={setPageIndex}
-  onPageSizeChange={setPageSize}
-  sorting={sorting}
-  onSortingChange={setSorting}
-  onGlobalSearch={setSearch}
-/>
+              <Table
+                data={data}
+                columns={memoizedColumns}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows}
+                isLoading={isLoading}
+                serverMode={true}
+                totalCount={totalCount}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                onPageChange={setPageIndex}
+                onPageSizeChange={setPageSize}
+                sorting={sorting}
+                onSortingChange={setSorting}
+                onGlobalSearch={setSearch}
+              />
             </div>
           </div>
         </main>

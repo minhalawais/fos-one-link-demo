@@ -39,6 +39,8 @@ interface CRUDPageProps<T> {
     validateBeforeSubmit?: (formData: Partial<T>) => string | null
     supportsBulkAdd?: boolean
     validationErrors?: Record<string, string>
+    loadingStates?: Record<string, boolean>
+    setLoadingStates?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   }>
   onDataChange?: () => void
   validateBeforeSubmit?: (formData: Partial<T>) => string | null
@@ -68,6 +70,12 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     total: 0,
     active: 0,
     inactive: 0,
+  })
+  // Add loading states for file uploads
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({
+    cnic_front_image: false,
+    cnic_back_image: false,
+    agreement_document: false,
   })
 
   useEffect(() => {
@@ -101,6 +109,7 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       setIsLoading(false)
     }
   }
+
   const handleBulkStatusChange = async (newStatus: boolean) => {
     if (selectedRows.length === 0) return
 
@@ -133,10 +142,17 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       setIsLoading(false)
     }
   }
+
   const showModal = (item: T | null) => {
     setEditingItem(item)
     setFormData(item || {})
     setValidationErrors({})
+    // Reset loading states when opening modal
+    setLoadingStates({
+      cnic_front_image: false,
+      cnic_back_image: false,
+      agreement_document: false,
+    })
     setIsModalVisible(true)
   }
 
@@ -145,6 +161,12 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     setEditingItem(null)
     setFormData({})
     setValidationErrors({})
+    // Reset loading states when closing modal
+    setLoadingStates({
+      cnic_front_image: false,
+      cnic_back_image: false,
+      agreement_document: false,
+    })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -311,6 +333,20 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
     return [
       ...columns,
       {
+        header: "View",
+        id: "view",
+        cell: (info: any) => (
+          <button
+            onClick={() => (window.location.href = `/customers/${info.row.original.id}`)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-deep-ocean to-electric-blue text-white rounded-lg hover:shadow-lg transition-all duration-200 hover:scale-105 font-semibold"
+            title="View Details"
+          >
+            <Eye className="h-4 w-4" />
+            View Profile
+          </button>
+        ),
+      },
+      {
         header: "Status",
         accessorKey: "is_active",
         cell: (info: any) => (
@@ -338,28 +374,22 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       },
       {
         header: "Actions",
+        id: "actions",
         cell: (info: any) => (
           <div className="flex items-center gap-2">
             <button
               onClick={() => showModal(info.row.original)}
-              className="p-2 text-white bg-electric-blue rounded-md hover:bg-btn-hover transition-colors"
+              className="p-2.5 text-white bg-electric-blue rounded-lg hover:bg-btn-hover transition-all duration-200 hover:shadow-md"
               title="Edit"
             >
               <Pencil className="h-4 w-4" />
             </button>
             <button
               onClick={() => handleDelete(info.row.original.id)}
-              className="p-2 text-white bg-coral-red rounded-md hover:bg-coral-red/80 transition-colors"
+              className="p-2.5 text-white bg-coral-red rounded-lg hover:bg-coral-red/80 transition-all duration-200 hover:shadow-md"
               title="Delete"
             >
               <Trash2 className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => (window.location.href = `/customers/${info.row.original.id}`)}
-              className="p-2 text-white bg-deep-ocean rounded-md hover:bg-deep-ocean/80 transition-colors"
-              title="View Details"
-            >
-              <Eye className="h-4 w-4" />
             </button>
           </div>
         ),
@@ -373,10 +403,11 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
       <div className="flex-1 flex flex-col overflow-hidden">
         <Topbar toggleSidebar={toggleSidebar} />
         <main
-          className={`flex-1 overflow-x-hidden overflow-y-auto bg-light-sky/50 p-6 pt-20 transition-all duration-300 ${
-            isSidebarOpen ? "ml-64" : "ml-20"
-          }`}
-        >
+  className={`flex-1 overflow-x-hidden overflow-y-auto bg-light-sky/50 p-0 sm:p-6 pt-20 transition-all duration-300 ${
+    isSidebarOpen ? "ml-64" : "ml-0 lg:ml-20"
+  }`}
+>
+
           <div className="container mx-auto">
             {/* Breadcrumb */}
             <div className="flex items-center text-sm text-slate-gray mb-6">
@@ -490,6 +521,8 @@ export function CRUDPage<T extends { id: string; is_active?: boolean }>({
             handleFileChange={handleFileChange}
             isEditing={!!editingItem}
             validationErrors={validationErrors}
+            loadingStates={loadingStates}
+            setLoadingStates={setLoadingStates}
           />
           <div className="mt-6 flex justify-end gap-3">
             <button
