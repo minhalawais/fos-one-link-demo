@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Building2,
-  Users,
-  Clock,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -13,6 +13,14 @@ import {
   FileText,
   Eye,
   Download,
+  Search,
+  Clock,
+  AlertCircle,
+  MessageSquare,
+  Users,
+  Smile,
+  ShieldCheck,
+  CheckCircle2,
 } from "lucide-react"
 
 interface SceneProps {
@@ -22,6 +30,34 @@ interface SceneProps {
 }
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
+
+const COLORS = {
+  deepTeal: "#284952",
+  freshGreen: "#60BA81",
+  warmOrange: "#F5A83C",
+  charcoal: "#17161A",
+  white: "#FFFFFF",
+  bg: "#F5F5F7",
+  border: "#DEE2E6",
+  chartRed: "#FF5353",
+  chartYellow: "#FFD221",
+  chartLightGreen: "#77E6B4",
+  chartGreen: "#21D683",
+}
+
+const FACTORS_HAPPINESS = [
+  { label: "Avg Resolution Time", icon: Clock },
+  { label: "Avg Bounced Rate", icon: AlertCircle },
+  { label: "Avg Response Time", icon: MessageSquare },
+  { label: "Complaints : Employees", icon: Users },
+]
+
+const FACTORS_SAFETY = [
+  { label: "Avg Resolution Time", icon: Clock },
+  { label: "Avg Response Time", icon: MessageSquare },
+  { label: "Avg Bounced Rate", icon: AlertCircle },
+  { label: "Complaints : Employees", icon: Users },
+]
 
 // Sites data with full dashboard stats per site
 const sitesData: Record<string, SiteData> = {
@@ -321,6 +357,239 @@ const GENDER_DATA = [
   { category: "Discipline", key: "discipline" },
 ]
 
+const loadScript = (src: string) =>
+  new Promise<void>((resolve, reject) => {
+    const existingScript = document.querySelector(`script[src="${src}"]`)
+    if (existingScript) {
+      resolve()
+      return
+    }
+
+    const script = document.createElement("script")
+    script.src = src
+    script.async = true
+
+    script.onload = () => {
+      console.log(`Script loaded: ${src}`)
+      resolve()
+    }
+
+    script.onerror = () => {
+      console.error(`Failed to load script: ${src}`)
+      reject(new Error(`Failed to load script: ${src}`))
+    }
+
+    document.head.appendChild(script)
+  })
+
+const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId: string }) => {
+  const chartRef = useRef<HTMLDivElement>(null)
+  const chartInstance = useRef<any>(null)
+  const [scriptsLoaded, setScriptsLoaded] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+
+    const loadScripts = async () => {
+      try {
+        await loadScript("/assets/jscharting.js")
+        await loadScript("/assets/types.js")
+        await new Promise((resolve) => setTimeout(resolve, 200))
+
+        if (mounted) {
+          setScriptsLoaded(true)
+        }
+      } catch (error) {
+        console.error("Failed to load JSCharting scripts:", error)
+      }
+    }
+
+    loadScripts()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!scriptsLoaded || !chartRef.current) return
+
+    let mounted = true
+
+    const initChart = async () => {
+      // @ts-ignore
+      const JSC = window.JSC
+
+      if (!JSC || !mounted) {
+        console.warn("JSC not available or component unmounted")
+        return
+      }
+
+      if (chartInstance.current) {
+        try {
+          chartInstance.current.dispose()
+        } catch (e) {
+          console.warn("Error disposing old chart:", e)
+        }
+      }
+
+      const minValue = 0
+      const maxValue = 100
+
+      try {
+        chartInstance.current = JSC.chart(chartRef.current, {
+          debug: false,
+          width: 180,
+          height: 180,
+          license: { jscharting: "no-logo-button" },
+
+          legend_visible: false,
+          defaultTooltip_enabled: false,
+          xAxis_spacingPercentage: 0.4,
+
+          yAxis: [
+            {
+              id: "ax1",
+              defaultTick: { padding: 10, enabled: false },
+              customTicks: [0, 25, 50, 75, 100],
+              line: {
+                width: 10,
+                breaks: {},
+                color: "smartPalette:pal1",
+              },
+              scale_range: [minValue, maxValue],
+            },
+
+            {
+              id: "ax2",
+              scale_range: [minValue, maxValue],
+              defaultTick: { padding: 10, enabled: false },
+              customTicks: [minValue, maxValue],
+              line: {
+                width: 10,
+                color: "smartPalette:pal2",
+              },
+            },
+          ],
+
+          defaultSeries: {
+            type: "gauge column roundcaps",
+            shape: {
+              label: {
+                text: "%max",
+                align: "center",
+                verticalAlign: "middle",
+                style_fontSize: 20,
+              },
+            },
+          },
+
+          series: [
+            {
+              type: "column roundcaps",
+              name: "Temperatures",
+              yAxis: "ax1",
+
+              palette: {
+                id: "pal1",
+                pointValue: "%yValue",
+                ranges: [
+                  { value: 0, color: "#FF5353" },
+                  { value: 25, color: "#FFD221" },
+                  { value: 50, color: "#77E6B4" },
+                  { value: [75, 100], color: "#21D683" },
+                ],
+              },
+
+              points: [["x", [0, value]]],
+            },
+          ],
+        })
+      } catch (error) {
+        console.error("Error initializing JSCharting chart:", error)
+      }
+    }
+
+    const timer = setTimeout(initChart, 100)
+
+    return () => {
+      mounted = false
+      clearTimeout(timer)
+      if (chartInstance.current) {
+        try {
+          chartInstance.current.dispose()
+        } catch (e) {
+          console.warn("Error disposing chart on unmount:", e)
+        }
+      }
+    }
+  }, [scriptsLoaded, value])
+
+  if (!scriptsLoaded) {
+    return (
+      <div style={{ width: 160, height: 160 }} className="flex items-center justify-center bg-gray-100 rounded-lg">
+        <div className="text-center text-gray-500">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#60BA81] mx-auto mb-2"></div>
+          <p className="text-xs">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div ref={chartRef} id={chartId} style={{ width: 160, height: 160 }} className="flex items-center justify-center" />
+  )
+}
+
+const ScoreCard = ({
+  title,
+  icon: Icon,
+  value,
+  factors,
+  factorLabel,
+  chartId,
+  delay = 0,
+  showFactors,
+  iconColor,
+}: {
+  title: string
+  icon: React.ElementType
+  value: number
+  factors: typeof FACTORS_HAPPINESS
+  factorLabel: string
+  chartId: string
+  delay?: number
+  showFactors: boolean
+  iconColor: string
+}) => {
+  return (
+    <motion.div
+      initial={{ y: 30, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, delay, ease: "backOut" }}
+      className="bg-white rounded-xl border border-[#DEE2E6]/60 p-3 flex flex-col items-center relative overflow-hidden shadow-sm"
+    >
+      {/* HEADER */}
+      <div className="flex items-center gap-2 mb-1">
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: `${iconColor}15` }}
+        >
+          <Icon size={14} style={{ color: iconColor }} />
+        </div>
+        <h2 className="text-[10px] font-bold" style={{ color: COLORS.deepTeal }}>
+          {title}
+        </h2>
+      </div>
+
+      {/* CHART */}
+      <div className="relative flex items-center justify-center" style={{ minHeight: 160 }}>
+        <JSChartingCircularColorBar value={value} chartId={chartId} />
+      </div>
+    </motion.div>
+  )
+}
+
 export function SceneHeatmap({ isActive, progress }: SceneProps) {
   const [selectedSite, setSelectedSite] = useState("CENTAURUS")
   const [sliderPosition, setSliderPosition] = useState(0)
@@ -329,15 +598,14 @@ export function SceneHeatmap({ isActive, progress }: SceneProps) {
   const currentSiteData = sitesData[selectedSite]
 
   // Voiceover sync states
-  // 30.64-35.56: "This allows factories to identify recurring issues and plan targeted interventions"
-  // 35.56-40.12: "You can also view insights by unit, department or shift."
-  // 40.12-43.4: "This makes it easier to pinpoint hotspots."
   const showDashboard = progress >= 30.64
   const showFilters = progress >= 30.64
   const highlightUnit = progress >= 35.56 && progress < 37.5
   const highlightDept = progress >= 37.5 && progress < 39
   const highlightShift = progress >= 39 && progress < 40.12
   const showHotspots = progress >= 40.12
+  const showHappinessFactors = progress >= 31.5
+  const showSafetyFactors = progress >= 32.5
 
   // Auto-animate site selection during voiceover to show dashboard updating
   useEffect(() => {
@@ -520,41 +788,22 @@ export function SceneHeatmap({ isActive, progress }: SceneProps) {
                 </div>
               </div>
 
-              {/* Filters & Search + View By */}
+              {/* Filters & Search section */}
               <div className="col-span-3 bg-white rounded-lg p-2">
-                <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">VIEW BY</div>
-                <div className="grid grid-cols-3 gap-1">
-                  {[
-                    { icon: Building2, label: "Unit", value: currentSiteData.units, highlight: highlightUnit },
-                    { icon: Users, label: "Dept", value: currentSiteData.departments, highlight: highlightDept },
-                    { icon: Clock, label: "Shift", value: currentSiteData.shifts, highlight: highlightShift },
-                  ].map((filter, i) => (
-                    <motion.div
-                      key={filter.label}
-                      animate={{
-                        scale: filter.highlight ? 1.1 : 1,
-                        backgroundColor: filter.highlight ? "#60BA81" : "#F5F5F7",
-                      }}
-                      transition={{ duration: 0.3 }}
-                      className={`rounded p-1 text-center ${filter.highlight ? "shadow-lg" : ""}`}
-                    >
-                      <filter.icon
-                        size={10}
-                        className={`mx-auto ${filter.highlight ? "text-white" : "text-[#60BA81]"}`}
-                      />
-                      <p className={`text-[5px] ${filter.highlight ? "text-white" : "text-[#767676]"}`}>
-                        {filter.label}
-                      </p>
-                      <motion.p
-                        key={`${selectedSite}-${filter.label}`}
-                        initial={{ scale: 1.2 }}
-                        animate={{ scale: 1 }}
-                        className={`text-[8px] font-bold ${filter.highlight ? "text-white" : "text-[#284952]"}`}
-                      >
-                        {filter.value}
-                      </motion.p>
-                    </motion.div>
-                  ))}
+                <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">FILTERS</div>
+                <div className="grid grid-cols-2 gap-1">
+                  <div>
+                    <div className="text-[6px] text-[#767676] text-center mb-0.5">SEARCH</div>
+                    <div className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center">
+                      <Search size={10} className="text-[#767676]" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[6px] text-[#767676] text-center mb-0.5">DATE RANGE</div>
+                    <div className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center px-1">
+                      <span className="text-[6px] text-[#17161A]">Oct 28, 2025 - Nov 26, 2025</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -684,31 +933,30 @@ export function SceneHeatmap({ isActive, progress }: SceneProps) {
 
             {/* CENTER COLUMN */}
             <div className="col-span-6 flex flex-col gap-2">
-              {/* Gauge Charts Row */}
               <div className="grid grid-cols-2 gap-2">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: showDashboard ? 1 : 0, y: showDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.15 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-0">Worker Happiness Score</h3>
-                  <div className="flex items-center justify-center">
-                    <HappinessGaugeChart value={currentSiteData.happinessScore} showAnimation={showDashboard} />
-                  </div>
-                </motion.div>
+                <ScoreCard
+                  title="Worker Happiness Score"
+                  icon={Smile}
+                  value={currentSiteData.happinessScore}
+                  factors={FACTORS_HAPPINESS}
+                  factorLabel="Calculated Based On"
+                  chartId={`heatmapHappinessChart-${selectedSite}`}
+                  delay={0}
+                  showFactors={showHappinessFactors}
+                  iconColor={COLORS.freshGreen}
+                />
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: showDashboard ? 1 : 0, y: showDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-0">Worker Safety Score</h3>
-                  <div className="flex items-center justify-center">
-                    <HappinessGaugeChart value={currentSiteData.safetyScore} showAnimation={showDashboard} />
-                  </div>
-                </motion.div>
+                <ScoreCard
+                  title="Worker Safety Score"
+                  icon={ShieldCheck}
+                  value={currentSiteData.safetyScore}
+                  factors={FACTORS_SAFETY}
+                  factorLabel="Worker Satisfaction Based On"
+                  chartId={`heatmapSafetyChart-${selectedSite}`}
+                  delay={0.1}
+                  showFactors={showSafetyFactors}
+                  iconColor={COLORS.warmOrange}
+                />
               </div>
 
               {/* Employees Feedback Section */}
@@ -922,35 +1170,6 @@ export function SceneHeatmap({ isActive, progress }: SceneProps) {
                 </table>
               </motion.div>
 
-              {/* Hotspot Alert - Shows during hotspot detection phase */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{
-                  opacity: showHotspots ? 1 : 0,
-                  scale: showHotspots ? 1 : 0.9,
-                }}
-                transition={{ duration: 0.5, ease: IOS_EASE }}
-                className={`p-3 rounded-lg border-2 transition-all duration-500 ${
-                  showHotspots
-                    ? "bg-red-50 border-red-400 shadow-lg shadow-red-400/20"
-                    : "bg-[#F5F5F7] border-[#DEE2E6]"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <motion.div
-                    animate={{ scale: showHotspots ? [1, 1.2, 1] : 1 }}
-                    transition={{ duration: 0.5, repeat: showHotspots ? Number.POSITIVE_INFINITY : 0, repeatDelay: 1 }}
-                    className="w-2 h-2 rounded-full bg-red-500"
-                  />
-                  <p className={`text-[10px] font-bold ${showHotspots ? "text-red-500" : "text-[#767676]"}`}>
-                    Hotspot Detected
-                  </p>
-                </div>
-                <p className={`text-[8px] ${showHotspots ? "text-red-400" : "text-[#767676]"}`}>
-                  <span className="font-semibold">{currentSiteData.hotspot}</span> requires immediate attention
-                </p>
-              </motion.div>
-
               {/* Survey Reports */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -1005,11 +1224,10 @@ export function SceneHeatmap({ isActive, progress }: SceneProps) {
   )
 }
 
-// Counseling Donut Chart Component
+// Helper Components
 function CounselingDonutChart({ showAnimation }: { showAnimation: boolean }) {
   return (
     <svg viewBox="0 0 100 100" className="w-28 h-28">
-      {/* Outer ring segments */}
       <motion.circle
         cx="50"
         cy="50"
@@ -1080,7 +1298,6 @@ function CounselingDonutChart({ showAnimation }: { showAnimation: boolean }) {
         transition={{ delay: 0.7, duration: 0.8 }}
         transform="rotate(-90 50 50)"
       />
-      {/* Inner ring segments */}
       <motion.circle
         cx="50"
         cy="50"
@@ -1123,7 +1340,6 @@ function CounselingDonutChart({ showAnimation }: { showAnimation: boolean }) {
         transition={{ delay: 1, duration: 0.8 }}
         transform="rotate(-90 50 50)"
       />
-      {/* Labels */}
       <text x="25" y="25" className="text-[7px] fill-[#60BA81] font-bold">
         22
       </text>
@@ -1140,150 +1356,50 @@ function CounselingDonutChart({ showAnimation }: { showAnimation: boolean }) {
   )
 }
 
-// Happiness Gauge Chart Component
-function HappinessGaugeChart({ value, showAnimation }: { value: number; showAnimation: boolean }) {
-  return (
-    <div className="relative">
-      <svg viewBox="0 0 120 70" className="w-36 h-20">
-        {/* Background arcs */}
-        <path
-          d="M 15 55 A 40 40 0 0 1 42 18"
-          fill="none"
-          stroke="#E74C3C"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        <path
-          d="M 42 18 A 40 40 0 0 1 60 12"
-          fill="none"
-          stroke="#F5A83C"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        <path
-          d="M 60 12 A 40 40 0 0 1 78 18"
-          fill="none"
-          stroke="#90EE90"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        <path
-          d="M 78 18 A 40 40 0 0 1 105 55"
-          fill="none"
-          stroke="#60BA81"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        <path
-          d="M 15 55 A 40 40 0 0 1 105 55"
-          fill="none"
-          stroke="#E5E7EB"
-          strokeWidth="6"
-          strokeLinecap="round"
-          opacity="0.3"
-        />
-        {/* Scale labels */}
-        <text x="8" y="60" className="text-[6px] fill-[#767676]">
-          0
-        </text>
-        <text x="30" y="22" className="text-[6px] fill-[#767676]">
-          25
-        </text>
-        <text x="56" y="10" className="text-[6px] fill-[#767676]">
-          50
-        </text>
-        <text x="82" y="22" className="text-[6px] fill-[#767676]">
-          75
-        </text>
-        <text x="100" y="60" className="text-[6px] fill-[#767676]">
-          100
-        </text>
-        {/* Center value */}
-        <motion.text
-          x="60"
-          y="48"
-          textAnchor="middle"
-          className="text-2xl font-bold fill-[#17161A]"
-          key={value}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: showAnimation ? 1 : 0, scale: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          {value}
-        </motion.text>
-      </svg>
-    </div>
-  )
-}
-
-// Complaint Line Chart Component
 function ComplaintLineChart({ showAnimation }: { showAnimation: boolean }) {
-  const data = [1, 1, 1, 2, 2.5, 2, 2, 4, 3, 4, 5, 3.5, 3, 3.5, 4, 3]
-  const maxValue = 5.5
-  const width = 320
-  const height = 45
-  const points = data.map((v, i) => ({
-    x: 20 + (i / (data.length - 1)) * (width - 40),
-    y: height - 5 - (v / maxValue) * (height - 10),
-  }))
-  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+  const data = [2, 5, 3, 8, 4, 6, 3, 7, 5, 4, 6, 8, 5, 3, 6, 4, 7, 5, 8, 6, 4, 5, 7, 3, 6, 4, 5, 8, 6]
+  const maxValue = Math.max(...data)
+  const width = 400
+  const height = 50
+  const padding = 5
+
+  const points = data.map((value, index) => {
+    const x = padding + (index / (data.length - 1)) * (width - 2 * padding)
+    const y = height - padding - (value / maxValue) * (height - 2 * padding)
+    return `${x},${y}`
+  })
+
+  const pathD = `M ${points.join(" L ")}`
 
   return (
-    <svg viewBox={`0 0 ${width} ${height + 15}`} className="w-full h-full">
-      {/* Grid lines */}
-      {[0, 1, 2, 3, 4, 5].map((v, i) => (
-        <line
-          key={i}
-          x1="20"
-          y1={height - 5 - (v / maxValue) * (height - 10)}
-          x2={width - 20}
-          y2={height - 5 - (v / maxValue) * (height - 10)}
-          stroke="#E5E7EB"
-          strokeWidth="0.5"
-        />
-      ))}
-      {/* Y-axis labels */}
-      {[0, 2.5, 5].map((v, i) => (
-        <text key={i} x="5" y={height - 5 - (v / maxValue) * (height - 10) + 2} className="text-[5px] fill-[#767676]">
-          {v}
-        </text>
-      ))}
-      {/* Line */}
+    <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full">
       <motion.path
         d={pathD}
         fill="none"
-        stroke="#2D9480"
-        strokeWidth="1.5"
+        stroke="#60BA81"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         initial={{ pathLength: 0 }}
         animate={{ pathLength: showAnimation ? 1 : 0 }}
-        transition={{ delay: 0.5, duration: 1.5, ease: "easeOut" }}
+        transition={{ duration: 1.5, ease: "easeInOut" }}
       />
-      {/* Data points */}
-      {points.map((p, i) => (
-        <motion.circle
-          key={i}
-          cx={p.x}
-          cy={p.y}
-          r="2"
-          fill="#2D9480"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: showAnimation ? 1 : 0, scale: showAnimation ? 1 : 0 }}
-          transition={{ delay: 0.5 + i * 0.03 }}
-        />
-      ))}
-      {/* X-axis label */}
-      <text x={width / 2} y={height + 12} className="text-[5px] fill-[#767676]" textAnchor="middle">
-        Number of Complaints
-      </text>
-      {/* Legend */}
-      <rect x={width / 2 - 40} y={height + 4} width="8" height="4" fill="#2D9480" rx="1" />
-      <text x={width / 2 - 28} y={height + 8} className="text-[5px] fill-[#767676]">
-        Complaint Count
-      </text>
+      {data.map((value, index) => {
+        const x = padding + (index / (data.length - 1)) * (width - 2 * padding)
+        const y = height - padding - (value / maxValue) * (height - 2 * padding)
+        return (
+          <motion.circle
+            key={index}
+            cx={x}
+            cy={y}
+            r="2"
+            fill="#60BA81"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: showAnimation ? 1 : 0, scale: showAnimation ? 1 : 0 }}
+            transition={{ delay: 0.5 + index * 0.03 }}
+          />
+        )
+      })}
     </svg>
   )
 }

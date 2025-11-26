@@ -35,7 +35,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         description:
           "The deployment process begins with companies or factories submitting their employee lists. The FOS team uploads and validates the data to ensure system readiness.",
         start: 3,
-        end: 14,
+        end: 13.4,
       },
       {
         name: "sms",
@@ -43,8 +43,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Automatic FOS IDs & SMS Distribution",
         description:
           "Each employee is assigned a unique FOS ID, enabling accurate identification and secure grievance registration. FOS IDs are sent directly to employees via the FOS SMS Service at no cost.",
-        start: 14,
-        end: 28,
+        start: 13.4,
+        end: 29,
       },
       {
         name: "card",
@@ -52,8 +52,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Personalized FOS Awareness Cards",
         description:
           "Personalized FOS Awareness Cards are designed for every employee for printing and distribution to maximize awareness.",
-        start: 28,
-        end: 45,
+        start: 29,
+        end: 43,
       },
       {
         name: "officers",
@@ -61,8 +61,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Appointment of Investigation Officer(s)",
         description:
           "Companies or factories nominate Investigation Officer(s) (IOs) responsible for grievance resolution and documentation. Multiple IOs may be appointed based on unit, gender, or complaint category.",
-        start: 45,
-        end: 60,
+        start: 43,
+        end: 61.44,
       },
       {
         name: "portal",
@@ -70,8 +70,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Investigation Officer-IO Portal Activation",
         description:
           "Investigation Officers receive secure login credentials to document Root Cause Analysis (RCA), Corrective and Preventive Actions (CAPA), and supporting evidence.",
-        start: 60,
-        end: 72,
+        start: 61.44,
+        end: 71,
       },
       {
         name: "training",
@@ -79,8 +79,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "On-Site Deployment & Awareness Sessions",
         description:
           "The FOS Team visits the company/factory facility to conduct comprehensive deployment and training sessions, educating employees on grievance reporting channels, and system functionality.",
-        start: 72,
-        end: 95,
+        start: 71,
+        end: 92,
       },
       {
         name: "closing",
@@ -88,7 +88,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Investigation Officer-IO Training",
         description:
           "Investigation Officers receive dedicated training on RCA validation, CAPA documentation, evidence uploading, and best-practice grievance remediation.",
-        start: 95,
+        start: 92,
         end: 102,
       },
     ],
@@ -148,7 +148,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         description:
           "Once verified, each complaint is assigned a unique system-generated ticket ID, enabling traceability, audit-ready documentation, and transparent end-to-end tracking throughout the grievance lifecycle.",
         start: 71,
-        end: 87,
+        end: 82,
       },
       {
         name: "notification",
@@ -156,7 +156,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "IO Notification & Assignment",
         description:
           "The relevant Investigation Officer (IO) is automatically notified via the IO mobile app and system-generated email alerts. The complaint appears in the IO-Portal dashboard for timely action.",
-        start: 87,
+        start: 82,
         end: 98,
       },
     ],
@@ -171,7 +171,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Investigation-Remediation-Satisfaction Framework",
         description: "Systematic resolution workflows with verified employee satisfaction.",
         start: 0,
-        end: 18,
+        end: 12.24,
       },
       {
         name: "timeline",
@@ -179,8 +179,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Case Activation",
         description:
           "Once a complaint is received, the Investigation Officer (IO) reviews the initial complaint details, selects the case, and formally changes its status to 'In-Process.' This initiates the investigation workflow.",
-        start: 18,
-        end: 23.7,
+        start: 12.24,
+        end: 23.76,
       },
       {
         name: "validity",
@@ -188,8 +188,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Validity Assessment",
         description:
           "The IO evaluates the complaint to determine whether it is Valid, Partially Valid, or Invalid. This assessment is based on evidence, worker interviews, and cross-verification with relevant records.",
-        start: 23.7,
-        end: 37.9,
+        start: 23.76,
+        end: 37.92,
       },
       {
         name: "rootCause",
@@ -197,8 +197,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Root Cause Analysis",
         description:
           "A justification is entered into Root Cause Analysis (RCA), creating a transparent audit trail for the validity assessment.",
-        start: 37.9,
-        end: 60.5,
+        start: 37.92,
+        end: 51.32,
       },
       {
         name: "capa",
@@ -206,8 +206,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "CAPA Development",
         description:
           "For valid or partially valid complaints, the IO develops a comprehensive Corrective and Preventive Action (CAPA) plan. This includes identifying immediate remedies and long-term preventive measures.",
-        start: 60.5,
-        end: 77.2,
+        start: 51.32,
+        end: 70.88,
       },
       {
         name: "evidence",
@@ -215,8 +215,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Evidence Submission & Documentation",
         description:
           "After implementing the necessary actions, the IO compiles and uploads all supporting evidence. This may include photographs, written statements, committee notes, or updated policy documents.",
-        start: 77.2,
-        end: 94.6,
+        start: 70.88,
+        end: 80.04,
       },
       {
         name: "verification",
@@ -224,8 +224,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Worker Interview for Independent Verification",
         description:
           "FOS Grievance Officers independently contact the complainant to verify the factory's resolution. This step ensures impartiality and confirms that the resolution genuinely addresses the worker's concern.",
-        start: 94.6,
-        end: 104.9,
+        start: 80.04,
+        end: 99.12,
       },
       {
         name: "rework",
@@ -233,7 +233,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Bounce-Back Mechanism",
         description:
           "If the complainant is not satisfied, the complaint is returned to the IO. The IO must re-evaluate RCA, update CAPA actions, and provide additional evidence before resubmission.",
-        start: 104.9,
+        start: 99.12,
         end: 111.4,
       },
       {
@@ -266,7 +266,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         description:
           "Provides a dynamic view of total, open, in-process, closed, and overdue complaints, enhancing operational transparency and enabling timely decision-making.",
         start: 16,
-        end: 30.6,
+        end: 30.64,
       },
       {
         name: "heatmap",
@@ -274,7 +274,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Category-Based Analytics",
         description:
           "Segments complaints by HRDD-relevant categories such as wages and benefits, harassment, discrimination, Health safety & Environment, and working hours to facilitate targeted interventions.",
-        start: 30.6,
+        start: 30.64,
         end: 43.4,
       },
       {
@@ -284,7 +284,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         description:
           "Visualizes risk concentration through breakdowns across units, shifts, or departments, highlighting priority areas for action.",
         start: 43.4,
-        end: 57.3,
+        end: 59.4,
       },
       {
         name: "timeline",
@@ -292,8 +292,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "RCA & CAPA Performance Metrics",
         description:
           "Evaluates investigation quality, CAPA completion rates, adherence to deadlines, and recurrence rates to measure overall operational effectiveness.",
-        start: 57.3,
-        end: 72.8,
+        start: 59.4,
+        end: 70.4,
       },
       {
         name: "nps",
@@ -301,8 +301,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Worker Satisfaction Indicators",
         description:
           "Aggregates feedback from verification calls to assess the effectiveness of remediation processes and overall worker happiness & Safety scores.",
-        start: 72.8,
-        end: 81.5,
+        start: 70.4,
+        end: 75.68,
       },
       {
         name: "trends",
@@ -310,8 +310,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Trend Analysis & Date-Range Filters",
         description:
           "Enables weekly, monthly, quarterly, and annual trend analysis, allowing for comparative insights and strategic planning.",
-        start: 81.5,
-        end: 90.9,
+        start: 75.68,
+        end: 90.28,
       },
       {
         name: "export",
@@ -319,8 +319,8 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Exportable Compliance Reports",
         description:
           "Supports report exports for HRDD, ESG, and CSDDD compliance, including due diligence reporting, social compliance audits, internal dashboards, and brand reporting.",
-        start: 90.9,
-        end: 96.5,
+        start: 90.28,
+        end: 96.4,
       },
       {
         name: "conclusion",
@@ -328,7 +328,7 @@ export const MODULE_DATA: Record<string, ModuleData> = {
         title: "Conclusion",
         description:
           "Comprehensive data intelligence empowering organizations with actionable insights for risk prevention and compliance reporting.",
-        start: 96.5,
+        start: 96.4,
         end: 102,
       },
     ],

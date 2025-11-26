@@ -1,9 +1,55 @@
 "use client"
 
+import type React from "react"
+
 import { motion } from "framer-motion"
-import { Building2, Search, LogOut, ChevronDown, Eye, FileText, Download } from "lucide-react"
+import { useRef, useState, useEffect } from "react"
+import {
+  Building2,
+  Search,
+  LogOut,
+  ChevronDown,
+  Eye,
+  FileText,
+  Download,
+  Clock,
+  AlertCircle,
+  MessageSquare,
+  Users,
+  Smile,
+  ShieldCheck,
+  CheckCircle2,
+} from "lucide-react"
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
+
+const COLORS = {
+  deepTeal: "#284952",
+  freshGreen: "#60BA81",
+  warmOrange: "#F5A83C",
+  charcoal: "#17161A",
+  white: "#FFFFFF",
+  bg: "#F5F5F7",
+  border: "#DEE2E6",
+  chartRed: "#FF5353",
+  chartYellow: "#FFD221",
+  chartLightGreen: "#77E6B4",
+  chartGreen: "#21D683",
+}
+
+const FACTORS_HAPPINESS = [
+  { label: "Avg Resolution Time", icon: Clock },
+  { label: "Avg Bounced Rate", icon: AlertCircle },
+  { label: "Avg Response Time", icon: MessageSquare },
+  { label: "Complaints : Employees", icon: Users },
+]
+
+const FACTORS_SAFETY = [
+  { label: "Avg Resolution Time", icon: Clock },
+  { label: "Avg Response Time", icon: MessageSquare },
+  { label: "Avg Bounced Rate", icon: AlertCircle },
+  { label: "Complaints : Employees", icon: Users },
+]
 
 interface SceneDashboardProps {
   isActive: boolean
@@ -22,8 +68,6 @@ const SITES = [
   { name: "GIGA MALL", hasLogo: true },
   { name: "GOLRA MOR", hasLogo: true },
   { name: "GULBAHAR ROA...", hasLogo: true },
-  { name: "Gulberg Green G...", hasLogo: true },
-  { name: "HBK ARENA HAY...", hasLogo: true },
 ]
 
 // Complaints categories data - exact from screenshot
@@ -85,6 +129,241 @@ const FEEDBACK_ITEMS = [
   { title: "Delayed Clearance Payment Issue", date: "Nov 10, 2025" },
 ]
 
+const loadScript = (src: string) =>
+  new Promise<void>((resolve, reject) => {
+    const existingScript = document.querySelector(`script[src="${src}"]`)
+    if (existingScript) {
+      resolve()
+      return
+    }
+
+    const script = document.createElement("script")
+    script.src = src
+    script.async = true
+
+    script.onload = () => {
+      console.log(`Script loaded: ${src}`)
+      resolve()
+    }
+
+    script.onerror = () => {
+      console.error(`Failed to load script: ${src}`)
+      reject(new Error(`Failed to load script: ${src}`))
+    }
+
+    document.head.appendChild(script)
+  })
+
+const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId: string }) => {
+  const chartRef = useRef<HTMLDivElement>(null)
+  const chartInstance = useRef<any>(null)
+  const [scriptsLoaded, setScriptsLoaded] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+
+    const loadScripts = async () => {
+      try {
+        await loadScript("/assets/jscharting.js")
+        await loadScript("/assets/types.js")
+        await new Promise((resolve) => setTimeout(resolve, 200))
+
+        if (mounted) {
+          setScriptsLoaded(true)
+        }
+      } catch (error) {
+        console.error("Failed to load JSCharting scripts:", error)
+      }
+    }
+
+    loadScripts()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!scriptsLoaded || !chartRef.current) return
+
+    let mounted = true
+
+    const initChart = async () => {
+      // @ts-ignore
+      const JSC = window.JSC
+
+      if (!JSC || !mounted) {
+        console.warn("JSC not available or component unmounted")
+        return
+      }
+
+      if (chartInstance.current) {
+        try {
+          chartInstance.current.dispose()
+        } catch (e) {
+          console.warn("Error disposing old chart:", e)
+        }
+      }
+
+      const minValue = 0
+      const maxValue = 100
+
+      try {
+        chartInstance.current = JSC.chart(chartRef.current, {
+          debug: false,
+          width: 180,
+          height: 180,
+          license: { jscharting: "no-logo-button" },
+
+          legend_visible: false,
+          defaultTooltip_enabled: false,
+          xAxis_spacingPercentage: 0.4,
+
+          yAxis: [
+            {
+              id: "ax1",
+              defaultTick: { padding: 10, enabled: false },
+              customTicks: [0, 25, 50, 75, 100],
+              line: {
+                width: 10,
+                breaks: {},
+                color: "smartPalette:pal1",
+              },
+              scale_range: [minValue, maxValue],
+            },
+
+            {
+              id: "ax2",
+              scale_range: [minValue, maxValue],
+              defaultTick: { padding: 10, enabled: false },
+              customTicks: [minValue, maxValue],
+              line: {
+                width: 10,
+                color: "smartPalette:pal2",
+              },
+            },
+          ],
+
+          defaultSeries: {
+            type: "gauge column roundcaps",
+            shape: {
+              label: {
+                text: "%max",
+                align: "center",
+                verticalAlign: "middle",
+                style_fontSize: 20,
+              },
+            },
+          },
+
+          series: [
+            {
+              type: "column roundcaps",
+              name: "Temperatures",
+              yAxis: "ax1",
+
+              palette: {
+                id: "pal1",
+                pointValue: "%yValue",
+                ranges: [
+                  { value: 0, color: "#FF5353" },
+                  { value: 25, color: "#FFD221" },
+                  { value: 50, color: "#77E6B4" },
+                  { value: [75, 100], color: "#21D683" },
+                ],
+              },
+
+              points: [["x", [0, value]]],
+            },
+          ],
+        })
+      } catch (error) {
+        console.error("Error initializing JSCharting chart:", error)
+      }
+    }
+
+    const timer = setTimeout(initChart, 100)
+
+    return () => {
+      mounted = false
+      clearTimeout(timer)
+      if (chartInstance.current) {
+        try {
+          chartInstance.current.dispose()
+        } catch (e) {
+          console.warn("Error disposing chart on unmount:", e)
+        }
+      }
+    }
+  }, [scriptsLoaded, value])
+
+  if (!scriptsLoaded) {
+    return (
+      <div style={{ width: 160, height: 160 }} className="flex items-center justify-center bg-gray-100 rounded-lg">
+        <div className="text-center text-gray-500">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#60BA81] mx-auto mb-2"></div>
+          <p className="text-xs">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div ref={chartRef} id={chartId} style={{ width: 160, height: 160 }} className="flex items-center justify-center" />
+  )
+}
+
+const ScoreCard = ({
+  title,
+  icon: Icon,
+  value,
+  factors,
+  factorLabel,
+  chartId,
+  delay = 0,
+  showFactors,
+  iconColor,
+}: {
+  title: string
+  icon: React.ElementType
+  value: number
+  factors: typeof FACTORS_HAPPINESS
+  factorLabel: string
+  chartId: string
+  delay?: number
+  showFactors: boolean
+  iconColor: string
+}) => {
+  return (
+    <motion.div
+      initial={{ y: 30, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, delay, ease: "backOut" }}
+      className="bg-white rounded-xl border border-[#DEE2E6]/60 p-3 flex flex-col items-center relative overflow-hidden shadow-sm"
+    >
+      {/* HEADER */}
+      <div className="flex items-center gap-2 mb-1">
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: `${iconColor}15` }}
+        >
+          <Icon size={14} style={{ color: iconColor }} />
+        </div>
+        <h2 className="text-[10px] font-bold" style={{ color: COLORS.deepTeal }}>
+          {title}
+        </h2>
+      </div>
+
+      {/* CHART */}
+      <div className="relative flex items-center justify-center" style={{ minHeight: 160 }}>
+        <JSChartingCircularColorBar value={value} chartId={chartId} />
+      </div>
+
+      
+    </motion.div>
+  )
+}
+
 export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
   const sceneStart = 6
   const sceneEnd = 16
@@ -100,6 +379,8 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
   const highlightInProcess = sceneProgress > 0.55 && sceneProgress < 0.7
   const highlightResolved = sceneProgress > 0.65 && sceneProgress < 0.8
   const showFullDashboard = sceneProgress > 0.75
+  const showHappinessFactors = sceneProgress > 0.78
+  const showSafetyFactors = sceneProgress > 0.82
 
   return (
     <div className="w-full h-full bg-[#F5F5F7] relative overflow-hidden font-sans">
@@ -123,56 +404,36 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
       >
         {/* ===== HEADER BAR - Exact match ===== */}
         <motion.div
-  initial={{ opacity: 0, y: -20 }}
-  animate={{ opacity: showHeader ? 1 : 0, y: showHeader ? 0 : -20 }}
-  transition={{ duration: 0.5, ease: IOS_EASE }}
-  className="bg-white border-b border-[#DEE2E6] px-4 py-2 flex items-center justify-between"
->
-  <div className="flex items-center gap-3">
-    {/* FOS Logo */}
-    <div className="w-10 h-10 flex items-center justify-center">
-      <img 
-        src="/assets/vertical_logo.png" 
-        alt="Fruit of Sustainability Logo" 
-        className="w-32 h-32 object-contain"
-        onError={(e) => {
-          // Fallback in case FOS logo doesn't load
-          e.target.style.display = 'none';
-          const fallback = document.createElement('div');
-          fallback.className = 'w-10 h-10 bg-[#60BA81] rounded-full flex items-center justify-center text-white text-xs font-bold';
-          fallback.textContent = 'FOS';
-          e.target.parentNode.appendChild(fallback);
-        }}
-      />
-    </div>
-  </div>
-  <div className="flex flex-col items-center">
-    <span className="text-[10px] text-[#E74C3C] font-semibold tracking-wide">COMPANY_A</span>
-    <span className="text-sm font-bold text-[#284952]">Human Rights Due Diligence Dashboard</span>
-  </div>
-  <div className="flex items-center gap-3">
-    {/* Company Logo */}
-    <div className="w-8 h-8 flex items-center justify-center">
-      <img 
-        src="/assets/company_logo.png" 
-        alt="Company Logo" 
-        className="w-8 h-8 object-contain rounded-full"
-        onError={(e) => {
-          // Fallback in case company logo doesn't load
-          e.target.style.display = 'none';
-          const fallback = document.createElement('div');
-          fallback.className = 'w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs';
-          fallback.textContent = 'Co';
-          e.target.parentNode.appendChild(fallback);
-        }}
-      />
-    </div>
-    <div className="flex items-center gap-2 text-[#284952] bg-white border border-[#DEE2E6] rounded px-2 py-1">
-      <span className="text-xs">Logout</span>
-      <LogOut size={14} />
-    </div>
-  </div>
-</motion.div>
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: showHeader ? 1 : 0, y: showHeader ? 0 : -20 }}
+          transition={{ duration: 0.5, ease: IOS_EASE }}
+          className="bg-white border-b border-[#DEE2E6] px-4 py-2 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            {/* FOS Logo */}
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img
+                src="/assets/vertical_logo.png"
+                alt="Fruit of Sustainability Logo"
+                className="w-32 h-32 object-contain"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] text-[#60BA81] font-semibold tracking-wide">COMPANY_A</span>
+            <span className="text-sm font-bold text-[#284952]">Human Rights Due Diligence Dashboard</span>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* Company Logo */}
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img src="/assets/company_logo.png" alt="Company Logo" className="w-8 h-8 object-contain rounded-full" />
+            </div>
+            <div className="flex items-center gap-2 text-[#284952] bg-white border border-[#DEE2E6] rounded px-2 py-1">
+              <span className="text-xs">Logout</span>
+              <LogOut size={14} />
+            </div>
+          </div>
+        </motion.div>
 
         {/* ===== MAIN CONTENT ===== */}
         <div className="flex-1 overflow-hidden p-2">
@@ -195,37 +456,37 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
 
               {/* Sites Filter */}
               <div className="col-span-6 bg-white rounded-lg p-2">
-  <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">SITES FILTER</div>
-  <div className="flex items-center gap-1 overflow-hidden">
-    <button className="shrink-0 w-5 h-5 flex items-center justify-center">
-      <ChevronDown size={12} className="text-[#284952]" />
-    </button>
-    <div className="flex gap-1.5 overflow-hidden items-end">
-      {SITES.slice(0, 11).map((site, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: showFilters ? 1 : 0, scale: showFilters ? 1 : 0.8 }}
-          transition={{ delay: 0.2 + i * 0.02 }}
-          className="flex flex-col items-center shrink-0"
-        >
-          <div
-            className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
-              site.selected ? "border-[#284952] bg-[#284952]" : "border-[#60BA81]/30 bg-white"
-            }`}
-          >
-            <img 
-              src={`/assets/${i + 1}.png`} 
-              alt={`Site ${i + 1}`}
-              className={`w-10 h-10 object-contain ${site.selected ? "filter brightness-0 invert" : ""}`}
-            />
-          </div>
-          <span className="text-[5px] text-[#767676] mt-0.5 w-10 text-center truncate">{site.name}</span>
-        </motion.div>
-      ))}
-    </div>
-  </div>
-</div>
+                <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">SITES FILTER</div>
+                <div className="flex items-center gap-1 overflow-hidden">
+                  <button className="shrink-0 w-5 h-5 flex items-center justify-center">
+                    <ChevronDown size={12} className="text-[#284952]" />
+                  </button>
+                  <div className="flex gap-1.5 overflow-hidden items-end">
+                    {SITES.slice(0, 11).map((site, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: showFilters ? 1 : 0, scale: showFilters ? 1 : 0.8 }}
+                        transition={{ delay: 0.2 + i * 0.02 }}
+                        className="flex flex-col items-center shrink-0"
+                      >
+                        <div
+                          className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
+                            site.selected ? "border-[#284952] bg-[#284952]" : "border-[#60BA81]/30 bg-white"
+                          }`}
+                        >
+                          <img
+                            src={`/assets/${i + 1}.png`}
+                            alt={`Site ${i + 1}`}
+                            className={`w-10 h-10 object-contain ${site.selected ? "filter brightness-0 invert" : ""}`}
+                          />
+                        </div>
+                        <span className="text-[5px] text-[#767676] mt-0.5 w-10 text-center truncate">{site.name}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
               {/* Filters & Search */}
               <div className="col-span-3 bg-white rounded-lg p-2">
                 <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">FILTERS</div>
@@ -366,49 +627,37 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                 animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : -20 }}
                 transition={{ delay: 0.1 }}
                 className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
+              >
                 <h3 className="text-[9px] font-semibold text-[#284952] mb-2">Complaints Status</h3>
                 <div className="flex justify-around">
-                    {/* Bounced 1.0 */}
-                    <div className="text-center">
+                  {/* Bounced 1.0 */}
+                  <div className="text-center">
                     <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                        <img 
-                        src="/assets/bounced_image.png" 
-                        alt="Bounced 1.0" 
-                        className="w-6 h-6 object-contain"
-                        />
+                      <img src="/assets/bounced_image.png" alt="Bounced 1.0" className="w-6 h-6 object-contain" />
                     </div>
                     <p className="text-[7px] text-[#284952]">Bounced 1.0</p>
                     <p className="text-sm font-bold text-[#284952]">2.7%</p>
-                    </div>
-                    
-                    {/* Bounced 2.0 */}
-                    <div className="text-center">
+                  </div>
+
+                  {/* Bounced 2.0 */}
+                  <div className="text-center">
                     <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                        <img 
-                        src="/assets/bounced_image1.png" 
-                        alt="Bounced 2.0" 
-                        className="w-6 h-6 object-contain"
-                        />
+                      <img src="/assets/bounced_image1.png" alt="Bounced 2.0" className="w-6 h-6 object-contain" />
                     </div>
                     <p className="text-[7px] text-[#284952]">Bounced 2.0</p>
                     <p className="text-sm font-bold text-[#284952]">0.0%</p>
-                    </div>
-                    
-                    {/* Unclosed */}
-                    <div className="text-center">
+                  </div>
+
+                  {/* Unclosed */}
+                  <div className="text-center">
                     <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                        <img 
-                        src="/assets/unclosed_image.png" 
-                        alt="Unclosed" 
-                        className="w-6 h-6 object-contain"
-                        />
+                      <img src="/assets/unclosed_image.png" alt="Unclosed" className="w-6 h-6 object-contain" />
                     </div>
                     <p className="text-[7px] text-[#284952]">Unclosed</p>
                     <p className="text-sm font-bold text-[#284952]">0.0%</p>
-                    </div>
+                  </div>
                 </div>
-                </motion.div>
+              </motion.div>
 
               {/* Counseling Sessions Analysis - Nested Donut */}
               <motion.div
@@ -453,33 +702,32 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
 
             {/* CENTER COLUMN - 50% width */}
             <div className="col-span-6 flex flex-col gap-2">
-              {/* Gauge Charts Row */}
               <div className="grid grid-cols-2 gap-2">
                 {/* Worker Happiness Score */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.15 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-0">Worker Happiness Score</h3>
-                  <div className="flex items-center justify-center">
-                    <HappinessGaugeChart value={96} showAnimation={showFullDashboard} />
-                  </div>
-                </motion.div>
+                <ScoreCard
+                  title="Worker Happiness Score"
+                  icon={Smile}
+                  value={85}
+                  factors={FACTORS_HAPPINESS}
+                  factorLabel="Calculated Based On"
+                  chartId="dashboardHappinessChart"
+                  delay={0}
+                  showFactors={showHappinessFactors}
+                  iconColor={COLORS.freshGreen}
+                />
 
                 {/* Worker Safety Score */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-0">Worker Safety Score</h3>
-                  <div className="flex items-center justify-center">
-                    <HappinessGaugeChart value={85} showAnimation={showFullDashboard} />
-                  </div>
-                </motion.div>
+                <ScoreCard
+                  title="Worker Safety Score"
+                  icon={ShieldCheck}
+                  value={92}
+                  factors={FACTORS_SAFETY}
+                  factorLabel="Worker Satisfaction Based On"
+                  chartId="dashboardSafetyChart"
+                  delay={0.1}
+                  showFactors={showSafetyFactors}
+                  iconColor={COLORS.warmOrange}
+                />
               </div>
 
               {/* Employees Feedback Section - Orange header */}
@@ -568,19 +816,6 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                     <span className="text-sm font-bold text-[#E91E63]">0</span>
                     <span className="text-[5px] text-[#767676]">0.0%</span>
                   </div>
-                </div>
-              </motion.div>
-
-              {/* Complaints by Days - Line Chart */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
-                transition={{ delay: 0.35 }}
-                className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-              >
-                <h3 className="text-[9px] font-semibold text-[#284952] mb-1">Complaints by Days</h3>
-                <div className="h-14">
-                  <ComplaintLineChart showAnimation={showFullDashboard} />
                 </div>
               </motion.div>
             </div>
@@ -842,165 +1077,6 @@ function CounselingDonutChart({ showAnimation }: { showAnimation: boolean }) {
       </text>
       <text x="28" y="75" className="text-[7px] fill-[#E74C3C] font-bold">
         124
-      </text>
-    </svg>
-  )
-}
-
-function HappinessGaugeChart({ value, showAnimation }: { value: number; showAnimation: boolean }) {
-  const progress = (value / 100) * 180
-
-  return (
-    <div className="relative">
-      <svg viewBox="0 0 120 70" className="w-36 h-20">
-        {/* Background arc - Red zone (0-25) */}
-        <path
-          d="M 15 55 A 40 40 0 0 1 42 18"
-          fill="none"
-          stroke="#E74C3C"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        {/* Yellow zone (25-50) */}
-        <path
-          d="M 42 18 A 40 40 0 0 1 60 12"
-          fill="none"
-          stroke="#F5A83C"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        {/* Light green zone (50-75) */}
-        <path
-          d="M 60 12 A 40 40 0 0 1 78 18"
-          fill="none"
-          stroke="#90EE90"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-        {/* Dark green zone (75-100) */}
-        <path
-          d="M 78 18 A 40 40 0 0 1 105 55"
-          fill="none"
-          stroke="#60BA81"
-          strokeWidth="10"
-          strokeLinecap="round"
-          opacity="0.8"
-        />
-
-        {/* Gray background arc (unfilled portion) */}
-        <path
-          d="M 15 55 A 40 40 0 0 1 105 55"
-          fill="none"
-          stroke="#E5E7EB"
-          strokeWidth="6"
-          strokeLinecap="round"
-          opacity="0.3"
-        />
-
-        {/* Scale labels */}
-        <text x="8" y="60" className="text-[6px] fill-[#767676]">
-          0
-        </text>
-        <text x="30" y="22" className="text-[6px] fill-[#767676]">
-          25
-        </text>
-        <text x="56" y="10" className="text-[6px] fill-[#767676]">
-          50
-        </text>
-        <text x="82" y="22" className="text-[6px] fill-[#767676]">
-          75
-        </text>
-        <text x="100" y="60" className="text-[6px] fill-[#767676]">
-          100
-        </text>
-
-        {/* Center value */}
-        <motion.text
-          x="60"
-          y="48"
-          textAnchor="middle"
-          className="text-2xl font-bold fill-[#17161A]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: showAnimation ? 1 : 0 }}
-          transition={{ delay: 1 }}
-        >
-          {value}
-        </motion.text>
-      </svg>
-    </div>
-  )
-}
-
-function ComplaintLineChart({ showAnimation }: { showAnimation: boolean }) {
-  const data = [1, 1, 1, 2, 2.5, 2, 2, 4, 3, 4, 5, 3.5, 3, 3.5, 4, 3]
-  const maxValue = 5.5
-  const width = 320
-  const height = 45
-  const points = data.map((v, i) => ({
-    x: 20 + (i / (data.length - 1)) * (width - 40),
-    y: height - 5 - (v / maxValue) * (height - 10),
-  }))
-  const pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
-
-  return (
-    <svg viewBox={`0 0 ${width} ${height + 15}`} className="w-full h-full">
-      {/* Grid lines */}
-      {[0, 1, 2, 3, 4, 5].map((v, i) => (
-        <line
-          key={i}
-          x1="20"
-          y1={height - 5 - (v / maxValue) * (height - 10)}
-          x2={width - 20}
-          y2={height - 5 - (v / maxValue) * (height - 10)}
-          stroke="#E5E7EB"
-          strokeWidth="0.5"
-        />
-      ))}
-
-      {/* Y-axis labels */}
-      {[0, 2.5, 5].map((v, i) => (
-        <text key={i} x="5" y={height - 5 - (v / maxValue) * (height - 10) + 2} className="text-[5px] fill-[#767676]">
-          {v}
-        </text>
-      ))}
-
-      {/* Line - teal color like screenshot */}
-      <motion.path
-        d={pathD}
-        fill="none"
-        stroke="#2D9480"
-        strokeWidth="1.5"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: showAnimation ? 1 : 0 }}
-        transition={{ delay: 0.5, duration: 1.5, ease: "easeOut" }}
-      />
-
-      {/* Data points */}
-      {points.map((p, i) => (
-        <motion.circle
-          key={i}
-          cx={p.x}
-          cy={p.y}
-          r="2"
-          fill="#2D9480"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: showAnimation ? 1 : 0, scale: showAnimation ? 1 : 0 }}
-          transition={{ delay: 0.5 + i * 0.03 }}
-        />
-      ))}
-
-      {/* X-axis label */}
-      <text x={width / 2} y={height + 12} className="text-[5px] fill-[#767676]" textAnchor="middle">
-        Number of Complaints
-      </text>
-
-      {/* Legend */}
-      <rect x={width / 2 - 40} y={height + 4} width="8" height="4" fill="#2D9480" rx="1" />
-      <text x={width / 2 - 28} y={height + 8} className="text-[5px] fill-[#767676]">
-        Complaint Count
       </text>
     </svg>
   )

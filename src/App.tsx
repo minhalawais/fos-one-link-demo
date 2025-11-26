@@ -20,7 +20,6 @@ import {
   Phone,
   Mail,
   X,
-  ChevronRight,
   Zap,
 } from "lucide-react"
 
@@ -35,16 +34,6 @@ import { ControlPanel } from "./components/control-panel.tsx"
 import { MODULE_DATA } from "./lib/module-data.ts"
 
 // --- DESIGN SYSTEM CONSTANTS ---
-const COLORS = {
-  deepTeal: "#284952",
-  freshGreen: "#60BA81",
-  charcoal: "#17161A",
-  warmOrange: "#F5A83C",
-  pureWhite: "#FFFFFF",
-  lightGray: "#F5F5F7",
-  borderGray: "#DEE2E6",
-}
-
 const IOS_EASE = [0.32, 0.72, 0, 1]
 
 // --- UTILITY COMPONENTS ---
@@ -92,8 +81,7 @@ const ControlPanelContainer = ({
   )
 }
 
-
-// --- VISUAL SCENES (Keep your existing visual components) ---
+// --- VISUAL SCENES (Unchanged) ---
 const FloatingIcon = ({ icon: Icon, delay = 0, x = 0, y = 0, color = "text-[#284952]" }) => (
   <motion.div
     className={`absolute p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${color}`}
@@ -111,9 +99,7 @@ const FloatingIcon = ({ icon: Icon, delay = 0, x = 0, y = 0, color = "text-[#284
 
 const DeploymentVisual = () => (
   <div className="w-full h-full relative flex items-center justify-center overflow-hidden bg-[#F5F5F7]">
-    {/* Ambient Glow */}
     <div className="absolute inset-0 bg-gradient-to-tr from-[#284952]/5 to-transparent" />
-    
     <motion.div className="relative z-10" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.8, ease: IOS_EASE }}>
       <GlassCard className="p-8 flex flex-col items-center gap-6 w-64 border-t border-white/80">
         <div className="relative">
@@ -141,34 +127,14 @@ const DeploymentVisual = () => (
 const IntakeVisual = () => (
   <div className="w-full h-full relative flex items-center justify-center overflow-hidden bg-[#FFF8F0]">
     <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#F5A83C]/10 to-transparent opacity-50" />
-    <motion.div
-      className="relative z-10"
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.6, ease: IOS_EASE }}
-    >
+    <motion.div className="relative z-10" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.6, ease: IOS_EASE }}>
       <GlassCard className="w-40 h-40 rounded-full flex items-center justify-center relative z-20 bg-white/80 border-2 border-white">
         <ShieldCheck size={64} className="text-[#F5A83C]" strokeWidth={1.5} />
       </GlassCard>
     </motion.div>
-    <motion.div
-      className="absolute w-80 h-80 rounded-full border border-[#F5A83C]/20 border-dashed"
-      animate={{ rotate: 360 }}
-      transition={{ duration: 40, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-    >
+    <motion.div className="absolute w-80 h-80 rounded-full border border-[#F5A83C]/20 border-dashed" animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}>
       {[Phone, Globe, MessageSquare, Mail].map((Icon, i) => (
-        <motion.div
-          key={i}
-          whileHover={{ scale: 1.2 }}
-          className="absolute bg-white p-4 rounded-full shadow-lg border border-gray-100 cursor-pointer"
-          style={{
-            top: i % 2 === 0 ? (i === 0 ? "-24px" : "auto") : "50%",
-            bottom: i === 2 ? "-24px" : "auto",
-            left: i % 2 !== 0 ? (i === 3 ? "-24px" : "auto") : "50%",
-            right: i === 1 ? "-24px" : "auto",
-            transform: i % 2 === 0 ? "translateX(-50%)" : "translateY(-50%)",
-          }}
-        >
+        <motion.div key={i} whileHover={{ scale: 1.2 }} className="absolute bg-white p-4 rounded-full shadow-lg border border-gray-100 cursor-pointer" style={{ top: i % 2 === 0 ? (i === 0 ? "-24px" : "auto") : "50%", bottom: i === 2 ? "-24px" : "auto", left: i % 2 !== 0 ? (i === 3 ? "-24px" : "auto") : "50%", right: i === 1 ? "-24px" : "auto", transform: i % 2 === 0 ? "translateX(-50%)" : "translateY(-50%)" }}>
           <Icon size={20} className="text-[#284952]" />
         </motion.div>
       ))}
@@ -198,11 +164,7 @@ const InvestigationVisual = () => (
         ))}
       </GlassCard>
     </motion.div>
-    <motion.div
-      className="absolute z-20 pointer-events-none"
-      animate={{ x: [-40, 40, -40], y: [-30, 30, -30] }}
-      transition={{ duration: 12, ease: "easeInOut", repeat: Number.POSITIVE_INFINITY }}
-    >
+    <motion.div className="absolute z-20 pointer-events-none" animate={{ x: [-40, 40, -40], y: [-30, 30, -30] }} transition={{ duration: 12, ease: "easeInOut", repeat: Number.POSITIVE_INFINITY }}>
       <div className="bg-white/60 backdrop-blur-lg border border-white w-24 h-24 rounded-[2rem] shadow-2xl flex items-center justify-center">
         <Search size={32} className="text-[#284952]" strokeWidth={2.5} />
       </div>
@@ -212,12 +174,7 @@ const InvestigationVisual = () => (
 
 const DashboardVisual = () => (
   <div className="w-full h-full relative flex items-center justify-center overflow-hidden bg-[#F5F7F9]">
-    <motion.div
-      className="grid grid-cols-2 gap-4 w-72"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.6, ease: IOS_EASE }}
-    >
+    <motion.div className="grid grid-cols-2 gap-4 w-72" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: IOS_EASE }}>
       <GlassCard className="col-span-2 h-32 p-5 flex flex-col justify-between !rounded-[1.5rem]">
         <div className="flex justify-between items-start">
           <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -237,19 +194,7 @@ const DashboardVisual = () => (
         <div className="relative w-16 h-16">
           <svg viewBox="0 0 32 32" className="w-full h-full -rotate-90">
             <circle cx="16" cy="16" r="12" fill="none" stroke="#E2E8F0" strokeWidth="4" />
-            <motion.circle
-              cx="16"
-              cy="16"
-              r="12"
-              fill="none"
-              stroke="#F5A83C"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray="75"
-              initial={{ strokeDashoffset: 75 }}
-              animate={{ strokeDashoffset: 20 }}
-              transition={{ duration: 1.5, delay: 0.5, ease: IOS_EASE }}
-            />
+            <motion.circle cx="16" cy="16" r="12" fill="none" stroke="#F5A83C" strokeWidth="4" strokeLinecap="round" strokeDasharray="75" initial={{ strokeDashoffset: 75 }} animate={{ strokeDashoffset: 20 }} transition={{ duration: 1.5, delay: 0.5, ease: IOS_EASE }} />
           </svg>
         </div>
       </GlassCard>
@@ -274,7 +219,7 @@ const DynamicCoverArt = ({ id }) => {
   }
 }
 
-// --- SLIDE COMPONENT ---
+// --- SLIDE COMPONENT (Unchanged) ---
 const Slide = ({ item, status, onClick, isPlaying, playerComponent, index }) => {
   const isExpanded = status === "expanded"
   const isCollapsed = status === "collapsed"
@@ -284,129 +229,44 @@ const Slide = ({ item, status, onClick, isPlaying, playerComponent, index }) => 
     <motion.div
       layout
       onClick={status !== "expanded" ? onClick : undefined}
-      className={`
-        relative h-full rounded-[2.5rem] overflow-hidden cursor-pointer group select-none
-        ${isExpanded ? "cursor-default" : ""}
-      `}
-      style={{
-        zIndex: isExpanded ? 30 : isIdle ? 10 : isCollapsed ? 5 : 10,
-      }}
+      className={`relative h-full rounded-[2.5rem] overflow-hidden cursor-pointer group select-none ${isExpanded ? "cursor-default" : ""}`}
+      style={{ zIndex: isExpanded ? 30 : isIdle ? 10 : isCollapsed ? 5 : 10 }}
       initial={false}
-      animate={{
-        flex: isExpanded ? 3.5 : isCollapsed ? 0.3 : 1,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 30,
-        mass: 1
-      }}
+      animate={{ flex: isExpanded ? 3.5 : isCollapsed ? 0.3 : 1 }}
+      transition={{ type: "spring", stiffness: 200, damping: 30, mass: 1 }}
     >
-      <motion.div
-        className={`absolute inset-0 overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)]`}
-        animate={{
-          borderRadius: "2.5rem",
-          backgroundColor: isExpanded ? "#FFFFFF" : isIdle ? "#FFFFFF" : "#F8F8FA"
-        }}
-      >
+      <motion.div className={`absolute inset-0 overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)]`} animate={{ borderRadius: "2.5rem", backgroundColor: isExpanded ? "#FFFFFF" : isIdle ? "#FFFFFF" : "#F8F8FA" }}>
         <div className="flex w-full h-full relative">
             
-            {/* IDLE STATE BACKGROUND PREVIEW */}
-            <motion.div 
-                className="absolute inset-0 z-0 opacity-0 bg-gray-50"
-                animate={{ opacity: isIdle ? 1 : 0 }}
-                transition={{ duration: 0.5 }}
-            >
-                <div className={`absolute -bottom-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-20
-                    ${item.id === 1 ? 'bg-[#60BA81]' : item.id === 2 ? 'bg-[#F5A83C]' : item.id === 3 ? 'bg-[#284952]' : 'bg-blue-400'}
-                `} />
+            <motion.div className="absolute inset-0 z-0 opacity-0 bg-gray-50" animate={{ opacity: isIdle ? 1 : 0 }} transition={{ duration: 0.5 }}>
+                <div className={`absolute -bottom-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-20 ${item.id === 1 ? 'bg-[#60BA81]' : item.id === 2 ? 'bg-[#F5A83C]' : item.id === 3 ? 'bg-[#284952]' : 'bg-blue-400'}`} />
                  <div className="absolute top-10 right-10 opacity-10">
                     <item.icon size={120} className="text-[#284952]" />
                  </div>
             </motion.div>
 
-          {/* LEFT PANEL: Content */}
-          <motion.div
-            layout
-            className="flex flex-col justify-between relative z-10 overflow-hidden"
-            animate={{
-               width: isPlaying ? "0%" : (isExpanded ? "45%" : "100%"),
-               padding: isPlaying ? 0 : (isExpanded ? "4rem" : (isCollapsed ? "1rem" : "3rem")),
-               opacity: isPlaying ? 0 : 1,
-            }}
-          >
-            {/* HEADER AREA */}
+          <motion.div layout className="flex flex-col justify-between relative z-10 overflow-hidden" animate={{ width: isPlaying ? "0%" : (isExpanded ? "45%" : "100%"), padding: isPlaying ? 0 : (isExpanded ? "4rem" : (isCollapsed ? "1rem" : "3rem")), opacity: isPlaying ? 0 : 1 }}>
             <motion.div layout className="flex flex-col gap-6 w-full">
-               {/* Number Indicator */}
               <motion.div layout className="flex items-center gap-3">
-                 <motion.span 
-                    layout="position"
-                    className={`font-mono font-bold text-[#284952]/20 
-                        ${isIdle ? "text-6xl" : isExpanded ? "text-xl" : "text-sm"}
-                    `}
-                 >
-                    {String(item.id).padStart(2, "0")}
-                 </motion.span>
-                
-                 {!isIdle && !isCollapsed && (
-                     <motion.div 
-                        initial={{ width: 0 }} animate={{ width: 40 }} 
-                        className="h-[2px] bg-[#F5A83C]" 
-                     />
-                 )}
+                 <motion.span layout="position" className={`font-mono font-bold text-[#284952]/20 ${isIdle ? "text-6xl" : isExpanded ? "text-xl" : "text-sm"}`}>{String(item.id).padStart(2, "0")}</motion.span>
+                 {!isIdle && !isCollapsed && (<motion.div initial={{ width: 0 }} animate={{ width: 40 }} className="h-[2px] bg-[#F5A83C]" />)}
               </motion.div>
               
-              {/* Title Logic */}
               <div className={`flex flex-col ${isCollapsed ? "items-center h-full justify-center pt-20" : "items-start"}`}>
                   {isCollapsed ? (
-                       <motion.h1 
-                         layout
-                         className="text-xl font-bold text-[#17161A]/60 tracking-wider uppercase"
-                         style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-                       >
-                         {item.shortTitle}
-                       </motion.h1>
+                       <motion.h1 layout className="text-xl font-bold text-[#17161A]/60 tracking-wider uppercase" style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}>{item.shortTitle}</motion.h1>
                   ) : (
                     <motion.div layout className="space-y-6 relative">
-                        <motion.h1
-                            layout="position"
-                            className={`font-bold tracking-tight text-[#284952] leading-[1]
-                            ${isExpanded ? "text-5xl lg:text-7xl" : "text-3xl"}
-                            `}
-                        >
-                            {item.headline}
-                        </motion.h1>
-
-                        {/* Subtext */}
+                        <motion.h1 layout="position" className={`font-bold tracking-tight text-[#284952] leading-[1] ${isExpanded ? "text-5xl lg:text-7xl" : "text-3xl"}`}>{item.headline}</motion.h1>
                         {(isExpanded || isIdle) && (
-                            <motion.p
-                                layout="position"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: isExpanded ? 1 : 0.6 }}
-                                className={`text-[#17161A] font-medium leading-relaxed max-w-md
-                                    ${isExpanded ? "text-lg" : "text-base line-clamp-3"}
-                                `}
-                            >
-                                {item.subtext}
-                            </motion.p>
+                            <motion.p layout="position" initial={{ opacity: 0 }} animate={{ opacity: isExpanded ? 1 : 0.6 }} className={`text-[#17161A] font-medium leading-relaxed max-w-md ${isExpanded ? "text-lg" : "text-base line-clamp-3"}`}>{item.subtext}</motion.p>
                         )}
-                        
-                        {/* Action Button */}
                         {isExpanded && !isPlaying && (
-                             <motion.button
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="group/btn flex items-center gap-3 px-6 py-3 bg-[#17161A] text-white rounded-full mt-4 hover:bg-[#284952] transition-colors shadow-lg"
-                             >
+                             <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="group/btn flex items-center gap-3 px-6 py-3 bg-[#17161A] text-white rounded-full mt-4 hover:bg-[#284952] transition-colors shadow-lg">
                                 <span className="text-sm font-semibold tracking-wide">Start Module</span>
-                                <div className="bg-white/20 rounded-full p-1 group-hover/btn:translate-x-1 transition-transform">
-                                    <Play size={12} fill="currentColor" />
-                                </div>
+                                <div className="bg-white/20 rounded-full p-1 group-hover/btn:translate-x-1 transition-transform"><Play size={12} fill="currentColor" /></div>
                              </motion.button>
                         )}
-
-                        {/* Idle Hint */}
                         {isIdle && (
                             <motion.div className="flex items-center gap-2 text-[#60BA81] font-bold text-sm mt-4">
                                 <div className="w-8 h-8 rounded-full border border-[#60BA81]/30 flex items-center justify-center group-hover:bg-[#60BA81] group-hover:text-white transition-colors">
@@ -421,37 +281,15 @@ const Slide = ({ item, status, onClick, isPlaying, playerComponent, index }) => 
             </motion.div>
           </motion.div>
 
-          {/* RIGHT PANEL: Visuals & Player */}
-          <motion.div
-            layout
-            className="h-full relative overflow-hidden bg-[#F5F5F7]"
-            initial={false}
-            animate={{
-              width: isPlaying ? "100%" : (isExpanded ? "55%" : "0%"),
-              opacity: isExpanded ? 1 : 0
-            }}
-          >
+          <motion.div layout className="h-full relative overflow-hidden bg-[#F5F5F7]" initial={false} animate={{ width: isPlaying ? "100%" : (isExpanded ? "55%" : "0%"), opacity: isExpanded ? 1 : 0 }}>
              <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-[#DEE2E6] to-transparent z-20" />
-
             <AnimatePresence mode="wait">
               {isPlaying ? (
-                <motion.div
-                  key="player"
-                  className="absolute inset-0 w-full h-full bg-[#17161A]"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
+                <motion.div key="player" className="absolute inset-0 w-full h-full bg-[#17161A]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   {playerComponent}
                 </motion.div>
               ) : (
-                <motion.div
-                  key="visual"
-                  className="absolute inset-0 w-full h-full"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
+                <motion.div key="visual" className="absolute inset-0 w-full h-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <DynamicCoverArt id={item.id} />
                 </motion.div>
               )}
@@ -463,7 +301,7 @@ const Slide = ({ item, status, onClick, isPlaying, playerComponent, index }) => 
   )
 }
 
-// --- NAVIGATION PILL ---
+// --- NEW COMPACT NAVIGATION PILL ---
 const NavigationPill = ({
   visible,
   onPlayPause,
@@ -474,7 +312,8 @@ const NavigationPill = ({
   isMuted,
   onVolumeChange,
   onMuteToggle,
-  onClose
+  onClose,
+  activeSlideTitle,
 }) => {
   const progress = totalDuration > 0 ? (currentTime / totalDuration) * 100 : 0
 
@@ -482,59 +321,98 @@ const NavigationPill = ({
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ y: 150, opacity: 0, x: "-50%", scale: 0.8 }}
+          initial={{ y: 100, opacity: 0, x: "-50%", scale: 0.9 }}
           animate={{ y: 0, opacity: 1, x: "-50%", scale: 1 }}
-          exit={{ y: 150, opacity: 0, x: "-50%", scale: 0.8 }}
-          transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          className="fixed bottom-10 left-1/2 z-50 origin-bottom"
+          exit={{ y: 100, opacity: 0, x: "-50%", scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 220, damping: 25 }}
+          className="fixed bottom-8 left-1/2 z-50 origin-bottom"
         >
-          <div className="bg-[#17161A]/80 backdrop-blur-xl border border-white/10 text-white pl-3 pr-5 py-3 rounded-full shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] flex items-center gap-5">
+          {/* Main Pill Container - Compact Apple Style */}
+          <div className="group relative bg-black/85 backdrop-blur-3xl border border-white/10 text-white rounded-full shadow-[0_25px_50px_-12px_rgba(0,0,0,0.6)] flex items-center pr-2 pl-2 py-2 h-[68px] overflow-hidden select-none">
             
+            {/* Play/Pause Button (Prominent) */}
             <button
               onClick={onPlayPause}
-              className="w-12 h-12 rounded-full bg-white text-black hover:scale-105 active:scale-95 transition-all flex items-center justify-center shadow-lg group"
+              className="w-12 h-12 rounded-full bg-white text-black hover:scale-105 active:scale-90 transition-all duration-200 flex items-center justify-center shadow-lg relative z-10 mr-3"
             >
-              {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
+              <AnimatePresence mode="wait">
+                {isPlaying ? (
+                  <motion.div key="pause" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                    <Pause size={20} fill="currentColor" />
+                  </motion.div>
+                ) : (
+                  <motion.div key="play" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+                    <Play size={20} fill="currentColor" className="ml-1" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </button>
 
-            <div className="flex flex-col gap-1.5 min-w-[240px]">
-              <div className="flex justify-between items-end px-0.5">
-                 <span className="text-[11px] font-bold text-white/90 tracking-wide">Now Playing</span>
-                 <span className="text-[10px] font-mono text-white/50">{formatTime(currentTime)} / {formatTime(totalDuration)}</span>
+            {/* Info & Progress - Compact Stack */}
+            <div className="flex flex-col justify-center min-w-[180px] max-w-[240px] mr-4 gap-1">
+              <div className="flex justify-between items-baseline px-1">
+                 <span className="text-[13px] font-semibold text-white tracking-tight truncate max-w-[120px]">
+                    {activeSlideTitle || "Module"}
+                 </span>
+                 <span className="text-[10px] font-mono text-white/40 tabular-nums tracking-wide">
+                    {formatTime(currentTime)} <span className="opacity-50">/</span> {formatTime(totalDuration)}
+                 </span>
               </div>
               
-              <div className="relative w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+              {/* Read-Only Progress Bar (No Scrubbing) */}
+              <div className="relative w-full h-[3px] bg-white/10 rounded-full overflow-hidden mt-1">
                 <motion.div
-                  className="absolute top-0 left-0 h-full bg-[#60BA81] shadow-[0_0_10px_rgba(96,186,129,0.5)]"
+                  className="absolute top-0 left-0 h-full bg-[#60BA81] shadow-[0_0_8px_rgba(96,186,129,0.6)]"
                   style={{ width: `${progress}%` }}
+                  layoutId="progress-bar"
                 />
               </div>
             </div>
 
-            <div className="h-8 w-[1px] bg-white/10 mx-1" />
+            {/* Divider */}
+            <div className="h-6 w-[1px] bg-white/10 mx-1" />
 
-            <div className="flex items-center gap-3 group/vol">
-               <button onClick={onMuteToggle} className="text-white/50 hover:text-white transition-colors">
-                 {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-               </button>
-               <div className="w-20 h-1 bg-white/20 rounded-full cursor-pointer relative group/slider">
-                  <div className="absolute -top-2 -bottom-2 left-0 right-0" />
-                  <input
-                    type="range" min="0" max="1" step="0.05"
-                    value={isMuted ? 0 : volume}
-                    onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-                    className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full"
-                  />
-                  <div className="absolute top-0 left-0 h-full bg-white rounded-full transition-all group-hover/slider:bg-[#F5A83C]" style={{ width: `${(isMuted ? 0 : volume) * 100}%` }} />
+            {/* Volume & Close Group */}
+            <div className="flex items-center gap-1 pl-2">
+               {/* Compact Volume Control */}
+               <div className="relative group/vol flex items-center justify-center w-10 h-10">
+                   <button 
+                     onClick={onMuteToggle}
+                     className="text-white/50 hover:text-white transition-colors"
+                   >
+                     {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                   </button>
+                   
+                   {/* Hover Slider (Apple Style Reveal) */}
+                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-8 h-24 bg-[#17161A] border border-white/10 rounded-full flex flex-col justify-end items-center p-2 opacity-0 group-hover/vol:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/vol:pointer-events-auto shadow-2xl">
+                      <div className="w-1 h-full bg-white/20 rounded-full relative overflow-hidden">
+                          <input
+                            type="range" min="0" max="1" step="0.05"
+                            value={isMuted ? 0 : volume}
+                            onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
+                            className="absolute inset-0 opacity-0 cursor-pointer z-10 w-full h-full -left-[10px] w-[30px]"
+                            style={{ transform: "rotate(-90deg)", transformOrigin: "center" }}
+                          />
+                          <div 
+                            className="absolute bottom-0 left-0 w-full bg-white rounded-full transition-all"
+                            style={{ height: `${(isMuted ? 0 : volume) * 100}%` }}
+                          />
+                      </div>
+                   </div>
                </div>
+
+                {/* Close Button */}
+                <button 
+                  onClick={onClose}
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white/60 hover:text-white transition-all active:scale-95"
+                  title="Close Module"
+                >
+                  <X size={16} strokeWidth={2.5} />
+                </button>
             </div>
 
-            <button 
-              onClick={onClose}
-              className="ml-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/20 text-white/70 hover:text-white transition-all"
-            >
-              <X size={14} />
-            </button>
+            {/* Subtle glow effect */}
+            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-white/5 to-transparent blur-md -z-10 pointer-events-none" />
           </div>
         </motion.div>
       )}
@@ -603,7 +481,7 @@ export default function App() {
 
   const currentSlideData = activeSlide !== null ? slides[activeSlide] : null
 
-  // Audio Logic
+  // Audio Logic & Auto Advance
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.pause()
@@ -617,9 +495,21 @@ export default function App() {
       audioRef.current.play().catch((e) => console.log("Autoplay blocked:", e))
 
       const handleEnded = () => {
-        setIsPlaying(false)
-        setCurrentTime(0)
+        // --- AUTO CLOSE AND OPEN NEXT MODULE LOGIC ---
+        if (activeSlide < slides.length - 1) {
+          // Advance to next slide
+          setActiveSlide(prev => prev + 1)
+          // Ensure it keeps playing
+          setIsPlaying(true)
+          setCurrentTime(0)
+        } else {
+          // If it's the last slide, stop and close
+          setIsPlaying(false)
+          setCurrentTime(0)
+          setActiveSlide(null)
+        }
       }
+      
       audioRef.current.addEventListener("ended", handleEnded)
 
       return () => {
@@ -629,7 +519,7 @@ export default function App() {
         }
       }
     }
-  }, [isPlaying, activeSlide])
+  }, [isPlaying, activeSlide]) // Re-run when activeSlide changes to load new audio
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume
@@ -674,9 +564,6 @@ export default function App() {
         <div className="flex items-center gap-1 text-2xl font-bold tracking-tighter text-[#284952]">
           Fruit of Sustainability<span className="text-[#F5A83C] text-4xl leading-[0]">.</span>
         </div>
-        <button className="bg-[#17161A] text-white px-7 py-3 rounded-full text-sm font-semibold hover:bg-[#284952] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#284952]/10">
-          Book Demo
-        </button>
       </nav>
 
       {/* Main Content Area */}
@@ -727,7 +614,7 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      {/* Navigation Pill */}
+      {/* Enhanced Compact Navigation Pill */}
       <NavigationPill
         visible={activeSlide !== null}
         isPlaying={isPlaying}
@@ -739,6 +626,7 @@ export default function App() {
         onVolumeChange={setVolume}
         onMuteToggle={() => setIsMuted(!isMuted)}
         onClose={handleClose}
+        activeSlideTitle={currentSlideData?.shortTitle}
       />
     </div>
   )
