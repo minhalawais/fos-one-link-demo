@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "cra-template-typescript": "1.2.0",
     "framer-motion": "^12.4.2",
+    "howler": "^2.2.4",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
     "leaflet": "^1.9.4",
@@ -70,5 +71,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "jscharting-react": "^1.4.2",
+    "typescript": "^5.9.3"
   }
 }
