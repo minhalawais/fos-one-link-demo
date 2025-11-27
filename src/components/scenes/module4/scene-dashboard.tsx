@@ -131,28 +131,29 @@ const FEEDBACK_ITEMS = [
 
 const loadScript = (src: string) =>
   new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector(`script[src="${src}"]`)
+    // Check if script is already loaded
+    const existingScript = document.querySelector(`script[src="${src}"]`);
     if (existingScript) {
-      resolve()
-      return
+      resolve();
+      return;
     }
 
-    const script = document.createElement("script")
-    script.src = src
-    script.async = true
-
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    
     script.onload = () => {
-      console.log(`Script loaded: ${src}`)
-      resolve()
-    }
-
+      console.log(`Script loaded: ${src}`);
+      resolve();
+    };
+    
     script.onerror = () => {
-      console.error(`Failed to load script: ${src}`)
-      reject(new Error(`Failed to load script: ${src}`))
-    }
-
-    document.head.appendChild(script)
-  })
+      console.error(`Failed to load script: ${src}`);
+      reject(new Error(`Failed to load script: ${src}`));
+    };
+    
+    document.head.appendChild(script);
+  });
 
 const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId: string }) => {
   const chartRef = useRef<HTMLDivElement>(null)

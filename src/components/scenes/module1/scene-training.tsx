@@ -312,24 +312,6 @@ export const SceneTraining = ({ isActive }: { isActive: boolean }) => {
             ))}
           </div>
         </div>
-        
-        {/* Mobile App Notification Popup */}
-        <motion.div 
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[90%] bg-white/95 backdrop-blur rounded-xl p-3 shadow-2xl border border-gray-200"
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          transition={{ delay: 2.5, type: "spring", damping: 15 }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#284952] rounded-lg flex items-center justify-center text-white">
-              <Smartphone size={16} />
-            </div>
-            <div>
-              <div className="text-[10px] text-gray-500 font-semibold uppercase">FOS Mobile App</div>
-              <div className="text-xs font-bold text-[#17161A]">New Report Submitted</div>
-            </div>
-          </div>
-        </motion.div>
      </motion.div>
 
      {/* TILE 2: MANAGEMENT DASHBOARD (Large) */}
