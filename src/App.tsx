@@ -189,9 +189,20 @@ export default function App() {
   }
 
   const handleClose = () => {
-    setActiveSlide(null)
-    setIsPlaying(false)
-    setCurrentTime(0)
+    // Stop audio immediately
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    
+    // Reset states
+    setIsPlaying(false);
+    setCurrentTime(0);
+    
+    // Small delay to allow clean animation transitions
+    setTimeout(() => {
+      setActiveSlide(null);
+    }, 50);
   }
 
   const getSlideStatus = (index: number): string => {
@@ -247,18 +258,18 @@ export default function App() {
               }}
             >
               {slides.map((item, index) => (
-                <Slide
-                  key={item.id}
-                  index={index}
-                  item={item}
-                  status={getSlideStatus(index)}
-                  onClick={() => handleSlideClick(index)}
-                  isPlaying={activeSlide === index && isPlaying}
-                  playerComponent={item.playerComponent}
-                  totalSlides={slides.length}
-                  currentTime={currentTime} // Passing down current time
-                />
-              ))}
+  <Slide
+    key={`${item.id}-${activeSlide === index && isPlaying ? 'playing' : 'idle'}`}
+    index={index}
+    item={item}
+    status={getSlideStatus(index)}
+    onClick={() => handleSlideClick(index)}
+    isPlaying={activeSlide === index && isPlaying}
+    playerComponent={item.playerComponent}
+    totalSlides={slides.length}
+    currentTime={currentTime}
+  />
+))}
             </motion.div>
           </motion.div>
         </LayoutGroup>

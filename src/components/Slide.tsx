@@ -369,15 +369,15 @@ const Slide: React.FC<SlideProps> = ({
       style={{ willChange: "width, transform" }}
     >
       <motion.div
-        className="absolute inset-0 overflow-hidden rounded-[32px] bg-white"
-        layout
-        transition={IOS_SPRING}
-        style={{
-            boxShadow: isExpanded 
-                ? "0 40px 100px -20px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.03)" 
-                : "0 4px 24px -4px rgba(0,0,0,0.08), 0 0 0 1px rgba(23,22,26,0.04)"
-        }}
-      >
+  className="absolute inset-0 overflow-hidden rounded-[32px] bg-white"
+  layout
+  transition={IOS_SPRING}
+  style={{
+      boxShadow: isExpanded 
+          ? "0 40px 100px -20px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.03)" 
+          : "0 4px 24px -4px rgba(0,0,0,0.08), 0 0 0 1px rgba(23,22,26,0.04)"
+  }}
+>
         <AnimatePresence mode="wait" initial={false}>
           {isIdle ? (
             // === IDLE STATE ===
@@ -560,66 +560,67 @@ const Slide: React.FC<SlideProps> = ({
 
               {/* RIGHT CONTENT / VISUAL & PLAYER SIDE */}
               <motion.div
-                layout
-                className="h-full relative overflow-hidden bg-[#F5F5F7]"
-                initial={false}
-                animate={{
-                  width: isPlaying ? "100%" : isExpanded ? "55%" : "0%",
-                  opacity: isExpanded ? 1 : 0,
-                }}
-                transition={IOS_SPRING}
-              >
-                <AnimatePresence mode="wait">
-                  {isPlaying ? (
-                    <motion.div
-                      key="player-container"
-                      // LEFT SIDE IS NOW F5F5F7, RIGHT IS DARK
-                      className="absolute inset-0 w-full h-full flex bg-[#F5F5F7]"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
-                    >
-                      {/* --- LEFT 25% : CONTROL PANEL --- */}
-                      <motion.div 
-                        className="w-[25%] h-full bg-[#F5F5F7] border-r border-[#E5E5EA]/60"
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.2, ...IOS_SPRING }}
-                      >
-                        <ControlPanel 
-                            scenes={moduleScenes}
-                            currentProgress={currentTime}
-                            isPlaying={isPlaying}
-                            moduleId={moduleId}
-                            onSeek={handleSeek}
-                        />
-                      </motion.div>
+  layout
+  className="h-full relative overflow-hidden"
+  initial={false}
+  animate={{
+    width: isPlaying ? "100%" : isExpanded ? "55%" : "0%",
+    opacity: isExpanded ? 1 : 0,
+  }}
+  transition={IOS_SPRING}
+>
+  <AnimatePresence mode="wait">
+    {isPlaying ? (
+      <motion.div
+        key="player-container"
+        className="absolute inset-0 w-full h-full flex"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* --- LEFT 25% : CONTROL PANEL --- */}
+        <motion.div 
+          className="w-[25%] h-full bg-[#F5F5F7] border-r border-[#E5E5EA]/60"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: -20, opacity: 0, transition: { duration: 0.2 } }}
+          transition={{ delay: 0.1, ...IOS_SPRING }}
+        >
+          <ControlPanel 
+              scenes={moduleScenes}
+              currentProgress={currentTime}
+              isPlaying={isPlaying}
+              moduleId={moduleId}
+              onSeek={handleSeek}
+          />
+        </motion.div>
 
-                      {/* --- RIGHT 75% : MODULE PLAYER --- */}
-                      <motion.div 
-                        className="w-[75%] h-full bg-[#17161A]"
-                        initial={{ x: 20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.3, ...IOS_SPRING }}
-                      >
-                        {playerComponent}
-                      </motion.div>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="visual"
-                      className="absolute inset-0 w-full h-full flex items-center justify-center"
-                      initial={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
-                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-                      transition={{ duration: 0.6, ease: IOS_EASE }}
-                    >
-                      <DynamicCoverArt id={item.id} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
+        {/* --- RIGHT 75% : MODULE PLAYER --- */}
+        <motion.div 
+          className="w-[75%] h-full bg-[#17161A]"
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: 20, opacity: 0, transition: { duration: 0.2 } }}
+          transition={{ delay: 0.15, ...IOS_SPRING }}
+        >
+          {playerComponent}
+        </motion.div>
+      </motion.div>
+    ) : (
+      <motion.div
+        key="visual"
+        className="absolute inset-0 w-full h-full"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <DynamicCoverArt id={item.id} />
+      </motion.div>
+    )}
+  </AnimatePresence>
+</motion.div>
             </motion.div>
           )}
         </AnimatePresence>
