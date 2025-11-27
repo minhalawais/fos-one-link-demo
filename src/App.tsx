@@ -73,6 +73,13 @@ export default function App() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // --- GLOBAL ZOOM SETUP ---
+  useEffect(() => {
+    // Forces the entire website to render at 80% zoom
+    // This provides a denser, "dashboard-like" view on load
+    (document.body.style as any).zoom = "80%"
+  }, [])
+
   const slides = [
     {
       id: 1,
@@ -208,21 +215,21 @@ export default function App() {
 
       {/* Floating Header "Island" */}
       <nav className="w-full pt-8 pb-4 flex justify-center z-50 relative pointer-events-none">
-  <motion.div
-    className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl px-6 py-2 rounded-full border border-white/50 shadow-lg shadow-black/5"
-    initial={{ y: -50, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    transition={{ duration: 1, type: "spring" }}
-  >
-    {/* Replace the colored dot with your logo */}
-    <img 
-      src="/assets/FOS-01.png" 
-      alt="Fruit of Sustainability"
-      className="w-10 h-10 object-contain"
-    />
-    <span className="text-sm font-bold tracking-wider text-[#284952] uppercase">Fruit of Sustainability</span>
-  </motion.div>
-</nav>
+        <motion.div
+          className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl px-6 py-2 rounded-full border border-white/50 shadow-lg shadow-black/5"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, type: "spring" }}
+        >
+          {/* Replace the colored dot with your logo */}
+          <img 
+            src="/assets/FOS-01.png" 
+            alt="Fruit of Sustainability"
+            className="w-10 h-10 object-contain"
+          />
+          <span className="text-sm font-bold tracking-wider text-[#284952] uppercase">Fruit of Sustainability</span>
+        </motion.div>
+      </nav>
 
       {/* Main Content Stage */}
       <main className="flex-1 w-full h-full flex flex-col justify-center relative z-10">
