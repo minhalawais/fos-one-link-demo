@@ -152,7 +152,16 @@ const IntakeVisual = () => (
         transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
       >
          {[Phone, Mail, MessageSquare].map((Icon, i) => (
-           <div key={i} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 origin-bottom" style={{ transform: `rotate(${i * 120}deg) translateY(-144px) rotate(-${i * 120}deg)` }}>
+           <div 
+             key={i} 
+             className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 origin-bottom" 
+             style={{ 
+               // Custom position for index 0, same for indices 1 and 2
+               transform: i === 0 
+                 ? `rotate(180deg) translateY(-230px) rotate(-180deg)`  // Custom position for index 0 (bottom)
+                 : `rotate(${i * 120}deg) translateY(-144px) rotate(-${i * 120}deg)`  // Same as before for indices 1 and 2
+             }}
+           >
              <motion.div 
                initial={{ scale: 0, opacity: 0, y: 20 }}
                animate={{ scale: 1, opacity: 1, y: 0 }}
