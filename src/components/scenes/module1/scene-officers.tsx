@@ -1,271 +1,394 @@
 "use client"
 
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  ShieldCheck, 
-  FileSignature, 
-  CheckCircle2, 
-  Building2, 
-  Users, 
+import {
+  ShieldCheck,
+  FileSignature,
+  Gavel,
+  Users,
+  Building2,
+  Lock,
+  MapPin,
   AlertTriangle,
-  BadgeCheck,
-  Fingerprint
+  HeartHandshake,
+  CheckCircle2,
+  Scan,
+  Fingerprint,
+  FileText,
+  Database
 } from "lucide-react"
 
-// --- THEME ---
+// --- ASSET CONFIGURATION ---
+const AVATARS = {
+  male_unit: "/assets/avatars/male_io.png",
+  female_hr: "/assets/avatars/female_io.png",
+  male_safety: "/assets/avatars/investigation_officer_avatar.png"
+}
+
+// --- THEME CONSTANTS ---
 const COLORS = {
   Teal: "#284952",
   Green: "#60BA81",
   Orange: "#F5A83C",
-  Charcoal: "#17161A",
   White: "#FFFFFF",
-  GlassBorder: "rgba(255, 255, 255, 0.6)",
-  GlassBg: "rgba(255, 255, 255, 0.65)",
 }
 
-// --- COMPONENTS ---
+// --- SUB-COMPONENTS ---
 
-// 1. The ID Card (The "Hero" Element)
-const OfficerBadge = ({ 
-  icon: Icon, 
-  title, 
-  subtitle, 
-  color, 
-  accentColor,
-  delay = 0,
-  scale = 1,
-  layoutId
-}: any) => (
+// 1. Holographic Duty Widget
+const DutyWidget = ({ icon: Icon, title, subtitle, align, color, delay }: any) => (
   <motion.div
-    layoutId={layoutId}
-    initial={{ opacity: 0, scale: 0.8, y: 20, rotateX: 10 }}
-    animate={{ opacity: 1, scale: scale, y: 0, rotateX: 0 }}
-    className="relative flex flex-col items-center overflow-hidden bg-white/70 backdrop-blur-2xl border border-white/60 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.15)] rounded-[1.5rem] w-48 aspect-[3/4] z-10"
-    style={{ transformStyle: "preserve-3d" }}
-    transition={{ delay, type: "spring", stiffness: 100, damping: 20 }}
-  >
-    {/* Decorative Header */}
-    <div className="absolute top-0 inset-x-0 h-24 opacity-10" style={{ background: color }} />
-    
-    {/* Avatar Section */}
-    <div className="mt-8 relative mb-4">
-       <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg text-white relative z-10"
-            style={{ background: `linear-gradient(135deg, ${color}, ${accentColor})` }}>
-          <Icon size={32} strokeWidth={2} />
-       </div>
-       {/* Animated Ring */}
-       <motion.div 
-         className="absolute inset-0 rounded-2xl z-0"
-         style={{ border: `2px solid ${color}` }}
-         animate={{ scale: [1, 1.3], opacity: [0.5, 0] }}
-         transition={{ duration: 2, repeat: Infinity }}
-       />
-    </div>
-
-    {/* Text Info */}
-    <div className="flex-1 flex flex-col items-center px-4 text-center space-y-1">
-      <h3 className="text-sm font-bold text-[#284952] leading-tight">{title}</h3>
-      <p className="text-[10px] font-medium text-[#767676] uppercase tracking-wide">{subtitle}</p>
-      
-      {/* Micro UI Elements */}
-      <div className="mt-auto mb-6 w-full space-y-2">
-         <div className="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-            <motion.div 
-              className="h-full rounded-full"
-              style={{ background: COLORS.Green }}
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ delay: delay + 0.5, duration: 1.5 }}
-            />
-         </div>
-         <div className="flex justify-between items-center text-[8px] text-gray-400 font-mono">
-            <span className="flex items-center gap-1"><Fingerprint size={8} /> VERIFIED</span>
-            <span>ID: 8092</span>
-         </div>
-      </div>
-    </div>
-  </motion.div>
-)
-
-// 2. Action Indicators (Floating Glass Pills)
-const TaskPill = ({ icon: Icon, label, align, delay }: any) => (
-  <motion.div
-    initial={{ opacity: 0, x: align === 'left' ? 20 : -20, scale: 0.8 }}
-    animate={{ opacity: 1, x: 0, scale: 1 }}
-    transition={{ delay, type: "spring", stiffness: 120 }}
+    initial={{ opacity: 0, x: align === 'left' ? 40 : -40, scale: 0.8, rotateY: align === 'left' ? 20 : -20 }}
+    animate={{ opacity: 1, x: 0, scale: 1, rotateY: 0 }}
+    transition={{ delay, type: "spring", stiffness: 100, damping: 15 }}
     className={`
-      absolute top-1/2 -translate-y-1/2 
-      ${align === 'left' ? 'right-[55%]' : 'left-[55%]'}
-      flex items-center gap-3 p-3 rounded-2xl
-      bg-white/80 backdrop-blur-xl border border-white
-      shadow-lg z-20 min-w-[140px]
+      absolute top-[30%] z-40
+      ${align === 'left' ? '-left-[150px] md:-left-[180px]' : '-right-[150px] md:-right-[180px]'}
+      flex items-center gap-3 p-3 rounded-xl
+      bg-white/80 backdrop-blur-md border border-white shadow-xl w-[170px]
     `}
   >
-    <div className={`p-2 rounded-full ${align === 'left' ? 'bg-[#60BA81]/10 text-[#60BA81]' : 'bg-[#F5A83C]/10 text-[#F5A83C]'}`}>
-      <Icon size={18} />
+    <div
+      className="p-3 rounded-lg text-white shadow-sm flex items-center justify-center relative overflow-hidden"
+      style={{ backgroundColor: color }}
+    >
+      <Icon size={20} className="relative z-10" />
+      <motion.div
+        animate={{ x: ["-100%", "200%"] }}
+        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 bg-white/30 skew-x-12"
+      />
     </div>
     <div className="flex flex-col">
-       <span className="text-[10px] uppercase tracking-wider text-gray-400 font-bold">Status</span>
-       <span className="text-xs font-bold text-[#284952]">{label}</span>
+      <span className="text-[8px] font-bold uppercase text-gray-400 tracking-wider">Module Access</span>
+      <span className="text-[10px] md:text-[11px] font-bold text-[#284952] leading-tight">{title}</span>
+      <span className="text-[9px] text-gray-500 leading-tight">{subtitle}</span>
     </div>
+
+    <div className={`absolute top-1/2 w-8 h-[2px] bg-gradient-to-r ${align === 'left' ? 'from-transparent to-' + color : 'from-' + color + ' to-transparent'} ${align === 'left' ? '-right-8' : '-left-8'}`} style={{ backgroundColor: color, opacity: 0.5 }} />
+    <motion.div
+      initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: delay + 0.2 }}
+      className={`absolute top-1/2 w-2 h-2 rounded-full border-2 border-white ${align === 'left' ? '-right-8' : '-left-8'} -mt-1`}
+      style={{ backgroundColor: color }}
+    />
   </motion.div>
 )
 
-export const SceneOfficers = ({ isActive }: { isActive: boolean }) => {
-  // Voiceover Timing Logic Map (approximate based on script)
-  // 0s - 5s: Intro Officer (VO: 43-48)
-  // 5s - 10s: Duties (VO: 48-53)
-  // 10s+: Split (VO: 53-61)
-  
+// 2. The Main Persona Card
+const PersonaCard = ({
+  avatar,
+  roleTitle,
+  dept,
+  systemRole,
+  systemId,
+  isUpgraded,
+  color,
+  delay = 0,
+  specialties = []
+}: any) => {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-[#F5F5F7] relative overflow-hidden">
-      
-      {/* Background Ambience (Subtle Apple-style Mesh) */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[#60BA81]/10 blur-[80px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#284952]/10 blur-[80px]" />
+    <motion.div
+      layout
+      className={`
+        relative flex flex-col items-center overflow-hidden rounded-2xl border transition-all duration-700 shrink-0
+        ${isUpgraded
+          // INCREASED CARD HEIGHT (h-[32rem])
+          ? 'bg-white/90 backdrop-blur-xl shadow-2xl border-white/80 w-64 h-[28rem] md:w-72 md:h-[32rem] z-20'
+          : 'bg-gray-200/80 grayscale opacity-70 border-gray-300 w-52 h-72 z-10'
+        }
+      `}
+      style={{
+        boxShadow: isUpgraded ? `0 25px 50px -12px ${color}30` : 'none'
+      }}
+    >
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{ backgroundImage: `radial-gradient(${color} 1px, transparent 1px)`, backgroundSize: '10px 10px' }} />
+
+      <div className={`w-full h-1.5 transition-colors duration-500 ${isUpgraded ? '' : 'bg-gray-400'}`} style={{ background: isUpgraded ? color : undefined }} />
+
+      <div className="mt-4 flex flex-col items-center z-10 w-full px-5">
+        <div className="flex justify-between w-full items-center mb-1">
+          <div className="flex flex-col">
+            <span className="text-[8px] font-bold uppercase tracking-widest text-gray-400">
+              {isUpgraded ? "IO-PORTAL STATUS" : "SYSTEM PENDING"}
+            </span>
+            {isUpgraded && (
+              <motion.span
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="text-[10px] font-mono font-bold" style={{ color: color }}
+              >
+                ID: {systemId}
+              </motion.span>
+            )}
+          </div>
+          {isUpgraded ? (
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: delay + 0.3, type: "spring" }}
+            >
+              <ShieldCheck size={20} color={color} />
+            </motion.div>
+          ) : (
+            <Lock size={16} className="text-gray-400" />
+          )}
+        </div>
       </div>
 
-      {/* Main Content Container - Fits Slider Aspect Ratio */}
-      <div className="relative w-full max-w-2xl h-full flex items-center justify-center p-8 perspective-[1000px]">
-        
-        {/* PHASE 1 & 2: SINGLE OFFICER & DUTIES */}
-        {/* We keep this visible until the split happens around 10s (approx 53s global time) */}
-        <motion.div 
-           className="absolute inset-0 flex items-center justify-center"
-           animate={{ 
-             opacity: [0, 1, 1, 0], 
-             scale: [0.9, 1, 1, 1.1],
-             filter: ["blur(10px)", "blur(0px)", "blur(0px)", "blur(8px)"]
-           }}
-           transition={{ 
-             times: [0, 0.1, 0.8, 1], 
-             duration: 10, // Visible for first 10 seconds of scene
-             ease: "easeInOut" 
-           }}
-        >
-           <div className="relative">
-              {/* Central Card */}
-              <OfficerBadge 
-                icon={BadgeCheck}
-                title="Investigation Officer"
-                subtitle="Authorized Personnel"
+      {/* --- AVATAR & SCANNER --- */}
+      {/* SIGNIFICANTLY INCREASED CONTAINER HEIGHT (h-60) */}
+      <div className={`relative w-full flex items-end justify-center overflow-hidden transition-all duration-500 ${isUpgraded ? 'h-60' : 'flex-1'}`}>
+        <motion.img
+          src={avatar}
+          alt={roleTitle}
+          layoutId={`avatar-${roleTitle}`}
+          // SIGNIFICANTLY INCREASED IMAGE WIDTH (w-64)
+          className={`object-contain drop-shadow-2xl transition-all duration-700 ${isUpgraded ? 'w-64 mb-[-20px]' : 'w-40 mb-0 opacity-60'}`}
+        />
+
+        <AnimatePresence>
+          {isUpgraded && (
+            <motion.div
+              initial={{ top: "-100%" }}
+              animate={{ top: ["-10%", "120%"] }}
+              transition={{ duration: 1.5, delay: delay, ease: "easeInOut" }}
+              className="absolute left-0 w-full h-16 bg-gradient-to-b from-transparent via-white/60 to-transparent z-30 opacity-60"
+            >
+              <div className="w-full h-[2px] bg-white shadow-[0_0_15px_white]" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div className="w-full flex-1 bg-white/70 backdrop-blur-sm p-4 z-20 border-t border-gray-100 flex flex-col items-center relative">
+
+        <div className="text-center w-full">
+          <AnimatePresence mode="wait">
+            {isUpgraded ? (
+              <motion.div
+                key="active"
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              >
+                <h3 className="text-sm md:text-base font-bold text-[#284952]">{roleTitle}</h3>
+                <p className="text-[10px] font-medium text-gray-500 uppercase mb-2">{dept}</p>
+
+                <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[9px] font-bold text-white shadow-sm" style={{ backgroundColor: color }}>
+                  <Fingerprint size={10} />
+                  <span>{systemRole}</span>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="inactive"
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-1"
+              >
+                <div className="w-20 h-2 bg-gray-200 rounded-full mb-1" />
+                <div className="w-12 h-2 bg-gray-200 rounded-full" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {isUpgraded && specialties.length > 0 && (
+          <motion.div
+            className="w-full mt-auto pt-3 border-t border-dashed border-gray-200"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: delay + 0.6 }}
+          >
+            <div className="flex flex-col gap-2">
+              {specialties.map((spec: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <div className={`p-1.5 rounded-md bg-opacity-10`} style={{ backgroundColor: color }}>
+                    <spec.icon size={12} style={{ color: color }} />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[7px] font-bold text-gray-400 uppercase">{spec.label}</span>
+                    <span className="text-[10px] font-bold text-[#284952]">{spec.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+      </div>
+    </motion.div>
+  )
+}
+
+// --- MAIN SCENE CONTROLLER ---
+
+export default function SceneOfficers() {
+  const [phase, setPhase] = useState(0)
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase(1), 1000)
+    const t2 = setTimeout(() => setPhase(2), 5000)
+    const t3 = setTimeout(() => setPhase(3), 10000)
+
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); }
+  }, [])
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#F5F5F7] relative overflow-hidden font-sans">
+
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full opacity-[0.03]"
+          style={{ backgroundImage: 'linear-gradient(#284952 1px, transparent 1px), linear-gradient(90deg, #284952 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#284952]/10 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity }}
+          className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#60BA81]/10 rounded-full blur-3xl"
+        />
+      </div>
+
+      <div className="relative w-full h-full flex items-center justify-center p-4">
+
+        {/* --- PHASE 1 & 2: APPOINTMENT & DUTIES --- */}
+        <AnimatePresence>
+          {phase < 3 && (
+            <motion.div
+              className="relative z-30"
+              exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+              transition={{ duration: 0.5 }}
+            >
+              <PersonaCard
+                avatar={AVATARS.male_unit}
+                roleTitle="Factory Nominee"
+                dept="Management Representative"
+                systemRole="Lead Investigation Officer"
+                systemId="IO-8921"
+                isUpgraded={phase >= 1}
                 color={COLORS.Teal}
-                accentColor={COLORS.Green}
-                delay={0.2}
-                layoutId="main-card"
+                specialties={[
+                  { icon: Database, label: "System Access", value: "IO-Portal Activated" },
+                  { icon: Scan, label: "Responsibility", value: "Grievance Resolution" }
+                ]}
               />
 
-              {/* Task: Resolving (Appears at ~5s mark in global relative time) */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 3.5, duration: 0.5 }} // Sync with "Resolving" audio
-              >
-                <TaskPill icon={CheckCircle2} label="Resolving" align="left" delay={3.5} />
-              </motion.div>
-
-              {/* Task: Documenting */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 4.5, duration: 0.5 }} // Sync with "Documenting" audio
-              >
-                <TaskPill icon={FileSignature} label="Documenting" align="right" delay={4.5} />
-              </motion.div>
-           </div>
-        </motion.div>
-
-
-        {/* PHASE 3: THE SPLIT (Different Units/Genders) */}
-        {/* Starts appearing at 10s (VO: "Different units, genders...") */}
-        <motion.div 
-           className="absolute inset-0 flex items-center justify-center"
-           initial={{ opacity: 0 }}
-           animate={{ opacity: 1 }}
-           transition={{ delay: 9.5, duration: 0.8 }}
-        >
-           <div className="flex gap-4 md:gap-6 items-center justify-center">
-              
-              {/* Left: Unit Officer */}
-              <motion.div
-                initial={{ x: 50, opacity: 0, scale: 0.8 }}
-                animate={{ x: 0, opacity: 1, scale: 0.9 }}
-                transition={{ delay: 10, type: "spring", stiffness: 80 }}
-                className="hidden md:block origin-right"
-              >
-                 <OfficerBadge 
-                    icon={Building2}
-                    title="Unit Officer"
-                    subtitle="Location A"
-                    color={COLORS.Teal}
-                    accentColor="#3b6b78"
-                    scale={0.9}
-                    delay={10}
-                 />
-              </motion.div>
-
-              {/* Center: Gender Specialist (Prominent) */}
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 10.2, type: "spring", stiffness: 100 }}
-                className="z-20 shadow-2xl"
-              >
-                 <OfficerBadge 
-                    icon={Users}
-                    title="Gender Specialist"
-                    subtitle="Inclusivity Lead"
-                    color={COLORS.Orange}
-                    accentColor="#ffc978"
-                    scale={1.1} // Slightly larger
-                    delay={10.2}
-                 />
-              </motion.div>
-
-              {/* Right: Category Lead */}
-              <motion.div
-                initial={{ x: -50, opacity: 0, scale: 0.8 }}
-                animate={{ x: 0, opacity: 1, scale: 0.9 }}
-                transition={{ delay: 10.4, type: "spring", stiffness: 80 }}
-                className="hidden md:block origin-left"
-              >
-                 <OfficerBadge 
-                    icon={AlertTriangle}
-                    title="Category Lead"
-                    subtitle="Safety Dept"
+              {/* HOLOGRAPHIC DUTIES */}
+              {phase >= 2 && (
+                <>
+                  <DutyWidget
+                    icon={Gavel}
+                    title="Remediation Protocol"
+                    subtitle="RCA & CAPA Development"
+                    align="left"
                     color={COLORS.Green}
-                    accentColor="#8be3ab"
-                    scale={0.9}
-                    delay={10.4}
-                 />
+                    delay={0}
+                  />
+                  <DutyWidget
+                    icon={FileText}
+                    title="Evidence Logging"
+                    subtitle="Documentation & Upload"
+                    align="right"
+                    color={COLORS.Orange}
+                    delay={0.2}
+                  />
+                </>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* --- PHASE 3: DIVERSITY GRID --- */}
+        {phase === 3 && (
+          <motion.div
+            className="flex items-end justify-center gap-3 md:gap-6 z-20 w-full max-w-5xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* 1. UNIT IO */}
+            <motion.div initial={{ x: 50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+              <PersonaCard
+                avatar={AVATARS.male_unit}
+                roleTitle="Production Supervisor"
+                dept="Production Unit A"
+                systemRole="Unit-Level IO"
+                systemId="IO-8921"
+                isUpgraded={true}
+                color={COLORS.Teal}
+                delay={0.2}
+                specialties={[
+                  { icon: MapPin, label: "Assignment Scope", value: "Production Floor" },
+                  { icon: CheckCircle2, label: "Task", value: "Verification & RCA" }
+                ]}
+              />
+            </motion.div>
+
+            {/* 2. GENDER IO - HERO CARD */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="transform scale-110 z-30"
+            >
+              <PersonaCard
+                avatar={AVATARS.female_hr}
+                roleTitle="HR Representative"
+                dept="Human Resources"
+                systemRole="Gender-Specific IO"
+                systemId="IO-4432"
+                isUpgraded={true}
+                color={COLORS.Orange}
+                delay={0.4}
+                specialties={[
+                  { icon: HeartHandshake, label: "Assignment Scope", value: "Female Grievances" },
+                  { icon: AlertTriangle, label: "Protocol", value: "Harassment/Sensitive" }
+                ]}
+              />
+              {/* Floating Badge */}
+              <motion.div
+                initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.5 }}
+                className="absolute -top-5 left-1/2 -translate-x-1/2 bg-[#284952] text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-lg border border-white/20 whitespace-nowrap flex items-center gap-2"
+              >
+                <Users size={12} className="text-[#F5A83C]" />
+                SENSITIVE CASES
               </motion.div>
-           </div>
-        </motion.div>
-        
-        {/* Connection Lines Background for Phase 3 */}
-        <motion.svg 
-          className="absolute inset-0 w-full h-full pointer-events-none -z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
-          transition={{ delay: 10.5 }}
-        >
-           <path d="M 50% 50% L 20% 50%" stroke={COLORS.Teal} strokeWidth="2" strokeDasharray="6 6" fill="none" />
-           <path d="M 50% 50% L 80% 50%" stroke={COLORS.Teal} strokeWidth="2" strokeDasharray="6 6" fill="none" />
-        </motion.svg>
+            </motion.div>
+
+            {/* 3. CATEGORY IO (HSE/Safety) */}
+            <motion.div initial={{ x: -50, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+              <PersonaCard
+                avatar={AVATARS.male_safety}
+                roleTitle="HSE Manager"
+                dept="Health & Safety"
+                systemRole="Category-Specific IO"
+                systemId="IO-1198"
+                isUpgraded={true}
+                color={COLORS.Green}
+                delay={0.6}
+                specialties={[
+                  { icon: ShieldCheck, label: "Assignment Scope", value: "HSE & Discipline" },
+                  { icon: FileSignature, label: "Duty", value: "CAPA Execution" }
+                ]}
+              />
+            </motion.div>
+          </motion.div>
+        )}
 
       </div>
 
-      {/* Footer / Context Indicator */}
-      <motion.div 
-        className="absolute bottom-6 flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-md rounded-full border border-white/40"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+      {/* --- FOOTER CONTEXT --- */}
+      <motion.div
+        className="absolute bottom-6 flex items-center gap-2 px-5 py-2.5 bg-white/60 backdrop-blur-md rounded-full border border-white/50 shadow-sm"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
       >
-        <ShieldCheck size={14} className="text-[#284952]" />
-        <span className="text-[10px] font-bold text-[#284952] uppercase tracking-wider">
-          FOS Investigation Framework
+        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <span className="text-[10px] font-bold text-[#284952] uppercase tracking-widest">
+          IO-PORTAL DEPLOYMENT ACTIVE
         </span>
       </motion.div>
 

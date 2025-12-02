@@ -158,11 +158,11 @@ export default function App() {
   // Listen for custom seek events from ControlPanel (Loose coupling)
   useEffect(() => {
     const handleSeekEvent = (e: Event) => {
-        const customEvent = e as CustomEvent;
-        if (audioRef.current) {
-            audioRef.current.currentTime = customEvent.detail.time;
-            setCurrentTime(customEvent.detail.time);
-        }
+      const customEvent = e as CustomEvent;
+      if (audioRef.current) {
+        audioRef.current.currentTime = customEvent.detail.time;
+        setCurrentTime(customEvent.detail.time);
+      }
     };
     window.addEventListener('seek-audio', handleSeekEvent);
     return () => window.removeEventListener('seek-audio', handleSeekEvent);
@@ -194,11 +194,11 @@ export default function App() {
       audioRef.current.pause();
       audioRef.current = null;
     }
-    
+
     // Reset states
     setIsPlaying(false);
     setCurrentTime(0);
-    
+
     // Small delay to allow clean animation transitions
     setTimeout(() => {
       setActiveSlide(null);
@@ -219,21 +219,21 @@ export default function App() {
 
       {/* Floating Header "Island" */}
       <nav className="w-full pt-8 pb-4 flex justify-center z-50 relative pointer-events-none">
-  <motion.div
-    className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl px-6 py-2 rounded-full border border-white/50 shadow-lg shadow-black/5"
-    initial={{ y: -50, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    transition={{ duration: 1, type: "spring" }}
-  >
-    {/* Replace the colored dot with your logo */}
-    <img 
-      src="/assets/FOS-01.png" 
-      alt="Fruit of Sustainability"
-      className="w-10 h-10 object-contain"
-    />
-    <span className="text-sm font-bold tracking-wider text-[#284952] uppercase">Fruit of Sustainability</span>
-  </motion.div>
-</nav>
+        <motion.div
+          className="pointer-events-auto flex items-center gap-3 bg-white/70 backdrop-blur-xl px-6 py-2 rounded-full border border-white/50 shadow-lg shadow-black/5"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, type: "spring" }}
+        >
+          {/* Replace the colored dot with your logo */}
+          <img
+            src="/assets/FOS-01.png"
+            alt="Fruit of Sustainability"
+            className="w-10 h-10 object-contain"
+          />
+          <span className="text-sm font-bold tracking-wider text-[#284952] uppercase">Fruit of Sustainability</span>
+        </motion.div>
+      </nav>
 
       {/* Main Content Stage */}
       <main className="flex-1 w-full h-full flex flex-col justify-center relative z-10">
@@ -258,18 +258,18 @@ export default function App() {
               }}
             >
               {slides.map((item, index) => (
-  <Slide
-    key={`${item.id}-${activeSlide === index && isPlaying ? 'playing' : 'idle'}`}
-    index={index}
-    item={item}
-    status={getSlideStatus(index)}
-    onClick={() => handleSlideClick(index)}
-    isPlaying={activeSlide === index && isPlaying}
-    playerComponent={item.playerComponent}
-    totalSlides={slides.length}
-    currentTime={currentTime}
-  />
-))}
+                <Slide
+                  key={`${item.id}-${activeSlide === index && isPlaying ? 'playing' : 'idle'}`}
+                  index={index}
+                  item={item}
+                  status={getSlideStatus(index)}
+                  onClick={() => handleSlideClick(index)}
+                  isPlaying={activeSlide === index && isPlaying}
+                  playerComponent={item.playerComponent}
+                  totalSlides={slides.length}
+                  currentTime={currentTime}
+                />
+              ))}
             </motion.div>
           </motion.div>
         </LayoutGroup>

@@ -1,20 +1,13 @@
 "use client"
 
-import type React from "react"
-
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  User,
-  Headset,
   Phone,
   MessageCircle,
   Mail,
-  ArrowRight,
-  CheckCircle2,
-  Sparkles,
-  Search,
+  Headset,
   Calendar,
-  Upload,
   HardHat,
   Users,
   Baby,
@@ -27,11 +20,36 @@ import {
   ShieldAlert,
   Gavel,
   MessageSquareQuote,
+  CheckCircle2,
+  Mic,
+  FileText,
+  UploadCloud,
+  User,
+  Building
 } from "lucide-react"
-import { useState, useEffect } from "react"
+
+// --- CONSTANTS ---
+const ASSETS = {
+  worker: "/assets/avatars/worker_calling.png",
+  officer: "/assets/avatars/fos_grievance_officer_complaint.png",
+}
+
+const PALETTE = {
+  teal: "#284952",
+  green: "#60BA81",
+  orange: "#F5A83C",
+  white: "#FFFFFF",
+  grayBg: "#F5F5F7",
+  charcoal: "#17161A",
+  border: "#DEE2E6",
+  textGray: "#767676",
+  softGreen: "rgba(96, 186, 129, 0.42)"
+}
+
+const IOS_EASE = [0.16, 1, 0.3, 1] // Apple-style spring ease
 
 const COMPLAINT_CATEGORIES = [
-  { icon: HardHat, label: "Workplace Health, Safety and Environment" },
+  { icon: HardHat, label: "Workplace Health, Safety" },
   { icon: Users, label: "Freedom of Association" },
   { icon: Baby, label: "Child Labor" },
   { icon: DollarSign, label: "Wages & Benefits" },
@@ -42,7 +60,7 @@ const COMPLAINT_CATEGORIES = [
   { icon: Globe, label: "Ethical Business" },
   { icon: ShieldAlert, label: "Harassment" },
   { icon: Gavel, label: "Workplace Discipline" },
-  { icon: MessageSquareQuote, label: "Employee Feedback/Suggestion" },
+  { icon: MessageSquareQuote, label: "Employee Feedback" },
 ]
 
 interface FormDataState {
@@ -55,615 +73,569 @@ interface FormDataState {
   gender: string
   mobile: string
   date: string
+  additionalComments: string
+  complaintAgainst: string
+  concernedDept: string
+  history: string
+  solution: string
 }
 
-const smoothSpring = { type: "spring", stiffness: 300, damping: 30 }
-const gentleSpring = { type: "spring", stiffness: 200, damping: 25 }
-const microInteraction = { type: "spring", stiffness: 400, damping: 25 }
+// --- SUB-COMPONENTS ---
 
+const DataWave = ({ color, direction = "right" }: { color: string, direction?: "left" | "right" }) => (
+  <div className="flex gap-1.5 items-center justify-center overflow-hidden w-24">
+    {[...Array(5)].map((_, i) => (
+      <motion.div
+        key={i}
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ backgroundColor: color }}
+        animate={{
+          scale: [0.8, 1.4, 0.8],
+          opacity: [0.3, 1, 0.3],
+          x: direction === "right" ? [0, 10, 0] : [0, -10, 0] // Subtle movement
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          delay: i * 0.2,
+          ease: "easeInOut"
+        }}
+      />
+    ))}
+  </div>
+)
+
+const FormField = ({ label, children, delay = 0, className = "" }: { label: string, children: React.ReactNode, delay?: number, className?: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.5, ease: IOS_EASE }}
+    className={`flex flex-col gap-1.5 ${className}`}
+  >
+    <label className="text-[10px] font-bold text-[#17161A] ml-1">{label}</label>
+    {children}
+  </motion.div>
+)
+
+const FormInput = ({ value, isTyping, placeholder, icon, className = "", multiline = false }: { value: string, isTyping?: boolean, placeholder: string, icon?: React.ReactNode, className?: string, multiline?: boolean }) => (
+  <div className={`relative group ${className}`}>
+    <motion.div
+      className={`
+        w-full px-3 py-2.5 rounded-lg text-xs transition-all duration-300 border
+        flex ${multiline ? 'items-start' : 'items-center'}
+        ${value
+          ? "bg-white border-[#60BA81]/50 shadow-[0_2px_12px_-4px_rgba(96,186,129,0.2)] text-[#17161A]"
+          : "bg-white border-[#DEE2E6] text-[#767676]"
+        }
+        ${multiline ? 'h-20' : ''}
+      `}
+    >
+      <span className={`flex-1 font-medium ${multiline ? 'whitespace-pre-wrap' : 'truncate'}`}>{value || placeholder}</span>
+      {isTyping && (
+        <motion.span
+          className="w-0.5 h-3 bg-[#60BA81] ml-1 rounded-full shrink-0"
+          animate={{ opacity: [1, 0, 1] }}
+          transition={{ duration: 0.8, repeat: Infinity }}
+          style={{ marginTop: multiline ? '4px' : '0' }}
+        />
+      )}
+    </motion.div>
+    {icon && <div className={`absolute right-3 ${multiline ? 'top-3' : 'top-1/2 -translate-y-1/2'} text-[#284952]/40`}>{icon}</div>}
+  </div>
+)
+
+// --- MAIN COMPONENT ---
 export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
+  // --- STATE ---
   const [stage, setStage] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [formData, setFormData] = useState<FormDataState>({
-    fosId: "",
-    name: "",
-    company: "",
-    workerType: "",
-    department: "",
-    designation: "",
-    gender: "",
-    mobile: "",
-    date: "",
+    fosId: "", name: "", company: "", workerType: "", department: "", designation: "", gender: "", mobile: "", date: "",
+    additionalComments: "", complaintAgainst: "", concernedDept: "", history: "", solution: ""
   })
-  const [showComments, setShowComments] = useState(false)
-  const [showUpload, setShowUpload] = useState(false)
   const [typingField, setTypingField] = useState<string | null>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
+  // --- TIMING LOGIC ---
   useEffect(() => {
     if (isActive) {
-      // Reset state
+      // Reset
       setStage(0)
       setSelectedCategory(null)
       setFormData({
-        fosId: "",
-        name: "",
-        company: "",
-        workerType: "",
-        department: "",
-        designation: "",
-        gender: "",
-        mobile: "",
-        date: "",
+        fosId: "", name: "", company: "", workerType: "", department: "", designation: "", gender: "", mobile: "", date: "",
+        additionalComments: "", complaintAgainst: "", concernedDept: "", history: "", solution: ""
       })
-      setShowComments(false)
-      setShowUpload(false)
       setTypingField(null)
+      if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0
 
-      // Timeline based on voiceover (22.96s - 44.56s = ~21.6s duration)
+      // Time Reference (Relative to 22.96s start)
+      // 0s: Worker Ringing
+      // 6.5s: Officer Enters
+      // 9.5s: Form Slides In (Data Entry Starts)
+
       const timers = [
-        // Stage 1: Show worker with communication channels (0s - Phone/SMS/WhatsApp/Email channels appear)
-        setTimeout(() => setStage(1), 500),
+        // 1. Start / Ringing (0s)
+        setTimeout(() => setStage(1), 100),
 
-        // Stage 2: Connection established, officer appears (around 6.4s mark - "trained FOS grievance officers")
-        setTimeout(() => setStage(2), 6400),
+        // 2. Officer Enters (6.5s)
+        setTimeout(() => setStage(2), 6500),
 
-        // Stage 3: Form appears, start filling (around 9.52s - "help them file their cases")
-        setTimeout(() => setStage(3), 9520),
+        // 3. Form Slides In (9.5s - "We ask...")
+        setTimeout(() => setStage(3), 9500),
 
-        // Counter questions - extracting info (around 14.8s - "ask counter questions")
-        setTimeout(() => {
-          setTypingField("fosId")
-          setFormData((prev) => ({ ...prev, fosId: "FOS-2024-" }))
-        }, 10500),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, fosId: "FOS-2024-78542" }))
-          setTypingField("name")
-        }, 11200),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, name: "Ahmed Khan" }))
-          setTypingField("company")
-        }, 12000),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, company: "Pearl Textile Mills" }))
-          setTypingField("workerType")
-        }, 12800),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, workerType: "Machine Operator" }))
-          setTypingField("department")
-        }, 13600),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, department: "Spinning Unit" }))
-          setTypingField("mobile")
-        }, 14400),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, mobile: "+92 300 1234567" }))
-          setTypingField("date")
-        }, 15200),
-        setTimeout(() => {
-          setFormData((prev) => ({ ...prev, date: "15/11/2024" }))
-          setTypingField(null)
-        }, 16000),
+        // --- DATA FILLING SIMULATION (Post 9.5s) ---
+        // Basic Info
+        setTimeout(() => { setTypingField("fosId"); setFormData(p => ({ ...p, fosId: "FOS-24-" })) }, 10500),
+        setTimeout(() => { setFormData(p => ({ ...p, fosId: "FOS-24-8921" })); setTypingField("name") }, 11000),
+        setTimeout(() => { setFormData(p => ({ ...p, name: "Ahmed Khan" })); setTypingField("company") }, 11500),
+        setTimeout(() => { setFormData(p => ({ ...p, company: "Pearl Textiles" })); setTypingField("workerType") }, 12000),
+        setTimeout(() => { setFormData(p => ({ ...p, workerType: "Operator" })); setTypingField("department") }, 12300),
+        setTimeout(() => { setFormData(p => ({ ...p, department: "Spinning" })); setTypingField("designation") }, 12600),
+        setTimeout(() => { setFormData(p => ({ ...p, designation: "Senior Op" })); setTypingField("gender") }, 12900),
+        setTimeout(() => { setFormData(p => ({ ...p, gender: "Male" })); setTypingField("mobile") }, 13200),
+        setTimeout(() => { setFormData(p => ({ ...p, mobile: "+92 300 123..." })); setTypingField("date") }, 13500),
+        setTimeout(() => { setFormData(p => ({ ...p, date: "15 Nov 2024" })); setTypingField(null) }, 13800),
 
-        // Stage 4: Category selection (around 17s - "verify details")
+        // 4. Category Selection (Approx 14.5s)
         setTimeout(() => {
-          setStage(4)
-          setSelectedCategory(0) // Workplace Health selected
-        }, 17000),
+          setStage(4);
+          setSelectedCategory(3);
+          // Scroll down slightly
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTo({ top: 200, behavior: 'smooth' });
+          }
+        }, 14500),
 
-        // Stage 5: Additional fields appear (around 18.5s)
-        setTimeout(() => {
-          setShowComments(true)
-        }, 18500),
-        setTimeout(() => {
-          setShowUpload(true)
-        }, 19500),
+        // --- ADDITIONAL FIELDS FILLING (Post 15.5s) ---
+        setTimeout(() => { setTypingField("additionalComments"); setFormData(p => ({ ...p, additionalComments: "Wages delayed for 2 months..." })) }, 15500),
+        setTimeout(() => { setFormData(p => ({ ...p, additionalComments: "Wages delayed for 2 months. Overtime not paid." })); setTypingField("complaintAgainst") }, 16500),
 
-        // Stage 6: Submit success (around 21s - "launch complaint on their behalf")
-        setTimeout(() => setStage(5), 21000),
+        setTimeout(() => {
+          if (scrollContainerRef.current) scrollContainerRef.current.scrollTo({ top: 400, behavior: 'smooth' });
+          setFormData(p => ({ ...p, complaintAgainst: "Mr. Asif (Supervisor)" })); setTypingField("concernedDept")
+        }, 17500),
+
+        setTimeout(() => { setFormData(p => ({ ...p, concernedDept: "Accounts / HR" })); setTypingField("history") }, 18200),
+        setTimeout(() => { setFormData(p => ({ ...p, history: "First time reporting." })); setTypingField("solution") }, 18800),
+        setTimeout(() => { setFormData(p => ({ ...p, solution: "Immediate release of pending dues." })); setTypingField(null) }, 19500),
+
+        // 5. File Upload Simulation (Approx 20s)
+        setTimeout(() => {
+          setStage(4.5); // Trigger upload visual
+          if (scrollContainerRef.current) scrollContainerRef.current.scrollTo({ top: 600, behavior: 'smooth' });
+        }, 20000),
+
+        // 6. Success (Approx 22s)
+        setTimeout(() => setStage(5), 22000),
       ]
-
       return () => timers.forEach(clearTimeout)
     }
   }, [isActive])
 
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#F5F5F7] via-white to-[#E8EEF1] relative overflow-hidden font-sans p-4">
-      {/* Subtle Background Gradients */}
-      <div className="absolute inset-0 z-0 opacity-30">
+    <div className="w-full h-full bg-[#F5F5F7] flex items-center justify-center relative overflow-hidden font-sans selection:bg-[#60BA81]/20">
+
+      {/* --- BACKGROUND AMBIANCE --- */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04]" />
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.15, 0.25, 0.15],
-          }}
-          transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-          className="absolute -top-1/4 -left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-[#60BA81]/30 to-[#284952]/20 rounded-full blur-[100px]"
+          className="absolute -top-[30%] -right-[10%] w-[800px] h-[800px] bg-[#60BA81]/10 rounded-full blur-[120px]"
+          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 10, repeat: Infinity }}
         />
         <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.2, 0.3, 0.2],
-          }}
-          transition={{ duration: 25, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-          className="absolute -bottom-1/4 -right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-[#F5A83C]/25 to-[#60BA81]/15 rounded-full blur-[90px]"
+          className="absolute -bottom-[30%] -left-[10%] w-[600px] h-[600px] bg-[#284952]/5 rounded-full blur-[100px]"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 12, repeat: Infinity, delay: 2 }}
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-6xl flex items-center justify-center gap-8 px-4">
-        {/* LEFT: Worker with Communication Channels */}
-        <motion.div
-          className="flex flex-col items-center gap-4"
-          initial={{ opacity: 0, x: -60, scale: 0.9 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          transition={smoothSpring}
-        >
-          <div className="relative w-28 h-28">
-            <motion.div
-              className="w-full h-full rounded-full bg-white shadow-xl flex items-center justify-center relative z-10 border-4 border-white"
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-            >
-              <User size={44} className="text-[#284952]" strokeWidth={1.5} />
-            </motion.div>
+      {/* --- MAIN STAGE CONTAINER --- */}
+      <div className="relative z-10 w-full max-w-[1400px] h-full flex items-center justify-center px-8">
 
-            {/* Communication Channels Orbiting */}
-            {stage >= 1 && (
-              <>
-                {[
-                  { Icon: Phone, angle: 0, color: "#60BA81", label: "Phone" },
-                  { Icon: MessageCircle, angle: 90, color: "#F5A83C", label: "SMS/WhatsApp" },
-                  { Icon: Mail, angle: 180, color: "#284952", label: "Email" },
-                ].map(({ Icon, angle, color }, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute left-1/2 top-1/2"
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{
-                      scale: 1,
-                      opacity: 1,
-                      x: 55 * Math.cos((angle * Math.PI) / 180) - 16,
-                      y: 55 * Math.sin((angle * Math.PI) / 180) - 16,
-                    }}
-                    transition={{ delay: i * 0.15, ...microInteraction }}
-                  >
+        <motion.div
+          className="flex items-center gap-2"
+          layout
+          transition={{ duration: 1, ease: IOS_EASE }}
+        >
+
+          {/* === 1. WORKER (LEFT) === */}
+          <motion.div
+            layout
+            className="flex flex-col items-center relative z-20 shrink-0"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <div className="relative">
+              {/* Ringing Animation */}
+              {stage < 2 && (
+                <>
+                  {[1, 2, 3].map((i) => (
                     <motion.div
-                      className="w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
-                      style={{ backgroundColor: color }}
-                      animate={{
-                        y: [0, -3, 0],
-                        rotate: [0, 5, 0],
-                      }}
+                      key={`ring-${i}`}
+                      className="absolute inset-0 rounded-full border-2 border-[#60BA81]/40 z-0"
+                      initial={{ scale: 1, opacity: 1 }}
+                      animate={{ scale: 2.2, opacity: 0 }}
                       transition={{
                         duration: 2,
-                        repeat: Number.POSITIVE_INFINITY,
-                        delay: i * 0.3,
-                        ease: "easeInOut",
+                        repeat: Infinity,
+                        delay: i * 0.6,
+                        ease: "easeOut"
                       }}
-                    >
-                      <Icon size={14} className="text-white" strokeWidth={2.5} />
-                    </motion.div>
-                  </motion.div>
-                ))}
-
-                {/* Pulse Waves */}
-                <motion.div
-                  animate={{ scale: [1, 2.5], opacity: [0.4, 0] }}
-                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeOut" }}
-                  className="absolute inset-0 bg-[#60BA81]/30 rounded-full"
-                />
-              </>
-            )}
-          </div>
-
-          <div className="text-center">
-            <motion.h3
-              className="text-lg font-semibold text-[#1d1d1f]"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              Worker
-            </motion.h3>
-            <motion.p
-              className="text-xs text-[#86868b] mt-1"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              Phone / SMS / WhatsApp / Email
-            </motion.p>
-          </div>
-        </motion.div>
-
-        {/* CENTER: Animated Connection Line */}
-        <div className="hidden lg:flex flex-col items-center gap-3">
-          <motion.div
-            className="relative w-32 h-1.5 bg-gray-200 rounded-full overflow-hidden"
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-          >
-            <motion.div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#60BA81] via-[#F5A83C] to-[#284952]"
-              initial={{ width: "0%" }}
-              animate={{ width: stage >= 2 ? "100%" : "0%" }}
-              transition={{ duration: 1.5, ease: [0.32, 0.72, 0, 1] }}
-            />
-          </motion.div>
-
-          <motion.div
-            className="p-2.5 rounded-full bg-white shadow-lg"
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{
-              scale: stage >= 2 ? 1 : 0.7,
-              rotate: stage >= 2 ? 0 : -180,
-              backgroundColor: stage >= 2 ? "#60BA81" : "#E5E7EB",
-            }}
-            transition={gentleSpring}
-          >
-            <ArrowRight size={18} className={stage >= 2 ? "text-white" : "text-gray-400"} strokeWidth={2.5} />
-          </motion.div>
-
-          <motion.p
-            className="text-[10px] text-[#86868b] font-medium"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: stage >= 2 ? 1 : 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            Assisted Filing
-          </motion.p>
-        </div>
-
-        {/* RIGHT: FOS Officer Interface with Form */}
-        <motion.div
-          className="relative w-full max-w-xl"
-          initial={{ opacity: 0, x: 60, scale: 0.95 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          transition={{ ...smoothSpring, delay: 0.2 }}
-        >
-          <motion.div
-            className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/60 overflow-hidden"
-            whileHover={{ y: -2 }}
-            transition={gentleSpring}
-          >
-            {/* Header - Gradient like the form */}
-            <div className="bg-gradient-to-r from-[#60BA81] to-[#284952] p-5 flex items-center gap-3">
-              <div className="relative">
-                <motion.div
-                  className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30"
-                  animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-                >
-                  <Headset size={26} className="text-white" strokeWidth={2} />
-                </motion.div>
-                <motion.div
-                  className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#60BA81] border-2 border-white rounded-full"
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                />
-              </div>
-              <div className="flex-1">
-                <motion.h4 className="text-white font-semibold text-base">FOS Grievance Officer</motion.h4>
-                <div className="flex items-center gap-2 mt-1">
-                  <motion.span
-                    className="w-2 h-2 bg-white rounded-full"
-                    animate={{ opacity: [1, 0.3, 1] }}
-                    transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                  />
-                  <span className="text-white/90 text-xs font-medium">
-                    {stage < 3 ? "Connecting..." : "Assisting Live"}
-                  </span>
-                </div>
-              </div>
-              {stage >= 5 && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={microInteraction}
-                >
-                  <CheckCircle2 size={28} className="text-white" strokeWidth={2} />
-                </motion.div>
+                    />
+                  ))}
+                </>
               )}
-            </div>
 
-            {/* Form Content */}
-            <div className="p-5">
-              <AnimatePresence mode="wait">
-                {stage < 3 ? (
-                  <motion.div
-                    key="loading"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="h-[380px] flex flex-col items-center justify-center gap-4"
-                  >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                    >
-                      <Sparkles size={40} className="text-[#F5A83C]" strokeWidth={1.5} />
-                    </motion.div>
-                    <div className="text-center">
-                      <h5 className="text-sm font-semibold text-[#1d1d1f] mb-1">
-                        {stage < 2 ? "Receiving Call..." : "Preparing Assistance..."}
-                      </h5>
-                      <p className="text-xs text-[#86868b]">
-                        {stage < 2 ? "Worker is reaching out" : "Verifying worker details"}
-                      </p>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="form"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={smoothSpring}
-                    className="space-y-4"
-                  >
-                    {/* FOS ID Search */}
-                    <motion.div
-                      className="bg-[#F5F5F7] rounded-xl p-3"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <label className="text-[10px] font-semibold text-[#86868b] uppercase tracking-wide block mb-2">
-                        FOS ID - فوس آئی ڈی
-                      </label>
-                      <div className="flex gap-2">
-                        <FormInput
-                          value={formData.fosId}
-                          isTyping={typingField === "fosId"}
-                          placeholder="Enter FOS ID or CNIC"
-                          className="flex-1"
-                        />
-                        <motion.button
-                          className="px-4 py-2 bg-[#F5A83C] text-white rounded-lg text-xs font-semibold"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <Search size={14} />
-                        </motion.button>
-                      </div>
-                    </motion.div>
+              {/* Avatar */}
+              <motion.div
+                className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl relative z-10 bg-white"
+                layoutId="worker-avatar"
+              >
+                <img src={ASSETS.worker} alt="Worker" className="w-full h-full object-cover scale-110" />
+              </motion.div>
 
-                    {/* Form Grid */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <FormField
-                        label="Name - نام"
-                        value={formData.name}
-                        isTyping={typingField === "name"}
-                        placeholder="Enter your name"
-                        delay={0}
-                      />
-                      <FormField
-                        label="Company - کمپنی"
-                        value={formData.company}
-                        isTyping={typingField === "company"}
-                        placeholder="Enter company name"
-                        delay={0.1}
-                      />
-                      <FormField
-                        label="Worker Type - کارکن کی قسم"
-                        value={formData.workerType}
-                        isTyping={typingField === "workerType"}
-                        placeholder="Enter worker type"
-                        delay={0.2}
-                      />
-                      <FormField
-                        label="Department - شعبہ"
-                        value={formData.department}
-                        isTyping={typingField === "department"}
-                        placeholder="Enter department"
-                        delay={0.3}
-                      />
-                      <FormField
-                        label="Mobile Number - موبائل نمبر"
-                        value={formData.mobile}
-                        isTyping={typingField === "mobile"}
-                        placeholder="Enter mobile number"
-                        delay={0.4}
-                      />
-                      <FormField
-                        label="Date of Incident - تاریخ"
-                        value={formData.date}
-                        isTyping={typingField === "date"}
-                        placeholder="mm/dd/yyyy"
-                        icon={<Calendar size={12} className="text-[#86868b]" />}
-                        delay={0.5}
-                      />
-                    </div>
-
-                    {/* Complaint Categories */}
-                    {stage >= 4 && (
+              {/* Floating Icons (Initial Call State) */}
+              <AnimatePresence>
+                {stage < 2 && (
+                  <>
+                    {[Phone, MessageCircle, Mic].map((Icon, i) => (
                       <motion.div
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={gentleSpring}
-                        className="space-y-2"
+                        key={`icon-${i}`}
+                        className="absolute w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#284952] z-20 border border-[#F5F5F7]"
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{
+                          opacity: 1, scale: 1,
+                          x: 75 * Math.cos(i * 2 * Math.PI / 3 - Math.PI / 2),
+                          y: 75 * Math.sin(i * 2 * Math.PI / 3 - Math.PI / 2)
+                        }}
+                        exit={{ opacity: 0, scale: 0 }}
+                        style={{ top: '50%', left: '50%', marginTop: -20, marginLeft: -20 }}
                       >
-                        <label className="text-[10px] font-semibold text-[#86868b] uppercase tracking-wide">
-                          Complaint Category - شکایت کی قسم
-                        </label>
-                        <div className="grid grid-cols-6 gap-2">
-                          {COMPLAINT_CATEGORIES.slice(0, 6).map((cat, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ scale: 0.8, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              transition={{ delay: i * 0.05, ...microInteraction }}
-                              onClick={() => setSelectedCategory(i)}
-                              className={`
-                                relative p-2 rounded-xl border-2 flex flex-col items-center gap-1 cursor-pointer transition-all
-                                ${
-                                  selectedCategory === i
-                                    ? "bg-[#60BA81] border-[#60BA81] shadow-lg"
-                                    : "bg-white border-[#DEE2E6] hover:border-[#60BA81]/50"
-                                }
-                              `}
-                            >
-                              <cat.icon
-                                size={16}
-                                className={selectedCategory === i ? "text-white" : "text-[#284952]"}
-                                strokeWidth={1.5}
-                              />
-                              <span
-                                className={`text-[7px] font-medium leading-tight text-center line-clamp-2 ${
-                                  selectedCategory === i ? "text-white" : "text-[#17161A]"
-                                }`}
-                              >
-                                {cat.label.split(" ").slice(0, 2).join(" ")}
-                              </span>
-                            </motion.div>
-                          ))}
-                        </div>
+                        <Icon size={18} />
                       </motion.div>
-                    )}
-
-                    {/* Additional Comments */}
-                    {showComments && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        transition={gentleSpring}
-                      >
-                        <label className="text-[10px] font-semibold text-[#86868b] uppercase tracking-wide block mb-2">
-                          Additional Comments - اضافی تبصرے
-                        </label>
-                        <motion.div
-                          className="bg-[#F5F5F7] rounded-xl p-3 h-14 flex items-center justify-center"
-                          animate={{ opacity: [0.7, 1, 0.7] }}
-                          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                        >
-                          <span className="text-xs text-[#86868b]">Recording details from call...</span>
-                        </motion.div>
-                      </motion.div>
-                    )}
-
-                    {/* File Upload */}
-                    {showUpload && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        transition={{ ...gentleSpring, delay: 0.1 }}
-                      >
-                        <label className="text-[10px] font-semibold text-[#86868b] uppercase tracking-wide block mb-2 flex items-center gap-1">
-                          <Upload size={10} />
-                          Upload Supporting Documents
-                        </label>
-                        <div className="border-2 border-dashed border-[#60BA81] rounded-xl p-3 bg-[#60BA81]/5 flex items-center justify-center">
-                          <span className="text-xs text-[#284952] font-medium">Drag and drop files here</span>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Submit */}
-                    {stage >= 5 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={gentleSpring}
-                        className="pt-2"
-                      >
-                        <motion.button
-                          className="w-full py-3 bg-gradient-to-r from-[#F5A83C] to-[#e69426] text-white rounded-xl font-semibold text-sm shadow-lg"
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
-                          animate={{
-                            boxShadow: [
-                              "0 4px 15px rgba(245, 168, 60, 0.3)",
-                              "0 8px 25px rgba(245, 168, 60, 0.5)",
-                              "0 4px 15px rgba(245, 168, 60, 0.3)",
-                            ],
-                          }}
-                          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                        >
-                          <span className="flex items-center justify-center gap-2">
-                            <CheckCircle2 size={16} />
-                            Complaint Filed Successfully
-                          </span>
-                        </motion.button>
-                      </motion.div>
-                    )}
-                  </motion.div>
+                    ))}
+                  </>
                 )}
               </AnimatePresence>
             </div>
+
+            <motion.div className="mt-6 text-center bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white shadow-sm">
+              <h3 className="text-sm font-bold text-[#284952]">Factory Worker</h3>
+              <p className="text-[10px] text-[#767676] font-medium uppercase tracking-wide">Complainant</p>
+            </motion.div>
           </motion.div>
+
+
+          {/* === CONNECTION: WORKER -> OFFICER === */}
+          <AnimatePresence>
+            {stage >= 2 && (
+              <motion.div
+                layout
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: stage >= 3 ? "100px" : "180px" }} // Shrink when form appears
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center shrink-0 overflow-hidden"
+              >
+                <span className="text-[9px] font-bold text-[#60BA81] uppercase tracking-widest mb-2 whitespace-nowrap">Live Assist</span>
+                <DataWave color="#60BA81" direction="right" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+
+          {/* === 2. OFFICER (CENTER HUB) === */}
+          <AnimatePresence>
+            {stage >= 2 && (
+              <motion.div
+                layout
+                className="flex flex-col items-center relative z-30 shrink-0"
+                initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: IOS_EASE }}
+              >
+                {/* Big Avatar for Officer */}
+                <div className="relative">
+                  <div className="w-44 h-44 rounded-full border-[6px] border-white shadow-[0_20px_40px_-12px_rgba(40,73,82,0.2)] overflow-hidden bg-[#F0F4F8] relative z-10">
+                    <img src={ASSETS.officer} alt="Officer" className="w-full h-full object-cover" />
+                  </div>
+
+                  {/* Badge */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.3, type: "spring" }}
+                    className="absolute bottom-2 right-2 bg-[#284952] p-3 rounded-full shadow-lg border-2 border-white z-20"
+                  >
+                    <Headset size={20} className="text-white" />
+                  </motion.div>
+                </div>
+
+                <motion.div className="mt-6 text-center bg-white/80 backdrop-blur-md px-6 py-3 rounded-xl border border-white shadow-sm">
+                  <h3 className="text-lg font-bold text-[#284952]">Grievance Officer</h3>
+                  <p className="text-[10px] text-[#767676] font-medium uppercase tracking-wide">FOS Support</p>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+
+          {/* === CONNECTION: OFFICER -> FORM === */}
+          <AnimatePresence>
+            {stage >= 3 && (
+              <motion.div
+                layout
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: "100px" }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center shrink-0 overflow-hidden"
+              >
+                <span className="text-[9px] font-bold text-[#284952] uppercase tracking-widest mb-2 whitespace-nowrap">Filling</span>
+                <DataWave color="#284952" direction="right" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+
+          {/* === 3. FORM (RIGHT) === */}
+          <AnimatePresence>
+            {stage >= 3 && (
+              <motion.div
+                layout
+                className="relative z-20 shrink-0"
+                initial={{ opacity: 0, x: 100, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: 0.8, ease: IOS_EASE }}
+              >
+                <div className="w-[420px] bg-white rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden border border-[#DEE2E6]">
+
+                  {/* Header */}
+                  <div className="bg-[#284952] p-6 text-center text-white relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
+                    {/* Abstract Header Shape */}
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#60BA81] rounded-full blur-2xl opacity-20" />
+
+                    <h1 className="text-xl font-bold relative z-10 tracking-tight">Complaint Filing</h1>
+                    <div className="flex items-center justify-center gap-2 mt-2 opacity-80">
+                      <span className="w-1.5 h-1.5 bg-[#60BA81] rounded-full animate-pulse" />
+                      <p className="text-[10px] uppercase tracking-widest font-semibold relative z-10">Assisted Mode Active</p>
+                    </div>
+                  </div>
+
+                  {/* Form Content (No Scrollbar via utility class logic) */}
+                  <div
+                    ref={scrollContainerRef}
+                    className="p-5 bg-white max-h-[420px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] scroll-smooth"
+                  >
+
+                    {/* Search Field */}
+                    <div className="bg-[#F8FAFB] p-3 rounded-xl border border-[#DEE2E6] mb-4">
+                      <FormField label="FOS ID Lookup">
+                        <div className="flex gap-2">
+                          <div className="flex-1 relative">
+                            <FormInput value={formData.fosId} isTyping={typingField === "fosId"} placeholder="Enter ID..." />
+                          </div>
+                          <button className="bg-[#F5A83C] text-white text-[10px] font-bold px-4 rounded-lg shadow-sm hover:bg-[#E69426] transition-colors">
+                            Verify
+                          </button>
+                        </div>
+                      </FormField>
+                    </div>
+
+                    {/* Auto-Filling Grid */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <FormField label="Worker Name">
+                        <FormInput value={formData.name} isTyping={typingField === "name"} placeholder="Name" />
+                      </FormField>
+                      <FormField label="Factory / Unit">
+                        <FormInput value={formData.company} isTyping={typingField === "company"} placeholder="Company" />
+                      </FormField>
+
+                      <FormField label="Emp Type">
+                        <FormInput value={formData.workerType} isTyping={typingField === "workerType"} placeholder="Type" />
+                      </FormField>
+                      <FormField label="Department">
+                        <FormInput value={formData.department} isTyping={typingField === "department"} placeholder="Dept" />
+                      </FormField>
+
+                      <FormField label="Designation">
+                        <FormInput value={formData.designation} isTyping={typingField === "designation"} placeholder="Desig" />
+                      </FormField>
+                      <FormField label="Gender">
+                        <FormInput value={formData.gender} isTyping={typingField === "gender"} placeholder="Gender" />
+                      </FormField>
+
+                      <div className="col-span-2 grid grid-cols-2 gap-3">
+                        <FormField label="Mobile Contact">
+                          <FormInput value={formData.mobile} isTyping={typingField === "mobile"} placeholder="+92..." icon={<Phone size={12} />} />
+                        </FormField>
+                        <FormField label="Incident Date">
+                          <FormInput value={formData.date} isTyping={typingField === "date"} placeholder="DD/MM/YYYY" icon={<Calendar size={12} />} />
+                        </FormField>
+                      </div>
+                    </div>
+
+                    {/* Categories Grid */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: stage >= 3.5 ? 1 : 0 }}
+                      className="space-y-2 mb-4"
+                    >
+                      <label className="text-[10px] font-bold text-[#17161A] ml-1 uppercase tracking-wider">Classification</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {COMPLAINT_CATEGORIES.slice(0, 6).map((cat, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: stage >= 4 ? 1 : 0, scale: stage >= 4 ? 1 : 0.9 }}
+                            transition={{ delay: i * 0.05 }}
+                            className={`
+                              p-2 rounded-lg border flex flex-col items-center gap-1.5 text-center cursor-pointer transition-all duration-300
+                              ${selectedCategory === i
+                                ? "bg-[#60BA81] border-[#60BA81] text-white shadow-lg scale-105"
+                                : "bg-white border-[#DEE2E6] text-[#767676] opacity-60"}
+                            `}
+                          >
+                            <cat.icon size={14} />
+                            <span className="text-[8px] font-bold leading-tight">{cat.label}</span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+
+                    {/* Additional Details (New Fields) */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: stage >= 4 ? 1 : 0 }}
+                      className="space-y-3 mb-4"
+                    >
+                      <FormField label="Additional Comments">
+                        <FormInput
+                          value={formData.additionalComments}
+                          isTyping={typingField === "additionalComments"}
+                          placeholder="Details..."
+                          multiline
+                          icon={<MessageSquareQuote size={12} />}
+                        />
+                      </FormField>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <FormField label="Complaint Against">
+                          <FormInput
+                            value={formData.complaintAgainst}
+                            isTyping={typingField === "complaintAgainst"}
+                            placeholder="Person Name"
+                            icon={<User size={12} />}
+                          />
+                        </FormField>
+                        <FormField label="Concerned Dept">
+                          <FormInput
+                            value={formData.concernedDept}
+                            isTyping={typingField === "concernedDept"}
+                            placeholder="Department"
+                            icon={<Building size={12} />}
+                          />
+                        </FormField>
+                      </div>
+
+                      <FormField label="Previous History">
+                        <FormInput
+                          value={formData.history}
+                          isTyping={typingField === "history"}
+                          placeholder="Any prior issues..."
+                        />
+                      </FormField>
+
+                      <FormField label="Proposed Solution">
+                        <FormInput
+                          value={formData.solution}
+                          isTyping={typingField === "solution"}
+                          placeholder="Desired outcome..."
+                        />
+                      </FormField>
+                    </motion.div>
+
+                    {/* File Upload Simulation */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: stage >= 4.5 ? 1 : 0 }}
+                      className="mb-4"
+                    >
+                      <label className="text-[10px] font-bold text-[#17161A] ml-1 uppercase tracking-wider mb-2 block">Evidence</label>
+                      <div className="border-2 border-dashed border-[#60BA81]/40 bg-[#60BA81]/5 rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
+                        <div className="w-8 h-8 bg-white rounded-full shadow-sm flex items-center justify-center text-[#60BA81]">
+                          <UploadCloud size={16} />
+                        </div>
+                        <p className="text-[10px] text-[#284952] font-medium">
+                          <span className="font-bold">Evidence Uploaded</span><br />
+                          <span className="text-[#767676] font-normal">payslip_nov.pdf (1.2MB)</span>
+                        </p>
+                        <div className="w-full h-1 bg-[#DEE2E6] rounded-full overflow-hidden mt-1 max-w-[100px]">
+                          <motion.div
+                            className="h-full bg-[#60BA81]"
+                            initial={{ width: 0 }}
+                            animate={{ width: "100%" }}
+                            transition={{ duration: 1.5, delay: 0.5 }}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Submit Area */}
+                    <div className="mt-5 pt-4 border-t border-[#DEE2E6] flex justify-end">
+                      <div className="flex items-center gap-2">
+                        <div className="text-[9px] text-right text-[#767676] leading-tight">
+                          Verified by<br />Officer
+                        </div>
+                        <button className="bg-gradient-to-r from-[#284952] to-[#1e363d] text-white px-8 py-2 rounded-lg font-bold text-xs shadow-lg transform transition-transform active:scale-95">
+                          Submit Case
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* --- SUCCESS OVERLAY --- */}
+                  <AnimatePresence>
+                    {stage >= 5 && (
+                      <motion.div
+                        className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-8"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
+                        <motion.div
+                          initial={{ scale: 0, rotate: -20 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                          className="w-20 h-20 bg-[#60BA81]/10 rounded-full flex items-center justify-center mb-4"
+                        >
+                          <CheckCircle2 size={40} className="text-[#60BA81]" />
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.2 }}
+                          className="text-center"
+                        >
+                          <h2 className="text-2xl font-bold text-[#284952] mb-1">FOS-24-8921</h2>
+                          <p className="text-xs text-[#767676] font-medium uppercase tracking-wide mb-8">Case Filed Successfully</p>
+
+                          <button className="w-full px-8 py-2.5 border-2 border-[#60BA81] text-[#60BA81] rounded-xl hover:bg-[#60BA81] hover:text-white transition-all font-bold text-xs">
+                            Close & Notify Worker
+                          </button>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
         </motion.div>
       </div>
-
-      {/* Helper Text */}
-      <motion.div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-      >
-        <p className="text-xs text-[#86868b] text-center max-w-md">
-          Helpful for workers who aren't comfortable using digital forms
-        </p>
-      </motion.div>
     </div>
   )
 }
-
-// Form Field Component
-const FormField = ({
-  label,
-  value,
-  isTyping,
-  placeholder,
-  icon,
-  delay = 0,
-}: {
-  label: string
-  value: string
-  isTyping?: boolean
-  placeholder: string
-  icon?: React.ReactNode
-  delay?: number
-}) => (
-  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay }}>
-    <label className="text-[9px] font-semibold text-[#86868b] uppercase tracking-wide block mb-1">{label}</label>
-    <FormInput value={value} isTyping={isTyping} placeholder={placeholder} icon={icon} />
-  </motion.div>
-)
-
-// Form Input Component
-const FormInput = ({
-  value,
-  isTyping,
-  placeholder,
-  icon,
-  className = "",
-}: {
-  value: string
-  isTyping?: boolean
-  placeholder: string
-  icon?: React.ReactNode
-  className?: string
-}) => (
-  <div className={`relative ${className}`}>
-    <motion.div
-      className={`
-        w-full px-3 py-2 rounded-lg text-xs border-2 transition-all
-        ${
-          isTyping
-            ? "border-[#60BA81] bg-[#60BA81]/5"
-            : value
-              ? "border-[#60BA81]/30 bg-white"
-              : "border-[#DEE2E6] bg-white"
-        }
-      `}
-    >
-      <span className={value ? "text-[#17161A]" : "text-[#767676]"}>{value || placeholder}</span>
-      {isTyping && (
-        <motion.span
-          className="inline-block w-0.5 h-3 bg-[#60BA81] ml-0.5"
-          animate={{ opacity: [1, 0, 1] }}
-          transition={{ duration: 0.8, repeat: Number.POSITIVE_INFINITY }}
-        />
-      )}
-    </motion.div>
-    {icon && <div className="absolute right-3 top-1/2 -translate-y-1/2">{icon}</div>}
-  </div>
-)
