@@ -7,7 +7,6 @@ import { AnimatePresence } from "framer-motion"
 import { SceneValidity } from "../components/scenes/module3/scene-validity.tsx"
 import { SceneRCACAPAEvidence } from "../components/scenes/module3/scene-rca-capa-evidence.tsx"
 import { SceneFOSVerification } from "../components/scenes/module3/scene-fos-verification.tsx"
-import { SceneRework } from "../components/scenes/module3/scene-rework.tsx"
 import { SceneClosure } from "../components/scenes/module3/scene-closure.tsx"
 import { SceneInvestigation } from "../components/scenes/module3/scene-1-unprocessed.tsx"
 

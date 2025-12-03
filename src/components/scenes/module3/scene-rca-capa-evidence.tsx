@@ -18,7 +18,14 @@ import {
   CheckCircle2,
   Calendar,
   Info,
+  Monitor,
+  User,
 } from "lucide-react"
+
+// Assets
+const ASSETS = {
+  officer_pc: "/assets/avatars/officer_pc.png",  // Investigation Officer
+}
 
 // Brand Colors
 const COLORS = {
@@ -193,40 +200,40 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
   const getTransform = () => {
     const containerWidth = 900 // approx max-w-[900px]
     const containerHeight = 600 // approx max-h-[600px]
-    
+
     switch (true) {
       // Zoom to RCA (top right section) - More moderate zoom
       case stage >= 2 && stage < 4:
-        return { 
+        return {
           scale: 1.6, // Reduced from 2.2 to 1.6
           x: -containerWidth * 0.18, // Adjusted for new scale
-          y: containerHeight * 0.12   
+          y: containerHeight * 0.12
         }
-      
+
       // Zoom to CAPA (bottom left section) - More moderate zoom
       case stage >= 4 && stage < 8:
-        return { 
+        return {
           scale: 1.6, // Reduced from 2.2 to 1.6
-          x: containerWidth * 0.18,  
-          y: -containerHeight * 0.12 
+          x: containerWidth * 0.18,
+          y: -containerHeight * 0.12
         }
-      
+
       // Zoom to Evidence (bottom right section) - More moderate zoom
       case stage >= 8 && stage < 13:
-        return { 
+        return {
           scale: 1.6, // Reduced from 2.2 to 1.6
-          x: -containerWidth * 0.18, 
-          y: -containerHeight * 0.18 
+          x: -containerWidth * 0.18,
+          y: -containerHeight * 0.18
         }
-      
+
       // Zoom to footer/submit button area - More moderate zoom
       case stage >= 13:
-        return { 
+        return {
           scale: 1.4, // Reduced from 1.8 to 1.4
-          x: 0, 
+          x: 0,
           y: -containerHeight * 0.25 // Less aggressive upward movement
         }
-      
+
       // Default: show full page
       default:
         return { scale: 1, x: 0, y: 0 }
@@ -276,8 +283,8 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
           x: transform.x,
           y: transform.y,
         }}
-        transition={{ 
-          type: "spring", 
+        transition={{
+          type: "spring",
           stiffness: 90, // Slightly softer spring
           damping: 25,   // More damping for smoother stop
           mass: 1        // Standard mass
@@ -365,7 +372,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                     animate={{
                                       backgroundColor:
                                         (stage === 6 && line.includes("CORRECTIVE")) ||
-                                        (stage === 7 && line.includes("PREVENTIVE"))
+                                          (stage === 7 && line.includes("PREVENTIVE"))
                                           ? COLORS.softGreen
                                           : "transparent",
                                     }}
@@ -643,6 +650,166 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
           </motion.div>
         </div>
       </motion.div>
+
+      {/* Investigation Officer Visualization - Bottom Left Corner */}
+      <AnimatePresence>
+        {stage >= 1 && (
+          <motion.div
+            initial={{ x: -120, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -120, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+            className="absolute bottom-6 left-6 z-30"
+          >
+            {/* Officer Card Container */}
+            <div className="relative">
+              {/* Main Card */}
+              <div className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden w-48">
+                {/* Header */}
+                <div
+                  className="px-3 py-2 flex items-center gap-2"
+                  style={{ backgroundColor: COLORS.darkTeal }}
+                >
+                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                    <User size={14} className="text-white" />
+                  </div>
+                  <span className="text-[10px] font-bold text-white">Investigation Officer</span>
+                </div>
+
+                {/* Officer Avatar */}
+                <div className="p-3 bg-gradient-to-br from-gray-50 to-white">
+                  <div className="relative">
+                    {/* Computer/Browser Frame */}
+                    <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+                      {/* Browser Header */}
+                      <div className="h-4 bg-gray-700 flex items-center px-2 gap-1">
+                        <div className="flex gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                        </div>
+                        <div className="flex-1 flex items-center justify-center">
+                          <Monitor size={8} className="text-gray-400" />
+                        </div>
+                      </div>
+
+                      {/* Screen Content - Officer Working */}
+                      <div className="relative bg-[#F8F8F8] h-32 flex items-center justify-center overflow-hidden">
+                        {/* Miniature version of the form (blurred background) */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 opacity-60" />
+
+                        {/* Typing Indicator */}
+                        <motion.div
+                          animate={{
+                            opacity: stage >= 3 && stage < 15 ? [0.3, 0.7, 0.3] : 0.3,
+                          }}
+                          transition={{
+                            duration: 2,
+                            repeat: stage >= 3 && stage < 15 ? Number.POSITIVE_INFINITY : 0,
+                          }}
+                          className="absolute top-2 right-2 flex gap-0.5"
+                        >
+                          {[0, 1, 2].map((i) => (
+                            <motion.div
+                              key={i}
+                              animate={{
+                                y: stage >= 3 && stage < 15 ? [0, -3, 0] : 0,
+                              }}
+                              transition={{
+                                duration: 0.6,
+                                repeat: stage >= 3 && stage < 15 ? Number.POSITIVE_INFINITY : 0,
+                                delay: i * 0.15,
+                              }}
+                              className="w-1 h-1 rounded-full"
+                              style={{ backgroundColor: COLORS.teal }}
+                            />
+                          ))}
+                        </motion.div>
+
+                        {/* Officer Avatar Overlay */}
+                        <div className="relative z-10">
+                          <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg bg-gradient-to-br from-gray-50 to-white">
+                            <img
+                              src={ASSETS.officer_pc}
+                              alt="Investigation Officer"
+                              className="w-full h-full object-cover"
+                              style={{
+                                imageRendering: 'auto',
+                                WebkitFontSmoothing: 'antialiased',
+                                backfaceVisibility: 'hidden',
+                                transform: 'translateZ(0) scale(1.001)',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Indicator */}
+                    <motion.div
+                      className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[8px] font-bold text-white shadow-md flex items-center gap-1"
+                      style={{ backgroundColor: COLORS.green }}
+                      animate={{
+                        scale: stage >= 3 && stage < 15 ? [1, 1.1, 1] : 1,
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: stage >= 3 && stage < 15 ? Number.POSITIVE_INFINITY : 0,
+                      }}
+                    >
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-white"
+                        animate={{
+                          opacity: stage >= 3 && stage < 15 ? [1, 0.3, 1] : 1,
+                        }}
+                        transition={{
+                          duration: 1,
+                          repeat: stage >= 3 && stage < 15 ? Number.POSITIVE_INFINITY : 0,
+                        }}
+                      />
+                      {stage >= 3 && stage < 8 && "Writing RCA"}
+                      {stage >= 8 && stage < 13 && "Uploading Evidence"}
+                      {stage >= 13 && stage < 15 && "Submitting"}
+                      {(stage < 3 || stage >= 15) && "Active"}
+                    </motion.div>
+                  </div>
+
+                  {/* Progress Info */}
+                  <div className="mt-2 text-center">
+                    <p className="text-[9px] text-gray-600 font-medium">
+                      {stage >= 2 && stage < 4 && "Documenting Root Cause"}
+                      {stage >= 4 && stage < 8 && "Creating Action Plan"}
+                      {stage >= 8 && stage < 13 && "Attaching Evidence"}
+                      {stage >= 13 && stage < 15 && "Finalizing Case"}
+                      {stage >= 15 && "Investigation Complete"}
+                      {stage < 2 && "Reviewing Case"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating Action Indicator */}
+              {stage >= 9 && stage < 13 && (
+                <motion.div
+                  initial={{ scale: 0, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0, y: 20 }}
+                  className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-lg border border-gray-200 whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-2">
+                    <Upload size={12} style={{ color: COLORS.teal }} />
+                    <span className="text-[9px] font-medium text-gray-700">Uploading files...</span>
+                  </div>
+                  {/* Arrow pointing down */}
+                  <div
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white border-r border-b border-gray-200 rotate-45"
+                  />
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Success Overlay */}
       <AnimatePresence>

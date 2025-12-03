@@ -20,6 +20,15 @@ import {
   RefreshCw,
 } from "lucide-react"
 
+// Assets
+const ASSETS = {
+  fosOfficer: "/assets/avatars/fos_officer.png",        // FOS Grievance Officer on phone
+  workerNeutral: "/assets/avatars/worker_neutral.png",  // Worker listening on phone
+  workerSad: "/assets/avatars/worker_sad.png",          // Worker dissatisfied
+  workerHappy: "/assets/avatars/worker_happy.png",      // Worker satisfied (optional)
+  officerPC: "/assets/avatars/officer_pc.png",          // Investigation Officer at computer
+}
+
 // Brand Colors
 const COLORS = {
   teal: "#0f9690",
@@ -203,87 +212,258 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                 <span className="text-white font-bold text-lg">FOS Team Verification</span>
               </motion.div>
 
-              {/* Stage 1: Phone Call */}
+              {/* Stage 1: Phone Call - Split Screen with Avatars */}
               {stage === 1 && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center gap-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="w-full max-w-[800px]"
                 >
-                  <motion.div
-                    animate={{
-                      rotate: [0, -10, 10, -10, 10, 0],
-                      scale: [1, 1.1, 1.1, 1.1, 1.1, 1],
-                    }}
-                    transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, repeatDelay: 0.5 }}
-                    className="w-20 h-20 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: COLORS.softGreen }}
-                  >
-                    <Phone size={36} style={{ color: COLORS.teal }} />
-                  </motion.div>
-                  <div className="text-center">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">Contacting Complainant</h3>
-                    <p className="text-sm text-gray-500">FOS Team calling for independent verification...</p>
-                  </div>
-                  <motion.div
-                    className="flex gap-1"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                  >
-                    {[1, 2, 3].map((i) => (
+                  {/* Split Screen Layout */}
+                  <div className="flex items-center justify-center gap-8">
+                    {/* FOS Officer Side */}
+                    <motion.div
+                      initial={{ x: -100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                      className="flex flex-col items-center gap-3"
+                    >
+                      {/* FOS Officer Avatar */}
+                      <div className="relative">
+                        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white">
+                          <img
+                            src={ASSETS.fosOfficer}
+                            alt="FOS Grievance Officer"
+                            className="w-full h-full object-cover"
+                            style={{
+                              imageRendering: 'auto',
+                              backfaceVisibility: 'hidden',
+                              transform: 'translateZ(0)',
+                            }}
+                          />
+                        </div>
+                        {/* Calling Indicator */}
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [0.7, 1, 0.7],
+                          }}
+                          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+                          className="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: COLORS.teal }}
+                        >
+                          <Phone size={20} className="text-white" />
+                        </motion.div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-bold text-gray-800">FOS Officer</p>
+                        <p className="text-xs text-gray-500">Calling...</p>
+                      </div>
+                    </motion.div>
+
+                    {/* Animated Connection Line */}
+                    <div className="relative flex items-center">
+                      {/* Pulsing Dots */}
+                      <div className="flex gap-2">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            animate={{
+                              scale: [1, 1.5, 1],
+                              opacity: [0.3, 1, 0.3],
+                            }}
+                            transition={{
+                              duration: 1.5,
+                              repeat: Number.POSITIVE_INFINITY,
+                              delay: i * 0.3,
+                            }}
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: COLORS.teal }}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Sound Waves */}
                       <motion.div
-                        key={i}
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: COLORS.teal }}
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 0.6, repeat: Number.POSITIVE_INFINITY, delay: i * 0.2 }}
-                      />
-                    ))}
+                        className="absolute left-1/2 -translate-x-1/2"
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                      >
+                        <svg width="80" height="40" viewBox="0 0 80 40">
+                          <motion.path
+                            d="M 10 20 Q 25 10, 40 20 T 70 20"
+                            stroke={COLORS.teal}
+                            strokeWidth="2"
+                            fill="none"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1 }}
+                            transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+                          />
+                        </svg>
+                      </motion.div>
+                    </div>
+
+                    {/* Worker Side */}
+                    <motion.div
+                      initial={{ x: 100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
+                      className="flex flex-col items-center gap-3"
+                    >
+                      {/* Worker Avatar */}
+                      <div className="relative">
+                        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white">
+                          <img
+                            src={ASSETS.workerNeutral}
+                            alt="Worker Complainant"
+                            className="w-full h-full object-cover"
+                            style={{
+                              imageRendering: 'auto',
+                              backfaceVisibility: 'hidden',
+                              transform: 'translateZ(0)',
+                            }}
+                          />
+                        </div>
+                        {/* Ringing Indicator */}
+                        <motion.div
+                          animate={{
+                            rotate: [0, -15, 15, -15, 15, 0],
+                            scale: [1, 1.1, 1.1, 1.1, 1.1, 1],
+                          }}
+                          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY, repeatDelay: 0.5 }}
+                          className="absolute -top-2 -right-2 w-12 h-12 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: COLORS.green }}
+                        >
+                          <Phone size={20} className="text-white" />
+                        </motion.div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-bold text-gray-800">Worker</p>
+                        <p className="text-xs text-gray-500">Receiving call...</p>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* Context Text Below */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                    className="mt-6 text-center"
+                  >
+                    <p className="text-sm text-gray-600 max-w-md mx-auto">
+                      FOS Team calling for independent verification...
+                    </p>
                   </motion.div>
                 </motion.div>
               )}
 
-              {/* Stage 2: Explaining Actions */}
+              {/* Stage 2: Conversation - Explaining Actions */}
               {stage === 2 && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-[500px]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="w-full max-w-[700px]"
                 >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: COLORS.softGreen }}
+                  <div className="flex items-start justify-center gap-6">
+                    {/* FOS Officer with Speech Bubble */}
+                    <motion.div
+                      initial={{ x: -50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex flex-col items-center gap-3 flex-1"
                     >
-                      <MessageSquare size={24} style={{ color: COLORS.teal }} />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-base font-bold text-gray-800 mb-2">Verification Call in Progress</h3>
-                      <div className="space-y-3">
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="flex items-start gap-2"
-                        >
-                          <ArrowRight size={14} style={{ color: COLORS.teal }} className="mt-1 flex-shrink-0" />
-                          <p className="text-sm text-gray-600">
-                            Explaining the actions taken by the Investigation Officer
-                          </p>
-                        </motion.div>
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.6 }}
-                          className="flex items-start gap-2"
-                        >
-                          <ArrowRight size={14} style={{ color: COLORS.teal }} className="mt-1 flex-shrink-0" />
-                          <p className="text-sm text-gray-600">
-                            Confirming if the worker is satisfied with the outcome
-                          </p>
-                        </motion.div>
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-gray-50 to-white">
+                        <img
+                          src={ASSETS.fosOfficer}
+                          alt="FOS Officer"
+                          className="w-full h-full object-cover"
+                          style={{
+                            imageRendering: 'auto',
+                            backfaceVisibility: 'hidden',
+                            transform: 'translateZ(0)',
+                          }}
+                        />
                       </div>
-                    </div>
+                      <p className="text-xs font-bold text-gray-800">FOS Officer</p>
+
+                      {/* Speech Bubble */}
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.5, type: "spring" }}
+                        className="relative bg-white rounded-2xl shadow-lg p-4 border-2 max-w-xs"
+                        style={{ borderColor: COLORS.teal }}
+                      >
+                        <div className="space-y-2">
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.7 }}
+                            className="text-xs text-gray-700 leading-relaxed"
+                          >
+                            "The Investigation Officer has reviewed your complaint and taken corrective actions..."
+                          </motion.p>
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.2 }}
+                            className="text-xs text-gray-700 leading-relaxed font-medium"
+                          >
+                            "Are you satisfied with the outcome?"
+                          </motion.p>
+                        </div>
+                        {/* Bubble Tail */}
+                        <div
+                          className="absolute -bottom-2 left-8 w-4 h-4 bg-white border-b-2 border-r-2 rotate-45"
+                          style={{ borderColor: COLORS.teal }}
+                        />
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Worker Listening */}
+                    <motion.div
+                      initial={{ x: 50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                      className="flex flex-col items-center gap-3 flex-1"
+                    >
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-gray-50 to-white">
+                        <img
+                          src={ASSETS.workerNeutral}
+                          alt="Worker"
+                          className="w-full h-full object-cover"
+                          style={{
+                            imageRendering: 'auto',
+                            backfaceVisibility: 'hidden',
+                            transform: 'translateZ(0)',
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs font-bold text-gray-800">Worker</p>
+
+                      {/* Listening Indicator */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1 }}
+                        className="flex gap-1"
+                      >
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            animate={{ y: [0, -5, 0] }}
+                            transition={{
+                              duration: 0.6,
+                              repeat: Number.POSITIVE_INFINITY,
+                              delay: i * 0.2,
+                            }}
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: COLORS.teal }}
+                          />
+                        ))}
+                      </motion.div>
+                    </motion.div>
                   </div>
                 </motion.div>
               )}
@@ -313,7 +493,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
           </motion.div>
         )}
 
-        {/* Stage 4: Not Satisfied Card */}
+        {/* Stage 4: Not Satisfied - Worker Dissatisfied */}
         {stage === 4 && (
           <motion.div
             key="not-satisfied"
@@ -322,17 +502,45 @@ Deadline: 15 Dec 2025 | Escalated Priority`
             exit={{ opacity: 0, scale: 0.9 }}
             className="absolute inset-0 flex items-center justify-center px-6"
           >
-            <div className="w-full max-w-[700px]">
-              {/* Timeline connector */}
-              <div className="flex justify-center mb-4">
-                <div className="w-0.5 h-8 border-l-2 border-dashed border-gray-300" />
-              </div>
+            <div className="w-full max-w-[800px]">
+              {/* Worker Dissatisfied Avatar - Prominent */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="flex justify-center mb-6"
+              >
+                <div className="relative">
+                  <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white">
+                    <img
+                      src={ASSETS.workerSad}
+                      alt="Dissatisfied Worker"
+                      className="w-full h-full object-cover"
+                      style={{
+                        imageRendering: 'auto',
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(0)',
+                      }}
+                    />
+                  </div>
+                  {/* Dissatisfied Indicator */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.5, type: "spring" }}
+                    className="absolute -bottom-2 -right-2 w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+                    style={{ backgroundColor: COLORS.orange }}
+                  >
+                    <XCircle size={32} className="text-white" />
+                  </motion.div>
+                </div>
+              </motion.div>
 
-              {/* Orange "Not Satisfied" Card - Matching Image */}
+              {/* Orange "Not Satisfied" Card */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ delay: 0.4 }}
                 className="rounded-xl overflow-hidden shadow-2xl"
                 style={{
                   background: COLORS.orangeGradient,
@@ -359,7 +567,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.7 }}
                 className="flex flex-col items-center mt-4 gap-2"
               >
                 <motion.div animate={{ y: [0, 5, 0] }} transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}>
@@ -604,6 +812,121 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                 </motion.div>
               </div>
             </motion.div>
+
+            {/* Investigation Officer - Reworking (Bottom Left Corner) */}
+            <AnimatePresence>
+              {stage >= 5 && stage <= 8 && (
+                <motion.div
+                  initial={{ x: -120, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -120, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+                  className="absolute bottom-6 left-6 z-40"
+                >
+                  <div className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden w-52">
+                    {/* Header */}
+                    <div
+                      className="px-3 py-2 flex items-center gap-2"
+                      style={{ backgroundColor: COLORS.orange }}
+                    >
+                      <RefreshCw size={14} className="text-white" />
+                      <span className="text-[10px] font-bold text-white">Investigation Officer - Rework</span>
+                    </div>
+
+                    {/* Officer Working */}
+                    <div className="p-3 bg-gradient-to-br from-gray-50 to-white">
+                      <div className="relative">
+                        {/* Computer Frame */}
+                        <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+                          <div className="h-4 bg-gray-700 flex items-center px-2 gap-1">
+                            <div className="flex gap-1">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                            </div>
+                          </div>
+
+                          {/* Screen with Officer */}
+                          <div className="relative bg-[#F8F8F8] h-28 flex items-center justify-center overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-red-50 opacity-40" />
+
+                            {/* Typing Indicator */}
+                            <motion.div
+                              animate={{
+                                opacity: [0.3, 0.7, 0.3],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Number.POSITIVE_INFINITY,
+                              }}
+                              className="absolute top-2 right-2 flex gap-0.5"
+                            >
+                              {[0, 1, 2].map((i) => (
+                                <motion.div
+                                  key={i}
+                                  animate={{
+                                    y: [0, -3, 0],
+                                  }}
+                                  transition={{
+                                    duration: 0.6,
+                                    repeat: Number.POSITIVE_INFINITY,
+                                    delay: i * 0.15,
+                                  }}
+                                  className="w-1 h-1 rounded-full"
+                                  style={{ backgroundColor: COLORS.orange }}
+                                />
+                              ))}
+                            </motion.div>
+
+                            {/* Officer Avatar */}
+                            <div className="relative z-10">
+                              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-lg">
+                                <img
+                                  src={ASSETS.officerPC}
+                                  alt="Investigation Officer"
+                                  className="w-full h-full object-cover"
+                                  style={{
+                                    imageRendering: 'auto',
+                                    backfaceVisibility: 'hidden',
+                                    transform: 'translateZ(0)',
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Status Badge */}
+                        <motion.div
+                          className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[8px] font-bold text-white shadow-md"
+                          style={{ backgroundColor: COLORS.orange }}
+                          animate={{
+                            scale: [1, 1.1, 1],
+                          }}
+                          transition={{
+                            duration: 1.5,
+                            repeat: Number.POSITIVE_INFINITY,
+                          }}
+                        >
+                          {stage >= 6 && stage < 8 && "Updating RCA"}
+                          {stage === 8 && "Revising CAPA"}
+                          {stage === 5 && "Reviewing"}
+                        </motion.div>
+                      </div>
+
+                      {/* Progress Text */}
+                      <div className="mt-2 text-center">
+                        <p className="text-[9px] text-gray-600 font-medium">
+                          {stage >= 6 && stage < 8 && "Documenting new findings"}
+                          {stage === 8 && "Creating revised action plan"}
+                          {stage === 5 && "Preparing rework"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
