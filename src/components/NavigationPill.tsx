@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion"
-import { Play, Pause, Volume2, VolumeX, X } from "lucide-react"
+import { Play, Pause, Volume2, VolumeX, X, SkipForward, SkipBack } from "lucide-react"
 
 interface NavigationPillProps {
   visible: boolean
@@ -34,84 +34,180 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ y: 120, opacity: 0, x: "-50%", scale: 0.9 }}
+          initial={{ y: 100, opacity: 0, x: "-50%", scale: 0.92 }}
           animate={{ y: 0, opacity: 1, x: "-50%", scale: 1 }}
-          exit={{ y: 120, opacity: 0, x: "-50%", scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 280, damping: 24, mass: 1 }}
-          className="fixed bottom-10 left-1/2 z-50 origin-bottom"
+          exit={{ y: 100, opacity: 0, x: "-50%", scale: 0.92 }}
+          transition={{ type: "spring", stiffness: 320, damping: 28, mass: 0.9 }}
+          className="fixed bottom-8 left-1/2 z-50 origin-bottom"
         >
-          {/* Ambient Glow behind the pill */}
-          <div className="absolute -inset-6 bg-gradient-to-t from-[#284952]/40 to-transparent rounded-full blur-3xl pointer-events-none opacity-60" />
+          {/* Multi-layered ambient glow effect */}
+          <div className="absolute -inset-8 pointer-events-none">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#60BA81]/25 via-[#284952]/15 to-transparent rounded-[60px] blur-3xl" />
+            <div className="absolute inset-4 bg-[#17161A]/40 rounded-[50px] blur-2xl" />
+          </div>
 
-          {/* Main Glass Container */}
-          <div className="group relative bg-[#17161A]/90 backdrop-blur-2xl border border-white/[0.08] text-white rounded-full shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05)_inset] flex items-center pr-2 pl-2 py-2 h-[68px] overflow-hidden select-none">
-            
-            {/* Play/Pause Button - Tactile feel */}
-            <button
+          {/* Main Glass Container - Premium material design */}
+          <div
+            className="group relative backdrop-blur-2xl border text-white rounded-[28px] flex items-center gap-1 px-3 py-2.5 h-[72px] overflow-hidden select-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(23,22,26,0.95) 0%, rgba(30,29,34,0.92) 100%)',
+              borderColor: 'rgba(255,255,255,0.08)',
+              boxShadow: `
+                0 40px 80px -20px rgba(0,0,0,0.6),
+                0 0 0 1px rgba(255,255,255,0.04) inset,
+                0 1px 0 0 rgba(255,255,255,0.06) inset,
+                0 -1px 0 0 rgba(0,0,0,0.3) inset
+              `,
+            }}
+          >
+            {/* Inner highlight gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent rounded-[28px] pointer-events-none" />
+
+            {/* Play/Pause Button - Premium tactile button */}
+            <motion.button
               onClick={onPlayPause}
-              className="w-12 h-12 rounded-full bg-white text-[#17161A] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.2)] relative z-10 mr-4 group-hover:bg-[#F5F5F7]"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative w-14 h-14 rounded-full flex items-center justify-center z-10 overflow-hidden"
+              style={{
+                background: 'linear-gradient(145deg, #60BA81 0%, #4CAF7A 100%)',
+                boxShadow: `
+                  0 8px 24px -4px rgba(96,186,129,0.4),
+                  0 2px 0 0 rgba(255,255,255,0.15) inset,
+                  0 -2px 0 0 rgba(0,0,0,0.1) inset
+                `,
+              }}
             >
+              {/* Button shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-60" />
+
               <AnimatePresence mode="wait">
                 {isPlaying ? (
                   <motion.div
                     key="pause"
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.5, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+                    initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                    exit={{ scale: 0.5, opacity: 0, rotate: 90 }}
+                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                    className="relative z-10"
                   >
-                    <Pause size={20} fill="currentColor" />
+                    <Pause size={22} fill="white" className="text-white drop-shadow-sm" />
                   </motion.div>
                 ) : (
                   <motion.div
                     key="play"
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.5, opacity: 0 }}
-                    transition={{ duration: 0.15 }}
+                    initial={{ scale: 0.5, opacity: 0, rotate: 90 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                    exit={{ scale: 0.5, opacity: 0, rotate: -90 }}
+                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                    className="relative z-10"
                   >
-                    <Play size={20} fill="currentColor" className="ml-0.5" />
+                    <Play size={22} fill="white" className="text-white ml-1 drop-shadow-sm" />
                   </motion.div>
                 )}
               </AnimatePresence>
-            </button>
+            </motion.button>
 
-            {/* Info & Progress */}
-            <div className="flex flex-col justify-center min-w-[200px] max-w-[240px] mr-6 gap-1.5">
-              <div className="flex justify-between items-end px-0.5">
-                <span className="text-[13px] font-semibold text-white tracking-tight truncate max-w-[140px] drop-shadow-sm">
-                  {activeSlideTitle || "Module"}
-                </span>
-                <span className="text-[10px] font-medium text-white/50 tabular-nums tracking-wide">
+            {/* Info & Progress Section */}
+            <div className="flex flex-col justify-center min-w-[220px] max-w-[260px] px-3 gap-2">
+              {/* Title and Time Row */}
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  {/* Now Playing indicator */}
+                  {isPlaying && (
+                    <motion.div
+                      className="flex items-center gap-0.5"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                    >
+                      {[1, 2, 3].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-[3px] bg-[#60BA81] rounded-full"
+                          animate={{ height: [4, 12, 4] }}
+                          transition={{
+                            duration: 0.6,
+                            repeat: Infinity,
+                            delay: i * 0.1,
+                            ease: "easeInOut"
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                  <span className="text-[14px] font-semibold text-white tracking-tight truncate max-w-[140px]">
+                    {activeSlideTitle || "Module"}
+                  </span>
+                </div>
+                <span className="text-[11px] font-medium text-white/40 tabular-nums tracking-wide font-mono">
                   {formatTime(currentTime)} / {formatTime(totalDuration)}
                 </span>
               </div>
 
-              {/* Progress Bar Track */}
-              <div className="relative w-full h-[4px] bg-white/[0.15] rounded-full overflow-hidden">
-                {/* Progress Fill with Glow */}
+              {/* Enhanced Progress Bar */}
+              <div className="relative w-full h-[6px] bg-white/[0.08] rounded-full overflow-hidden group/progress cursor-pointer">
+                {/* Background glow when hovering */}
+                <div className="absolute inset-0 bg-[#60BA81]/10 opacity-0 group-hover/progress:opacity-100 transition-opacity" />
+
+                {/* Progress Fill with gradient */}
                 <motion.div
-                  className="absolute top-0 left-0 h-full bg-[#60BA81] rounded-full"
-                  style={{ width: `${progress}%` }}
+                  className="absolute top-0 left-0 h-full rounded-full"
+                  style={{
+                    width: `${progress}%`,
+                    background: 'linear-gradient(90deg, #60BA81 0%, #4CAF7A 50%, #60BA81 100%)',
+                  }}
                   layoutId="progress-bar"
                 >
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(96,186,129,0.8)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {/* Animated shimmer effect */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    animate={{ x: ['-100%', '200%'] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  />
+                </motion.div>
+
+                {/* Playhead indicator */}
+                <motion.div
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover/progress:opacity-100 transition-all scale-75 group-hover/progress:scale-100"
+                  style={{ left: `calc(${progress}% - 6px)` }}
+                >
+                  <div className="absolute inset-0 bg-[#60BA81] rounded-full animate-ping opacity-40" />
                 </motion.div>
               </div>
             </div>
 
-            <div className="h-6 w-px bg-white/[0.1] mx-1" />
+            {/* Separator */}
+            <div className="h-8 w-px bg-gradient-to-b from-transparent via-white/[0.1] to-transparent mx-2" />
 
-            {/* Volume & Close Group */}
-            <div className="flex items-center gap-1 pl-1">
-              {/* Volume Control - Reveals on hover */}
-              <div className="relative group/vol flex items-center justify-center w-10 h-10">
-                <button onClick={onMuteToggle} className="text-white/60 hover:text-white transition-colors">
+            {/* Controls Group */}
+            <div className="flex items-center gap-0.5">
+              {/* Volume Control with hover popup */}
+              <div className="relative group/vol">
+                <motion.button
+                  onClick={onMuteToggle}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
+                >
                   {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                </button>
+                </motion.button>
 
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-12 h-32 bg-[#17161A]/95 backdrop-blur-2xl border border-white/[0.08] rounded-2xl flex flex-col justify-end items-center p-3 opacity-0 group-hover/vol:opacity-100 transition-all duration-300 translate-y-2 group-hover/vol:translate-y-0 pointer-events-none group-hover/vol:pointer-events-auto shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)]">
-                  <div className="w-1.5 h-full bg-white/10 rounded-full relative overflow-hidden">
+                {/* Volume Slider Popup */}
+                <div
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-14 h-36 rounded-2xl flex flex-col justify-end items-center p-3 pb-4 opacity-0 group-hover/vol:opacity-100 transition-all duration-300 translate-y-2 group-hover/vol:translate-y-0 pointer-events-none group-hover/vol:pointer-events-auto"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(23,22,26,0.98) 0%, rgba(30,29,34,0.95) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset',
+                  }}
+                >
+                  {/* Volume level indicator */}
+                  <div className="text-[10px] font-bold text-white/60 mb-2 tabular-nums">
+                    {Math.round((isMuted ? 0 : volume) * 100)}%
+                  </div>
+
+                  <div className="w-2 h-full bg-white/[0.08] rounded-full relative overflow-hidden">
                     <input
                       type="range"
                       min="0"
@@ -126,24 +222,31 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
                         width: "100px",
                         height: "30px",
                         left: "-46px",
-                        top: "35px"
+                        top: "38px"
                       }}
                     />
-                    <div
-                      className="absolute bottom-0 left-0 w-full bg-white rounded-full transition-all"
-                      style={{ height: `${(isMuted ? 0 : volume) * 100}%` }}
+                    <motion.div
+                      className="absolute bottom-0 left-0 w-full rounded-full"
+                      style={{
+                        height: `${(isMuted ? 0 : volume) * 100}%`,
+                        background: 'linear-gradient(to top, #60BA81, #4CAF7A)',
+                      }}
+                      transition={{ duration: 0.1 }}
                     />
                   </div>
                 </div>
               </div>
 
-              <button
+              {/* Close Button */}
+              <motion.button
                 onClick={onClose}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/[0.1] text-white/60 hover:text-[#F5A83C] transition-colors active:scale-95"
+                whileHover={{ scale: 1.05, rotate: 90 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-10 h-10 flex items-center justify-center rounded-xl text-white/40 hover:text-white hover:bg-red-500/10 transition-all duration-200"
                 title="Close Module"
               >
                 <X size={18} />
-              </button>
+              </motion.button>
             </div>
           </div>
         </motion.div>
