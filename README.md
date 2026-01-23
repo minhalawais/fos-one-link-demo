@@ -1,46 +1,110 @@
-# Getting Started with Create React App
+# 🌿 FOS Digital Grievance Management System – Interactive Walkthrough
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![React](https://img.shields.io/badge/React-19.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.0-black?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
 
-## Available Scripts
+> **Live Demo**: [fos-one-link-demo.vercel.app](https://fos-one-link-demo.vercel.app/)  
+> **Powered By**: [Fruit of Sustainability (SMC-Private) Ltd.](http://fruitofsustainability.com/)  
+> **Developed By**: [Minhal Awais](https://minhalawais.me/) | [LinkedIn](https://linkedin.com/in/minhal-awais-601216227)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## 🚀 Experience the Platform
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The **One-Link Demo** is a high-fidelity, cinematic digital walkthrough designed to demonstrate the full capabilities of the **FOS Digital Grievance Management System**. 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Unlike a static presentation, this interactive application guides stakeholders, audio-visually, through the complete lifecycle of grievance handling—bridging the gap between factory workers and management through transparent, secure, and compliant processes.
 
-### `npm test`
+## 🌟 Key Modules (The Journey)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The walkthrough is structured into four immersive modules, each highlighting a critical pillar of the FOS ecosystem:
 
-### `npm run build`
+### 1. ⚡ Deployment & Onboarding
+*   **Rapid Digitalization**: Automated employee registration and validation.
+*   **FOS IDs**: Unique digital identities for every worker, accessible via SMS.
+*   **Awareness Cards**: Physical cards with reporting channels and instructions.
+*   **Investigation Officers**: Role assignment for Root Cause Analysis (RCA) and evidence handling.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 2. 🛡️ Complaint Intake & Registration
+*   **Multi-Channel Reporting**: Toll-free hotline, WhatsApp, SMS, Email, and Mobile App.
+*   **Inclusive Access**: Support for all literacy levels via trained grievance officers.
+*   **Anonymous Reporting**: Secure channels for sensitive issues (Harassment, Discrimination).
+*   **Instant Verification**: Unique ticket generation and real-time notifications for IOs.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 3. 🔍 Investigation & Resolution
+*   **Structured Workflow**: "In Process" → "Validity Assessment" → "RCA" → "CAPA".
+*   **Root Cause Analysis (RCA)**: Deep-dive validity checks based on evidence and interviews.
+*   **CAPA Planning**: Corrective & Preventive Action plans with assigned responsibilities.
+*   **Satisfaction Loop**: Independent FOS verification with the complainant before case closure to ensure genuine resolution.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 4. 📊 Dashboards & Risk Insights
+*   **Real-Time Analytics**: Live tracking of open, overdue, and resolved cases.
+*   **Category Heatmaps**: Identification of hotspots (e.g., Health & Safety, Wages).
+*   **Performance Metrics**: Monitoring investigation quality and timeline adherence.
+*   **Compliance Reporting**: Exportable data for EU CSDDD, LkSG, and ESG audits.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## 🔐 User Roles & Governance
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+This walkthrough demonstrates how the system supports various stakeholders:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+| Role | Responsibilities |
+| :--- | :--- |
+| **Worker / Complainant** | Reports grievances via multiple channels; validates satisfaction. |
+| **Investigation Officer (IO)** | Conducts RCA, implements CAPA, uploads evidence. |
+| **FOS Team** | Validates onboarding, verifies case closure, conducts training. |
+| **Factory Management** | Monitors risk dashboards, strategic planning, and compliance. |
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+---
 
-## Learn More
+## 🛠️ Technology Stack
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This demo application is built with a focus on **cinematic user experience** and **smooth interactivity**.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+*   **Frontend Framework**: [React 19](https://react.dev/)
+*   **Language**: TypeScript
+*   **Styling**: Tailwind CSS + Custom Design System
+*   **Animations**: Framer Motion (Spring Physics, Layout Animations)
+*   **Icons**: Lucide React
+*   **Visuals**: Custom Particles & Light Ray Effects
+
+> **Note**: The core production system (backend) is hosted separately and powers the actual logic demonstrated in this frontend walkthrough.
+
+---
+
+## 💻 Local Development
+
+To run this interactive demo locally:
+
+1.  **Clone the Repo**
+    ```bash
+    git clone https://github.com/minhalawais/one-link-demo.git
+    cd one-link-demo
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    npm install --legacy-peer-deps
+    ```
+
+3.  **Run Development Server**
+    ```bash
+    npm start
+    ```
+    Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+---
+
+## ⚠️ Disclaimer
+
+> This application is a **demonstration walkthrough** intended for educational and presentation purposes. It visualizes the workflows of the FOS Grievance Management System. For the actual operational platform, please refer to the specific separate production environments.
+
+---
+
+<div align="center">
+  <p>Developed with ❤️ by <a href="https://minhalawais.me/">Minhal Awais</a></p>
+  <p>© 2025 Fruit of Sustainability (SMC-Private) Ltd. All Rights Reserved.</p>
+</div>
