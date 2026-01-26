@@ -8,437 +8,278 @@ import {
   UploadCloud,
   Lock,
   ShieldCheck,
-  Zap,
   Check,
-  FileSearch
+  FileSearch,
+  Stamp,
+  Users
 } from "lucide-react"
 
-// --- DESIGN SYSTEM CONSTANTS ---
-// Exact match to user provided color scheme
+// --- THEME CONSTANTS ---
 const COLORS = {
-  teal: "#284952",       // Deep Teal - Main brand color
-  green: "#60BA81",      // Fresh Green - Primary actions
-  greenLight: "rgba(96, 186, 129, 0.15)",
-  charcoal: "#17161A",   // Body Text
-  orange: "#F5A83C",     // Warm Orange - Accent/Warning
+  teal: "#284952",       // Deep Teal
+  green: "#60BA81",      // Fresh Green
   white: "#FFFFFF",      // Pure White
-  grayLight: "#F5F5F7",  // Light Gray - Backgrounds
-  grayMedium: "#767676", // Medium Gray - Secondary text
   grayBorder: "#DEE2E6", // Border Gray
-  accentGreen: "rgba(96, 186, 129, 0.42)", // Soft Green Accent
 }
 
-const ASSETS = {
-  io_officer: "/assets/avatars/male_io_training.png",
-}
+// --- MICRO-ANIMATIONS ---
+const ValidationAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="text-gray-200">
+      <FileSearch size={32} />
+    </motion.div>
+    <motion.div
+      initial={{ scale: 2, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 0.2 }}
+      className="absolute bottom-0 right-0 bg-[#60BA81] text-white p-1 rounded-full shadow-lg"
+    >
+      <Check size={12} strokeWidth={4} />
+    </motion.div>
+  </div>
+)
 
-// Layout Config
-// Reduced radius significantly to close gap between image and cards
-const ARC_RADIUS = 330
-const CENTER_Y_OFFSET = 140
+const BlueprintAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <motion.div animate={{ opacity: 1 }} className="absolute inset-0 border-2 border-dashed border-[#F5A83C]/30 rounded-lg" />
+    <ClipboardList size={28} className="text-[#F5A83C]" />
+    <motion.div
+      initial={{ width: 0 }}
+      animate={{ width: "80%" }}
+      transition={{ duration: 1 }}
+      className="absolute bottom-2 h-1 bg-[#F5A83C] rounded-full"
+    />
+  </div>
+)
 
-// Apple-style Easing
-const IOS_EASE = [0.16, 1, 0.3, 1]
+const UploadAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+    <div className="absolute inset-x-0 bottom-0 h-1/2 bg-[#284952]/10 rounded-b-lg" />
+    <UploadCloud size={28} className="text-[#284952] relative z-10" />
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: -20, opacity: [0, 1, 0] }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+      className="absolute flex flex-col items-center justify-center"
+    >
+      <div className="w-1 h-1 bg-[#284952] rounded-full mb-1" />
+      <div className="w-1 h-1 bg-[#284952] rounded-full" />
+    </motion.div>
+  </div>
+)
 
-// --- COMPONENT: ORGANIC CONNECTION LINE ---
-const ConnectionLine = ({
-  startX,
-  startY,
-  endX,
-  endY,
-  isActive,
-  isVisible
-}: {
-  startX: number,
-  startY: number,
-  endX: number,
-  endY: number,
-  isActive: boolean,
-  isVisible: boolean
-}) => {
-  // Calculate control points for a smooth Bezier curve
-  const midX = (startX + endX) / 2
-  const midY = (startY + endY) / 2 - 20
+const ClosureAnim = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <ShieldCheck size={32} className="text-[#284952]" />
+    <motion.div
+      initial={{ scale: 1.5, opacity: 0, rotate: -20 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      transition={{ delay: 0.3 }}
+      className="absolute -top-1 -right-1"
+    >
+      <Stamp size={20} className="text-[#60BA81]" />
+    </motion.div>
+  </div>
+)
 
-  const pathD = `M ${startX},${startY} Q ${midX},${midY} ${endX},${endY}`
-
-  return (
-    <svg className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-visible z-0">
-      <defs>
-        <linearGradient id={`grad-${endX}`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={COLORS.teal} stopOpacity="0" />
-          <stop offset="50%" stopColor={isActive ? COLORS.green : COLORS.teal} stopOpacity={isActive ? 0.8 : 0.2} />
-          <stop offset="100%" stopColor={isActive ? COLORS.green : COLORS.teal} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-
-      {/* Base subtle line */}
-      <motion.path
-        d={pathD}
-        fill="none"
-        stroke={COLORS.teal}
-        strokeWidth="1.5"
-        strokeOpacity="0.15"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: isVisible ? 1 : 0 }}
-        transition={{ duration: 1.2, ease: "circOut" }}
-      />
-
-      {/* Active Data Stream */}
-      {isVisible && (
-        <motion.path
-          d={pathD}
-          fill="none"
-          stroke={`url(#grad-${endX})`}
-          strokeWidth={isActive ? 3 : 1}
-          strokeLinecap="round"
-          initial={{ pathLength: 0, strokeDasharray: "0 1" }}
-          animate={{
-            pathLength: [0, 1],
-            strokeDashoffset: [0, -100],
-            opacity: isActive ? 1 : 0.3
-          }}
-          transition={{
-            duration: isActive ? 1.5 : 2,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-        />
-      )}
-
-      {/* Pulse Dot traveling the line */}
-      {isActive && (
-        <motion.circle
-          r="4"
-          fill={COLORS.green}
-        >
-          <motion.animateMotion
-            dur="1.5s"
-            repeatCount="indefinite"
-            path={pathD}
-            calcMode="linear"
-          />
-        </motion.circle>
-      )}
-    </svg>
-  )
-}
-
-// --- COMPONENT: PREMIUM GLASS CARD ---
-const SkillCard = ({
+// --- CARD COMPONENT ---
+const SkillNode = ({
   icon: Icon,
   title,
-  subtitle,
-  index,
   isActive,
-  isMastered,
+  isCompleted,
   isVisible,
-  position
-}: {
-  icon: any
-  title: string
-  subtitle: string
-  index: number
-  isActive: boolean
-  isMastered: boolean
-  isVisible: boolean
-  position: { x: number, y: number }
-}) => {
+  pos,
+  anim: Anim
+}: any) => {
   return (
     <motion.div
-      className="absolute"
-      style={{ left: '50%', top: '50%', x: position.x, y: position.y }}
-      initial={{ opacity: 0, scale: 0.8, y: position.y + 40 }}
+      initial={{ opacity: 0, scale: 0 }}
       animate={{
         opacity: isVisible ? 1 : 0,
-        scale: isVisible ? (isActive ? 1.15 : 1) : 0.8,
-        y: isVisible ? position.y : position.y + 40,
-        zIndex: isActive ? 50 : 10
+        scale: isActive ? 1.1 : isVisible ? 1 : 0,
+        x: pos.x,
+        y: pos.y
       }}
-      transition={{
-        duration: 0.8,
-        ease: IOS_EASE,
-        delay: index * 0.1
-      }}
+      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+      className="absolute flex flex-col items-center justify-center z-20"
+      style={{ left: '50%', top: '50%', marginLeft: '-3.5rem', marginTop: '-3.5rem' }} // Center the 7rem (w-28) box
     >
-      <div
-        className={`
-          relative flex flex-col items-center justify-center p-3 w-32 h-32 rounded-2xl
-          backdrop-blur-xl transition-all duration-500
-          ${isActive ? 'shadow-[0_20px_40px_-10px_rgba(96,186,129,0.4)]' : 'shadow-sm'}
-        `}
-        style={{
-          background: isActive
-            ? 'linear-gradient(145deg, rgba(255,255,255,0.98), rgba(240,250,245,0.95))'
-            : 'linear-gradient(145deg, rgba(255,255,255,0.9), rgba(245,245,247,0.8))',
-          border: `1px solid ${isActive ? COLORS.green : COLORS.grayBorder}`,
-        }}
-      >
-        {/* Status Indicator Dot */}
-        <div
-          className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full transition-colors duration-500"
-          style={{ backgroundColor: isActive ? COLORS.green : COLORS.grayBorder }}
-        />
+      <div className={`
+          relative w-28 h-28 bg-white rounded-2xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] 
+          flex flex-col items-center justify-center p-2
+          border-2 transition-colors duration-300
+          ${isActive ? 'border-[#60BA81]' : 'border-transparent'}
+          ${isCompleted ? 'border-[#60BA81]/50' : ''}
+      `}>
+        {isActive ? (
+          <div className="w-16 h-16 mb-2">
+            <Anim />
+          </div>
+        ) : (
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${isCompleted ? 'bg-[#60BA81]/10 text-[#60BA81]' : 'bg-gray-100 text-gray-400'}`}>
+            {isCompleted ? <Check size={24} strokeWidth={3} /> : <Icon size={24} />}
+          </div>
+        )}
 
-        {/* Icon Container */}
-        <div className="relative mb-2">
-          <motion.div
-            className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md relative z-10"
-            style={{ backgroundColor: isActive || isMastered ? COLORS.green : COLORS.teal }}
-            animate={{
-              scale: isActive ? [1, 1.1, 1] : 1,
-              rotate: isActive ? [0, 5, -5, 0] : 0
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Icon size={18} strokeWidth={2.5} />
-          </motion.div>
-
-          {/* Ripple Effect behind icon */}
-          {isActive && (
-            <motion.div
-              className="absolute inset-0 rounded-full opacity-30"
-              style={{ backgroundColor: COLORS.accentGreen }}
-              animate={{ scale: [1, 1.6], opacity: [0.5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          )}
-        </div>
-
-        {/* Text */}
-        <h3 className="text-xs font-bold text-center leading-tight mb-1 px-1" style={{ color: COLORS.charcoal }}>
+        <span className={`text-[10px] font-bold text-center leading-tight ${isActive ? 'text-[#284952]' : 'text-gray-500'}`}>
           {title}
-        </h3>
+        </span>
 
-        {/* Subtitle - e.g., Module Step */}
-        <p className="text-[9px] font-medium text-center uppercase tracking-wide" style={{ color: isActive ? COLORS.teal : COLORS.grayMedium }}>
-          {isActive ? "Active Module" : isMastered ? "Completed" : "Pending"}
-        </p>
-
-        {/* Mastered Checkmark Badge */}
-        <AnimatePresence>
-          {isMastered && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              className="absolute -bottom-2 -right-2 text-white w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-md z-20"
-              style={{ backgroundColor: COLORS.teal }}
-            >
-              <Check size={12} strokeWidth={4} />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Active Progress Ring */}
+        {isActive && (
+          <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+            <rect width="100%" height="100%" fill="none" rx="14" ry="14" />
+            <motion.rect
+              width="100%" height="100%" rx="14" ry="14"
+              fill="none" stroke="#60BA81" strokeWidth="4"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 3, ease: "linear" }}
+            />
+          </svg>
+        )}
       </div>
     </motion.div>
   )
 }
 
-// --- MAIN COMPONENT ---
-export default function SceneIOTraining({ progress }: { progress: number }) {
+// --- MAIN SCENE ---
+export default function SceneIOTraining({ isActive, progress }: { isActive: boolean, progress: number }) {
 
-  // TIMELINE LOGIC 
-  // 85-92: Validate
-  // 92-93.5: CAPA
-  // 93.5-95: Evidence
-  // 95-97: Close
+  const localTime = isActive ? Math.max(0, progress - 134) : 0
 
-  const activeStage = useMemo(() => {
-    if (progress < 85) return 0
-    if (progress < 92) return 1 // Validate Active
-    if (progress < 93.5) return 2 // CAPA Active
-    if (progress < 95) return 3 // Evidence Active
-    if (progress < 97) return 4 // Close Active
-    return 5 // All Done
-  }, [progress])
+  const stage = useMemo(() => {
+    if (localTime < 3) return -1 // FOS Team Intro
+    if (localTime < 6) return 0
+    if (localTime < 9) return 1
+    if (localTime < 12) return 2
+    if (localTime < 15) return 3
+    return 4
+  }, [localTime])
 
-  // UPDATED WORDING based on PDF & Script
-  // 1. "validate complaints" -> Validation & RCA (PDF: RCA Validation / Validity Assessment)
-  // 2. "build corrective action plans" -> CAPA Development (PDF: CAPA Development)
-  // 3. "upload evidence" -> Evidence Submission (PDF: Evidence Submission)
-  // 4. "close cases" -> Case Closure (PDF: Submission for Closure Review)
   const skills = [
-    { icon: FileSearch, title: "Validation & RCA", subtitle: "Assessment", angle: -55 },
-    { icon: ClipboardList, title: "CAPA Development", subtitle: "Planning", angle: -20 },
-    { icon: UploadCloud, title: "Evidence Submission", subtitle: "Documentation", angle: 20 },
-    { icon: Lock, title: "Case Closure", subtitle: "Remediation", angle: 55 }
+    { icon: FileSearch, title: "Validation", anim: ValidationAnim },
+    { icon: ClipboardList, title: "CAPA Plan", anim: BlueprintAnim },
+    { icon: UploadCloud, title: "Evidence", anim: UploadAnim },
+    { icon: Lock, title: "Closure", anim: ClosureAnim },
   ]
 
-  // Calculate positions on the arc
-  const getPosition = (angle: number) => {
-    const rad = (angle - 90) * (Math.PI / 180) // -90 to start from top
-    return {
-      x: ARC_RADIUS * Math.cos(rad),
-      y: ARC_RADIUS * Math.sin(rad) + CENTER_Y_OFFSET
-    }
-  }
+  // Wider Layout Positions to prevent overlap
+  // Center is (0,0). Avatar radius is ~80px.
+  // We place cards at +/- 220px in X and +/- 120px in Y
+  const positions = [
+    { x: -220, y: -120 }, // Top Left
+    { x: 220, y: -120 },  // Top Right
+    { x: -220, y: 120 },  // Bottom Left
+    { x: 220, y: 120 }    // Bottom Right
+  ]
 
   return (
-    <div className="w-full h-full flex items-center justify-center relative overflow-hidden font-sans select-none" style={{ backgroundColor: COLORS.grayLight }}>
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#f8f9fc] relative overflow-hidden font-sans">
 
-      {/* --- BACKGROUND --- */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Subtle Grain */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.12]" />
+      {/* Background Decor */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none"
+        style={{ backgroundImage: 'radial-gradient(#284952 1px, transparent 1px)', backgroundSize: '30px 30px' }}
+      />
 
-        {/* Brand Ambient Glows - Using Fresh Green and Deep Teal */}
-        <motion.div
-          animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.1, 1] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] blur-[100px] rounded-full"
-          style={{ background: `radial-gradient(circle, ${COLORS.accentGreen} 0%, transparent 70%)` }}
-        />
-      </div>
+      {/* --- SVG LINES LAYER (Z-0) --- */}
+      {/* This ensures lines are drawn properly behind everything */}
+      <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-visible">
+        {skills.map((_, i) => (
+          stage >= i && (
+            <motion.line
+              key={`line-${i}`}
+              x1="50%"
+              y1="50%"
+              x2={`calc(50% + ${positions[i].x}px)`}
+              y2={`calc(50% + ${positions[i].y}px)`}
+              stroke={stage === i ? COLORS.green : COLORS.grayBorder}
+              strokeWidth="2"
+              strokeDasharray={stage === i ? "none" : "4 4"}
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+            />
+          )
+        ))}
+      </svg>
 
-      {/* --- MAIN SCENE CONTAINER --- */}
-      <div className="relative w-full h-full max-w-5xl mx-auto flex flex-col items-center justify-end pb-0">
+      {/* --- CENTRAL AVATAR (Z-10) --- */}
+      <motion.div
+        className="relative z-10 w-40 h-40 rounded-full border-[6px] border-white shadow-2xl flex items-center justify-center bg-gray-100 overflow-hidden"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1, boxShadow: stage === 4 ? "0 0 60px #60BA81" : "0 20px 40px rgba(0,0,0,0.1)" }}
+        transition={{ type: "spring" }}
+      >
+        <img src="/assets/avatars/male_io_training.png" className="w-full h-full object-cover" alt="Officer" />
 
-        {/* 1. CONNECTING LINES LAYER (Behind IO) */}
-        <div className="absolute inset-0 z-0">
-          {skills.map((skill, i) => {
-            const pos = getPosition(skill.angle)
-            // Adjust start point to be roughly chest/head level of IO
-            const startX = window.innerWidth < 1024 ? 50 : 500
-            const startY = 600
-
-            return (
-              <div key={`line-${i}`} className="absolute top-1/2 left-1/2 w-0 h-0 overflow-visible">
-                <ConnectionLine
-                  startX={0}
-                  startY={CENTER_Y_OFFSET - 80} // Start from IO Head/Chest
-                  endX={pos.x}
-                  endY={pos.y + 60} // Connect to bottom of card
-                  isActive={activeStage === i + 1}
-                  isVisible={activeStage >= 1}
-                />
-              </div>
-            )
-          })}
-        </div>
-
-        {/* 2. SKILL CARDS LAYER (Top Arc) */}
-        <div className="absolute inset-0 z-20 pointer-events-none">
-          {skills.map((skill, i) => {
-            const pos = getPosition(skill.angle)
-            const isActive = activeStage === i + 1
-            const isMastered = activeStage > i + 1
-
-            return (
-              <SkillCard
-                key={i}
-                index={i}
-                {...skill}
-                position={{ x: pos.x - 64, y: pos.y - 64 }} // Center offset based on w/h
-                isActive={isActive}
-                isMastered={isMastered}
-                isVisible={activeStage >= 1}
-              />
-            )
-          })}
-        </div>
-
-        {/* 3. HERO LAYER: IO OFFICER */}
-        <motion.div
-          className="relative z-10 h-[75%] flex items-end mt-auto mb-0"
-          initial={{ y: 100, opacity: 0 }}
-          animate={{
-            y: activeStage >= 1 ? 0 : 100,
-            opacity: activeStage >= 1 ? 1 : 0
-          }}
-          transition={{ duration: 1, ease: IOS_EASE }}
-        >
-          <img
-            src={ASSETS.io_officer}
-            alt="Investigation Officer"
-            className="h-full w-auto object-contain drop-shadow-2xl"
-          />
-
-          {/* Floating UI: Officer ID */}
-          {activeStage >= 1 && (
+        {/* FOS Team Intro Overlay */}
+        <AnimatePresence>
+          {stage === -1 && (
             <motion.div
-              className="absolute top-[40%] -left-24 bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-xl shadow-lg border flex flex-col gap-1.5"
-              style={{ borderColor: COLORS.white }}
-              initial={{ x: 20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-[#284952]/90 flex flex-col items-center justify-center text-white"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: COLORS.orange }} />
-                <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: COLORS.teal }}>System Sync</span>
-              </div>
-              <div className="h-1.5 w-32 rounded-full overflow-hidden" style={{ backgroundColor: COLORS.grayLight }}>
-                <motion.div
-                  className="h-full"
-                  style={{ backgroundColor: COLORS.green }}
-                  initial={{ width: "0%" }}
-                  animate={{ width: activeStage === 5 ? "100%" : `${(activeStage / 4) * 100}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
+              <Users size={32} className="mb-2" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-center px-4 leading-tight">
+                FOS Team<br />Training
+              </span>
             </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
 
-        {/* 4. FOOTER STATUS BAR */}
-        <motion.div
-          className="absolute bottom-8 z-30 flex items-center gap-6 bg-white/90 backdrop-blur-xl px-6 py-3 rounded-full border shadow-lg"
-          style={{ borderColor: COLORS.white, color: COLORS.charcoal }}
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-        >
-          <div className="flex items-center gap-3 pr-4 border-r" style={{ borderColor: COLORS.grayBorder }}>
-            <div className="p-1.5 rounded-lg text-white" style={{ backgroundColor: COLORS.teal }}>
-              <ShieldCheck size={18} />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: COLORS.grayMedium }}>Module</p>
-              <p className="text-sm font-bold" style={{ color: COLORS.teal }}>Investigation Officer</p>
-            </div>
-          </div>
+        <AnimatePresence>
+          {stage === 4 && (
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="absolute inset-0 bg-[#60BA81]/90 flex flex-col items-center justify-center text-white"
+            >
+              <CheckCircle2 size={48} className="mb-1" />
+              <span className="text-xs font-bold uppercase tracking-widest">Certified</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: COLORS.grayMedium }}>Status</p>
-              <p className="text-sm font-semibold" style={{ color: activeStage === 5 ? COLORS.green : COLORS.orange }}>
-                {activeStage === 0 ? "Standby" : activeStage === 5 ? "Certified" : "Training Active..."}
-              </p>
-            </div>
+      {/* --- SKILL NODES (Z-20) --- */}
+      {skills.map((skill, i) => (
+        <SkillNode
+          key={i}
+          {...skill}
+          index={i}
+          isActive={stage === i}
+          isCompleted={stage > i}
+          isVisible={stage >= i}
+          pos={positions[i]}
+        />
+      ))}
 
-            {/* Animated Ring Chart */}
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              <svg className="w-full h-full -rotate-90">
-                <circle cx="20" cy="20" r="16" fill="none" stroke={COLORS.grayBorder} strokeWidth="4" />
-                <motion.circle
-                  cx="20" cy="20" r="16" fill="none" stroke={COLORS.green} strokeWidth="4" strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: Math.min((activeStage - 1) / 4, 1) }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </svg>
-              {activeStage === 5 ? (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ color: COLORS.green }}
-                >
-                  <Check size={14} strokeWidth={4} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ color: COLORS.orange }}
-                >
-                  <Zap size={14} fill="currentColor" />
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </motion.div>
-
+      {/* --- BOTTOM LABEL --- */}
+      <div className="absolute bottom-12 w-full text-center z-30">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={stage}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="inline-flex items-center gap-3 px-6 py-3 bg-white rounded-full shadow-lg border border-gray-100"
+          >
+            <div className={`w-2 h-2 rounded-full ${stage === 4 ? 'bg-[#60BA81]' : stage === -1 ? 'bg-[#284952]' : 'bg-[#F5A83C] animate-pulse'}`} />
+            <span className="text-sm font-bold text-[#284952]">
+              {stage === -1 && "FOS Team: Initiating Training..."}
+              {stage === 0 && "Module 1: Validating Complaints"}
+              {stage === 1 && "Module 2: Building CAPA Plans"}
+              {stage === 2 && "Module 3: Uploading Evidence"}
+              {stage === 3 && "Module 4: Closing Procedures"}
+              {stage === 4 && "Training Complete"}
+            </span>
+          </motion.div>
+        </AnimatePresence>
       </div>
+
     </div>
   )
 }

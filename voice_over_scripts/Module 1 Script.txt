@@ -1,0 +1,11 @@
+(00:00) Lets start with deployment and onboarding. (00:02) We begin by registering the employee data. (00:05) Companies simply share their active employee list or they may integrate their existing HRMs with the FOS platform through secure APIs.
+
+(00:17) Our team uploads and validates every record to make sure the system is ready. (00:22) Once the data is uploaded, the system automatically generates a unique S FOS ID for every employee. (00:30) Each ID is mapped with the employee's cnic, enabling accurate identification and ease of access during the grievance registration process.
+
+(00:42) These FOS IDs are then sent directly to employees through the FOS SMS service. (00:50) This ensures immediate accessibility for everyone, including workers who do not have smartphones or Internet access. (00:58) To boost awareness on the factory floor, the system creates personalized FOS awareness card designs for every employee.
+
+(01:08) These cards include their IDs, clear written instructions, details of reporting channels and a QR code that leads to a short video guide explaining how to lodge a grievance and navigate the system. (01:23) As part of onboarding, the company appoints its internal employee as investigation officer. (01:30) Multiple officers may be assigned by unit, gender or complaint category and are responsible for managing grievance resolution and documentation.
+
+(01:41) To ensure a smooth rollout, the FOS team visits the facility and and conducts complete on site sessions, training workers on how to report concerns, briefing management on dashboards and responsibilities, and walking everyone through the entire system. (02:00) Each investigation officer receives secure access to the I O portal where they document root cause analysis, corrective and preventive actions and upload evidence.
+
+(02:14) Finally, the FOS team trains the investigation officers on the skills they need how to validate complaints, build corrective action plans, upload evidence and close cases effectively. (02:29) This ensures your grievance management system is fully functional from day one.

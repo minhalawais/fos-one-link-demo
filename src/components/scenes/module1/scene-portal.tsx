@@ -847,7 +847,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                     animate={{
                                       backgroundColor:
                                         (stage === 11 && line.includes("CORRECTIVE")) ||
-                                        (stage === 12 && line.includes("PREVENTIVE"))
+                                          (stage === 12 && line.includes("PREVENTIVE"))
                                           ? COLORS.softGreen
                                           : "transparent",
                                     }}
@@ -1162,15 +1162,19 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 export function ScenePortal({ isActive, progress }: { isActive: boolean; progress: number }) {
   const [stage, setStage] = useState(0)
 
-  // Scene runs from 60 to 72 seconds (12 seconds duration)
-  // Sync stages to progress timeline
+  // Scene runs from 120s to 134s (14 seconds duration)
+  // Script: "Each investigation officer receives secure access to the I O portal..." (120-123)
+  // "...where they document root cause analysis..." (123-127)
+  // "...corrective and preventive actions..." (127-130)
+  // "...and upload evidence." (130-134)
+
   useEffect(() => {
     if (!isActive) {
       setStage(0)
       return
     }
 
-    const sceneStart = 60
+    const sceneStart = 120
     const localProgress = progress - sceneStart
 
     if (localProgress < 0) {
@@ -1178,36 +1182,36 @@ export function ScenePortal({ isActive, progress }: { isActive: boolean; progres
       return
     }
 
-    // Timeline mapping for 12-second scene:
-    // [60-61s] Stage 0-1: Login screen appears
-    // [61-62s] Stage 2-3: Type username, password, hover button
-    // [62-63.5s] Stage 4-5: Transition to dashboard, select row
-    // [63.5-64.5s] Stage 6: Transition to timeline form
-    // [64.5-66s] Stage 7-8: Show full form, zoom to RCA, type RCA
-    // [66-68s] Stage 9-10: Zoom to CAPA, type CAPA
-    // [68-69s] Stage 11-12: CAPA highlights
-    // [69-70s] Stage 13-14: Evidence upload
-    // [70-71s] Stage 15-16: Submit button focus
-    // [71-72s] Stage 17: Success overlay
+    // --- TIMELINE MAPPING (0s to 14s) ---
 
-    if (localProgress < 0.5) setStage(0)
-    else if (localProgress < 1) setStage(1)
-    else if (localProgress < 1.5) setStage(2)
-    else if (localProgress < 2) setStage(3)
-    else if (localProgress < 2.5) setStage(4)
-    else if (localProgress < 3.5) setStage(5)
-    else if (localProgress < 4.5) setStage(6)
-    else if (localProgress < 5) setStage(7)
-    else if (localProgress < 6) setStage(8)
-    else if (localProgress < 6.5) setStage(9)
-    else if (localProgress < 7) setStage(10)
-    else if (localProgress < 7.5) setStage(11)
-    else if (localProgress < 8) setStage(12)
-    else if (localProgress < 8.5) setStage(13)
-    else if (localProgress < 9) setStage(14)
-    else if (localProgress < 10) setStage(15)
-    else if (localProgress < 11) setStage(16)
-    else setStage(17)
+    // [0s - 3s] LOGIN PHASE (Matches "Secure access...")
+    if (localProgress < 0.5) setStage(0)      // Show Login
+    else if (localProgress < 1.5) setStage(1) // Type User
+    else if (localProgress < 2.5) setStage(2) // Type Pass
+    else if (localProgress < 3.0) setStage(3) // Button Hover/Click
+
+    // [3s - 4.5s] DASHBOARD PHASE (Transition context)
+    else if (localProgress < 3.5) setStage(4) // Dashboard Fade In
+    else if (localProgress < 4.5) setStage(5) // Select Row/Context
+
+    // [4.5s - 7.5s] RCA PHASE (Matches "document root cause analysis")
+    else if (localProgress < 5.0) setStage(6) // Transition to Timeline
+    else if (localProgress < 5.5) setStage(7) // Zoom RCA
+    else if (localProgress < 7.5) setStage(8) // Type RCA Text
+
+    // [7.5s - 10.5s] CAPA PHASE (Matches "corrective and preventive actions")
+    else if (localProgress < 8.0) setStage(9)  // Zoom CAPA
+    else if (localProgress < 10.0) setStage(10) // Type CAPA Text
+    else if (localProgress < 10.5) setStage(11) // Highlight Actions
+
+    // [10.5s - 14s] EVIDENCE PHASE (Matches "and upload evidence")
+    else if (localProgress < 11.0) setStage(12) // Highlight Preventive
+    else if (localProgress < 11.5) setStage(13) // Zoom Evidence
+    else if (localProgress < 12.5) setStage(14) // Drag Drop 1
+    else if (localProgress < 13.0) setStage(15) // Drag Drop 2
+    else if (localProgress < 13.5) setStage(16) // Submit Button Focus
+    else setStage(17)                           // Success Overlay
+
   }, [isActive, progress])
 
   // Determine which screen to show based on stage

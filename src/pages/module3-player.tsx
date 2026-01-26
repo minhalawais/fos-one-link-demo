@@ -9,14 +9,14 @@ import { SceneRCACAPAEvidence } from "../components/scenes/module3/scene-rca-cap
 import { SceneFOSVerification } from "../components/scenes/module3/scene-fos-verification.tsx"
 import { SceneClosure } from "../components/scenes/module3/scene-closure.tsx"
 import { SceneInvestigation } from "../components/scenes/module3/scene-1-unprocessed.tsx"
-
+import { Scene2InProcess } from "../components/scenes/module3/scene-2-in-process.tsx"
 
 const SCENES = [
-  { name: "intro", start: 0, end: 23, component: SceneInvestigation },
-  { name: "validity", start: 23, end: 37.9, component: SceneValidity },
-  { name: "rootCause", start: 37.9, end: 80, component: SceneRCACAPAEvidence },
-  { name: "verification", start: 80, end: 111, component: SceneFOSVerification },
-  { name: "closure", start: 111.4, end: 122, component: SceneClosure },
+  { name: "intro", start: 0, end: 21, component: SceneInvestigation },
+  { name: "inProcess", start: 21, end: 32, component: Scene2InProcess },
+  { name: "rootCause", start: 31, end: 75, component: SceneRCACAPAEvidence },
+  { name: "verification", start: 75, end: 111, component: SceneFOSVerification },
+  { name: "closure", start: 111, end: 130, component: SceneClosure },
 ]
 
 interface Module3PlayerProps {

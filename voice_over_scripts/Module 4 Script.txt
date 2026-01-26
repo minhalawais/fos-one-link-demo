@@ -1,0 +1,13 @@
+(00:00) Beyond complaints, the system also enables companies to actively listen to employees through digital in app surveys. (00:09) Surveys are initiated directly from the system by defining a clear title, short description and visibility period. (00:17) They can be launched in multiple languages, allowing employees to respond in their native language and improving participation and accuracy.
+
+(00:26) Participants can be carefully selected based on designation department, unit or gender. (00:33) The system also supports random sampling using employee IDs or CNICs, ensuring surveys remain statistically representative while maintaining data integrity. (00:46) Once a survey is launched, selected employees receive automated invitations through the FOSSMS service.
+
+(00:54) Each message includes a direct survey link, making it easy to participate even for employees who do not use the mobile app. (01:03) Employees submit their responses at their convenience through the mobile app. (01:08) All responses remain confidential, encouraging honest and unbiased feedback.
+
+(01:15) As responses come in, the system automatically compiles real time survey reports.
+
+(01:21) Management can instantly view response rates, summary statistics, charts and trends through the dashboard for open ended questions. (01:31) Built in, AI tools analyze employee feedback and group responses by sentiment positive, neutral or negative, transforming raw input into clear, actionable insights. (01:45) This digital survey module helps helps organizations switch from reactive grievance handling to proactive employee engagement and continuous improvement.
+
+---
+Converted using noscribe.ai
+Upgrade your plan to remove watermark

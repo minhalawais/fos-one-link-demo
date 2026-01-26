@@ -8,9 +8,9 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
   return (
     // Light Gray Background with a subtle Green/Teal radial gradient
     <div className="w-full h-full flex items-center justify-center bg-[#F5F5F7] relative overflow-hidden p-4">
-      
+
       {/* Refined Subtle Background Radial Gradient (Breathing Effect) */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0 opacity-10"
         style={{ background: 'radial-gradient(circle at center, #60BA81 0%, transparent 50%)' }}
         animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.1, 0.05] }}
@@ -26,13 +26,13 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.6, ease: "easeOut" }}
+          transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }} // Faster entrance
           className="mb-4"
         >
           {/* Elegant Logo Treatment with subtle continuous float */}
           <motion.div
             animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1.5 }}
+            transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
             className="w-20 h-20 mx-auto mb-3 bg-white rounded-2xl shadow-2xl flex items-center justify-center border border-gray-100"
           >
             {/* The FOS Cube */}
@@ -45,7 +45,7 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
         <motion.h1
           initial={{ y: 15, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.7, ease: "easeOut" }} // Quicker delay
+          transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }} // Faster entrance
           className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#284952] mb-4 tracking-tighter leading-snug"
         >
           Fruit of Sustainability
@@ -54,7 +54,7 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
         <motion.p
           initial={{ y: 15, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.7, ease: "easeOut" }} // Quicker delay
+          transition={{ delay: 0.4, duration: 0.5, ease: "easeOut" }} // Faster entrance
           className="text-lg sm:text-xl md:text-2xl text-[#767676] font-light mb-8"
         >
           Your Partner in Grievance Management

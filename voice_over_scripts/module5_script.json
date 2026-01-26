@@ -1,0 +1,128 @@
+[
+    {
+        "timestamp": [
+            0,
+            7
+        ],
+        "text": "It's time to explore the dashboards and risk insights that give management complete visibility into grievance trends."
+    },
+    {
+        "timestamp": [
+            7,
+            16
+        ],
+        "text": "The system is built with a multilayer structure allowing separate dashboards for sites, business units and different management levels."
+    },
+    {
+        "timestamp": [
+            16,
+            24
+        ],
+        "text": "This ensures that site teams, compliance staff and senior leadership each see insights relevant to their role."
+    },
+    {
+        "timestamp": [
+            24,
+            35
+        ],
+        "text": "Users can apply location and date filters to view data by site, department, supplier or branch and analyze trends across specific time periods."
+    },
+    {
+        "timestamp": [
+            35,
+            40
+        ],
+        "text": "This makes it easy to compare performance and detect recurring issues."
+    },
+    {
+        "timestamp": [
+            40,
+            51
+        ],
+        "text": "The Grievance Overview provides a complete snapshot of total complaints, anonymous cases, closed and in process cases, and bounced or unclosed complaints."
+    },
+    {
+        "timestamp": [
+            51,
+            60
+        ],
+        "text": "Category wise chart group complaints by issue type, such as wages, working hours, harassment or health and safety."
+    },
+    {
+        "timestamp": [
+            60,
+            66
+        ],
+        "text": "It helps management prioritize corrective and preventive actions where they are needed most."
+    },
+    {
+        "timestamp": [
+            66,
+            76
+        ],
+        "text": "Furthermore, datewise charts show how grievances rate changes over time, while Genderwise views number of grievances by male and female employees."
+    },
+    {
+        "timestamp": [
+            76,
+            88
+        ],
+        "text": "In addition, a dedicated section captures general employees suggestions and feedback, offering valuable insights beyond formal complaints and understand broader workforce concerns."
+    },
+    {
+        "timestamp": [
+            88,
+            102
+        ],
+        "text": "The dashboard also includes a breakdown of counseling sessions where fos grievance officers directly supported workers and provided counseling without the need for launch of formal grievance investigation."
+    },
+    {
+        "timestamp": [
+            102,
+            114
+        ],
+        "text": "Officer performance is tracked through resolution Time breakdown showing how quickly cases are closed and how effectively grievances are handled across defined time slabs."
+    },
+    {
+        "timestamp": [
+            114,
+            118
+        ],
+        "text": "Each dashboard metric is interactive and clickable."
+    },
+    {
+        "timestamp": [
+            118,
+            128
+        ],
+        "text": "Users can access metric specific complaints list view AI generated summaries of complaints, separate summary of RCA and capa."
+    },
+    {
+        "timestamp": [
+            128,
+            137
+        ],
+        "text": "Further, clicking on each ticket number provides complete case timeline with all details and evidences to support long term monitoring."
+    },
+    {
+        "timestamp": [
+            137,
+            146
+        ],
+        "text": "The system also generates worker happiness and safety scores based on grievance data, counseling outcomes and verification feedback."
+    },
+    {
+        "timestamp": [
+            146,
+            155
+        ],
+        "text": "These scores help benchmark performance, track improvements over time, and assess the real impact of corrective actions."
+    },
+    {
+        "timestamp": [
+            155,
+            null
+        ],
+        "text": "Finally, all completed survey reports are archived in one place, supporting audits, trend analysis, and continuous oversight of workplace conditions."
+    }
+]

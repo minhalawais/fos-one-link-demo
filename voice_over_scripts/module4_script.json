@@ -1,74 +1,93 @@
 [
   {
-    "timestamp": [0, 7],
-    "text": " It's time to explore the dashboards and risk insights that give management complete visibility into grievance trends."
+    "timestamp": [
+      0,
+      9
+    ],
+    "text": "Beyond complaints, the system also enables companies to actively listen to employees through digital in app surveys."
   },
   {
-    "timestamp": [7, 16],
-    "text": " The dashboard provides a real-time view of total complaints, open cases, those in-process, overdue cases, and resolve issues."
+    "timestamp": [
+      9,
+      17
+    ],
+    "text": "Surveys are initiated directly from the system by defining a clear title, short description and visibility period."
   },
   {
-    "timestamp": [16, 20.2],
-    "text": " This helps management quickly assess the overall situation."
+    "timestamp": [
+      17,
+      26
+    ],
+    "text": "They can be launched in multiple languages, allowing employees to respond in their native language and improving participation and accuracy."
   },
   {
-    "timestamp": [20.2, 25.36],
-    "text": " Complaints are automatically grouped into categories like wages and benefits, harassment,"
+    "timestamp": [
+      26,
+      33
+    ],
+    "text": "Participants can be carefully selected based on designation department, unit or gender."
   },
   {
-    "timestamp": [25.36, 30.64],
-    "text": " discrimination, health and safety, working hours and ethical business."
+    "timestamp": [
+      33,
+      46
+    ],
+    "text": "The system also supports random sampling using employee IDs or CNICs, ensuring surveys remain statistically representative while maintaining data integrity."
   },
   {
-    "timestamp": [30.64, 35.56],
-    "text": " This allows factories to identify recurring issues and plan targeted interventions, you"
+    "timestamp": [
+      46,
+      54
+    ],
+    "text": "Once a survey is launched, selected employees receive automated invitations through the FOSSMS service."
   },
   {
-    "timestamp": [35.56, 40.12],
-    "text": " can also view insights by unit, department or shift."
+    "timestamp": [
+      54,
+      63
+    ],
+    "text": "Each message includes a direct survey link, making it easy to participate even for employees who do not use the mobile app."
   },
   {
-    "timestamp": [40.12, 43.4],
-    "text": " This makes it easier to pinpoint hotspots."
+    "timestamp": [
+      63,
+      68
+    ],
+    "text": "Employees submit their responses at their convenience through the mobile app."
   },
   {
-    "timestamp": [43.4, 49.16],
-    "text": " The system also tracks RCA and CAPA performance, showing how quickly issues were resolved,"
+    "timestamp": [
+      68,
+      75
+    ],
+    "text": "All responses remain confidential, encouraging honest and unbiased feedback."
   },
   {
-    "timestamp": [49.16, 53.96],
-    "text": " the quality of the investigation, and whether similar complaints are recurring."
+    "timestamp": [
+      75,
+      81
+    ],
+    "text": "As responses come in, the system automatically compiles real time survey reports."
   },
   {
-    "timestamp": [53.96, 59.4],
-    "text": " Timeline monitoring highlights average investigation times and overdue cases."
+    "timestamp": [
+      81,
+      91
+    ],
+    "text": "Management can instantly view response rates, summary statistics, charts and trends through the dashboard for open ended questions."
   },
   {
-    "timestamp": [59.4, 65.28],
-    "text": " This helps leadership ensure that grievances are being addressed within the required timeframes."
+    "timestamp": [
+      91,
+      105
+    ],
+    "text": "Built in, AI tools analyze employee feedback and group responses by sentiment positive, neutral or negative, transforming raw input into clear, actionable insights."
   },
   {
-    "timestamp": [65.28, 70.4],
-    "text": " Workers' satisfaction indicators show how employees responded during verification calls."
-  },
-  {
-    "timestamp": [70.4, 75.68],
-    "text": " This gives management a clear picture of whether solutions are genuinely helping workers."
-  },
-  {
-    "timestamp": [75.68, 80.96],
-    "text": " You can also analyze trends over weeks, months, or years to support strategic decision-making"
-  },
-  {
-    "timestamp": [80.96, 90.28],
-    "text": " and internal planning. And finally, all reports are exportable for HRDD, ESG and CSDD compliance, making it easy"
-  },
-  {
-    "timestamp": [90.28, 96.4],
-    "text": " to prepare due diligence reports, share updates with brands and complete social audits."
-  },
-  {
-    "timestamp": [96.4, null],
-    "text": " Together, these dashboards turn grievance data into actionable insights and help build a transparent, responsible, and compliant workplace."
+    "timestamp": [
+      105,
+      null
+    ],
+    "text": "This digital survey module helps helps organizations switch from reactive grievance handling to proactive employee engagement and continuous improvement."
   }
 ]

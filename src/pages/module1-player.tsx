@@ -9,18 +9,18 @@ import SceneOfficers from "../components/scenes/module1/scene-officers.tsx"
 import { ScenePortal } from "../components/scenes/module1/scene-portal.tsx"
 import SceneTraining from "../components/scenes/module1/scene-training.tsx"
 import SceneIOTraining from "../components/scenes/module1/scene-io-training.tsx" // Import new scene
-import { SceneClosing } from "../components/scenes/module1/scene-closing.tsx"
+import SceneClosing from "../components/scenes/module1/scene-closing.tsx"
 
 const SCENES = [
-  { name: "hero", start: 0, end: 3, component: SceneHero },
-  { name: "upload", start: 3, end: 14, component: SceneUpload },
-  { name: "sms", start: 14, end: 28, component: SceneSMS },
-  { name: "card", start: 28, end: 45, component: SceneCard },
-  { name: "officers", start: 45, end: 60, component: SceneOfficers },
-  { name: "portal", start: 60, end: 71, component: ScenePortal }, // Adjusted end to 71
-  { name: "training", start: 71, end: 85, component: SceneTraining }, // General Training
-  { name: "io_training", start: 85, end: 97, component: SceneIOTraining }, // IO Specific Training
-  { name: "closing", start: 97, end: 102, component: SceneClosing },
+  { name: "hero", start: 0, end: 2, component: SceneHero },
+  { name: "upload", start: 2, end: 22, component: SceneUpload },
+  { name: "sms", start: 22, end: 58, component: SceneSMS },
+  { name: "card", start: 58, end: 83, component: SceneCard },
+  { name: "officers", start: 83, end: 101, component: SceneOfficers },
+  { name: "training", start: 101, end: 120, component: SceneTraining }, // Training first
+  { name: "portal", start: 120, end: 134, component: ScenePortal }, // Then Portal
+  { name: "io_training", start: 134, end: 149, component: SceneIOTraining },
+  { name: "closing", start: 149, end: 152, component: SceneClosing },
 ]
 
 interface Module1PlayerProps {

@@ -1,0 +1,11 @@
+(00:00) In this section we walk through how each complaint is investigated and resolved in a structured, transparent way. (00:08) Once a complaint is reflected in the IO portal, it appears under unprocessed. (00:14) The investigation officer reviews the details and activates the case by marking it in process.
+
+(00:21) This step starts the formal investigation and triggers system based timeline tracking. (00:28) The next step is root cause analysis. (00:31) The investigation officer examines the complaint, reviews evidence, conducts worker interviews and cross checks records such as attendance, payroll or security records where needed.
+
+(00:45) Based on this review, the RCA section is filled as valid, partially valid or invalid cases with with clear justification, a deadline is entered for associated corrective and preventive actions. (01:00) For valid or partially valid cases, a corrective and preventive action plan is developed. (01:07) This includes immediate corrective steps to resolve the issue and preventive measures to stop it from happening again.
+
+(01:14) Responsibilities and deadlines are assigned and the system automatically tracks progress and sends reminders.
+
+---
+Converted using noscribe.ai
+Upgrade your plan to remove watermark

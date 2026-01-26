@@ -1,66 +1,114 @@
 [
   {
-    "timestamp": [0, 3],
-    "text": " Let's start with deployment and onboarding."
+    "timestamp": [
+      0,
+      2
+    ],
+    "text": "Lets start with deployment and onboarding."
   },
   {
-    "timestamp": [3, 6.2],
-    "text": " We begin by registering the employee data."
+    "timestamp": [
+      2,
+      5
+    ],
+    "text": "We begin by registering the employee data."
   },
   {
-    "timestamp": [6.2, 13.4],
-    "text": " Companies simply share their employee list, and our team uploads and validates every record to make sure the system is ready."
+    "timestamp": [
+      5,
+      17
+    ],
+    "text": "Companies simply share their active employee list or they may integrate their existing HRMs with the FOS platform through secure APIs."
   },
   {
-    "timestamp": [13.4, 18.5],
-    "text": " Next, every worker is automatically assigned a unique FOS ID."
+    "timestamp": [
+      17,
+      22
+    ],
+    "text": "Our team uploads and validates every record to make sure the system is ready."
   },
   {
-    "timestamp": [18.5, 29],
-    "text": " We send these IDs directly to employees through our SMS service, completely free of cost, so everyone gets immediate access, even without a smartphone."
+    "timestamp": [
+      22,
+      30
+    ],
+    "text": "Once the data is uploaded, the system automatically generates a unique S FOS ID for every employee."
   },
   {
-    "timestamp": [29, 35],
-    "text": " To boost awareness on the factory floor, we create personalized FOS awareness cards for every employee."
+    "timestamp": [
+      30,
+      42
+    ],
+    "text": "Each ID is mapped with the employee's cnic, enabling accurate identification and ease of access during the grievance registration process."
   },
   {
-    "timestamp": [35, 43],
-    "text": " These cards include their IDs, reporting channels, and quick instructions to help everyone understand how to launch a complaint easily."
+    "timestamp": [
+      42,
+      50
+    ],
+    "text": "These FOS IDs are then sent directly to employees through the FOS SMS service."
   },
   {
-    "timestamp": [43, 48.28],
-    "text": " During onboarding, factories also appoint investigation officers."
+    "timestamp": [
+      50,
+      58
+    ],
+    "text": "This ensures immediate accessibility for everyone, including workers who do not have smartphones or Internet access."
   },
   {
-    "timestamp": [48.28, 53.24],
-    "text": " These officers are responsible for resolving and documenting cases."
+    "timestamp": [
+      58,
+      68
+    ],
+    "text": "To boost awareness on the factory floor, the system creates personalized FOS awareness card designs for every employee."
   },
   {
-    "timestamp": [53.24, 57.32],
-    "text": " Depending on the size of the facility, there can be multiple investigation officers for"
+    "timestamp": [
+      68,
+      83
+    ],
+    "text": "These cards include their IDs, clear written instructions, details of reporting channels and a QR code that leads to a short video guide explaining how to lodge a grievance and navigate the system."
   },
   {
-    "timestamp": [57.32, 61.44],
-    "text": " different units, genders, or complaint categories."
+    "timestamp": [
+      83,
+      90
+    ],
+    "text": "As part of onboarding, the company appoints its internal employee as investigation officer."
   },
   {
-    "timestamp": [61.44, 71],
-    "text": " Each investigation officer receives secure access to the I/O portal, where they document root cause analysis, corrective and preventive actions, and upload evidence."
+    "timestamp": [
+      90,
+      101
+    ],
+    "text": "Multiple officers may be assigned by unit, gender or complaint category and are responsible for managing grievance resolution and documentation."
   },
   {
-    "timestamp": [71, 85],
-    "text": " To ensure a smooth rollout, our FOS team visits your facility and conducts complete on-site sessions, training workers on how to report concerns, briefing management on dashboards and responsibilities, and walking everyone through the entire system."
+    "timestamp": [
+      101,
+      120
+    ],
+    "text": "To ensure a smooth rollout, the FOS team visits the facility and and conducts complete on site sessions, training workers on how to report concerns, briefing management on dashboards and responsibilities, and walking everyone through the entire system."
   },
   {
-    "timestamp": [85, 92],
-    "text": " Finally, our investigation officer training equips them with the skills they need, how to validate complaints,"
+    "timestamp": [
+      120,
+      134
+    ],
+    "text": "Each investigation officer receives secure access to the I O portal where they document root cause analysis, corrective and preventive actions and upload evidence."
   },
   {
-    "timestamp": [92, 97],
-    "text": " build corrective action plans, upload evidence, and close cases effectively."
+    "timestamp": [
+      134,
+      149
+    ],
+    "text": "Finally, the FOS team trains the investigation officers on the skills they need how to validate complaints, build corrective action plans, upload evidence and close cases effectively."
   },
   {
-    "timestamp": [97, null],
-    "text": " This ensures your grievance management system is fully functional from day one."
+    "timestamp": [
+      149,
+      null
+    ],
+    "text": "This ensures your grievance management system is fully functional from day one."
   }
 ]

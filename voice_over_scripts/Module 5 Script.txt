@@ -1,0 +1,15 @@
+(00:00) It's time to explore the dashboards and risk insights that give management complete visibility into grievance trends. (00:07) The system is built with a multilayer structure allowing separate dashboards for sites, business units and different management levels. (00:16) This ensures that site teams, compliance staff and senior leadership each see insights relevant to their role.
+
+(00:24) Users can apply location and date filters to view data by site, department, supplier or branch and analyze trends across specific time periods. (00:35) This makes it easy to compare performance and detect recurring issues. (00:40) The Grievance Overview provides a complete snapshot of total complaints, anonymous cases, closed and in process cases, and bounced or unclosed complaints.
+
+(00:51) Category wise chart group complaints by issue type, such as wages, working hours, harassment or health and safety. (01:00) It helps management prioritize corrective and preventive actions where they are needed most. (01:06) Furthermore, datewise charts show how grievances rate changes over time, while Genderwise views number of grievances by male and female employees.
+
+(01:16) In addition, a dedicated section captures general employees suggestions and feedback, offering valuable insights beyond formal complaints and understand broader workforce concerns. (01:28) The dashboard also includes a breakdown of counseling sessions where fos grievance officers directly supported workers and provided counseling without the need for launch of formal grievance investigation. (01:42) Officer performance is tracked through resolution Time breakdown showing how quickly cases are closed and how effectively grievances are handled across defined time slabs.
+
+(01:54) Each dashboard metric is interactive and clickable. (01:58) Users can access metric specific complaints list view AI generated summaries of complaints, separate summary of RCA and capa. (02:08) Further, clicking on each ticket number provides complete case timeline with all details and evidences to support long term monitoring.
+
+(02:17) The system also generates worker happiness and safety scores based on grievance data, counseling outcomes and verification feedback. (02:26) These scores help benchmark performance, track improvements over time, and assess the real impact of corrective actions. (02:35) Finally, all completed survey reports are archived in one place, supporting audits, trend analysis, and continuous oversight of workplace conditions.
+
+---
+Converted using noscribe.ai
+Upgrade your plan to remove watermark

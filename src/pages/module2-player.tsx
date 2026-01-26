@@ -11,13 +11,13 @@ import { SceneTicket } from "../components/scenes/module2/scene-ticket.tsx"
 import { SceneNotification } from "../components/scenes/module2/scene-notification.tsx"
 
 const SCENES = [
-  { name: "intro", start: 0, end: 4.64, component: SceneIntro },
-  { name: "omnichannel", start: 4.64, end: 22, component: SceneOmnichannel },
-  { name: "assisted", start: 22, end: 44.56, component: SceneAssistedFiling },
-  { name: "anonymity", start: 44.56, end: 61.24, component: SceneAnonymity },
-  { name: "review", start: 61.24, end: 71, component: SceneReview },
-  { name: "ticket", start: 71, end: 82, component: SceneTicket },
-  { name: "notification", start: 82, end: 98, component: SceneNotification },
+  { name: "intro", start: 0, end: 5, component: SceneIntro },
+  { name: "omnichannel", start: 5, end: 28, component: SceneOmnichannel },
+  { name: "assisted", start: 28, end: 57, component: SceneAssistedFiling },
+  { name: "anonymity", start: 57, end: 77, component: SceneAnonymity },
+  { name: "review", start: 77, end: 95, component: SceneReview },
+  { name: "ticket", start: 95, end: 113, component: SceneTicket },
+  { name: "notification", start: 113, end: 132, component: SceneNotification },
 ]
 
 interface Module2PlayerProps {
