@@ -610,7 +610,134 @@ const InvestigationVisual = () => (
   </div>
 )
 
-// === MODULE 4: DASHBOARDS & INSIGHTS VISUAL ===
+// === MODULE 4: SURVEYS VISUAL ===
+// Content: Digital surveys, multi-language, participant targeting, SMS invitations, responses, AI analysis
+const SurveyVisual = () => (
+  <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
+    {/* Survey gradient background */}
+    <div className="absolute inset-0 bg-gradient-to-br from-[#F8F5FF] via-white to-[#F0FAFF]" />
+
+    {/* Subtle pattern */}
+    <div
+      className="absolute inset-0 opacity-[0.02]"
+      style={{
+        backgroundImage: 'radial-gradient(circle at 2px 2px, #8B5CF6 1px, transparent 0)',
+        backgroundSize: '24px 24px',
+      }}
+    />
+
+    <div className="relative z-10 flex flex-col items-center gap-4">
+      {/* Survey Features Row */}
+      <motion.div
+        className="flex gap-3"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        {[
+          { Icon: MessageSquare, label: 'Create', color: '#8B5CF6' },
+          { Icon: Users, label: 'Target', color: '#3B82F6' },
+          { Icon: Mail, label: 'Invite', color: '#60BA81' },
+          { Icon: BarChart3, label: 'Analyze', color: '#F5A83C' },
+        ].map(({ Icon, label, color }, i) => (
+          <motion.div
+            key={label}
+            className="bg-white rounded-2xl p-3 shadow-lg shadow-black/5 border border-gray-100 flex flex-col items-center gap-2"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 + i * 0.1 }}
+            whileHover={{ y: -4, scale: 1.02 }}
+          >
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: `${color}12`, color }}
+            >
+              <Icon size={18} strokeWidth={2} />
+            </div>
+            <span className="text-[8px] font-bold text-[#284952]/70 uppercase tracking-wider">{label}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Main Survey Card */}
+      <motion.div
+        initial={{ y: 20, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ delay: 0.4, ...IOS_SPRING }}
+      >
+        <GlassSurface className="w-[380px] p-5">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center">
+                <ClipboardCheck size={18} className="text-white" />
+              </div>
+              <div>
+                <div className="font-bold text-[#1A1D21] text-sm">Employee Wellbeing Survey</div>
+                <div className="text-[10px] text-[#8A9199]">Multi-language • 847 responses</div>
+              </div>
+            </div>
+            <motion.div
+              className="px-2.5 py-1 rounded-full bg-[#60BA81]/15 text-[#60BA81] text-[10px] font-bold"
+              animate={{ opacity: [1, 0.6, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              Live
+            </motion.div>
+          </div>
+
+          {/* Response Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {[
+              { label: 'Sent', value: '1,250', color: '#3B82F6' },
+              { label: 'Responded', value: '847', color: '#60BA81' },
+              { label: 'Rate', value: '68%', color: '#8B5CF6' },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className="bg-gray-50 rounded-xl p-2.5 text-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 + i * 0.1 }}
+              >
+                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
+                <div className="text-[9px] font-medium text-gray-400 uppercase">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Sentiment Analysis */}
+          <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-[#3B82F6]/10 rounded-xl p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles size={14} className="text-[#8B5CF6]" />
+              <span className="text-[10px] font-bold text-[#284952]">AI Sentiment Analysis</span>
+            </div>
+            <div className="flex gap-2">
+              {[
+                { label: 'Positive', pct: 62, color: '#60BA81' },
+                { label: 'Neutral', pct: 28, color: '#F5A83C' },
+                { label: 'Negative', pct: 10, color: '#EF4444' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  className="flex-1 text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 + i * 0.1 }}
+                >
+                  <div className="text-sm font-bold" style={{ color: item.color }}>{item.pct}%</div>
+                  <div className="text-[8px] text-gray-500">{item.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </GlassSurface>
+      </motion.div>
+    </div>
+  </div>
+)
+
+// === MODULE 5: DASHBOARDS & INSIGHTS VISUAL ===
 // Content: Dashboard with total/open/overdue cases, categories, RCA/CAPA performance, timeline monitoring, satisfaction indicators, exports
 const DashboardVisual = () => (
   <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
@@ -777,6 +904,8 @@ const DynamicCoverArt = ({ id }: { id: number }) => {
     case 3:
       return <InvestigationVisual />
     case 4:
+      return <SurveyVisual />
+    case 5:
       return <DashboardVisual />
     default:
       return null
@@ -912,6 +1041,23 @@ const Slide: React.FC<SlideProps> = ({
       featureTags: ["Real-Time", "AI Insights", "HRDD Ready"],
       isDark: true,
     },
+    {
+      // Card 5 - Purple Accent for Surveys
+      cardBg: "#1E1E2E",
+      textColor: "#FFFFFF",
+      subtextColor: "rgba(255,255,255,0.7)",
+      accent: "#8B5CF6",
+      accentLight: "rgba(139,92,246,0.12)",
+      secondaryAccent: "#60BA81",
+      iconBg: "rgba(139,92,246,0.15)",
+      gradient: "from-[#1E1E2E] via-[#252538] to-[#1a1a28]",
+      glow: "rgba(139,92,246,0.35)",
+      decorativeColor: "#8B5CF6",
+      innerGlow: "radial-gradient(ellipse at top center, rgba(139,92,246,0.1) 0%, transparent 55%)",
+      borderGradient: "linear-gradient(135deg, rgba(139,92,246,0.4) 0%, rgba(139,92,246,0.1) 50%, rgba(139,92,246,0.25) 100%)",
+      featureTags: ["Multi-Language", "AI Sentiment", "Proactive"],
+      isDark: true,
+    },
   ]
   const currentTheme = themeColors[index % themeColors.length]
 
@@ -923,7 +1069,7 @@ const Slide: React.FC<SlideProps> = ({
   const getWidth = () => {
     if (isExpanded) return `${EXPANDED_WIDTH}vw`
     if (isPeek) return `${PEEK_WIDTH}vw`
-    if (isIdle) return `calc((100% - 1rem) / 4.1)`
+    if (isIdle) return `calc((100% - 2rem) / 5.1)`
     return "0px"
   }
 

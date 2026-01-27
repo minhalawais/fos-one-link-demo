@@ -35,8 +35,8 @@ interface SceneClosureProps {
 }
 
 export function SceneClosure({ progress }: SceneClosureProps) {
-  const sceneStart = 111.4
-  const transitionPoint = 118.2
+  const sceneStart = 163
+  const transitionPoint = 171
   const showInsights = progress > transitionPoint
 
   // Stage management for sequential storytelling

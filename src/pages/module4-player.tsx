@@ -2,52 +2,26 @@
 
 import { AnimatePresence } from "framer-motion"
 
-// Import all scene components
+// Import scene components
 import { SceneIntro } from "../components/scenes/module4/scene-intro.tsx"
-import { SceneBreakdown } from "../components/scenes/module4/scene-breakdown.tsx"
-import { SceneHeatmap } from "../components/scenes/module4/scene-heatmap.tsx"
-import { SceneMetrics } from "../components/scenes/module4/scene-metrics.tsx"
-import { SceneTimeline } from "../components/scenes/module4/scene-timeline.tsx"
-import { SceneNPS } from "../components/scenes/module4/scene-nps.tsx"
-import { SceneTrends } from "../components/scenes/module4/scene-trends.tsx"
-import { SceneExport } from "../components/scenes/module4/scene-export.tsx"
-import { SceneConclusion } from "../components/scenes/module4/scene-conclusion.tsx"
-import { SceneDashboard } from "../components/scenes/module4/scene-dashboard.tsx"
+import { SceneCreation } from "../components/scenes/module4/scene-creation.tsx"
+import { SceneTargeting } from "../components/scenes/module4/scene-targeting.tsx"
+import { SceneSampling } from "../components/scenes/module4/scene-sampling.tsx"
+import { SceneInvitations } from "../components/scenes/module4/scene-invitations.tsx"
+import { SceneResponses } from "../components/scenes/module4/scene-responses.tsx"
+import { SceneReports } from "../components/scenes/module4/scene-reports.tsx"
+import { SceneAI } from "../components/scenes/module4/scene-ai.tsx"
 
-// Updated scene configuration to match voiceover script timestamps
+// Scene configuration matching the module4_script.json timestamps
 const SCENES = [
-  // Intro: "It's time to explore the dashboards and risk insights..."
-  { name: "intro", start: 0, end: 7, component: SceneIntro },
-  
-  // Dashboard overview: "The dashboard provides a real-time view..."
-  { name: "dashboard", start: 7, end: 16, component: SceneDashboard },
-  
-  // Quick assessment: "This helps management quickly assess..."
-  { name: "assessment", start: 16, end: 20.2, component: SceneDashboard }, // Could be a variant of dashboard
-  
-  // Categories breakdown: "Complaints are automatically grouped..."
-  { name: "breakdown", start: 20.2, end: 30.64, component: SceneBreakdown },
-  
-  // Heatmap insights: "This allows factories to identify recurring issues..."
-  { name: "heatmap", start: 30.64, end: 43.4, component: SceneHeatmap },
-  
-  // RCA/CAPA metrics: "The system also tracks RCA and CAPA performance..."
-  { name: "metrics", start: 43.4, end: 59.4, component: SceneMetrics },
-  
-  // Timeline monitoring: "Timeline monitoring highlights average investigation times..."
-  { name: "timeline", start: 59.4, end: 70.4, component: SceneTimeline },
-  
-  // Worker satisfaction: "Workers' satisfaction indicators show how employees responded..."
-  { name: "nps", start: 70.4, end: 75.68, component: SceneNPS },
-  
-  // Trends analysis: "You can also analyze trends over weeks, months..."
-  { name: "trends", start: 75.68, end: 90.28, component: SceneTrends },
-  
-  // Export functionality: "And finally, all reports are exportable for HRDD..."
-  { name: "export", start: 90.28, end: 96.4, component: SceneExport },
-  
-  // Conclusion: "Together, these dashboards turn grievance data..."
-  { name: "conclusion", start: 96.4, end: 102, component: SceneConclusion }
+  { name: "intro", start: 0, end: 9, component: SceneIntro },
+  { name: "creation", start: 9, end: 17, component: SceneCreation },
+  { name: "targeting", start: 17, end: 33, component: SceneTargeting },
+  { name: "sampling", start: 33, end: 46, component: SceneSampling },
+  { name: "invitations", start: 46, end: 63, component: SceneInvitations },
+  { name: "responses", start: 63, end: 75, component: SceneResponses },
+  { name: "reports", start: 75, end: 91, component: SceneReports },
+  { name: "ai", start: 91, end: 115, component: SceneAI },
 ]
 
 interface Module4PlayerProps {
@@ -55,14 +29,18 @@ interface Module4PlayerProps {
 }
 
 export default function Module4Player({ progress }: Module4PlayerProps) {
-  const currentSceneConfig = SCENES.find((scene) => progress >= scene.start && progress < scene.end) || SCENES[0]
-  const CurrentSceneComponent = currentSceneConfig.component
+  const currentScene = SCENES.find((scene) => progress >= scene.start && progress < scene.end) || SCENES[SCENES.length - 1]
+  const SceneComponent = currentScene.component
 
   return (
-    <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
+    <div className="w-full h-full relative overflow-hidden font-sans select-none" style={{ backgroundColor: "#E5E1DA" }}>
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">
-          <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
+          <SceneComponent
+            key={currentScene.name}
+            isActive={true}
+            progress={progress}
+          />
         </AnimatePresence>
       </div>
     </div>

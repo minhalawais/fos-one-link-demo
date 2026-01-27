@@ -3,12 +3,13 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence, LayoutGroup, useMotionValue, useTransform } from "framer-motion"
-import { Zap, ShieldCheck, Search, Activity } from "lucide-react"
+import { Zap, ShieldCheck, Search, ClipboardList, Activity } from "lucide-react"
 
 import Module1Player from "./pages/module1-player.tsx"
 import Module2Player from "./pages/module2-player.tsx"
 import Module3Player from "./pages/module3-player.tsx"
 import Module4Player from "./pages/module4-player.tsx"
+import Module5Player from "./pages/module5-player.tsx"
 
 // ControlPanel is now inside Slide.tsx, so we don't import it here directly
 import { MODULE_DATA } from "./lib/module-data.ts"
@@ -276,7 +277,7 @@ export default function App() {
       shortTitle: "Investigate",
       headline: "Investigation-Remediation-Satisfaction Framework",
       subtext: "Systematic resolution workflows with verified employee satisfaction.",
-      duration: 120,
+      duration: 177,
       audioPath: "/assets/Module 3 Script.mp3",
       icon: Search,
       playerComponent: <Module3Player progress={currentTime} />,
@@ -284,14 +285,25 @@ export default function App() {
     },
     {
       id: 4,
+      shortTitle: "Surveys",
+      headline: "Digital Surveys",
+      subtext: "Proactive employee engagement through in-app surveys.",
+      duration: 115,
+      audioPath: "/assets/Module 4 Script.mp3",
+      icon: ClipboardList,
+      playerComponent: <Module4Player progress={currentTime} />,
+      scenes: MODULE_DATA.module4.scenes,
+    },
+    {
+      id: 5,
       shortTitle: "Insights",
       headline: "Dashboards & Risk Insights",
       subtext: "Data Intelligence for HRDD reporting and risk monitoring.",
       duration: 102,
-      audioPath: "/assets/Module 4 Script.mp3",
+      audioPath: "/assets/Module 5 Script.mp3",
       icon: Activity,
-      playerComponent: <Module4Player progress={currentTime} />,
-      scenes: MODULE_DATA.module4.scenes,
+      playerComponent: <Module5Player progress={currentTime} />,
+      scenes: MODULE_DATA.module5.scenes,
     },
   ]
 

@@ -17,6 +17,12 @@ import {
   Shield,
   RefreshCw,
   Sparkles,
+  ArrowUp,
+  Clock,
+  Users,
+  AlertCircle,
+  FileText,
+  Upload,
 } from "lucide-react"
 
 const ASSETS = {
@@ -51,7 +57,11 @@ export function SceneFOSVerification({ isActive, progress = 0 }: SceneFOSVerific
   const [stage, setStage] = useState(0)
   const [rcaText, setRcaText] = useState("")
   const [capaText, setCapaText] = useState("")
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Evidence files to show during upload animation
+  const evidenceFiles = ["site_photo_1.jpg", "renovation_quote.pdf", "worker_statement.pdf"]
 
   const rcaReworkText = `UPDATED RCA (Rework):
 
@@ -78,19 +88,43 @@ Deadline: 15 Dec 2025 | Escalated Priority`
 
   useEffect(() => {
     if (!isActive) return
-    const sceneStart = 80.04
+    const sceneStart = 113
     const localProgress = progress - sceneStart
     if (localProgress < 0) { setStage(0); return }
-    if (localProgress < 5.16) setStage(1)
-    else if (localProgress < 10.56) setStage(2)
-    else if (localProgress < 14.56) setStage(3)
-    else if (localProgress < 19.08) setStage(4)
-    else if (localProgress < 27) {
-      if (localProgress < 21) setStage(5)
-      else if (localProgress < 23) setStage(6)
-      else if (localProgress < 25) setStage(7)
-      else setStage(8)
-    } else setStage(9)
+
+    // 113-118s (5s): "Once a complaint is submitted, EFOS team contacts back the complainant directly for verification."
+    if (localProgress < 5) setStage(1) // FOS Call
+
+    // 118-124s (6s): "We explain the actions taken and confirm if the worker is satisfied with the outcome."
+    else if (localProgress < 11) setStage(2) // Explain actions
+
+    // 124-128s (4s): "This independent check ensures fairness and builds trust."
+    else if (localProgress < 15) setStage(3) // Trust badge
+
+    // 128-134s (6s): "If the worker is not satisfied, the case is bounced back to the investigation officer."
+    else if (localProgress < 21) setStage(4) // Dissatisfied - bounce back
+
+    // 134-138s (4s): "For the investigation officer must update the rca..."
+    else if (localProgress < 25) setStage(5) // Rework intro - show timeline
+
+    // 138-144s (6s): "...revise the CAPA and resubmit with improved documentation."
+    else if (localProgress < 31) {
+      if (localProgress < 28) setStage(6) // Zoom to RCA
+      else setStage(7) // RCA typing
+    }
+
+    // 144-148s (4s): "This prevents premature or incomplete closures."
+    else if (localProgress < 35) setStage(8) // CAPA revision
+
+    // 148-155s (7s): "The system also supports escalation if timelines are missed or cases are repeatedly bounced back."
+    else if (localProgress < 42) setStage(9) // Escalation visualization
+
+    // 155-161s (6s): "Senior management can be automatically engaged to ensure accountability."
+    else if (localProgress < 48) setStage(10) // Senior management
+
+    // 161-163s (2s+): Quality assurance summary
+    else setStage(11)
+
   }, [isActive, progress])
 
   useEffect(() => {
@@ -111,17 +145,31 @@ Deadline: 15 Dec 2025 | Escalated Priority`
     }
   }, [stage, capaText.length, capaReworkText])
 
+  // File upload animation for evidence
+  useEffect(() => {
+    if (stage === 8 && uploadedFiles.length < evidenceFiles.length) {
+      const timer = setTimeout(() => {
+        setUploadedFiles(prev => [...prev, evidenceFiles[prev.length]])
+      }, 800)
+      return () => clearTimeout(timer)
+    }
+  }, [stage, uploadedFiles.length, evidenceFiles])
+
   useEffect(() => {
     if (!isActive) {
       setStage(0)
       setRcaText("")
       setCapaText("")
+      setUploadedFiles([])
     }
   }, [isActive])
 
   const getTransform = () => {
-    if (stage === 6 || stage === 7) return { scale: 2.2, x: -160, y: 60 }
-    if (stage === 8) return { scale: 2.2, x: 160, y: -40 }
+    // Zoom to RCA card - stages 6, 7
+    if (stage === 6 || stage === 7) return { scale: 1.8, x: -180, y: 30 }
+    // Zoom to CAPA card - stage 8
+    if (stage === 8) return { scale: 1.8, x: 180, y: -80 }
+    // Default - full view
     return { scale: 1, x: 0, y: 0 }
   }
 
@@ -653,7 +701,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
           </motion.div>
         )}
 
-        {/* Stage 5-8: Enhanced RCA/CAPA Timeline */}
+        {/* Stage 5-8: Enhanced RCA/CAPA Timeline - Matching scene-rca-capa-evidence.tsx style */}
         {stage >= 5 && stage <= 8 && (
           <motion.div
             key="rework-timeline"
@@ -670,124 +718,131 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                 x: transform.x,
                 y: transform.y,
               }}
-              transition={{ type: "spring", stiffness: 100, damping: 25 }}
+              transition={{
+                type: "spring",
+                stiffness: 90,
+                damping: 25,
+                mass: 1
+              }}
             >
-              <div className="w-[98%] h-[98%] max-w-[1000px] max-h-[650px]">
-                {/* Header badge */}
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex justify-center mb-4"
-                >
-                  <motion.div
-                    className="flex items-center gap-3 px-6 py-3 rounded-full shadow-lg relative"
-                    style={{
-                      background: COLORS.orangeGradient,
-                      boxShadow: `0 10px 30px -10px ${COLORS.orange}60`,
-                    }}
-                    animate={{
-                      boxShadow: [
-                        `0 10px 30px -10px ${COLORS.orange}60`,
-                        `0 10px 40px -5px ${COLORS.orange}80`,
-                        `0 10px 30px -10px ${COLORS.orange}60`,
-                      ],
-                    }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <motion.div
-                      animate={{ rotate: [0, 360] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    >
-                      <RefreshCw size={20} className="text-white" />
-                    </motion.div>
-                    <span className="text-white font-bold text-base">REWORK REQUIRED</span>
-                  </motion.div>
-                </motion.div>
-
-                {/* Timeline card */}
+              <div className="w-[90%] h-[90%] max-w-[850px] max-h-[550px]">
+                {/* Apple-style Card Container - matching scene-rca-capa-evidence.tsx */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="w-full h-[calc(100%-60px)] bg-white rounded-3xl overflow-hidden border border-gray-200 flex flex-col"
-                  style={{
-                    boxShadow: "0 30px 80px -20px rgba(0,0,0,0.15)",
-                  }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full h-full bg-[#F8F8F8] rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden border border-gray-200 flex flex-col"
                 >
-                  <div className="relative flex-1 p-6 overflow-hidden">
-                    {/* Timeline line */}
-                    <div className="absolute left-1/2 top-6 bottom-20 w-0 -translate-x-1/2 border-l-2 border-dashed border-gray-300" />
+                  {/* Timeline Content */}
+                  <div className="relative flex-1 p-4 overflow-hidden">
+                    {/* Central Timeline Line - Vertical Dashed */}
+                    <div className="absolute left-1/2 top-4 bottom-16 w-0 -translate-x-1/2 border-l-2 border-dashed border-gray-300" />
 
-                    {/* Animated progress line */}
+                    {/* Timeline Progress Line */}
                     <motion.div
-                      className="absolute left-1/2 top-6 w-1 -translate-x-1/2 rounded-full"
-                      style={{
-                        background: `linear-gradient(180deg, ${COLORS.orange} 0%, ${COLORS.teal} 50%, ${COLORS.green} 100%)`,
-                      }}
+                      className="absolute left-1/2 top-4 w-0.5 -translate-x-1/2 bg-gradient-to-b from-[#0f9690] to-[#60BA81]"
                       initial={{ height: "0%" }}
-                      animate={{ height: "75%" }}
-                      transition={{ duration: 2, ease: "easeOut" }}
+                      animate={{ height: stage >= 5 ? "80%" : "0%" }}
+                      transition={{ duration: 3, ease: "easeOut" }}
                     />
 
-                    {/* Content grid */}
-                    <div className="relative grid grid-cols-[1fr_60px_1fr] gap-4 h-full">
-                      {/* Left: CAPA */}
-                      <div className="flex flex-col justify-end pb-6">
+                    {/* Worker Feedback Card - Horizontally Centered at Top */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="mb-3"
+                    >
+                      <motion.div
+                        className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300 mx-auto max-w-[500px]"
+                        style={{
+                          borderColor: COLORS.orange,
+                          boxShadow: `0 10px 40px -10px ${COLORS.orange}60`,
+                        }}
+                      >
+                        {/* Card Header */}
+                        <div
+                          className="px-3 py-2 flex items-center gap-2"
+                          style={{ backgroundColor: COLORS.orange }}
+                        >
+                          <XCircle size={14} className="text-white" strokeWidth={2.5} />
+                          <span className="font-bold text-white text-xs">Worker Feedback - Not Satisfied</span>
+                        </div>
+
+                        {/* Card Body */}
+                        <div className="bg-white p-3">
+                          <div className="text-[10px] text-gray-600 leading-relaxed">
+                            The complainant mentioned that no renovation work has been done— all the washrooms are
+                            still in poor condition. He requested the issue be properly addressed.
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+
+                    {/* Content Layout - Two Columns with Timeline in Center */}
+                    <div className="relative grid grid-cols-[1fr_50px_1fr] gap-3 flex-1">
+                      {/* Left Column - CAPA at bottom */}
+                      <div className="flex flex-col justify-end pb-4">
+                        {/* CAPA Card - Bottom Left */}
                         <motion.div
                           animate={{
                             scale: stage === 8 ? 1.03 : 1,
+                            zIndex: stage === 8 ? 10 : 1,
                           }}
-                          transition={{ type: "spring" }}
+                          transition={{ type: "spring", stiffness: 200 }}
                         >
                           <motion.div
-                            className="rounded-2xl overflow-hidden shadow-xl border-2 transition-all duration-300"
+                            className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300"
                             style={{
                               borderColor: stage === 8 ? COLORS.teal : "transparent",
                               boxShadow: stage === 8
-                                ? `0 15px 50px -15px ${COLORS.teal}60`
-                                : "0 5px 25px -5px rgba(0,0,0,0.1)",
+                                ? `0 10px 40px -10px ${COLORS.teal}60`
+                                : "0 4px 20px -5px rgba(0,0,0,0.1)",
                             }}
                           >
+                            {/* Card Header */}
                             <div
-                              className="px-4 py-3 flex items-center justify-between"
-                              style={{
-                                background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
-                              }}
+                              className="px-3 py-2 flex items-center justify-between"
+                              style={{ backgroundColor: COLORS.teal }}
                             >
-                              <span className="font-bold text-white text-sm">CAPA - Corrective & Preventive Actions</span>
-                              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                                <List size={14} className="text-white" />
+                              <span className="font-bold text-white text-xs">CAPA-Corrective & Preventive Actions</span>
+                              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                                <List size={12} className="text-white" />
                               </div>
                             </div>
 
-                            <div className="bg-white p-4">
-                              <div className="text-xs text-gray-500 font-medium mb-2">Detail:</div>
-                              <div className="flex items-center gap-1 p-2 bg-gray-50 rounded-lg mb-3 border border-gray-200">
+                            {/* Card Body */}
+                            <div className="bg-white p-3">
+                              <div className="text-[10px] text-gray-500 font-medium mb-1">Detail:</div>
+
+                              {/* Rich Text Toolbar */}
+                              <div className="flex items-center gap-0.5 p-1.5 bg-gray-50 rounded mb-2 border border-gray-200">
                                 {[Bold, Italic, Underline, List, ListOrdered, LinkIcon].map((Icon, i) => (
                                   <button
                                     key={i}
-                                    className="w-6 h-6 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                                    className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
                                   >
-                                    <Icon size={12} />
+                                    <Icon size={10} />
                                   </button>
                                 ))}
                               </div>
 
-                              <div className="min-h-[130px] max-h-[150px] overflow-y-auto p-3 border border-gray-200 rounded-lg bg-gray-50/50">
-                                <div className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
+                              {/* Text Content */}
+                              <div className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50">
+                                <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
                                   {capaText ? (
                                     <>
                                       {capaText}
                                       {stage === 8 && capaText.length < capaReworkText.length && (
                                         <motion.span
                                           animate={{ opacity: [1, 0] }}
-                                          transition={{ repeat: Infinity, duration: 0.6 }}
-                                          className="inline-block w-0.5 h-4 bg-teal-600 ml-1 align-middle"
+                                          transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6 }}
+                                          className="inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle"
                                         />
                                       )}
                                     </>
                                   ) : (
-                                    <span className="text-gray-400 italic">
+                                    <span className="text-gray-400 italic text-[10px]">
                                       Revise CAPA with improved documentation...
                                     </span>
                                   )}
@@ -798,116 +853,112 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                         </motion.div>
                       </div>
 
-                      {/* Center: Timeline nodes */}
-                      <div className="flex flex-col items-center justify-between py-8">
-                        <div className="flex flex-col items-center gap-2">
+                      {/* Center Column - Timeline Nodes */}
+                      <div className="flex flex-col items-center justify-between py-6">
+                        {/* Node 1 - RCA */}
+                        <div className="flex flex-col items-center gap-1">
                           <motion.div
-                            className="px-3 py-1 rounded-full text-xs font-bold text-white"
-                            style={{ background: COLORS.orangeGradient }}
+                            className="px-2 py-0.5 rounded text-[9px] font-bold text-white"
+                            style={{ backgroundColor: COLORS.orange }}
                             animate={{
-                              scale: stage === 6 || stage === 7 ? [1, 1.15, 1] : 1,
+                              scale: stage >= 5 && stage < 8 ? [1, 1.1, 1] : 1,
                             }}
                             transition={{
-                              duration: 0.6,
-                              repeat: stage === 6 || stage === 7 ? Infinity : 0,
-                              repeatDelay: 0.8,
+                              duration: 0.5,
+                              repeat: stage >= 5 && stage < 8 ? Number.POSITIVE_INFINITY : 0,
+                              repeatDelay: 1,
                             }}
                           >
-                            REWORK
+                            RCA
                           </motion.div>
                           <motion.div
-                            className="w-4 h-4 rounded-full bg-white border-4 shadow-lg z-10"
-                            style={{ borderColor: stage >= 6 ? COLORS.orange : COLORS.border }}
-                            animate={{
-                              scale: stage >= 6 ? [1, 1.2, 1] : 1,
-                            }}
-                            transition={{ duration: 0.5 }}
+                            className="w-3 h-3 rounded-full bg-white border-[3px] shadow-md z-10"
+                            style={{ borderColor: stage >= 5 ? COLORS.teal : COLORS.border }}
                           />
                         </div>
 
-                        <div className="flex flex-col items-center gap-2">
+                        {/* Node 2 - CAPA */}
+                        <div className="flex flex-col items-center gap-1">
                           <motion.div
-                            className="px-3 py-1 rounded-full text-xs font-bold text-white"
-                            style={{ background: COLORS.orangeGradient }}
+                            className="px-2 py-0.5 rounded text-[9px] font-bold text-white"
+                            style={{ backgroundColor: COLORS.orange }}
                             animate={{
-                              scale: stage === 8 ? [1, 1.15, 1] : 1,
+                              scale: stage >= 8 ? [1, 1.1, 1] : 1,
                             }}
                             transition={{
-                              duration: 0.6,
-                              repeat: stage === 8 ? Infinity : 0,
-                              repeatDelay: 0.8,
+                              duration: 0.5,
+                              repeat: stage >= 8 ? Number.POSITIVE_INFINITY : 0,
+                              repeatDelay: 1,
                             }}
                           >
-                            UPDATE
+                            CAPA
                           </motion.div>
                           <motion.div
-                            className="w-4 h-4 rounded-full bg-white border-4 shadow-lg z-10"
-                            style={{ borderColor: stage === 8 ? COLORS.teal : COLORS.border }}
-                            animate={{
-                              scale: stage === 8 ? [1, 1.2, 1] : 1,
-                            }}
-                            transition={{ duration: 0.5 }}
+                            className="w-3 h-3 rounded-full bg-white border-[3px] shadow-md z-10"
+                            style={{ borderColor: stage >= 8 ? COLORS.teal : COLORS.border }}
                           />
                         </div>
                       </div>
 
-                      {/* Right: RCA */}
-                      <div className="flex flex-col gap-4 py-3">
+                      {/* Right Column - RCA at top, Evidence at bottom */}
+                      <div className="flex flex-col gap-3 py-2">
+                        {/* RCA Card - Top Right */}
                         <motion.div
                           animate={{
-                            scale: stage === 6 || stage === 7 ? 1.03 : 1,
+                            scale: stage >= 5 && stage < 8 ? 1.03 : 1,
+                            zIndex: stage >= 5 && stage < 8 ? 10 : 1,
                           }}
-                          transition={{ type: "spring" }}
+                          transition={{ type: "spring", stiffness: 200 }}
                         >
                           <motion.div
-                            className="rounded-2xl overflow-hidden shadow-xl border-2 transition-all duration-300"
+                            className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300"
                             style={{
-                              borderColor: stage === 6 || stage === 7 ? COLORS.green : "transparent",
-                              boxShadow: stage === 6 || stage === 7
-                                ? `0 15px 50px -15px ${COLORS.green}60`
-                                : "0 5px 25px -5px rgba(0,0,0,0.1)",
+                              borderColor: stage >= 5 && stage < 8 ? COLORS.green : "transparent",
+                              boxShadow: stage >= 5 && stage < 8
+                                ? `0 10px 40px -10px ${COLORS.green}60`
+                                : "0 4px 20px -5px rgba(0,0,0,0.1)",
                             }}
                           >
-                            <div
-                              className="px-4 py-3 flex items-center gap-2"
-                              style={{
-                                background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
-                              }}
-                            >
-                              <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                                <AlertTriangle size={14} className="text-white" />
+                            {/* Card Header */}
+                            <div className="px-3 py-2 flex items-center gap-2" style={{ backgroundColor: COLORS.teal }}>
+                              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                                <AlertTriangle size={12} className="text-white" />
                               </div>
-                              <span className="font-bold text-white text-sm">RCA - Root Cause Analysis</span>
+                              <span className="font-bold text-white text-xs">RCA-Root Cause Analysis</span>
                             </div>
 
-                            <div className="bg-white p-4">
-                              <div className="text-xs text-gray-500 font-medium mb-2">Detail:</div>
-                              <div className="flex items-center gap-1 p-2 bg-gray-50 rounded-lg mb-3 border border-gray-200">
+                            {/* Card Body */}
+                            <div className="bg-white p-3">
+                              <div className="text-[10px] text-gray-500 font-medium mb-1">Detail</div>
+
+                              {/* Rich Text Toolbar */}
+                              <div className="flex items-center gap-0.5 p-1.5 bg-gray-50 rounded mb-2 border border-gray-200">
                                 {[Bold, Italic, Underline, List, ListOrdered, LinkIcon].map((Icon, i) => (
                                   <button
                                     key={i}
-                                    className="w-6 h-6 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                                    className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
                                   >
-                                    <Icon size={12} />
+                                    <Icon size={10} />
                                   </button>
                                 ))}
                               </div>
 
-                              <div className="min-h-[110px] max-h-[130px] overflow-y-auto p-3 border border-gray-200 rounded-lg bg-gray-50/50">
-                                <div className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
+                              {/* Text Content */}
+                              <div className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50">
+                                <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
                                   {rcaText ? (
                                     <>
                                       {rcaText}
-                                      {stage === 7 && rcaText.length < rcaReworkText.length && (
+                                      {stage >= 6 && stage < 8 && (
                                         <motion.span
                                           animate={{ opacity: [1, 0] }}
-                                          transition={{ repeat: Infinity, duration: 0.6 }}
-                                          className="inline-block w-0.5 h-4 bg-green-600 ml-1 align-middle"
+                                          transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6 }}
+                                          className="inline-block w-0.5 h-3 bg-[#60BA81] ml-0.5 align-middle"
                                         />
                                       )}
                                     </>
                                   ) : (
-                                    <span className="text-gray-400 italic">
+                                    <span className="text-gray-400 italic text-[10px]">
                                       Update RCA based on complainant feedback...
                                     </span>
                                   )}
@@ -916,7 +967,101 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             </div>
                           </motion.div>
                         </motion.div>
+
+                        {/* Evidence Upload Card - Bottom Right */}
+                        <motion.div
+                          animate={{
+                            scale: stage === 8 && uploadedFiles.length > 0 ? 1.03 : 1,
+                            zIndex: stage === 8 && uploadedFiles.length > 0 ? 10 : 1,
+                          }}
+                          transition={{ type: "spring", stiffness: 200 }}
+                        >
+                          <motion.div
+                            className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300"
+                            style={{
+                              borderColor: stage === 8 && uploadedFiles.length > 0 ? COLORS.teal : "transparent",
+                              boxShadow: stage === 8 && uploadedFiles.length > 0
+                                ? `0 10px 40px -10px ${COLORS.teal}60`
+                                : "0 4px 20px -5px rgba(0,0,0,0.1)",
+                            }}
+                          >
+                            {/* Upload Area */}
+                            <div className="p-3" style={{ backgroundColor: COLORS.teal }}>
+                              <div className="flex items-center gap-3">
+                                {/* Select Files Button */}
+                                <div className="flex items-center gap-2 px-3 py-2 bg-white/20 rounded">
+                                  <Upload size={14} className="text-white" />
+                                  <span className="text-[10px] text-white font-medium">Select Files</span>
+                                </div>
+                                {/* Drop Zone Text */}
+                                <span className="text-[10px] text-white">
+                                  Drag and drop files here
+                                </span>
+                              </div>
+
+                              {/* Uploaded Files Display */}
+                              <div className="mt-2 min-h-[40px] bg-white/10 rounded p-2">
+                                {uploadedFiles.length > 0 ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    {uploadedFiles.map((file) => (
+                                      <motion.div
+                                        key={file}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded text-[9px] text-white"
+                                      >
+                                        <FileText size={10} />
+                                        {file}
+                                      </motion.div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] text-white/60 italic">No files selected</span>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        </motion.div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Footer - Matching scene-rca-capa-evidence.tsx */}
+                  <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                    {/* Rework Badge */}
+                    <motion.div
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                      style={{
+                        background: COLORS.orangeGradient,
+                        boxShadow: `0 4px 15px -5px ${COLORS.orange}60`,
+                      }}
+                      animate={{
+                        boxShadow: [
+                          `0 4px 15px -5px ${COLORS.orange}60`,
+                          `0 4px 20px -2px ${COLORS.orange}80`,
+                          `0 4px 15px -5px ${COLORS.orange}60`,
+                        ],
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 360] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      >
+                        <RefreshCw size={14} className="text-white" />
+                      </motion.div>
+                      <span className="text-xs font-bold text-white">REWORK REQUIRED</span>
+                    </motion.div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2">
+                      <button className="px-3 py-1.5 rounded text-[10px] font-medium text-white bg-gray-500">Close</button>
+                      <motion.button
+                        className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
+                        style={{ backgroundColor: "#0095da" }}
+                      >
+                        Submit Changes
+                      </motion.button>
                     </div>
                   </div>
                 </motion.div>
@@ -1005,8 +1150,236 @@ Deadline: 15 Dec 2025 | Escalated Priority`
           </motion.div>
         )}
 
-        {/* Stage 9: Enhanced Success */}
+        {/* Stage 9: Escalation Visualization */}
         {stage === 9 && (
+          <motion.div
+            key="escalation"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center px-6"
+          >
+            <div className="flex flex-col items-center gap-6 max-w-[700px]">
+              {/* Escalation Header */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0, y: -20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 200 }}
+                className="flex items-center gap-3 px-6 py-3 rounded-full"
+                style={{
+                  background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                  boxShadow: "0 10px 40px -10px rgba(239, 68, 68, 0.5)",
+                }}
+              >
+                <motion.div
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <ArrowUp size={24} className="text-white" />
+                </motion.div>
+                <span className="text-white font-bold text-lg">Escalation Triggered</span>
+              </motion.div>
+
+              {/* Escalation Pyramid */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="relative bg-white rounded-3xl p-8 shadow-2xl w-full"
+                style={{ boxShadow: "0 30px 80px -20px rgba(0,0,0,0.15)" }}
+              >
+                {/* Timeline missed indicator */}
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border-2 border-red-200"
+                  >
+                    <Clock size={18} className="text-red-500" />
+                    <span className="text-sm font-semibold text-red-600">Timeline Missed: 7 Days Overdue</span>
+                  </motion.div>
+
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 border-2 border-orange-200"
+                  >
+                    <RotateCcw size={18} className="text-orange-500" />
+                    <span className="text-sm font-semibold text-orange-600">3 Bounce-backs</span>
+                  </motion.div>
+                </div>
+
+                {/* Escalation levels */}
+                <div className="flex items-end justify-center gap-6">
+                  {/* Level 1 - IO */}
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: 80 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    className="w-28 bg-gradient-to-t from-gray-200 to-gray-100 rounded-t-xl flex flex-col items-center justify-end pb-2"
+                  >
+                    <span className="text-xs font-medium text-gray-600">IO</span>
+                  </motion.div>
+
+                  {/* Level 2 - Supervisor */}
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: 120 }}
+                    transition={{ delay: 0.7, duration: 0.5 }}
+                    className="w-28 bg-gradient-to-t from-orange-300 to-orange-200 rounded-t-xl flex flex-col items-center justify-end pb-2"
+                  >
+                    <span className="text-xs font-medium text-orange-700">Supervisor</span>
+                  </motion.div>
+
+                  {/* Level 3 - Management */}
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: 160 }}
+                    transition={{ delay: 0.9, duration: 0.5 }}
+                    className="w-28 rounded-t-xl flex flex-col items-center justify-end pb-2 relative overflow-hidden"
+                    style={{
+                      background: "linear-gradient(180deg, #EF4444 0%, #DC2626 100%)",
+                    }}
+                  >
+                    {/* Pulsing effect */}
+                    <motion.div
+                      className="absolute inset-0"
+                      animate={{ opacity: [0.3, 0.6, 0.3] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      style={{ background: "rgba(255,255,255,0.2)" }}
+                    />
+                    <ArrowUp size={20} className="text-white mb-1" />
+                    <span className="text-xs font-bold text-white">Senior Mgmt</span>
+                  </motion.div>
+                </div>
+
+                {/* Arrow animation */}
+                <motion.div
+                  className="absolute right-8 top-1/2 -translate-y-1/2"
+                  animate={{ x: [0, 10, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white shadow-lg">
+                    <AlertCircle size={16} />
+                    <span className="text-sm font-bold">Auto-Escalating</span>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Stage 10: Senior Management */}
+        {stage === 10 && (
+          <motion.div
+            key="senior-mgmt"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center px-6"
+          >
+            <div className="flex flex-col items-center gap-6 max-w-[700px]">
+              {/* Header */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+                className="flex items-center gap-3 px-6 py-3 rounded-full"
+                style={{
+                  background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
+                  boxShadow: `0 10px 40px -10px ${COLORS.teal}80`,
+                }}
+              >
+                <Users size={24} className="text-white" />
+                <span className="text-white font-bold text-lg">Senior Management Engaged</span>
+              </motion.div>
+
+              {/* Management Team */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-white rounded-3xl p-8 shadow-2xl w-full relative overflow-hidden"
+                style={{ boxShadow: "0 30px 80px -20px rgba(0,0,0,0.15)" }}
+              >
+                {/* Background glow */}
+                <motion.div
+                  className="absolute inset-0"
+                  style={{
+                    background: `radial-gradient(circle at 50% 50%, ${COLORS.teal}10 0%, transparent 60%)`,
+                  }}
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+
+                {/* Management avatars */}
+                <div className="flex items-center justify-center gap-8 mb-6 relative z-10">
+                  {[
+                    { title: "HR Director", color: "#8B5CF6" },
+                    { title: "Compliance Head", color: COLORS.teal },
+                    { title: "Plant Manager", color: "#F59E0B" },
+                  ].map((person, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.3 + i * 0.2, type: "spring" }}
+                      className="flex flex-col items-center gap-2"
+                    >
+                      <motion.div
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                        className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+                        style={{ background: `linear-gradient(135deg, ${person.color} 0%, ${person.color}CC 100%)` }}
+                      >
+                        <Users size={32} className="text-white" />
+                      </motion.div>
+                      <span className="text-sm font-semibold text-gray-700">{person.title}</span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Action items */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="bg-gray-50 rounded-xl p-4 relative z-10"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 size={18} style={{ color: COLORS.teal }} />
+                    <span className="text-sm font-bold text-gray-800">Accountability Actions</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      "Direct intervention assigned",
+                      "Priority escalation active",
+                      "Daily progress reviews",
+                      "Compliance audit scheduled",
+                    ].map((action, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.9 + i * 0.1 }}
+                        className="flex items-center gap-2 text-sm text-gray-600"
+                      >
+                        <div
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: COLORS.teal }}
+                        />
+                        {action}
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Stage 11: Quality Assurance Summary */}
+        {stage === 11 && (
           <motion.div
             key="success"
             initial={{ opacity: 0 }}

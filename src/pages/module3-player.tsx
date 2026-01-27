@@ -12,11 +12,11 @@ import { SceneInvestigation } from "../components/scenes/module3/scene-1-unproce
 import { Scene2InProcess } from "../components/scenes/module3/scene-2-in-process.tsx"
 
 const SCENES = [
-  { name: "intro", start: 0, end: 21, component: SceneInvestigation },
-  { name: "inProcess", start: 21, end: 32, component: Scene2InProcess },
-  { name: "rootCause", start: 31, end: 75, component: SceneRCACAPAEvidence },
-  { name: "verification", start: 75, end: 111, component: SceneFOSVerification },
-  { name: "closure", start: 111, end: 130, component: SceneClosure },
+  { name: "intro", start: 0, end: 13, component: SceneInvestigation },
+  { name: "inProcess", start: 13, end: 28, component: Scene2InProcess },
+  { name: "rootCause", start: 29, end: 113, component: SceneRCACAPAEvidence },
+  { name: "verification", start: 113, end: 163, component: SceneFOSVerification },
+  { name: "closure", start: 163, end: 177, component: SceneClosure },
 ]
 
 interface Module3PlayerProps {

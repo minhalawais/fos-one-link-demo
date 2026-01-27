@@ -1,92 +1,87 @@
-# 🌿 FOS Digital Grievance Management System – Interactive Walkthrough
+# One-Link Demo - Green Pakistan / FOS Digital Platform
 
 [![React](https://img.shields.io/badge/React-19.0-blue?style=for-the-badge&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer_Motion-12.0-black?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
 
-> **Live Demo**: [fos-one-link-demo.vercel.app](https://fos-one-link-demo.vercel.app/)  
-> **Powered By**: [Fruit of Sustainability (SMC-Private) Ltd.](http://fruitofsustainability.com/)  
-> **Developed By**: [Minhal Awais](https://minhalawais.me/) | [LinkedIn](https://linkedin.com/in/minhal-awais-601216227)
+> **Interactive Walkthrough & Simulation of the FOS Grievance Management Ecosystem.**
+
+## 📖 Project Overview
+
+The **One-Link Demo** is a specialized, standalone interactive application designed to showcase the full capabilities of the **Fruit of Sustainability (FOS) / Green Pakistan Platform**. 
+
+Unlike the production platform (which consists of separate specific microservices and dashboards), this application serves as a **cinematic narrative tool**. It uses audio voice-overs synchronized with advanced frontend animations to simulate user journeys, making it ideal for:
+*   **Client Demonstrations**: Presenting the full feature set without requiring live data or backend connectivity.
+*   **Stakeholder Training**: Explaining the end-to-end workflow of grievance handling and compliance.
+*   **Exhibitions**: A self-driving or interactive "Kiosk Mode" experience.
+
+## ✨ Key Features
+
+This project utilizes a high-end "gaming-style" architecture to deliver smooth visual storytelling:
+*   **Audio-Driven Navigation**: Scenes serve as a visual accompaniment to a narrated script, synchronized via time-coded events.
+*   **Cinematic UI**: Features ambient particle systems, light rays, and glassmorphism effects for a premium "WOW" factor.
+*   **Interactive Simulation**: Users can interact with simulated phone screens, dashboards, and forms that mimic the real application's behavior.
+*   **Module-Based Structure**: Organized into 4 distinct content modules covering the platform's core value propositions.
 
 ---
 
-## 🚀 Experience the Platform
+## 🏗 Modular Breakdown
 
-The **One-Link Demo** is a high-fidelity, cinematic digital walkthrough designed to demonstrate the full capabilities of the **FOS Digital Grievance Management System**. 
+The application guides users through 4 key operational stages of the FOS ecosystem:
 
-Unlike a static presentation, this interactive application guides stakeholders, audio-visually, through the complete lifecycle of grievance handling—bridging the gap between factory workers and management through transparent, secure, and compliant processes.
+### 1. 🚀 Deployment & Onboarding (Module 1)
+*   **Narrative**: How factories join the platform.
+*   **Visuals**: Bulk employee data upload simulation, data validation checks, and generating digital ID cards.
+*   **Key Scenes**: `Hero` -> `Upload` -> `SMS` -> `ID Card Generation` -> `Training`.
 
-## 🌟 Key Modules (The Journey)
+### 2. 🛡 Complaint Intake (Module 2)
+*   **Narrative**: The multi-channel grievance reporting ecosystem.
+*   **Visuals**: Simulation of reporting via **Toll-Free Hotline, SMS, WhatsApp, and Mobile App**.
+*   **Key Scenes**: Anonymous reporting flows, ticket number generation, and instant IO (Investigation Officer) notification.
 
-The walkthrough is structured into four immersive modules, each highlighting a critical pillar of the FOS ecosystem:
+### 3. 🔍 Investigation & Resolution (Module 3)
+*   **Narrative**: The structured workflow for resolving complaints.
+*   **Visuals**: IO Dashboard simulation.
+*   **Process**:
+    1.  **Review**: Unprocessed -> In Process.
+    2.  **RCA**: Root Cause Analysis & Evidence collection.
+    3.  **CAPA**: Corrective & Preventive Action Plans with deadline tracking.
 
-### 1. ⚡ Deployment & Onboarding
-*   **Rapid Digitalization**: Automated employee registration and validation.
-*   **FOS IDs**: Unique digital identities for every worker, accessible via SMS.
-*   **Awareness Cards**: Physical cards with reporting channels and instructions.
-*   **Investigation Officers**: Role assignment for Root Cause Analysis (RCA) and evidence handling.
-
-### 2. 🛡️ Complaint Intake & Registration
-*   **Multi-Channel Reporting**: Toll-free hotline, WhatsApp, SMS, Email, and Mobile App.
-*   **Inclusive Access**: Support for all literacy levels via trained grievance officers.
-*   **Anonymous Reporting**: Secure channels for sensitive issues (Harassment, Discrimination).
-*   **Instant Verification**: Unique ticket generation and real-time notifications for IOs.
-
-### 3. 🔍 Investigation & Resolution
-*   **Structured Workflow**: "In Process" → "Validity Assessment" → "RCA" → "CAPA".
-*   **Root Cause Analysis (RCA)**: Deep-dive validity checks based on evidence and interviews.
-*   **CAPA Planning**: Corrective & Preventive Action plans with assigned responsibilities.
-*   **Satisfaction Loop**: Independent FOS verification with the complainant before case closure to ensure genuine resolution.
-
-### 4. 📊 Dashboards & Risk Insights
-*   **Real-Time Analytics**: Live tracking of open, overdue, and resolved cases.
-*   **Category Heatmaps**: Identification of hotspots (e.g., Health & Safety, Wages).
-*   **Performance Metrics**: Monitoring investigation quality and timeline adherence.
-*   **Compliance Reporting**: Exportable data for EU CSDDD, LkSG, and ESG audits.
+### 4. 📊 Risk Insights & Surveys (Module 4)
+*   **Narrative**: Proactive employee engagement and analytics.
+*   **Visuals**: Creating and launching digital surveys.
+*   **Features**: Demographic targeting (Gender, Department), random sampling, and AI-driven sentiment analysis dashboards.
 
 ---
 
-## 🔐 User Roles & Governance
+## 🛠 Technology Stack
 
-This walkthrough demonstrates how the system supports various stakeholders:
+This is a **Frontend-Only** application that simulates backend interactions.
 
-| Role | Responsibilities |
-| :--- | :--- |
-| **Worker / Complainant** | Reports grievances via multiple channels; validates satisfaction. |
-| **Investigation Officer (IO)** | Conducts RCA, implements CAPA, uploads evidence. |
-| **FOS Team** | Validates onboarding, verifies case closure, conducts training. |
-| **Factory Management** | Monitors risk dashboards, strategic planning, and compliance. |
-
----
-
-## 🛠️ Technology Stack
-
-This demo application is built with a focus on **cinematic user experience** and **smooth interactivity**.
-
-*   **Frontend Framework**: [React 19](https://react.dev/)
-*   **Language**: TypeScript
-*   **Styling**: Tailwind CSS + Custom Design System
-*   **Animations**: Framer Motion (Spring Physics, Layout Animations)
-*   **Icons**: Lucide React
-*   **Visuals**: Custom Particles & Light Ray Effects
-
-> **Note**: The core production system (backend) is hosted separately and powers the actual logic demonstrated in this frontend walkthrough.
+*   **Core Framework**: React 19 + TypeScript
+*   **State & Animation**: `framer-motion` (Complex sequencing), `react-spring` (Physics-based interactions).
+*   **Styling**: `tailwind-css`, `styled-components`, `lucide-react` (Icons).
+*   **Audio Engine**: `howler.js` for precise audio sprite control and seamless looping.
+*   **Visualization**: `recharts` for simulated analytics graphs, `leaflet` for map visualizations.
 
 ---
 
-## 💻 Local Development
+## 🚀 Local Development Setup
 
-To run this interactive demo locally:
+Since this is a standalone demo, it does not require a backend connection.
 
-1.  **Clone the Repo**
+1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/minhalawais/one-link-demo.git
-    cd one-link-demo
+    git clone https://github.com/minhalawais/ISP-MANAGEMENT-SYSTEM.git
+    cd ISP-MANAGEMENT-SYSTEM
+    # Note: Folder might be named One-Link-Demo based on your unzip location
     ```
 
 2.  **Install Dependencies**
     ```bash
+    npm install
+    # OR if you face dependency conflicts (due to React 19 beta/RC usage)
     npm install --legacy-peer-deps
     ```
 
@@ -94,17 +89,40 @@ To run this interactive demo locally:
     ```bash
     npm start
     ```
-    Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+    The app will launch at `http://localhost:3000`.
+
+4.  **Build for Production**
+    ```bash
+    npm run build
+    ```
+    Outputs static files to the `build` directory, ready for deployment on Netlify, Vercel, or any static host.
 
 ---
 
-## ⚠️ Disclaimer
+## 📂 Project Structure
 
-> This application is a **demonstration walkthrough** intended for educational and presentation purposes. It visualizes the workflows of the FOS Grievance Management System. For the actual operational platform, please refer to the specific separate production environments.
+```
+src/
+├── components/
+│   ├── scenes/          # Individual story scenes (e.g., scene-upload.tsx)
+│   ├── ui/              # Reusable UI elements (Buttons, Cards)
+│   ├── Slide.tsx        # Main slide wrapper component
+│   └── NavigationPill.tsx # The floating control bar
+├── lib/
+│   └── module-data.ts   # Configuration for scenes and timings
+├── pages/
+│   ├── module1-player.tsx # Orchestrator for Module 1
+│   └── ...
+├── App.tsx              # Main entry point & Audio Context
+└── index.css            # Global styles & Tailwind directives
+```
+
+## ⚠️ Note on "Backend"
+This repository interacts with **mock data** and scripts. It **does not** connect to the production FOS database. All "uploads" and "reports" are simulated for demonstration purposes.
 
 ---
 
 <div align="center">
-  <p>Developed with ❤️ by <a href="https://minhalawais.me/">Minhal Awais</a></p>
-  <p>© 2025 Fruit of Sustainability (SMC-Private) Ltd. All Rights Reserved.</p>
+  <p>Developed for <strong>Fruit of Sustainability (SMC-Private) Ltd.</strong></p>
+  <p><em>Delivering Technology for Human Rights Due Diligence.</em></p>
 </div>

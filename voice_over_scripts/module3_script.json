@@ -2,71 +2,183 @@
   {
     "timestamp": [
       0,
-      8
+      7
     ],
-    "text": "In this section we walk through how each complaint is investigated and resolved in a structured, transparent way."
+    "text": "In this section, we walk through how each complaint is investigated and resolved in a structured, transparent way."
   },
   {
     "timestamp": [
-      8,
-      14
+      7,
+      13
     ],
     "text": "Once a complaint is reflected in the IO portal, it appears under unprocessed."
   },
   {
     "timestamp": [
-      14,
-      21
+      13,
+      20
     ],
     "text": "The investigation officer reviews the details and activates the case by marking it in process."
   },
   {
     "timestamp": [
-      21,
-      28
+      20,
+      26
     ],
     "text": "This step starts the formal investigation and triggers system based timeline tracking."
   },
   {
     "timestamp": [
-      28,
-      31
+      26,
+      29
     ],
     "text": "The next step is root cause analysis."
   },
   {
     "timestamp": [
-      31,
-      45
+      29,
+      42
     ],
     "text": "The investigation officer examines the complaint, reviews evidence, conducts worker interviews and cross checks records such as attendance, payroll or security records where needed."
   },
   {
     "timestamp": [
-      45,
-      60
+      42,
+      51
     ],
-    "text": "Based on this review, the RCA section is filled as valid, partially valid or invalid cases with with clear justification, a deadline is entered for associated corrective and preventive actions."
+    "text": "Based on this review, the RCA section is filled as valid, partially valid or invalid cases with clear justification."
   },
   {
     "timestamp": [
-      60,
-      67
+      51,
+      55
+    ],
+    "text": "A deadline is entered for associated corrective and preventive actions."
+  },
+  {
+    "timestamp": [
+      55,
+      61
     ],
     "text": "For valid or partially valid cases, a corrective and preventive action plan is developed."
   },
   {
     "timestamp": [
-      67,
-      74
+      61,
+      69
     ],
     "text": "This includes immediate corrective steps to resolve the issue and preventive measures to stop it from happening again."
   },
   {
     "timestamp": [
-      74,
-      null
+      69,
+      76
     ],
     "text": "Responsibilities and deadlines are assigned and the system automatically tracks progress and sends reminders."
+  },
+  {
+    "timestamp": [
+      76,
+      87
+    ],
+    "text": "Once actions are implemented, the investigation officer uploads supporting evidence such as photos, records, statements or policy updates."
+  },
+  {
+    "timestamp": [
+      87,
+      94
+    ],
+    "text": "All evidence is securely stored and timestamped, creating a complete and compliant documentation trail."
+  },
+  {
+    "timestamp": [
+      94,
+      98
+    ],
+    "text": "The case is then submitted to FOS for complainant interview."
+  },
+  {
+    "timestamp": [
+      98,
+      106
+    ],
+    "text": "For complex cases, the system also allows complaints to be routed directly to relevant internal teams via email."
+  },
+  {
+    "timestamp": [
+      106,
+      111
+    ],
+    "text": "This enables coordination and quicker decision making across departments."
+  },
+  {
+    "timestamp": [
+      111,
+      118
+    ],
+    "text": "Once a complaint is submitted, EFOS team contacts back the complainant directly for verification."
+  },
+  {
+    "timestamp": [
+      118,
+      124
+    ],
+    "text": "We explain the actions taken and confirm if the worker is satisfied with the outcome."
+  },
+  {
+    "timestamp": [
+      124,
+      128
+    ],
+    "text": "This independent check ensures fairness and builds trust."
+  },
+  {
+    "timestamp": [
+      128,
+      134
+    ],
+    "text": "If the worker is not satisfied, the case is bounced back to the investigation officer."
+  },
+  {
+    "timestamp": [
+      134,
+      144
+    ],
+    "text": "For the investigation officer must update the rca, revise the CAPA and resubmit with improved documentation."
+  },
+  {
+    "timestamp": [
+      144,
+      148
+    ],
+    "text": "This prevents premature or incomplete closures."
+  },
+  {
+    "timestamp": [
+      148,
+      155
+    ],
+    "text": "The system also supports escalation if timelines are missed or cases are repeatedly bounced back."
+  },
+  {
+    "timestamp": [
+      155,
+      161
+    ],
+    "text": "Senior management can be automatically engaged to ensure accountability."
+  },
+  {
+    "timestamp": [
+      161,
+      169
+    ],
+    "text": "When the worker confirms satisfaction, FOS officially closes the complaint and records closure feedback."
+  },
+  {
+    "timestamp": [
+      169,
+      175
+    ],
+    "text": "These insights help factories understand recurring issues and strengthen long term risk prevention."
   }
 ]
