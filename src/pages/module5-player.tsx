@@ -2,17 +2,17 @@
 
 import { AnimatePresence } from "framer-motion"
 
-// Import all scene components
-import { SceneIntro } from "../components/scenes/module4/scene-intro.tsx"
-import { SceneBreakdown } from "../components/scenes/module4/scene-breakdown.tsx"
-import { SceneHeatmap } from "../components/scenes/module4/scene-heatmap.tsx"
-import { SceneMetrics } from "../components/scenes/module4/scene-metrics.tsx"
-import { SceneTimeline } from "../components/scenes/module4/scene-timeline.tsx"
-import { SceneNPS } from "../components/scenes/module4/scene-nps.tsx"
-import { SceneTrends } from "../components/scenes/module4/scene-trends.tsx"
-import { SceneExport } from "../components/scenes/module4/scene-export.tsx"
-import { SceneConclusion } from "../components/scenes/module4/scene-conclusion.tsx"
-import { SceneDashboard } from "../components/scenes/module4/scene-dashboard.tsx"
+// Import all scene components from module5 folder
+import { SceneIntro } from "../components/scenes/module5/scene-intro.tsx"
+import { SceneBreakdown } from "../components/scenes/module5/scene-breakdown.tsx"
+import { SceneHeatmap } from "../components/scenes/module5/scene-heatmap.tsx"
+import { SceneMetrics } from "../components/scenes/module5/scene-metrics.tsx"
+import { SceneTimeline } from "../components/scenes/module5/scene-timeline.tsx"
+import { SceneNPS } from "../components/scenes/module5/scene-nps.tsx"
+import { SceneTrends } from "../components/scenes/module5/scene-trends.tsx"
+import { SceneExport } from "../components/scenes/module5/scene-export.tsx"
+import { SceneConclusion } from "../components/scenes/module5/scene-conclusion.tsx"
+import { SceneDashboard } from "../components/scenes/module5/scene-dashboard.tsx"
 
 // Updated scene configuration to match voiceover script timestamps
 const SCENES = [

@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion"
 
 
 // Import Scenes (Retaining original imports)
-import { SceneValidity } from "../components/scenes/module3/scene-validity.tsx"
+
 import { SceneRCACAPAEvidence } from "../components/scenes/module3/scene-rca-capa-evidence.tsx"
 import { SceneFOSVerification } from "../components/scenes/module3/scene-fos-verification.tsx"
 import { SceneClosure } from "../components/scenes/module3/scene-closure.tsx"

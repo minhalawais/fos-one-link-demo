@@ -1,284 +1,307 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Globe, Users, Building2, Filter, Check, ChevronDown } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+    X, Plus, Filter, Calendar, Check, Hash, Building2, Users, CreditCard
+} from "lucide-react"
+import { useEffect, useRef } from "react"
 
-// Color Scheme
+// --- SYSTEM COLORS ---
 const COLORS = {
-    primary: "#89A8B2",
-    secondary: "#B3C8CF",
-    background: "#E5E1DA",
-    surface: "#F1F0E8",
-    text: "#2D3748",
-    textMuted: "#5A6A7A",
-    success: "#60BA81",
+    teal: "#0f9690",
+    darkTeal: "#284952",
+    green: "#60BA81",
+    charcoal: "#17161A",
+    orange: "#F5A83C",
+    white: "#FFFFFF",
+    bg: "#F5F5F7",
+    border: "#DEE2E6",
+    softGreen: "rgba(96, 186, 129, 0.42)",
 }
 
-interface SceneTargetingProps {
+interface SceneProps {
     isActive: boolean
     progress: number
 }
 
-export const SceneTargeting = ({ isActive, progress }: SceneTargetingProps) => {
-    // Scene runs from 17-33s (16 seconds duration)
-    const localProgress = progress - 17
+// ==========================================
+// SCENE TARGETING (26-46s)
+// "Spotlight Focus" Interaction Model
+// ==========================================
 
-    // Phase 1 (0-9s): Multi-language support (17-26s in script)
-    // Phase 2 (9-16s): Participant targeting (26-33s in script)
-    const languagePhase = Math.min(1, localProgress / 9)
-    const targetingPhase = Math.min(1, Math.max(0, (localProgress - 9) / 7))
+export const SceneTargeting = ({ isActive, progress }: SceneProps) => {
+    const modalContentRef = useRef<HTMLDivElement>(null)
 
-    // Language selection animation
-    const languages = [
-        { code: "EN", name: "English", selected: localProgress > 1 },
-        { code: "UR", name: "اردو", selected: localProgress > 2.5 },
-        { code: "PS", name: "پښتو", selected: localProgress > 4 },
-        { code: "AR", name: "العربية", selected: localProgress > 5.5 },
-    ]
+    // Local time relative to scene start (26s)
+    const localT = Math.max(0, progress - 26)
 
-    // Targeting filters
-    const departments = ["Spinning", "Knitting", "Processing", "Denim"]
-    const selectedDepts = Math.min(departments.length, Math.floor((targetingPhase * 2) * departments.length))
+    // Auto-scroll to Filters at start of scene (Run once)
+    const hasScrolledRef = useRef(false)
+    useEffect(() => {
+        if (!hasScrolledRef.current && localT < 1 && modalContentRef.current) {
+            modalContentRef.current.scrollTo({ top: 400, behavior: 'smooth' })
+            hasScrolledRef.current = true
+        }
+    }, [localT])
 
-    const employeeCount = Math.floor(847 * Math.min(1, targetingPhase * 1.5))
+    // --- FOCUS LOGIC ---
+    // 0-2s: Offices
+    // 2-4s: Gender
+    // 4-6s: Dept
+    // 6s-13s: IDs (Sampling Start at 7s)
+    // 13s+: CNICs
+
+    let currentFocus = 'none'
+    if (localT > 1 && localT < 3) currentFocus = 'offices'
+    else if (localT >= 3 && localT < 5) currentFocus = 'gender'
+    else if (localT >= 5 && localT < 7) currentFocus = 'dept'
+    else if (localT >= 7 && localT < 13) currentFocus = 'ids'
+    else if (localT >= 13) currentFocus = 'cnics'
+
+    // Typing simulation
+    const samplingT = Math.max(0, localT - 7)
+    const sampleIDs = "EMP-042, EMP-089, EMP-103, EMP-156, EMP-204"
+    const currentIDs = samplingT > 0 ? sampleIDs.substring(0, Math.floor(samplingT * 8)) : ""
+
+    const sampleCNICs = "35202-1844932-1, 35201-9928374-3, 33100-9283711-2"
+    const currentCNICs = samplingT > 6 ? sampleCNICs.substring(0, Math.floor((samplingT - 6) * 10)) : ""
+
+    let showOffices = localT > 1
+    let showGender = localT > 3
+    let showDept = localT > 5
+
+    // EXIT LOGIC (Start at 18s local -> 44s global)
+    const isExiting = localT > 18
+
+    // Force visible when exiting
+    if (isExiting) {
+        showOffices = true
+        showGender = true
+        showDept = true
+        currentFocus = 'none'
+    }
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isActive ? 1 : 0 }}
-            exit={{ opacity: 0 }}
-            className="w-full h-full flex items-center justify-center overflow-hidden"
-            style={{ backgroundColor: COLORS.background }}
-        >
-            {/* Background */}
-            <div className="absolute inset-0">
-                <div
-                    className="absolute inset-0 opacity-[0.03]"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 1px 1px, ${COLORS.primary} 1px, transparent 0)`,
-                        backgroundSize: '32px 32px'
-                    }}
-                />
-                <motion.div
-                    className="absolute top-10 left-16 w-48 h-48 rounded-full"
-                    style={{
-                        background: `radial-gradient(circle, ${COLORS.primary}25, transparent 70%)`,
-                        filter: 'blur(40px)'
-                    }}
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 6, repeat: Infinity }}
-                />
-            </div>
+        <div className="w-full h-full font-sans overflow-hidden relative" style={{ backgroundColor: COLORS.bg }}>
+            <motion.div
+                initial={{ opacity: 1 }}
+                animate={isExiting ? { y: -800, opacity: 0 } : { y: 0, opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeInOut" }}
+                className="w-full h-full flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-8 absolute inset-0"
+            >
+                <div className="relative w-full max-w-5xl">
+                    {/* SUCCESS TOAST on Exit */}
+                    <AnimatePresence>
+                        {isExiting && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 text-xl font-bold"
+                            >
+                                <div className="p-2 bg-white/20 rounded-full"><Check size={24} /></div>
+                                Survey Launched Successfully!
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
-            {/* Main content - Two panels */}
-            <div className="relative z-10 flex gap-8 px-8">
-                {/* Left Panel: Language Selection */}
-                <motion.div
-                    initial={{ opacity: 0, x: -40 }}
-                    animate={{ opacity: languagePhase, x: -40 + (languagePhase * 40) }}
-                    className="w-[380px] rounded-3xl overflow-hidden"
-                    style={{
-                        backgroundColor: COLORS.surface,
-                        boxShadow: `0 25px 60px -15px ${COLORS.primary}30`
-                    }}
-                >
-                    {/* Header */}
-                    <div
-                        className="px-6 py-4 flex items-center gap-3"
-                        style={{
-                            background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`
-                        }}
+                    <motion.div
+                        className="w-full bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-full"
+                        style={{ filter: isExiting ? "blur(4px)" : "none" }} // Blur the modal backing as we leave
+                        layout
                     >
-                        <Globe size={22} className="text-white" />
-                        <span className="font-semibold text-white text-lg">Multi-Language Support</span>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 space-y-4">
-                        <p className="text-sm" style={{ color: COLORS.textMuted }}>
-                            Allow employees to respond in their native language
-                        </p>
-
-                        {/* Language chips */}
-                        <div className="flex flex-wrap gap-3">
-                            {languages.map((lang, i) => (
-                                <motion.div
-                                    key={lang.code}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{
-                                        opacity: Math.min(1, languagePhase * 4 - i * 0.5),
-                                        scale: lang.selected ? 1 : 0.9
-                                    }}
-                                    className={`px-4 py-2.5 rounded-xl flex items-center gap-2 cursor-pointer transition-all`}
-                                    style={{
-                                        backgroundColor: lang.selected ? COLORS.primary : 'white',
-                                        color: lang.selected ? 'white' : COLORS.text,
-                                        border: `2px solid ${lang.selected ? COLORS.primary : COLORS.secondary}`,
-                                        boxShadow: lang.selected ? `0 4px 15px -3px ${COLORS.primary}50` : 'none'
-                                    }}
-                                    whileHover={{ scale: 1.05 }}
-                                >
-                                    {lang.selected && (
-                                        <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ type: "spring", stiffness: 500 }}
-                                        >
-                                            <Check size={16} />
-                                        </motion.div>
-                                    )}
-                                    <span className="font-bold">{lang.code}</span>
-                                    <span className="text-sm">{lang.name}</span>
-                                </motion.div>
-                            ))}
+                        {/* Header with increased padding matching SceneInitiation */}
+                        <div className="h-28 flex items-center justify-between px-8 bg-gradient-to-r relative z-20"
+                            style={{ background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.darkTeal})` }}
+                        >
+                            <div>
+                                <div className="flex items-center gap-3 text-white mb-2">
+                                    <Plus size={28} strokeWidth={3} /> <h2 className="text-3xl font-bold">Add New Survey</h2>
+                                </div>
+                                <p className="text-white/90 text-sm font-medium">Create a new survey with advanced filters and settings</p>
+                            </div>
+                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
+                                <X size={20} className="text-white" />
+                            </div>
                         </div>
 
-                        {/* Preview card */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: Math.max(0, languagePhase - 0.5) * 2, y: 20 - (Math.max(0, languagePhase - 0.5) * 40) }}
-                            className="rounded-xl p-4 border-2"
-                            style={{
-                                borderColor: COLORS.secondary,
-                                backgroundColor: 'white'
-                            }}
+                        {/* Content - Hidden Scrollbar */}
+                        <div
+                            ref={modalContentRef}
+                            className="p-8 space-y-8 overflow-hidden relative h-full bg-[#F8FAFC]"
                         >
-                            <div className="flex items-center gap-2 mb-2">
-                                <div
-                                    className="w-2 h-2 rounded-full animate-pulse"
-                                    style={{ backgroundColor: COLORS.success }}
-                                />
-                                <span className="text-xs font-bold uppercase" style={{ color: COLORS.primary }}>
-                                    Live Preview
-                                </span>
-                            </div>
-                            <div className="text-right font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
-                                صداقت کے ملازمین کا سروے
-                            </div>
-                            <div className="text-xs text-right mt-1" style={{ color: COLORS.textMuted, direction: 'rtl' }}>
-                                براہ مہربانی نوٹ فرمائیں کہ اس فارم میں فراہم کیا گیا آپ کا نام...
-                            </div>
-                        </motion.div>
-                    </div>
-                </motion.div>
 
-                {/* Right Panel: Participant Targeting */}
-                <motion.div
-                    initial={{ opacity: 0, x: 40 }}
-                    animate={{ opacity: targetingPhase, x: 40 - (targetingPhase * 40) }}
-                    className="w-[380px] rounded-3xl overflow-hidden"
-                    style={{
-                        backgroundColor: COLORS.surface,
-                        boxShadow: `0 25px 60px -15px ${COLORS.primary}30`
-                    }}
-                >
-                    {/* Header */}
-                    <div
-                        className="px-6 py-4 flex items-center gap-3"
-                        style={{
-                            background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`
-                        }}
-                    >
-                        <Filter size={22} className="text-white" />
-                        <span className="font-semibold text-white text-lg">Participant Targeting</span>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 space-y-4">
-                        {/* Department filter */}
-                        <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-medium" style={{ color: COLORS.text }}>
-                                <Building2 size={16} style={{ color: COLORS.primary }} />
-                                Department
-                            </label>
-                            <div
-                                className="rounded-xl border-2 p-3"
-                                style={{ borderColor: COLORS.secondary, backgroundColor: 'white' }}
+                            {/* === SECTION 1: BASIC INFO (Blurred) === */}
+                            <motion.div
+                                animate={{
+                                    filter: isExiting ? "blur(0px)" : "blur(3px)",
+                                    opacity: isExiting ? 1 : 0.4,
+                                }}
+                                className="space-y-4 pointer-events-none origin-top"
                             >
-                                <div className="flex flex-wrap gap-2">
-                                    {departments.map((dept, i) => (
-                                        <motion.div
-                                            key={dept}
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{
-                                                opacity: i < selectedDepts ? 1 : 0.4,
-                                                scale: i < selectedDepts ? 1 : 0.95
-                                            }}
-                                            className="px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5"
-                                            style={{
-                                                backgroundColor: i < selectedDepts ? `${COLORS.primary}20` : COLORS.background,
-                                                color: i < selectedDepts ? COLORS.primary : COLORS.textMuted,
-                                                border: `1px solid ${i < selectedDepts ? COLORS.primary : 'transparent'}`
-                                            }}
-                                        >
-                                            {i < selectedDepts && <Check size={12} />}
-                                            {dept}
-                                        </motion.div>
-                                    ))}
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">SURVEY TITLE:</label>
+                                    <div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm text-gray-700">
+                                        Employee Wellbeing Survey - Q1 2026
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">DESCRIPTION:</label>
+                                    <div className="h-24 bg-white border border-gray-300 rounded-lg p-4 text-sm shadow-sm text-gray-600">
+                                        A regular pulse check to screen the general sentiment, wellbeing and safety of our employees across all branches.
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">QUESTION COUNT:</label><div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm">35</div></div>
+                                    <div><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">ESTIMATED TIME (MINUTES):</label><div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm">15</div></div>
+                                </div>
+                            </motion.div>
+
+                            {/* === SECTION 2: FILTERS === */}
+                            <div className="pt-2 relative z-10">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Filter size={20} style={{ color: COLORS.teal, fill: COLORS.teal }} />
+                                    <h3 className="font-bold text-xl text-gray-800">Survey Filters</h3>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+
+                                    {/* 1. OFFICES */}
+                                    <FocusArea label="OFFICES" isActive={currentFocus === 'offices' || isExiting} icon={<Building2 size={12} />} height="h-12">
+                                        <div className="h-full px-1.5 flex items-center overflow-hidden">
+                                            <AnimatePresence>
+                                                {showOffices ? (
+                                                    <motion.div
+                                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                                                        className="bg-green-100 text-green-700 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2"
+                                                    >
+                                                        <Building2 size={12} /> Head Office <X size={10} className="cursor-pointer hover:text-green-900" />
+                                                    </motion.div>
+                                                ) : <span className="text-gray-400 ml-2 text-sm">Select options...</span>}
+                                            </AnimatePresence>
+                                        </div>
+                                    </FocusArea>
+
+                                    {/* 2. GENDER */}
+                                    <FocusArea label="GENDER" isActive={currentFocus === 'gender' || isExiting} icon={<Users size={12} />} height="h-12">
+                                        <div className="h-full px-1.5 flex items-center overflow-hidden">
+                                            <AnimatePresence>
+                                                {showGender ? (
+                                                    <motion.div
+                                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                                                        className="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2"
+                                                    >
+                                                        <Users size={12} /> Female <X size={10} className="cursor-pointer hover:text-purple-900" />
+                                                    </motion.div>
+                                                ) : <span className="text-gray-400 ml-2 text-sm">Select options...</span>}
+                                            </AnimatePresence>
+                                        </div>
+                                    </FocusArea>
+
+                                    {/* 3. EMPLOYEE IDS */}
+                                    <FocusArea
+                                        label="EMPLOYEE IDS"
+                                        isActive={currentFocus === 'ids' || isExiting}
+                                        icon={<Hash size={12} />}
+                                        height="h-24"
+                                    >
+                                        <div className="h-full p-3 font-mono text-sm leading-relaxed">
+                                            {currentIDs.length > 0 ? (
+                                                <span className="text-gray-800">{currentIDs}<span className="inline-block w-1.5 h-4 bg-green-500 ml-1 animate-pulse align-middle" /></span>
+                                            ) : <span className="text-gray-400 italic">Enter employee IDs...</span>}
+                                        </div>
+                                    </FocusArea>
+
+                                    {/* 4. DEPARTMENT */}
+                                    <FocusArea label="DEPARTMENT" isActive={currentFocus === 'dept' || isExiting} icon={<Building2 size={12} />} height="h-12">
+                                        <div className="h-full px-1.5 flex items-center overflow-hidden">
+                                            <AnimatePresence>
+                                                {showDept ? (
+                                                    <motion.div
+                                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                                                        className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2"
+                                                    >
+                                                        <Building2 size={12} /> IT Support <X size={10} className="cursor-pointer hover:text-blue-900" />
+                                                    </motion.div>
+                                                ) : <span className="text-gray-400 ml-2 text-sm">Select options...</span>}
+                                            </AnimatePresence>
+                                        </div>
+                                    </FocusArea>
+
+                                    {/* 5. COMPANY IDS */}
+                                    <div className="space-y-1 opacity-50 filter blur-[2px]">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">COMPANY IDS:</label>
+                                        <div className="bg-white border border-gray-300 rounded-lg p-3 text-sm shadow-sm h-24 flex items-center">
+                                            <span className="text-gray-400">Enter company IDs...</span>
+                                        </div>
+                                    </div>
+
+                                    {/* 6. CNICS */}
+                                    <FocusArea
+                                        label="CNICS"
+                                        isActive={currentFocus === 'cnics' || isExiting}
+                                        icon={<CreditCard size={12} />}
+                                        height="h-24"
+                                    >
+                                        <div className="h-full p-3 font-mono text-sm leading-relaxed">
+                                            {currentCNICs.length > 0 ? (
+                                                <span className="text-gray-800">{currentCNICs}<span className="inline-block w-1.5 h-4 bg-green-500 ml-1 animate-pulse align-middle" /></span>
+                                            ) : <span className="text-gray-400 italic">Enter CNICs...</span>}
+                                        </div>
+                                    </FocusArea>
+
                                 </div>
                             </div>
+
+                            {/* Footer */}
+                            <div className="pt-2 flex justify-end gap-3 opacity-80">
+                                <button className="px-6 py-3 rounded-lg border border-gray-200 text-gray-600 font-bold text-sm bg-white hover:bg-gray-50 shadow-sm">Cancel</button>
+                                <button className="px-6 py-3 rounded-lg text-white font-bold text-sm flex items-center gap-2 shadow-md" style={{ backgroundColor: COLORS.green }}>
+                                    <Plus size={18} strokeWidth={3} /> Add Survey
+                                </button>
+                            </div>
+
                         </div>
-
-                        {/* Unit & Gender row */}
-                        <div className="grid grid-cols-2 gap-3">
-                            {/* Unit */}
-                            <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-xs font-medium" style={{ color: COLORS.text }}>
-                                    <Building2 size={14} style={{ color: COLORS.primary }} />
-                                    Unit
-                                </label>
-                                <motion.div
-                                    className="rounded-xl border-2 px-3 py-2.5 flex items-center justify-between cursor-pointer"
-                                    style={{ borderColor: COLORS.secondary, backgroundColor: 'white' }}
-                                    animate={targetingPhase > 0.5 ? { borderColor: COLORS.primary } : {}}
-                                >
-                                    <span className="text-sm" style={{ color: COLORS.text }}>All Units</span>
-                                    <ChevronDown size={16} style={{ color: COLORS.primary }} />
-                                </motion.div>
-                            </div>
-
-                            {/* Gender */}
-                            <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-xs font-medium" style={{ color: COLORS.text }}>
-                                    <Users size={14} style={{ color: COLORS.primary }} />
-                                    Gender
-                                </label>
-                                <motion.div
-                                    className="rounded-xl border-2 px-3 py-2.5 flex items-center justify-between cursor-pointer"
-                                    style={{ borderColor: COLORS.secondary, backgroundColor: 'white' }}
-                                    animate={targetingPhase > 0.7 ? { borderColor: COLORS.primary } : {}}
-                                >
-                                    <span className="text-sm" style={{ color: COLORS.text }}>All</span>
-                                    <ChevronDown size={16} style={{ color: COLORS.primary }} />
-                                </motion.div>
-                            </div>
-                        </div>
-
-                        {/* Employee count badge */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: targetingPhase, y: 10 - (targetingPhase * 10) }}
-                            className="rounded-xl p-4 flex items-center justify-between"
-                            style={{
-                                background: `linear-gradient(135deg, ${COLORS.primary}15, ${COLORS.secondary}20)`,
-                                border: `2px solid ${COLORS.primary}30`
-                            }}
-                        >
-                            <div className="flex items-center gap-2">
-                                <Users size={20} style={{ color: COLORS.primary }} />
-                                <span className="font-medium" style={{ color: COLORS.text }}>Selected Employees</span>
-                            </div>
-                            <motion.span
-                                className="text-2xl font-bold"
-                                style={{ color: COLORS.primary }}
-                                key={employeeCount}
-                            >
-                                {employeeCount.toLocaleString()}
-                            </motion.span>
-                        </motion.div>
-                    </div>
-                </motion.div>
-            </div>
-        </motion.div>
+                    </motion.div >
+                </div>
+            </motion.div >
+        </div >
     )
 }
+
+// ==========================================
+//  HELPER COMPONENTS
+// ==========================================
+
+const FocusArea = ({ label, isActive, children, icon, height = "h-24" }: { label: string, isActive: boolean, children: React.ReactNode, icon: React.ReactNode, height?: string }) => {
+    return (
+        <div className="space-y-1 relative z-20">
+            <motion.div
+                animate={{ color: isActive ? COLORS.teal : "#6B7280" }}
+                className="flex items-center gap-1 mb-1"
+            >
+                <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
+                {isActive && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-green-600">{icon}</motion.span>}
+            </motion.div>
+
+            <motion.div
+                animate={{
+                    scale: isActive ? 1.05 : 1,
+                    borderColor: isActive ? COLORS.teal : "#D1D5DB",
+                    boxShadow: isActive ? `0 10px 25px -5px rgba(15, 150, 144, 0.2), 0 8px 10px -6px rgba(15, 150, 144, 0.1)` : "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+                    zIndex: isActive ? 30 : 0,
+                    filter: isActive ? "blur(0px)" : "blur(2px)",
+                    opacity: isActive ? 1 : 0.5
+                }}
+                transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
+                className={`bg-white border rounded-lg ${height} overflow-hidden relative`}
+            >
+                {/* Active Indicator Strip */}
+                {isActive && <motion.div layoutId="activeStrip" className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-green-600" />}
+
+                {children}
+            </motion.div>
+        </div>
+    )
+}
+
+

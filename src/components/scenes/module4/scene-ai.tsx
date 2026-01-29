@@ -1,19 +1,33 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { Brain, Sparkles, ThumbsUp, Meh, ThumbsDown, CheckCircle, ArrowRight, ClipboardList, Users, MessageSquare, BarChart3 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { Brain, Sparkles, ThumbsUp, Meh, ThumbsDown, CheckCircle, ArrowRight, Zap, MessageSquare, BarChart3, FileText, TrendingUp } from "lucide-react"
 
-// Color Scheme
+// --- ENHANCED AI COLOR PALETTE (Light Theme) ---
 const COLORS = {
-    primary: "#89A8B2",
-    secondary: "#B3C8CF",
-    background: "#E5E1DA",
-    surface: "#F1F0E8",
-    text: "#2D3748",
-    textMuted: "#5A6A7A",
-    success: "#60BA81",
-    orange: "#F5A83C",
-    red: "#EF4444",
+    // Background and Surface
+    bg: "#FFFFFF",
+    surface: "#F8FAFC",
+
+    // Accents (Teal/Purple for AI feel but on light)
+    aiPrimary: "#0F9690",    // Teal
+    aiSecondary: "#8B5CF6",  // Purple
+    aiAccent: "#06B6D4",     // Cyan
+
+    // Sentiment
+    positive: "#059669",
+    neutral: "#D97706",
+    negative: "#DC2626",
+
+    // Neural network
+    node: "#CBD5E1",        // Light gray nodes
+    nodeActive: "#0F9690",  // Teal active
+    line: "#E2E8F0",        // Very light lines
+
+    // Text
+    textMain: "#1E293B",
+    textMuted: "#64748B",
+    white: "#FFFFFF"
 }
 
 interface SceneAIProps {
@@ -21,336 +35,341 @@ interface SceneAIProps {
     progress: number
 }
 
+// Sample employee feedback for animation
+const SAMPLE_FEEDBACK = [
+    { text: "محفوظ ماحول ہے", sentiment: "positive" },
+    { text: "ٹریننگ کی ضرورت ہے", sentiment: "neutral" },
+    { text: "Good management", sentiment: "positive" },
+    { text: "Need better equipment", sentiment: "negative" },
+    { text: "صفائی بہتر ہے", sentiment: "positive" },
+]
+
+// Neural network nodes configuration
+const NEURAL_NODES = [
+    { x: 10, y: 20, size: 6 },
+    { x: 25, y: 45, size: 8 },
+    { x: 40, y: 15, size: 5 },
+    { x: 55, y: 55, size: 7 },
+    { x: 70, y: 25, size: 6 },
+    { x: 85, y: 50, size: 8 },
+    { x: 15, y: 70, size: 5 },
+    { x: 45, y: 80, size: 6 },
+    { x: 75, y: 75, size: 7 },
+    { x: 90, y: 30, size: 5 },
+    { x: 30, y: 60, size: 4 },
+    { x: 60, y: 40, size: 5 },
+]
+
 export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
-    // Scene runs from 91-115s (24 seconds duration)
     const localProgress = progress - 91
 
-    // Phase 1 (0-14s): AI sentiment analysis (91-105s in script)
-    // Phase 2 (14-24s): Conclusion - proactive engagement (105-115s in script)
+    // Phase timing
+    // Phase 1 (0-14s): AI sentiment analysis with neural processing
+    // Phase 2 (14-24s): Conclusion - transformation
     const aiPhase = Math.min(1, localProgress / 14)
     const conclusionPhase = Math.min(1, Math.max(0, (localProgress - 14) / 10))
+    const showConclusion = localProgress > 14
 
-    // Sentiment values (animated)
+    // Animated sentiment values
     const positiveValue = Math.round(62 * aiPhase)
     const neutralValue = Math.round(28 * aiPhase)
     const negativeValue = Math.round(10 * aiPhase)
 
-    // Word cloud terms
-    const themes = [
-        { text: "Work-Life Balance", size: 1.2, x: 0, y: 0, delay: 0.2 },
-        { text: "Management", size: 1.0, x: -80, y: 40, delay: 0.4 },
-        { text: "Safety", size: 1.1, x: 90, y: 30, delay: 0.3 },
-        { text: "Growth", size: 0.9, x: -60, y: -40, delay: 0.5 },
-        { text: "Benefits", size: 1.0, x: 70, y: -35, delay: 0.6 },
-        { text: "Training", size: 0.85, x: -100, y: 0, delay: 0.7 },
-        { text: "Communication", size: 0.95, x: 110, y: -10, delay: 0.55 },
-    ]
+    // Current feedback being processed (cycles through)
+    const currentFeedbackIndex = Math.floor((localProgress * 0.8) % SAMPLE_FEEDBACK.length)
 
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: isActive ? 1 : 0 }}
             exit={{ opacity: 0 }}
-            className="w-full h-full flex items-center justify-center overflow-hidden"
-            style={{ backgroundColor: COLORS.background }}
+            className="w-full h-full flex items-center justify-center overflow-hidden relative"
+            style={{ backgroundColor: COLORS.bg }}
         >
-            {/* Background */}
-            <div className="absolute inset-0">
-                <div
-                    className="absolute inset-0 opacity-[0.03]"
+            {/* ===== NEURAL NETWORK BACKGROUND (Reverted to original style but Light) ===== */}
+            <div className="absolute inset-0 overflow-hidden">
+                {/* Animated gradient orbs (Subtler for light mode) */}
+                <motion.div
+                    className="absolute w-[600px] h-[600px] rounded-full"
                     style={{
-                        backgroundImage: `radial-gradient(circle at 1px 1px, ${COLORS.primary} 1px, transparent 0)`,
-                        backgroundSize: '32px 32px'
+                        background: `radial-gradient(circle, ${COLORS.aiSecondary}15, transparent 70%)`,
+                        top: '10%',
+                        left: '20%',
+                        filter: 'blur(80px)'
                     }}
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        x: [0, 50, 0],
+                        opacity: [0.3, 0.5, 0.3]
+                    }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute top-20 left-1/4 w-64 h-64 rounded-full"
+                    className="absolute w-[500px] h-[500px] rounded-full"
                     style={{
-                        background: `radial-gradient(circle, ${COLORS.primary}20, transparent 70%)`,
-                        filter: 'blur(50px)'
+                        background: `radial-gradient(circle, ${COLORS.aiPrimary}15, transparent 70%)`,
+                        bottom: '10%',
+                        right: '10%',
+                        filter: 'blur(60px)'
                     }}
-                    animate={{ scale: [1, 1.3, 1], x: [0, 30, 0] }}
-                    transition={{ duration: 8, repeat: Infinity }}
+                    animate={{
+                        scale: [1, 1.3, 1],
+                        x: [0, -30, 0],
+                        opacity: [0.3, 0.6, 0.3]
+                    }}
+                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
                 />
+
+                {/* Neural Connections */}
+                <svg className="absolute inset-0 w-full h-full">
+                    {NEURAL_NODES.map((node, i) => (
+                        NEURAL_NODES.slice(i + 1).map((target, j) => {
+                            const dist = Math.hypot(node.x - target.x, node.y - target.y)
+                            if (dist < 35) {
+                                return (
+                                    <motion.line
+                                        key={`${i}-${j}`}
+                                        x1={`${node.x}%`}
+                                        y1={`${node.y}%`}
+                                        x2={`${target.x}%`}
+                                        y2={`${target.y}%`}
+                                        stroke={COLORS.line}
+                                        strokeWidth={1.5}
+                                        initial={{ pathLength: 0, opacity: 0 }}
+                                        animate={{
+                                            pathLength: [0, 1, 1],
+                                            opacity: [0.1, 0.4, 0.1]
+                                        }}
+                                        transition={{
+                                            duration: 4,
+                                            repeat: Infinity,
+                                            delay: Math.random() * 5
+                                        }}
+                                    />
+                                )
+                            }
+                            return null
+                        })
+                    ))}
+
+                    {/* Nodes */}
+                    {NEURAL_NODES.map((node, i) => (
+                        <motion.circle
+                            key={i}
+                            cx={`${node.x}%`}
+                            cy={`${node.y}%`}
+                            r={node.size}
+                            fill={COLORS.bg}
+                            stroke={Math.random() > 0.5 ? COLORS.aiPrimary : COLORS.node}
+                            strokeWidth={2}
+                            initial={{ scale: 0, opacity: 0 }}
+                            animate={{
+                                scale: [1, 1.2, 1],
+                                opacity: 1,
+                                stroke: [COLORS.node, COLORS.aiPrimary, COLORS.node]
+                            }}
+                            transition={{
+                                scale: { duration: 3 + Math.random(), repeat: Infinity },
+                                stroke: { duration: 4 + Math.random(), repeat: Infinity },
+                                delay: i * 0.1
+                            }}
+                        />
+                    ))}
+                </svg>
             </div>
 
-            {/* Main content */}
-            <div className="relative z-10 max-w-5xl mx-auto">
-                {/* AI Phase content */}
-                <motion.div
-                    initial={{ opacity: 1 }}
-                    animate={{ opacity: conclusionPhase > 0.5 ? 0 : 1 }}
-                    className="flex gap-8"
-                    style={{ display: conclusionPhase > 0.7 ? 'none' : 'flex' }}
-                >
-                    {/* Left: Sentiment Analysis */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: aiPhase, x: -30 + (aiPhase * 30) }}
-                        className="w-[400px] rounded-3xl overflow-hidden"
-                        style={{
-                            backgroundColor: COLORS.surface,
-                            boxShadow: `0 25px 60px -15px ${COLORS.primary}30`
-                        }}
-                    >
-                        <div
-                            className="px-6 py-4 flex items-center gap-3"
-                            style={{
-                                background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`
-                            }}
-                        >
-                            <motion.div
-                                animate={{ rotate: [0, 15, -15, 0] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                            >
-                                <Brain size={22} className="text-white" />
-                            </motion.div>
-                            <span className="font-semibold text-white text-lg">AI Sentiment Analysis</span>
-                            <motion.div
-                                className="ml-auto"
-                                animate={{ scale: [1, 1.2, 1] }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            >
-                                <Sparkles size={18} className="text-white" />
-                            </motion.div>
-                        </div>
+            {/* ===== MAIN CONTENT ===== */}
+            <div className="relative z-10 w-full max-w-6xl px-8 h-full flex flex-col justify-center">
 
-                        <div className="p-6 space-y-5">
-                            {/* Sentiment bars */}
-                            {[
-                                { icon: ThumbsUp, label: "Positive", value: positiveValue, color: COLORS.success },
-                                { icon: Meh, label: "Neutral", value: neutralValue, color: COLORS.orange },
-                                { icon: ThumbsDown, label: "Negative", value: negativeValue, color: COLORS.red },
-                            ].map((item, i) => (
+                {!showConclusion ? (
+                    <div className="grid grid-cols-12 gap-8 items-center h-full max-h-[600px]">
+
+                        {/* Section 1: AI Processing Visualization */}
+                        <div className="col-span-4 flex flex-col items-center">
+                            <motion.div
+                                className="relative w-48 h-48 mb-8"
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                            >
+                                {/* Outer Rings */}
+                                <div className="absolute inset-0 rounded-full border-2 border-dashed border-gray-200" />
                                 <motion.div
-                                    key={item.label}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: aiPhase, x: 0 }}
-                                    transition={{ delay: i * 0.15 }}
-                                    className="space-y-2"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div
-                                                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                                                style={{ backgroundColor: `${item.color}15` }}
+                                    className="absolute inset-0 rounded-full border-t-2 border-r-2 border-teal-500"
+                                    animate={{ rotate: -360 }}
+                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                />
+
+                                {/* Central Brain */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-32 h-32 bg-white rounded-full shadow-lg flex items-center justify-center border border-teal-100 z-10">
+                                        <Brain size={64} className="text-teal-600" />
+                                    </div>
+                                    {/* Pulse Effect */}
+                                    <motion.div
+                                        className="absolute w-32 h-32 bg-teal-100 rounded-full -z-10"
+                                        animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                    />
+                                </div>
+                            </motion.div>
+
+                            {/* Processing Text */}
+                            <motion.div
+                                className="bg-white/80 backdrop-blur px-6 py-3 rounded-full border border-teal-100 shadow-sm text-center"
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                            >
+                                <div className="flex items-center justify-center gap-2 mb-1">
+                                    <Sparkles size={16} className="text-teal-500" />
+                                    <span className="font-bold text-gray-800">AI Analysis Active</span>
+                                </div>
+                                <div className="text-xs text-gray-500">Processing employee feedback nodes...</div>
+                            </motion.div>
+                        </div>
+
+                        {/* Section 2: Live Feedback Stream */}
+                        <div className="col-span-4 h-full flex flex-col justify-center">
+                            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <MessageSquare size={18} className="text-teal-600" />
+                                Incoming Responses
+                            </h3>
+                            <div className="space-y-3 relative">
+                                <AnimatePresence mode="popLayout">
+                                    {SAMPLE_FEEDBACK.map((fb, i) => {
+                                        const isCurrent = i === currentFeedbackIndex;
+                                        return (
+                                            <motion.div
+                                                key={i}
+                                                className={`p-4 rounded-xl border transition-all duration-300 ${isCurrent
+                                                        ? "bg-white border-teal-400 shadow-md scale-105 z-10"
+                                                        : "bg-gray-50 border-gray-100 opacity-60 scale-95"
+                                                    }`}
+                                                animate={{
+                                                    y: isCurrent ? 0 : 0,
+                                                    opacity: isCurrent ? 1 : 0.4
+                                                }}
                                             >
-                                                <item.icon size={16} style={{ color: item.color }} />
-                                            </div>
-                                            <span className="font-medium" style={{ color: COLORS.text }}>{item.label}</span>
-                                        </div>
-                                        <motion.span
-                                            className="text-xl font-bold"
-                                            style={{ color: item.color }}
-                                            key={item.value}
-                                        >
-                                            {item.value}%
-                                        </motion.span>
-                                    </div>
-                                    <div
-                                        className="h-3 rounded-full overflow-hidden"
-                                        style={{ backgroundColor: `${item.color}20` }}
-                                    >
-                                        <motion.div
-                                            className="h-full rounded-full"
-                                            style={{ backgroundColor: item.color }}
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${item.value}%` }}
-                                            transition={{ delay: i * 0.15 + 0.3, duration: 0.8 }}
-                                        />
-                                    </div>
-                                </motion.div>
-                            ))}
-
-                            {/* AI insights list */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: aiPhase > 0.7 ? 1 : 0, y: aiPhase > 0.7 ? 0 : 10 }}
-                                className="pt-3 border-t"
-                                style={{ borderColor: COLORS.secondary }}
-                            >
-                                <div className="text-xs font-bold uppercase mb-3" style={{ color: COLORS.textMuted }}>
-                                    Key Insights
-                                </div>
-                                {[
-                                    "Most positive feedback about work environment",
-                                    "Safety measures rated highly across units",
-                                    "Training opportunities requested frequently",
-                                ].map((insight, i) => (
-                                    <motion.div
-                                        key={i}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.8 + i * 0.1 }}
-                                        className="flex items-start gap-2 py-1.5"
-                                    >
-                                        <CheckCircle size={14} style={{ color: COLORS.success }} className="mt-0.5 flex-shrink-0" />
-                                        <span className="text-sm" style={{ color: COLORS.text }}>{insight}</span>
-                                    </motion.div>
-                                ))}
-                            </motion.div>
-                        </div>
-                    </motion.div>
-
-                    {/* Right: Word Cloud */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: aiPhase, x: 30 - (aiPhase * 30) }}
-                        className="w-[380px] rounded-3xl overflow-hidden"
-                        style={{
-                            backgroundColor: COLORS.surface,
-                            boxShadow: `0 25px 60px -15px ${COLORS.primary}30`
-                        }}
-                    >
-                        <div
-                            className="px-6 py-4 flex items-center gap-3"
-                            style={{
-                                background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`
-                            }}
-                        >
-                            <Sparkles size={22} className="text-white" />
-                            <span className="font-semibold text-white text-lg">Key Themes</span>
-                        </div>
-
-                        <div className="p-6">
-                            {/* Word cloud visualization */}
-                            <div className="relative h-48 flex items-center justify-center">
-                                {themes.map((theme, i) => (
-                                    <motion.div
-                                        key={theme.text}
-                                        className="absolute px-3 py-1.5 rounded-lg font-medium whitespace-nowrap"
-                                        style={{
-                                            backgroundColor: `${COLORS.primary}${Math.round(theme.size * 20)}`,
-                                            color: COLORS.text,
-                                            fontSize: `${theme.size * 14}px`,
-                                            left: `calc(50% + ${theme.x}px)`,
-                                            top: `calc(50% + ${theme.y}px)`,
-                                            transform: 'translate(-50%, -50%)'
-                                        }}
-                                        initial={{ opacity: 0, scale: 0 }}
-                                        animate={{ opacity: aiPhase, scale: aiPhase }}
-                                        transition={{ delay: theme.delay, type: "spring", stiffness: 200 }}
-                                        whileHover={{ scale: 1.1, zIndex: 10 }}
-                                    >
-                                        {theme.text}
-                                    </motion.div>
-                                ))}
+                                                <p className="text-gray-800 font-medium text-right" style={{ direction: 'rtl' }}>
+                                                    {fb.text}
+                                                </p>
+                                                {isCurrent && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                                        className="mt-2 flex justify-between items-center"
+                                                    >
+                                                        <span className="text-xs text-gray-400">Determining sentiment...</span>
+                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase
+                                                            ${fb.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
+                                                                fb.sentiment === 'negative' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}
+                                                        >
+                                                            {fb.sentiment}
+                                                        </span>
+                                                    </motion.div>
+                                                )}
+                                            </motion.div>
+                                        )
+                                    })}
+                                </AnimatePresence>
                             </div>
-
-                            {/* Actionable badge */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: aiPhase > 0.8 ? 1 : 0, y: aiPhase > 0.8 ? 0 : 10 }}
-                                className="mt-4 rounded-xl p-4 text-center"
-                                style={{
-                                    background: `linear-gradient(135deg, ${COLORS.success}15, ${COLORS.primary}10)`,
-                                    border: `2px solid ${COLORS.success}30`
-                                }}
-                            >
-                                <p style={{ color: COLORS.text }}>
-                                    Raw input transformed into <br />
-                                    <span className="font-bold text-lg" style={{ color: COLORS.success }}>
-                                        Clear, Actionable Insights
-                                    </span>
-                                </p>
-                            </motion.div>
                         </div>
-                    </motion.div>
-                </motion.div>
 
-                {/* Conclusion Phase */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: conclusionPhase }}
-                    className="absolute inset-0 flex flex-col items-center justify-center"
-                    style={{ display: conclusionPhase < 0.3 ? 'none' : 'flex' }}
-                >
-                    {/* Flow icons */}
+                        {/* Section 3: Sentiment Results */}
+                        <div className="col-span-4 flex flex-col justify-center gap-6">
+                            <StatsCard
+                                icon={ThumbsUp}
+                                label="Positive"
+                                value={positiveValue}
+                                color={COLORS.positive}
+                                bg="bg-green-50"
+                                border="border-green-100"
+                            />
+                            <StatsCard
+                                icon={Meh}
+                                label="Neutral"
+                                value={neutralValue}
+                                color={COLORS.neutral}
+                                bg="bg-orange-50"
+                                border="border-orange-100"
+                            />
+                            <StatsCard
+                                icon={ThumbsDown}
+                                label="Negative"
+                                value={negativeValue}
+                                color={COLORS.negative}
+                                bg="bg-red-50"
+                                border="border-red-100"
+                            />
+                        </div>
+                    </div>
+                ) : (
+                    /* ===== CONCLUSION TRANSFORM ===== */
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: conclusionPhase, y: 20 - (conclusionPhase * 20) }}
-                        className="flex items-center gap-4 mb-8"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto"
                     >
-                        {[
-                            { icon: ClipboardList, label: "Create" },
-                            { icon: Users, label: "Target" },
-                            { icon: MessageSquare, label: "Invite" },
-                            { icon: CheckCircle, label: "Respond" },
-                            { icon: BarChart3, label: "Analyze" },
-                        ].map((step, i) => (
-                            <motion.div
-                                key={step.label}
-                                className="flex items-center"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: conclusionPhase, scale: 1 }}
-                                transition={{ delay: i * 0.1 }}
-                            >
-                                <div className="flex flex-col items-center gap-2">
-                                    <motion.div
-                                        className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                                        style={{
-                                            backgroundColor: COLORS.surface,
-                                            border: `2px solid ${COLORS.primary}`,
-                                            boxShadow: `0 8px 24px -4px ${COLORS.primary}30`
-                                        }}
-                                        whileHover={{ scale: 1.1, y: -4 }}
-                                    >
-                                        <step.icon size={24} style={{ color: COLORS.primary }} />
-                                    </motion.div>
-                                    <span className="text-xs font-bold uppercase" style={{ color: COLORS.textMuted }}>
-                                        {step.label}
-                                    </span>
-                                </div>
-                                {i < 4 && (
-                                    <motion.div
-                                        className="mx-2"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: conclusionPhase }}
-                                        transition={{ delay: i * 0.1 + 0.2 }}
-                                    >
-                                        <ArrowRight size={16} style={{ color: COLORS.secondary }} />
-                                    </motion.div>
-                                )}
-                            </motion.div>
-                        ))}
-                    </motion.div>
-
-                    {/* Main message */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: conclusionPhase, y: 30 - (conclusionPhase * 30) }}
-                        className="text-center"
-                    >
-                        <h2
-                            className="text-4xl font-bold mb-4"
-                            style={{ color: COLORS.text }}
+                        <motion.div
+                            className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-6"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: "spring" }}
                         >
-                            From Reactive to <span style={{ color: COLORS.success }}>Proactive</span>
+                            <CheckCircle size={40} className="text-teal-600" />
+                        </motion.div>
+
+                        <h2 className="text-4xl font-black text-gray-800 mb-6">
+                            From <span className="text-teal-600">Compliance</span> to Impact
                         </h2>
-                        <p
-                            className="text-lg max-w-xl mx-auto mb-8"
-                            style={{ color: COLORS.textMuted }}
-                        >
-                            Digital surveys help organizations switch from reactive grievance handling
-                            to proactive employee engagement
+
+                        <p className="text-xl text-gray-500 mb-12 max-w-2xl">
+                            FOS transforms routine audits into a continuous improvement engine driven by real employee data.
                         </p>
 
-                        {/* Completion badge */}
-                        <motion.div
-                            className="inline-flex items-center gap-3 px-6 py-3 rounded-full"
-                            style={{
-                                background: `linear-gradient(135deg, ${COLORS.success}, ${COLORS.primary})`,
-                                boxShadow: `0 15px 40px -10px ${COLORS.success}50`
-                            }}
-                            animate={{ scale: [1, 1.02, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                        >
-                            <CheckCircle size={24} className="text-white" />
-                            <span className="text-white font-bold text-lg">Continuous Improvement</span>
-                        </motion.div>
+                        <div className="grid grid-cols-3 gap-6 w-full">
+                            {[
+                                { title: "Transparent", icon: FileText },
+                                { title: "Efficient", icon: Zap },
+                                { title: "Actionable", icon: TrendingUp },
+                            ].map((item, i) => (
+                                <motion.div
+                                    key={item.title}
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.3 + i * 0.1 }}
+                                    className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:border-teal-200 transition-colors"
+                                >
+                                    <item.icon size={32} className="mx-auto mb-3 text-teal-600" />
+                                    <h3 className="font-bold text-gray-800">{item.title}</h3>
+                                </motion.div>
+                            ))}
+                        </div>
                     </motion.div>
-                </motion.div>
+                )}
             </div>
         </motion.div>
     )
 }
+
+const StatsCard = ({ icon: Icon, label, value, color, bg, border }: any) => (
+    <motion.div
+        className={`bg-white p-5 rounded-2xl shadow-sm border ${border} relative overflow-hidden`}
+        whileHover={{ scale: 1.02 }}
+    >
+        <div className="flex items-center gap-4 relative z-10">
+            <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center`}>
+                <Icon size={24} style={{ color }} />
+            </div>
+            <div className="flex-1">
+                <div className="text-sm font-medium text-gray-500">{label}</div>
+                <div className="text-3xl font-bold text-gray-800">{value}%</div>
+            </div>
+        </div>
+        {/* Progress Fill */}
+        <motion.div
+            className={`absolute bottom-0 left-0 h-1 ${bg.replace('-50', '-500')} opacity-20`}
+            initial={{ width: 0 }}
+            animate={{ width: `${value}%` }}
+            transition={{ duration: 1 }}
+        />
+    </motion.div>
+)
