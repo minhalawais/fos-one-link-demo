@@ -30,21 +30,35 @@ interface SceneProps {
 
 export const SceneResponses = ({ isActive, progress }: SceneProps) => {
     // Scene: 63s - 75s (12 seconds)
-    const localT = progress - 63
+    const localT = Math.max(0, progress - 63)
 
     // STAGES:
-    // Stage 1: CNIC Entry (0-2s) -> localT < 2
-    // Stage 2: Survey List (2-5s) -> localT < 5
-    // Stage 3: Survey Form + Scroll (5-12s) -> localT >= 5
-    const stage = localT < 2 ? 'cnic' : localT < 5 ? 'list' : 'form'
+    // 0s - 2.5s: CNIC Entry (Typing)
+    // 2.5s - 3.5s: Submit & Verify (Click -> Verified)
+    // 3.5s - 6.0s: Survey List (Appear -> Click)
+    // 6.0s - 12s+: Survey Form (Scroll)
 
-    // Form scroll progress (for auto-scroll effect)
-    const formProgress = Math.max(0, Math.min(1, (localT - 5) / 7))
-    const scrollY = formProgress * 400 // Scroll down 400px worth of content
+    let stage = 'cnic'
+    if (localT > 3.5 && localT <= 6.0) stage = 'list'
+    if (localT > 6.0) stage = 'form'
 
-    // Typing animation for CNIC
-    const cnicText = "3520112345678"
+    // --- CNIC STAGE ---
+    const cnicText = "35201-1234567-8"
+    // Type over 2 seconds
     const typedChars = Math.min(cnicText.length, Math.floor((localT / 2) * cnicText.length))
+    // Simulate Click at 2.3s
+    const isSubmitPressed = localT > 2.2 && localT < 2.5
+    // Show Verified after 2.5s
+    const isVerified = localT > 2.5
+
+    // --- LIST STAGE ---
+    // Simulate Click on Survey Card at 5.5s
+    const isCardPressed = localT > 5.4 && localT < 5.8
+
+    // --- FORM STAGE ---
+    // Scroll starts at 6.0s, duration 6s
+    const formProgress = Math.max(0, Math.min(1, (localT - 6.5) / 5.5))
+    const scrollY = formProgress * 300 // Slower scroll (300px)
 
     return (
         <motion.div
@@ -52,7 +66,6 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
             animate={{ opacity: isActive ? 1 : 0 }}
             exit={{ opacity: 0 }}
             className="w-full h-full flex items-center justify-center overflow-hidden relative"
-            style={{ backgroundColor: COLORS.bg }}
         >
             {/* Background Pattern */}
             <div className="absolute inset-0 grid grid-cols-[repeat(20,minmax(0,1fr))] opacity-[0.03] pointer-events-none">
@@ -95,14 +108,14 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
 
                             <AnimatePresence mode="wait">
 
-                                {/* ===== STAGE 1: CNIC ENTRY ===== */}
+                                {/* ===== STAGE 1: CNIC ENTRY & VERIFY ===== */}
                                 {stage === 'cnic' && (
                                     <motion.div
                                         key="cnic"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0, x: -100 }}
-                                        className="flex-1 flex flex-col items-center justify-center px-6 bg-white"
+                                        exit={{ opacity: 0, x: -50 }}
+                                        className="flex-1 flex flex-col items-center justify-center px-6 bg-white relative"
                                     >
                                         {/* FOS Logo Placeholder */}
                                         <motion.div
@@ -111,7 +124,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                             className="w-24 h-24 mb-6 rounded-full flex items-center justify-center"
                                             style={{ backgroundColor: `${COLORS.green}15` }}
                                         >
-                                            <div className="text-3xl font-bold" style={{ color: COLORS.green }}>FOS</div>
+                                            <img src="/assets/images/FOS-01.png" alt="FOS" className="w-20 h-20 object-contain" />
                                         </motion.div>
 
                                         {/* Title */}
@@ -133,29 +146,63 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                             animate={{ y: 0, opacity: 1 }}
                                             transition={{ delay: 0.3 }}
                                             className="w-full rounded-full px-5 py-3 flex items-center gap-3 mb-4"
-                                            style={{ border: `2px solid ${COLORS.border}` }}
+                                            style={{ border: `2px solid ${isVerified ? COLORS.green : COLORS.border}` }}
                                         >
                                             <span className="text-lg">👤</span>
                                             <span style={{ color: typedChars > 0 ? COLORS.text : COLORS.textMuted }}>
                                                 {typedChars > 0 ? cnicText.slice(0, typedChars) : "Enter your FOS ID/CNIC..."}
                                             </span>
-                                            <motion.span
-                                                animate={{ opacity: [1, 0, 1] }}
-                                                transition={{ repeat: Infinity, duration: 0.8 }}
-                                                className="w-0.5 h-5 bg-teal-500"
-                                            />
+                                            {!isVerified && (
+                                                <motion.span
+                                                    animate={{ opacity: [1, 0, 1] }}
+                                                    transition={{ repeat: Infinity, duration: 0.8 }}
+                                                    className="w-0.5 h-5 bg-teal-500"
+                                                />
+                                            )}
+                                            {isVerified && (
+                                                <motion.div
+                                                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                                                    className="ml-auto text-green-500"
+                                                >
+                                                    <CheckCircle size={20} fill={COLORS.green} className="text-white" />
+                                                </motion.div>
+                                            )}
                                         </motion.div>
 
                                         {/* Submit Button */}
                                         <motion.button
                                             initial={{ y: 10, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1, scale: localT > 1.5 ? [1, 0.95, 1] : 1 }}
+                                            animate={{
+                                                y: 0,
+                                                opacity: 1,
+                                                scale: isSubmitPressed ? 0.92 : 1,
+                                                backgroundColor: isVerified ? COLORS.green : COLORS.green // Keep green
+                                            }}
                                             transition={{ delay: 0.4 }}
-                                            className="w-full py-3 rounded-full text-white font-semibold text-lg"
+                                            className="w-full py-3 rounded-full text-white font-semibold text-lg relative overflow-hidden"
                                             style={{ backgroundColor: COLORS.green }}
                                         >
-                                            Submit
+                                            {isVerified ? "Verified" : "Submit"}
+
+                                            {/* Click Visual */}
+                                            {isSubmitPressed && (
+                                                <div className="absolute inset-0 bg-black/20" />
+                                            )}
                                         </motion.button>
+
+                                        {/* Toast Message */}
+                                        <AnimatePresence>
+                                            {isVerified && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="absolute bottom-10 bg-black/80 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2"
+                                                >
+                                                    <CheckCircle size={14} className="text-green-400" /> Employee Verified
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </motion.div>
                                 )}
 
@@ -166,7 +213,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                         initial={{ x: 100, opacity: 0 }}
                                         animate={{ x: 0, opacity: 1 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
-                                        className="flex-1 flex flex-col bg-gray-50"
+                                        className="flex-1 flex flex-col bg-gray-50 mb-4" // mb-4 for home bar safe area
                                     >
                                         {/* Header */}
                                         <div
@@ -180,33 +227,42 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                         <div className="p-4">
                                             <motion.div
                                                 initial={{ y: 30, opacity: 0 }}
-                                                animate={{ y: 0, opacity: 1 }}
-                                                transition={{ delay: 0.3, type: "spring" }}
-                                                whileTap={{ scale: 0.98 }}
-                                                className="bg-white rounded-2xl shadow-lg overflow-hidden"
-                                                style={{ border: `1px solid ${COLORS.border}` }}
+                                                animate={{
+                                                    y: 0,
+                                                    opacity: 1,
+                                                    scale: isCardPressed ? 0.96 : 1,
+                                                    backgroundColor: isCardPressed ? "#F0FDF4" : "#FFFFFF"
+                                                }}
+                                                transition={{ delay: 0.1 }}
+                                                className="rounded-2xl shadow-lg overflow-hidden relative"
+                                                style={{ border: `1px solid ${isCardPressed ? COLORS.green : COLORS.border}` }}
                                             >
-                                                {/* Green left accent */}
+                                                {/* Ripple Overlay */}
+                                                {isCardPressed && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }} animate={{ opacity: 0.1 }}
+                                                        className="absolute inset-0 bg-teal-500 z-10"
+                                                    />
+                                                )}
+
                                                 <div className="flex">
                                                     <div className="w-1.5" style={{ backgroundColor: COLORS.green }} />
                                                     <div className="flex-1 p-4">
                                                         <h3 className="font-bold text-base mb-2" style={{ color: COLORS.text }}>
-                                                            Organizational Effectiveness & Engagement Survey for CHZ Head Office Staff
+                                                            Organizational Effectiveness & Engagement Survey
                                                         </h3>
                                                         <p className="text-xs leading-relaxed mb-4" style={{ color: COLORS.textMuted }}>
-                                                            This survey is designed to assess leadership effectiveness, communication, performance management, and workplace culture within the Head Office team...
+                                                            Assess leadership effectiveness, communication, and workplace culture...
                                                         </p>
 
                                                         {/* Meta info */}
                                                         <div className="flex gap-4 text-xs mb-3">
                                                             <div className="flex items-center gap-1">
                                                                 <HelpCircle size={14} style={{ color: COLORS.green }} />
-                                                                <span style={{ color: COLORS.textMuted }}>Questions:</span>
-                                                                <span className="font-bold" style={{ color: COLORS.orange }}>40</span>
+                                                                <span className="font-bold" style={{ color: COLORS.orange }}>40 Qs</span>
                                                             </div>
                                                             <div className="flex items-center gap-1">
                                                                 <Clock size={14} style={{ color: COLORS.green }} />
-                                                                <span style={{ color: COLORS.textMuted }}>Est. Time:</span>
                                                                 <span className="font-bold" style={{ color: COLORS.teal }}>20 min</span>
                                                             </div>
                                                         </div>
@@ -215,31 +271,28 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                         <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: COLORS.border }}>
                                                             <div className="flex items-center gap-1 text-xs" style={{ color: COLORS.textMuted }}>
                                                                 <Calendar size={12} />
-                                                                <span>Expires: 2026-01-31</span>
+                                                                <span>Jan 31, 2026</span>
                                                             </div>
-                                                            <motion.div
-                                                                animate={{ scale: [1, 1.05, 1] }}
-                                                                transition={{ repeat: Infinity, duration: 2 }}
+                                                            <div
                                                                 className="px-3 py-1 rounded-full text-xs font-bold"
                                                                 style={{ color: COLORS.red, backgroundColor: `${COLORS.red}10` }}
                                                             >
                                                                 Not Filled
-                                                            </motion.div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </motion.div>
 
-                                            {/* Tap indicator */}
-                                            <motion.div
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: localT > 4 ? 1 : 0 }}
-                                                className="flex items-center justify-center gap-2 mt-4 text-sm"
-                                                style={{ color: COLORS.teal }}
-                                            >
-                                                <span>Tap to start</span>
-                                                <ChevronRight size={16} />
-                                            </motion.div>
+                                            {/* Finger pointer visualization (optional, showing interaction) */}
+                                            {isCardPressed && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 2 }}
+                                                    animate={{ opacity: 0.5, scale: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="absolute top-1/2 left-1/2 w-8 h-8 rounded-full bg-gray-400/30 blur-sm pointer-events-none"
+                                                />
+                                            )}
                                         </div>
                                     </motion.div>
                                 )}
@@ -270,8 +323,8 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                         <div className="flex-1 overflow-hidden relative">
                                             <motion.div
                                                 animate={{ y: -scrollY }}
-                                                transition={{ type: "tween", ease: "easeOut" }}
-                                                className="p-4 space-y-4"
+                                                transition={{ type: "tween", ease: "linear", duration: 0.1 }}
+                                                className="p-4 space-y-4 pb-20"
                                             >
                                                 {/* Confidentiality Notice */}
                                                 <motion.div
@@ -290,16 +343,16 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                     </div>
                                                     <motion.div
                                                         className="flex items-center gap-2"
-                                                        animate={formProgress > 0.1 ? { scale: [1, 1.02, 1] } : {}}
+                                                        animate={{ scale: [1, 1.02, 1] }}
                                                     >
                                                         <div
                                                             className="w-5 h-5 rounded-full flex items-center justify-center"
                                                             style={{
-                                                                backgroundColor: formProgress > 0.1 ? COLORS.green : 'transparent',
+                                                                backgroundColor: COLORS.green,
                                                                 border: `2px solid ${COLORS.green}`
                                                             }}
                                                         >
-                                                            {formProgress > 0.1 && <div className="w-2 h-2 rounded-full bg-white" />}
+                                                            <div className="w-2 h-2 rounded-full bg-white" />
                                                         </div>
                                                         <span className="text-sm" style={{ color: COLORS.text }}>ہاں</span>
                                                     </motion.div>
@@ -309,10 +362,6 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                 <motion.div
                                                     className="rounded-xl p-3"
                                                     style={{ backgroundColor: COLORS.surface }}
-                                                    animate={formProgress > 0.3 && formProgress < 0.6 ? {
-                                                        scale: 1.02,
-                                                        boxShadow: `0 4px 20px ${COLORS.teal}30`
-                                                    } : {}}
                                                 >
                                                     <div className="text-right text-sm mb-3 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
                                                         آپ صداقت لمیٹڈ کی کس مل میں کام کر رہے ہیں؟
@@ -320,12 +369,11 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                     </div>
                                                     <div className="space-y-2">
                                                         {["Denim Apparel", "Knitting", "Knitting Apparel", "Power & Engineering", "Processing", "Spinning"].map((option, i) => {
-                                                            const isSelected = formProgress > 0.4 && i === 2
+                                                            const isSelected = i === 2
                                                             return (
-                                                                <motion.div
+                                                                <div
                                                                     key={option}
                                                                     className="flex items-center gap-2 py-1"
-                                                                    animate={isSelected ? { scale: [1, 1.02, 1] } : {}}
                                                                 >
                                                                     <div
                                                                         className="w-4 h-4 rounded-full flex items-center justify-center"
@@ -337,7 +385,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                                         {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                                                                     </div>
                                                                     <span className="text-xs" style={{ color: COLORS.text }}>{option}</span>
-                                                                </motion.div>
+                                                                </div>
                                                             )
                                                         })}
                                                     </div>
@@ -347,10 +395,6 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                 <motion.div
                                                     className="rounded-xl p-3"
                                                     style={{ backgroundColor: COLORS.surface }}
-                                                    animate={formProgress > 0.6 ? {
-                                                        scale: 1.02,
-                                                        boxShadow: `0 4px 20px ${COLORS.teal}30`
-                                                    } : {}}
                                                 >
                                                     <div className="text-right text-sm mb-3 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
                                                         آپ ڈپارٹمنٹ کی ٹیم سپرٹ کو کیسے درجہ بندی کریں گے؟
@@ -358,22 +402,32 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                     </div>
                                                     <div className="flex justify-between">
                                                         {[1, 2, 3, 4, 5].map((num) => {
-                                                            const isActive = formProgress > 0.7 && num <= 4
+                                                            const isActive = num <= 4
                                                             return (
-                                                                <motion.div
+                                                                <div
                                                                     key={num}
                                                                     className="w-10 h-10 rounded-lg flex items-center justify-center font-bold"
                                                                     style={{
                                                                         backgroundColor: isActive ? COLORS.green : COLORS.border,
                                                                         color: isActive ? 'white' : COLORS.textMuted
                                                                     }}
-                                                                    animate={isActive && num === 4 ? { scale: [1, 1.1, 1] } : {}}
                                                                 >
                                                                     {num}
-                                                                </motion.div>
+                                                                </div>
                                                             )
                                                         })}
                                                     </div>
+                                                </motion.div>
+
+                                                {/* Long Text Question */}
+                                                <motion.div
+                                                    className="rounded-xl p-3"
+                                                    style={{ backgroundColor: COLORS.surface }}
+                                                >
+                                                    <div className="text-right text-sm mb-3 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
+                                                        کیا آپ کے پاس کوئی اور رائے ہے؟
+                                                    </div>
+                                                    <div className="w-full h-24 rounded-lg border bg-white" style={{ borderColor: COLORS.border }} />
                                                 </motion.div>
                                             </motion.div>
                                         </div>
@@ -382,8 +436,9 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                         <div className="h-2" style={{ backgroundColor: COLORS.border }}>
                                             <motion.div
                                                 className="h-full"
+                                                initial={{ width: "0%" }}
+                                                animate={{ width: `${formProgress * 80 + 20}%` }}
                                                 style={{
-                                                    width: `${formProgress * 100}%`,
                                                     background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.green})`
                                                 }}
                                             />

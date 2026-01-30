@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Report - {{ survey.title }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-teal': '#284952',
+                        'brand-green': '#60BA81',
+                        'brand-charcoal': '#17161A',
+                        'brand-orange': '#F5A83C',
+                        'brand-white': '#FFFFFF',
+                        'brand-light-gray': '#F5F5F7',
+                        'brand-medium-gray': '#767676',
+                        'brand-border': '#DEE2E6',
+                        'brand-green-light': 'rgba(96, 186, 129, 0.42)',
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 13px rgba(0, 0, 0, 0.05)',
+                        'card-hover': '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F7;
+            color: #17161A;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .btn-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-transition:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-transition {
+            transition: all 0.3s ease;
+        }
+
+        .card-transition:hover {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Enhanced print styles for professional PDF output */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            html,
+            body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: white !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background-color: white !important;
+                color: #17161A !important;
+            }
+
+            .max-w-7xl {
+                max-width: 100% !important;
+            }
+
+            /* Page setup */
+            @page {
+                size: A4;
+                margin: 0.5in;
+                orphans: 3;
+                widows: 3;
+            }
+
+            /* Header styling for print */
+            .survey-header {
+                page-break-after: avoid;
+                background: white !important;
+                border-bottom: 3px solid #60BA81 !important;
+                padding: 24px !important;
+                margin-bottom: 24px !important;
+            }
+
+            .survey-header h1 {
+                color: #284952 !important;
+                font-size: 28px !important;
+                font-weight: 700 !important;
+                margin-bottom: 8px !important;
+            }
+
+            .survey-header p {
+                color: #767676 !important;
+                font-size: 14px !important;
+            }
+
+            /* Info grid for print */
+            .info-grid {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 12px !important;
+                margin-bottom: 16px !important;
+                page-break-inside: avoid;
+            }
+
+            .info-card {
+                background: white !important;
+                border: 1px solid #DEE2E6 !important;
+                padding: 12px !important;
+                border-radius: 8px !important;
+            }
+
+            .info-card-label {
+                color: #284952 !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                margin-bottom: 4px !important;
+            }
+
+            .info-card-value {
+                color: #17161A !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+            }
+
+            /* Response statistics section */
+            .response-stats {
+                background: linear-gradient(135deg, #284952 0%, #60BA81 100%) !important;
+                color: white !important;
+                padding: 20px !important;
+                border-radius: 8px !important;
+                margin-bottom: 24px !important;
+                page-break-inside: avoid;
+            }
+
+            .response-stats h3 {
+                color: white !important;
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                margin-bottom: 12px !important;
+            }
+
+            .stat-box {
+                background: rgba(255, 255, 255, 0.15) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                padding: 12px !important;
+                border-radius: 6px !important;
+                text-align: center !important;
+            }
+
+            .stat-value {
+                color: white !important;
+                font-size: 20px !important;
+                font-weight: 700 !important;
+                margin-bottom: 4px !important;
+            }
+
+            .stat-label {
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-size: 11px !important;
+                font-weight: 500 !important;
+            }
+
+            /* Question cards */
+            .question-card {
+                background: white !important;
+                border: 1px solid #DEE2E6 !important;
+                padding: 20px !important;
+                margin-bottom: 20px !important;
+                border-radius: 8px !important;
+                page-break-inside: avoid;
+            }
+
+            .question-card h3 {
+                color: #284952 !important;
+                font-size: 18px !important;
+                font-weight: 700 !important;
+                margin-bottom: 12px !important;
+            }
+
+            .question-badge {
+                display: inline-block !important;
+                background: #60BA81 !important;
+                color: white !important;
+                padding: 4px 8px !important;
+                border-radius: 50% !important;
+                width: 28px !important;
+                height: 28px !important;
+                text-align: center !important;
+                line-height: 20px !important;
+                font-weight: 700 !important;
+                font-size: 12px !important;
+                margin-right: 8px !important;
+            }
+
+            .question-type-badge {
+                display: inline-block !important;
+                background: rgba(40, 73, 82, 0.1) !important;
+                color: #284952 !important;
+                padding: 4px 8px !important;
+                border-radius: 12px !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                border: 1px solid #284952 !important;
+                margin-right: 8px !important;
+            }
+
+            .response-count {
+                color: #60BA81 !important;
+                font-size: 20px !important;
+                font-weight: 700 !important;
+            }
+
+            /* Chart styling for print */
+            .chart-container {
+                background: white !important;
+                border: 1px solid #DEE2E6 !important;
+                padding: 12px !important;
+                border-radius: 8px !important;
+                margin: 16px 0 !important;
+                page-break-inside: avoid;
+                height: 350px !important;
+            }
+
+            .chart-image {
+                max-width: 100% !important;
+                height: auto !important;
+                display: block !important;
+            }
+
+            /* Analysis section */
+            .analysis-section {
+                background: rgba(40, 73, 82, 0.05) !important;
+                border-left: 4px solid #284952 !important;
+                padding: 16px !important;
+                border-radius: 4px !important;
+                margin: 16px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            .analysis-section h4 {
+                color: #284952 !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                margin-bottom: 8px !important;
+            }
+
+            .analysis-section p {
+                color: #17161A !important;
+                font-size: 12px !important;
+                line-height: 1.6 !important;
+            }
+
+            /* Table styling */
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                margin: 16px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            table thead {
+                background: linear-gradient(135deg, #284952 0%, #60BA81 100%) !important;
+                color: white !important;
+            }
+
+            table th {
+                padding: 10px !important;
+                text-align: left !important;
+                font-weight: 700 !important;
+                font-size: 12px !important;
+                border: none !important;
+            }
+
+            table td {
+                padding: 10px !important;
+                border-bottom: 1px solid #DEE2E6 !important;
+                font-size: 11px !important;
+                color: #17161A !important;
+            }
+
+            table tbody tr:nth-child(even) {
+                background: #F5F5F7 !important;
+            }
+
+            .sentiment-positive {
+                background: rgba(96, 186, 129, 0.1) !important;
+                color: #60BA81 !important;
+                padding: 4px 8px !important;
+                border-radius: 4px !important;
+                font-weight: 600 !important;
+            }
+
+            .sentiment-negative {
+                background: rgba(245, 168, 60, 0.1) !important;
+                color: #F5A83C !important;
+                padding: 4px 8px !important;
+                border-radius: 4px !important;
+                font-weight: 600 !important;
+            }
+
+            .sentiment-neutral {
+                background: rgba(118, 118, 118, 0.1) !important;
+                color: #767676 !important;
+                padding: 4px 8px !important;
+                border-radius: 4px !important;
+                font-weight: 600 !important;
+            }
+
+            /* Sample responses */
+            .response-item {
+                background: #F5F5F7 !important;
+                border-left: 3px solid #60BA81 !important;
+                padding: 12px !important;
+                margin: 8px 0 !important;
+                border-radius: 4px !important;
+                page-break-inside: avoid;
+            }
+
+            .response-number {
+                display: inline-block !important;
+                background: #60BA81 !important;
+                color: white !important;
+                width: 24px !important;
+                height: 24px !important;
+                border-radius: 50% !important;
+                text-align: center !important;
+                line-height: 24px !important;
+                font-weight: 700 !important;
+                font-size: 11px !important;
+                margin-right: 8px !important;
+                flex-shrink: 0 !important;
+            }
+
+            .response-text {
+                color: #17161A !important;
+                font-size: 11px !important;
+                line-height: 1.5 !important;
+            }
+
+            /* Footer */
+            footer {
+                background: #284952 !important;
+                color: white !important;
+                padding: 12px !important;
+                text-align: center !important;
+                font-size: 11px !important;
+                margin-top: 24px !important;
+                border-top: 3px solid #60BA81 !important;
+            }
+
+            /* Page breaks */
+            .page-break {
+                page-break-before: always !important;
+                margin-top: 0 !important;
+            }
+
+            /* Ensure proper spacing */
+            .px-4 {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+
+            .py-8 {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+            }
+
+            .mx-auto {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-light-gray">
+    <!-- Navigation -->
+    <nav class="bg-brand-white shadow-md sticky top-0 z-40 no-print border-b-4 border-brand-green">
+        <div class="max-w-full mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo"
+                        class="h-10 w-auto mr-3">
+                    <span class="text-brand-teal text-xl font-bold tracking-tight text-center">Survey Report</span>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="printReport()"
+                        class="btn-transition bg-brand-light-gray hover:bg-brand-border text-brand-teal px-4 py-2 rounded-lg font-medium flex items-center border border-brand-border transition-all duration-300">
+                        <i class="fas fa-print mr-2"></i>Print Report
+                    </button>
+                    <a href="{{ url_for('generate_pdf', survey_id=survey.id) }}?v={{ timestamp }}"
+                        class="btn-transition bg-brand-orange hover:bg-opacity-90 text-white px-4 py-2 rounded-lg font-medium flex items-center shadow-md">
+                        <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                    </a>
+                    <a href="{{ url_for('survey') }}"
+                        class="btn-transition bg-brand-green hover:bg-opacity-90 text-white px-4 py-2 rounded-lg font-medium flex items-center shadow-md">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Surveys
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Survey Header -->
+        <div class="bg-white rounded-2xl shadow-card p-8 mb-8 card-transition border border-brand-border survey-header">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold text-brand-teal mb-2">{{ survey.title }}</h1>
+                    <p class="text-brand-medium-gray text-lg">{{ survey.description }}</p>
+                </div>
+                <div class="text-right ml-4">
+                    <div class="text-sm text-brand-medium-gray font-medium">Survey ID</div>
+                    <div class="text-3xl font-bold text-brand-green">{{ survey.id }}</div>
+                </div>
+            </div>
+
+            <!-- Survey Info Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div
+                    class="bg-gradient-to-br from-brand-teal to-brand-teal bg-opacity-5 rounded-xl p-4 border border-brand-border hover:border-brand-green transition-colors">
+                    <div class="text-white text-sm font-semibold mb-1">Created Date</div>
+                    <div class="text-white font-bold">{{ survey.created_at.strftime('%b %d, %Y') if survey.created_at
+                        else 'N/A' }}</div>
+                </div>
+                <div
+                    class="bg-gradient-to-br from-brand-green to-brand-green bg-opacity-5 rounded-xl p-4 border border-brand-border hover:border-brand-green transition-colors">
+                    <div class="text-white text-sm font-semibold mb-1">Expiry Date</div>
+                    <div class="text-white font-bold">{{ survey.expiry_date.strftime('%b %d, %Y') if survey.expiry_date
+                        else 'No Expiry' }}</div>
+                </div>
+                <div
+                    class="bg-gradient-to-br from-brand-orange to-brand-orange bg-opacity-5 rounded-xl p-4 border border-brand-border hover:border-brand-orange transition-colors">
+                    <div class="text-white text-sm font-semibold mb-1">Total Questions</div>
+                    <div class="text-white font-bold">{{ questions_data|length }}</div>
+                </div>
+                <div
+                    class="bg-gradient-to-br from-brand-green to-brand-teal bg-opacity-5 rounded-xl p-4 border border-brand-border hover:border-brand-green transition-colors">
+                    <div class="text-white text-sm font-semibold mb-1">Est. Time</div>
+                    <div class="text-white font-bold">{{ survey.estimated_time or 'N/A' }} min</div>
+                </div>
+            </div>
+
+            <!-- Response Statistics -->
+            <div
+                class="bg-gradient-to-r from-brand-teal via-brand-teal to-brand-green rounded-xl p-6 text-white shadow-card response-stats">
+                <h3 class="flex items-center">
+                    <i class="fas fa-chart-pie mr-3 text-brand-orange"></i>Response Statistics
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="stat-box">
+                        <div class="stat-value">{{ employee_stats.total_filtered_employees }}</div>
+                        <div class="stat-label">Total Invited</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">{{ employee_stats.employees_with_responses }}</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">{{ employee_stats.remaining_employees }}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">
+                            {{ "%.1f"|format((employee_stats.employees_with_responses /
+                            employee_stats.total_filtered_employees * 100) if employee_stats.total_filtered_employees >
+                            0 else 0) }}%
+                        </div>
+                        <div class="stat-label">Completion Rate</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-4 justify-center pt-6 border-t border-white border-opacity-20">
+                    <a href="/login/survey/{{ survey.id }}/export/filled"
+                        class="btn-transition bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center shadow-lg border border-white border-opacity-20">
+                        <i class="fas fa-check-circle mr-2"></i>Export Completed ({{
+                        employee_stats.employees_with_responses }})
+                    </a>
+                    <a href="/login/survey/{{ survey.id }}/export/pending"
+                        class="btn-transition bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center shadow-lg border border-white border-opacity-20">
+                        <i class="fas fa-clock mr-2"></i>Export Pending ({{ employee_stats.remaining_employees }})
+                    </a>
+                    <a href="/login/survey/{{ survey.id }}/export/all"
+                        class="btn-transition bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center shadow-lg border border-white border-opacity-20">
+                        <i class="fas fa-users mr-2"></i>Export All ({{ employee_stats.total_filtered_employees }})
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions and Results -->
+        {% for item in questions_data %}
+        <div
+            class="bg-white rounded-2xl shadow-card p-8 mb-8 card-transition border border-brand-border question-card {% if loop.index > 2 %}page-break{% endif %}">
+            <div class="flex items-start justify-between mb-6">
+                <div class="flex-1">
+                    <div class="flex items-center mb-3 flex-wrap gap-2">
+                        <span
+                            class="bg-brand-green text-white rounded-full w-10 h-10 flex items-center justify-center font-bold question-badge">
+                            {{ item.question.order or loop.index }}
+                        </span>
+                        <span
+                            class="bg-brand-teal bg-opacity-10 text-brand-teal text-sm font-semibold px-3 py-1 rounded-full border border-brand-teal border-opacity-20 question-type-badge">
+                            {{ item.question.question_type }}
+                        </span>
+                        {% if item.question.is_required %}
+                        <span
+                            class="bg-brand-orange bg-opacity-10 text-brand-orange text-sm font-semibold px-3 py-1 rounded-full border border-brand-orange border-opacity-20">
+                            <i class="fas fa-asterisk text-xs mr-1"></i>Required
+                        </span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-2xl font-bold text-brand-teal mb-2">{{ item.question.question_text }}</h3>
+                    {% if item.question.help_text %}
+                    <p
+                        class="text-brand-charcoal bg-brand-teal bg-opacity-5 p-3 rounded-lg border-l-4 border-brand-teal">
+                        <i class="fas fa-info-circle mr-2 text-brand-teal"></i>{{ item.question.help_text }}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="text-right ml-4">
+                    <div class="text-sm text-brand-medium-gray font-medium">Responses</div>
+                    <div class="text-3xl font-bold response-count">{{ item.response_count }}</div>
+                </div>
+            </div>
+
+            <!-- Chart for MCQ/Checkbox Questions -->
+            {% if item.chart_data %}
+            <div class="chart-container mb-6 bg-brand-light-gray rounded-xl p-4 border border-brand-border">
+                <canvas id="chart_{{ item.question.question_id }}" class="print-chart"></canvas>
+            </div>
+            <script>
+                    (function () {
+                        const ctx = document.getElementById('chart_{{ item.question.question_id }}').getContext('2d');
+                        const chartData = {{ item.chart_data | tojson
+                    }};
+
+                const colors = [
+                    "#072448", "#54d2d2", "#ffcb00", "#f8aa4b", "#ff6150", "#a05195",
+                    "#2ca02c", "#1f77b4", "#e377c2", "#8c564b", "#9467bd", "#17becf",
+                    "#bcbd22", "#d62728", "#7f7f7f", "#ff7f0e", "#98df8a", "#c49c94",
+                    "#f7b6d2", "#c5b0d5", "#aec7e8", "#ffbb78", "#c7c7c7", "#dbdb8d"
+                ];
+
+                const chart = new Chart(ctx, {
+                    type: chartData.type,
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Responses',
+                            data: chartData.values,
+                            backgroundColor: colors.map(c => c + '99'),
+                            borderColor: colors,
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: chartData.type === 'pie',
+                                position: 'right',
+                                labels: {
+                                    font: { size: 12, family: "'Inter', sans-serif" },
+                                    padding: 15,
+                                    color: '#17161A'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(40, 73, 82, 0.9)',
+                                titleFont: { family: "'Inter', sans-serif" },
+                                bodyFont: { family: "'Inter', sans-serif" },
+                                callbacks: {
+                                    label: function (context) {
+                                        const value = context.parsed.y || context.parsed;
+                                        const total = chartData.total;
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                            {% if item.chart_data.type == 'bar' %}
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                            ticks: { precision: 0, color: '#767676' },
+                        grid: { color: 'rgba(222, 226, 230, 0.5)' }
+                    },
+                    x: {
+                        ticks: { color: '#767676' },
+                        grid: { color: 'rgba(222, 226, 230, 0.5)' }
+                    }
+                }
+                {% endif %}
+                        }
+                    });
+
+                window['chart_{{ item.question.question_id }}'] = chart;
+                }) ();
+            </script>
+            {% endif %}
+
+            <!-- Text Analysis for Open-ended Questions -->
+            {% if item.text_analysis %}
+            <div class="space-y-6">
+                <!-- AI Summary -->
+                <div
+                    class="bg-gradient-to-r from-brand-teal to-brand-green bg-opacity-5 rounded-xl p-6 border border-brand-border analysis-section text-white">
+                    <h4 class="flex items-center">
+                        <i class="fas fa-brain mr-2 text-white"></i>AI Analysis Summary
+                    </h4>
+                    <p class="text-white">{{ item.text_analysis.analysis_summary }}</p>
+                </div>
+
+                <!-- Topic Analysis Table -->
+                {% if item.text_analysis.topics %}
+                <div>
+                    <h4 class="text-lg font-bold text-brand-teal mb-4 flex items-center">
+                        <i class="fas fa-list-ul mr-2 text-brand-green"></i>Detailed Topic Analysis
+                    </h4>
+                    <div class="overflow-x-auto rounded-xl border border-brand-border">
+                        <table class="min-w-full bg-white">
+                            <thead class="bg-gradient-to-r from-brand-teal to-brand-green text-white">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-bold">Topic</th>
+                                    <th class="px-6 py-3 text-center text-sm font-bold">Percentage</th>
+                                    <th class="px-6 py-3 text-center text-sm font-bold">Sentiment</th>
+                                    <th class="px-6 py-3 text-left text-sm font-bold">Key Insights</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-brand-border">
+                                {% for topic in item.text_analysis.topics %}
+                                <tr class="hover:bg-brand-light-gray transition-colors">
+                                    <td class="px-6 py-4 font-semibold text-brand-charcoal">{{ topic.topic_name }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="bg-brand-teal bg-opacity-10 text-brand-teal px-3 py-1 rounded-full text-sm font-bold border border-brand-teal border-opacity-20">
+                                            {{ "%.1f"|format(topic.percentage) }}%
+                                        </span>
+                                        <div class="text-xs text-brand-medium-gray mt-1">{{ topic.response_count }}
+                                            responses</div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        {% if topic.sentiment == 'positive' %}
+                                        <span class="sentiment-positive">
+                                            <i class="fas fa-smile mr-1"></i>Positive
+                                        </span>
+                                        {% elif topic.sentiment == 'negative' %}
+                                        <span class="sentiment-negative">
+                                            <i class="fas fa-frown mr-1"></i>Negative
+                                        </span>
+                                        {% else %}
+                                        <span class="sentiment-neutral">
+                                            <i class="fas fa-meh mr-1"></i>Neutral
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <ul class="text-sm text-brand-charcoal space-y-1">
+                                            {% for phrase in topic.key_phrases[:3] %}
+                                            <li class="flex items-start">
+                                                <i class="fas fa-circle text-xs text-brand-green mr-2 mt-1"></i>
+                                                <span>{{ phrase }}</span>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Sample Responses -->
+                <div>
+                    <h4 class="text-lg font-bold text-brand-teal mb-4 flex items-center">
+                        <i class="fas fa-comments mr-2 text-brand-orange"></i>Sample Responses
+                    </h4>
+                    <div class="space-y-3">
+                        {% for response in item.responses[:5] %}
+                        <div
+                            class="bg-brand-light-gray rounded-lg p-4 border border-brand-border hover:border-brand-green transition-colors response-item">
+                            <div class="flex items-start">
+                                <div class="response-number">
+                                    {{ loop.index }}
+                                </div>
+                                <p class="response-text">
+                                    {{ response.answer_text[:300] }}
+                                    {% if response.answer_text|length > 300 %}...{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if item.responses|length > 5 %}
+                    <p class="text-sm text-brand-medium-gray italic mt-3 text-center">
+                        ... and {{ item.responses|length - 5 }} more responses
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-brand-teal text-white py-6 mt-12 no-print border-t-4 border-brand-green">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="font-medium">&copy; 2025 Survey Management System.</p>
+        </div>
+    </footer>
+
+    <!-- Enhanced print function with chart-to-image conversion -->
+    <script>
+        async function printReport() {
+            // Convert all charts to images before printing
+            const charts = document.querySelectorAll('.print-chart');
+
+            for (let canvas of charts) {
+                const chartId = canvas.id;
+                const chartInstance = window[chartId];
+
+                if (chartInstance) {
+                    try {
+                        // Get chart image
+                        const image = chartInstance.toBase64Image();
+
+                        // Create image element
+                        const img = document.createElement('img');
+                        img.src = image;
+                        img.className = 'chart-image';
+                        img.style.maxWidth = '100%';
+                        img.style.height = 'auto';
+
+                        // Replace canvas with image
+                        canvas.parentNode.replaceChild(img, canvas);
+                    } catch (e) {
+                        console.error('Error converting chart:', e);
+                    }
+                }
+            }
+
+            // Trigger print dialog
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+    </script>
+</body>
+
+</html>

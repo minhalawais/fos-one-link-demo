@@ -1,33 +1,20 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Brain, Sparkles, ThumbsUp, Meh, ThumbsDown, CheckCircle, ArrowRight, Zap, MessageSquare, BarChart3, FileText, TrendingUp } from "lucide-react"
+import { Brain, Sparkles, MessageSquare, List, CheckCircle, AlertCircle, Minus, FileText, Zap, TrendingUp } from "lucide-react"
 
-// --- ENHANCED AI COLOR PALETTE (Light Theme) ---
-const COLORS = {
-    // Background and Surface
-    bg: "#FFFFFF",
-    surface: "#F8FAFC",
-
-    // Accents (Teal/Purple for AI feel but on light)
-    aiPrimary: "#0F9690",    // Teal
-    aiSecondary: "#8B5CF6",  // Purple
-    aiAccent: "#06B6D4",     // Cyan
-
-    // Sentiment
-    positive: "#059669",
-    neutral: "#D97706",
-    negative: "#DC2626",
-
-    // Neural network
-    node: "#CBD5E1",        // Light gray nodes
-    nodeActive: "#0F9690",  // Teal active
-    line: "#E2E8F0",        // Very light lines
-
-    // Text
-    textMain: "#1E293B",
-    textMuted: "#64748B",
-    white: "#FFFFFF"
+// --- BRAND COLORS (Matching survey_web_report.html) ---
+const BRAND = {
+    teal: '#284952',
+    green: '#60BA81',
+    orange: '#F5A83C',
+    charcoal: '#17161A',
+    lightGray: '#F5F5F7',
+    border: '#DEE2E6',
+    white: '#FFFFFF',
+    greenLight: 'rgba(96, 186, 129, 0.1)',
+    orangeLight: 'rgba(245, 168, 60, 0.1)',
+    tealLight: 'rgba(40, 73, 82, 0.05)'
 }
 
 interface SceneAIProps {
@@ -35,48 +22,31 @@ interface SceneAIProps {
     progress: number
 }
 
-// Sample employee feedback for animation
-const SAMPLE_FEEDBACK = [
-    { text: "محفوظ ماحول ہے", sentiment: "positive" },
-    { text: "ٹریننگ کی ضرورت ہے", sentiment: "neutral" },
-    { text: "Good management", sentiment: "positive" },
-    { text: "Need better equipment", sentiment: "negative" },
-    { text: "صفائی بہتر ہے", sentiment: "positive" },
+// Sample feedback for ingestion phase
+const RAW_FEEDBACK = [
+    { text: "Safety equipment is missing", type: "negative" },
+    { text: "محفوظ ماحول ہے", type: "positive" }, // Safe environment
+    { text: "Need better training options", type: "neutral" },
+    { text: "Food quality is good", type: "positive" },
+    { text: "شفٹ ٹائمنگ کا مسئلہ ہے", type: "negative" }, // Shift timing issue
+    { text: "Management is cooperative", type: "positive" },
 ]
 
-// Neural network nodes configuration
-const NEURAL_NODES = [
-    { x: 10, y: 20, size: 6 },
-    { x: 25, y: 45, size: 8 },
-    { x: 40, y: 15, size: 5 },
-    { x: 55, y: 55, size: 7 },
-    { x: 70, y: 25, size: 6 },
-    { x: 85, y: 50, size: 8 },
-    { x: 15, y: 70, size: 5 },
-    { x: 45, y: 80, size: 6 },
-    { x: 75, y: 75, size: 7 },
-    { x: 90, y: 30, size: 5 },
-    { x: 30, y: 60, size: 4 },
-    { x: 60, y: 40, size: 5 },
+// Structured Analysis Data (for Dashboard)
+const TOPIC_ANALYSIS = [
+    { topic: "Availability", pct: 43, sent: "positive", count: 145, insights: ["Everything available", "Timely delivery"] },
+    { topic: "Safety Gear", pct: 32, sent: "negative", count: 108, insights: ["Shoes missing", "Helmet issue"] },
+    { topic: "Training", pct: 25, sent: "neutral", count: 82, insights: ["Need refresher", "Good basics"] },
 ]
 
 export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
-    const localProgress = progress - 91
+    // Local time starts from 91s in the overall timeline
+    const localT = Math.max(0, progress - 91)
 
-    // Phase timing
-    // Phase 1 (0-14s): AI sentiment analysis with neural processing
-    // Phase 2 (14-24s): Conclusion - transformation
-    const aiPhase = Math.min(1, localProgress / 14)
-    const conclusionPhase = Math.min(1, Math.max(0, (localProgress - 14) / 10))
-    const showConclusion = localProgress > 14
-
-    // Animated sentiment values
-    const positiveValue = Math.round(62 * aiPhase)
-    const neutralValue = Math.round(28 * aiPhase)
-    const negativeValue = Math.round(10 * aiPhase)
-
-    // Current feedback being processed (cycles through)
-    const currentFeedbackIndex = Math.floor((localProgress * 0.8) % SAMPLE_FEEDBACK.length)
+    // Stages:
+    // 0-6s: Ingestion (Raw feedback floating into brain)
+    // 6s+: Result (Dashboard view expansion)
+    const showDashboard = localT > 6
 
     return (
         <motion.div
@@ -84,292 +54,277 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
             animate={{ opacity: isActive ? 1 : 0 }}
             exit={{ opacity: 0 }}
             className="w-full h-full flex items-center justify-center overflow-hidden relative"
-            style={{ backgroundColor: COLORS.bg }}
+            style={{ backgroundColor: "#FFFFFF" }}
         >
-            {/* ===== NEURAL NETWORK BACKGROUND (Reverted to original style but Light) ===== */}
-            <div className="absolute inset-0 overflow-hidden">
-                {/* Animated gradient orbs (Subtler for light mode) */}
-                <motion.div
-                    className="absolute w-[600px] h-[600px] rounded-full"
-                    style={{
-                        background: `radial-gradient(circle, ${COLORS.aiSecondary}15, transparent 70%)`,
-                        top: '10%',
-                        left: '20%',
-                        filter: 'blur(80px)'
-                    }}
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        x: [0, 50, 0],
-                        opacity: [0.3, 0.5, 0.3]
-                    }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                    className="absolute w-[500px] h-[500px] rounded-full"
-                    style={{
-                        background: `radial-gradient(circle, ${COLORS.aiPrimary}15, transparent 70%)`,
-                        bottom: '10%',
-                        right: '10%',
-                        filter: 'blur(60px)'
-                    }}
-                    animate={{
-                        scale: [1, 1.3, 1],
-                        x: [0, -30, 0],
-                        opacity: [0.3, 0.6, 0.3]
-                    }}
-                    transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                />
-
-                {/* Neural Connections */}
-                <svg className="absolute inset-0 w-full h-full">
-                    {NEURAL_NODES.map((node, i) => (
-                        NEURAL_NODES.slice(i + 1).map((target, j) => {
-                            const dist = Math.hypot(node.x - target.x, node.y - target.y)
-                            if (dist < 35) {
-                                return (
-                                    <motion.line
-                                        key={`${i}-${j}`}
-                                        x1={`${node.x}%`}
-                                        y1={`${node.y}%`}
-                                        x2={`${target.x}%`}
-                                        y2={`${target.y}%`}
-                                        stroke={COLORS.line}
-                                        strokeWidth={1.5}
-                                        initial={{ pathLength: 0, opacity: 0 }}
-                                        animate={{
-                                            pathLength: [0, 1, 1],
-                                            opacity: [0.1, 0.4, 0.1]
-                                        }}
-                                        transition={{
-                                            duration: 4,
-                                            repeat: Infinity,
-                                            delay: Math.random() * 5
-                                        }}
-                                    />
-                                )
-                            }
-                            return null
-                        })
-                    ))}
-
-                    {/* Nodes */}
-                    {NEURAL_NODES.map((node, i) => (
-                        <motion.circle
-                            key={i}
-                            cx={`${node.x}%`}
-                            cy={`${node.y}%`}
-                            r={node.size}
-                            fill={COLORS.bg}
-                            stroke={Math.random() > 0.5 ? COLORS.aiPrimary : COLORS.node}
-                            strokeWidth={2}
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{
-                                scale: [1, 1.2, 1],
-                                opacity: 1,
-                                stroke: [COLORS.node, COLORS.aiPrimary, COLORS.node]
-                            }}
-                            transition={{
-                                scale: { duration: 3 + Math.random(), repeat: Infinity },
-                                stroke: { duration: 4 + Math.random(), repeat: Infinity },
-                                delay: i * 0.1
-                            }}
-                        />
-                    ))}
-                </svg>
+            {/* Background Decor (Subtle Brand Gradients) */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[100px] opacity-10" style={{ backgroundColor: BRAND.green }} />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-[100px] opacity-10" style={{ backgroundColor: BRAND.teal }} />
             </div>
 
-            {/* ===== MAIN CONTENT ===== */}
-            <div className="relative z-10 w-full max-w-6xl px-8 h-full flex flex-col justify-center">
-
-                {!showConclusion ? (
-                    <div className="grid grid-cols-12 gap-8 items-center h-full max-h-[600px]">
-
-                        {/* Section 1: AI Processing Visualization */}
-                        <div className="col-span-4 flex flex-col items-center">
-                            <motion.div
-                                className="relative w-48 h-48 mb-8"
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                            >
-                                {/* Outer Rings */}
-                                <div className="absolute inset-0 rounded-full border-2 border-dashed border-gray-200" />
+            <AnimatePresence mode="wait">
+                {!showDashboard ? (
+                    /* ===== PHASE 1: INGESTION (Raw Data -> AI) ===== */
+                    <motion.div
+                        key="ingestion"
+                        exit={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+                        transition={{ duration: 0.8 }}
+                        className="relative w-full h-full flex items-center justify-center"
+                    >
+                        {/* Central AI Core */}
+                        <div className="relative z-10">
+                            {/* Pulse Rings */}
+                            {[1, 2, 3].map(i => (
                                 <motion.div
-                                    className="absolute inset-0 rounded-full border-t-2 border-r-2 border-teal-500"
-                                    animate={{ rotate: -360 }}
-                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                                    key={i}
+                                    className="absolute inset-0 rounded-full border border-teal-500/30"
+                                    initial={{ scale: 1, opacity: 0.5 }}
+                                    animate={{ scale: 2.5, opacity: 0 }}
+                                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.6, ease: "easeOut" }}
                                 />
+                            ))}
 
-                                {/* Central Brain */}
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-32 h-32 bg-white rounded-full shadow-lg flex items-center justify-center border border-teal-100 z-10">
-                                        <Brain size={64} className="text-teal-600" />
-                                    </div>
-                                    {/* Pulse Effect */}
-                                    <motion.div
-                                        className="absolute w-32 h-32 bg-teal-100 rounded-full -z-10"
-                                        animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                    />
-                                </div>
-                            </motion.div>
+                            {/* Brain Icon Container */}
+                            <div className="w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center relative overflow-hidden ring-4 ring-teal-50 z-20">
+                                <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-teal-500 to-green-500" />
+                                <Brain size={64} className="text-[#284952] relative z-10" />
+                                <motion.div
+                                    className="absolute inset-0 bg-gradient-to-t from-teal-500/20 to-transparent"
+                                    animate={{ y: ["0%", "-100%"] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                />
+                            </div>
 
-                            {/* Processing Text */}
                             <motion.div
-                                className="bg-white/80 backdrop-blur px-6 py-3 rounded-full border border-teal-100 shadow-sm text-center"
-                                initial={{ y: 20, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="absolute -bottom-16 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white px-4 py-2 rounded-full shadow-lg border border-teal-100 flex items-center gap-2"
                             >
-                                <div className="flex items-center justify-center gap-2 mb-1">
-                                    <Sparkles size={16} className="text-teal-500" />
-                                    <span className="font-bold text-gray-800">AI Analysis Active</span>
-                                </div>
-                                <div className="text-xs text-gray-500">Processing employee feedback nodes...</div>
+                                <Sparkles size={16} className="text-teal-600 animate-pulse" />
+                                <span className="text-sm font-bold text-teal-800">Processing Feedback...</span>
                             </motion.div>
                         </div>
 
-                        {/* Section 2: Live Feedback Stream */}
-                        <div className="col-span-4 h-full flex flex-col justify-center">
-                            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <MessageSquare size={18} className="text-teal-600" />
-                                Incoming Responses
-                            </h3>
-                            <div className="space-y-3 relative">
-                                <AnimatePresence mode="popLayout">
-                                    {SAMPLE_FEEDBACK.map((fb, i) => {
-                                        const isCurrent = i === currentFeedbackIndex;
-                                        return (
-                                            <motion.div
-                                                key={i}
-                                                className={`p-4 rounded-xl border transition-all duration-300 ${isCurrent
-                                                        ? "bg-white border-teal-400 shadow-md scale-105 z-10"
-                                                        : "bg-gray-50 border-gray-100 opacity-60 scale-95"
-                                                    }`}
-                                                animate={{
-                                                    y: isCurrent ? 0 : 0,
-                                                    opacity: isCurrent ? 1 : 0.4
-                                                }}
-                                            >
-                                                <p className="text-gray-800 font-medium text-right" style={{ direction: 'rtl' }}>
-                                                    {fb.text}
-                                                </p>
-                                                {isCurrent && (
-                                                    <motion.div
-                                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                                        className="mt-2 flex justify-between items-center"
-                                                    >
-                                                        <span className="text-xs text-gray-400">Determining sentiment...</span>
-                                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full uppercase
-                                                            ${fb.sentiment === 'positive' ? 'bg-green-100 text-green-700' :
-                                                                fb.sentiment === 'negative' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'}`}
-                                                        >
-                                                            {fb.sentiment}
-                                                        </span>
-                                                    </motion.div>
-                                                )}
-                                            </motion.div>
-                                        )
-                                    })}
-                                </AnimatePresence>
+                        {/* Floating Feedback Cards */}
+                        {RAW_FEEDBACK.map((item, i) => (
+                            <FloatingCard
+                                key={i}
+                                item={item}
+                                index={i}
+                                total={RAW_FEEDBACK.length}
+                                time={localT}
+                            />
+                        ))}
+
+                    </motion.div>
+                ) : (
+                    /* ===== PHASE 2: DASHBOARD (Structured Results) ===== */
+                    <motion.div
+                        key="dashboard"
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="w-full max-w-5xl p-6 z-20"
+                    >
+                        {/* 1. Header Section */}
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#284952] to-[#60BA81] flex items-center justify-center shadow-lg text-white">
+                                <Brain size={24} />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-[#284952]">AI Analysis Summary</h1>
+                                <p className="text-[#767676] text-sm flex items-center gap-2">
+                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                    Analysis Complete • 335 Responses Processed
+                                </p>
                             </div>
                         </div>
 
-                        {/* Section 3: Sentiment Results */}
-                        <div className="col-span-4 flex flex-col justify-center gap-6">
-                            <StatsCard
-                                icon={ThumbsUp}
-                                label="Positive"
-                                value={positiveValue}
-                                color={COLORS.positive}
-                                bg="bg-green-50"
-                                border="border-green-100"
-                            />
-                            <StatsCard
-                                icon={Meh}
-                                label="Neutral"
-                                value={neutralValue}
-                                color={COLORS.neutral}
-                                bg="bg-orange-50"
-                                border="border-orange-100"
-                            />
-                            <StatsCard
-                                icon={ThumbsDown}
-                                label="Negative"
-                                value={negativeValue}
-                                color={COLORS.negative}
-                                bg="bg-red-50"
-                                border="border-red-100"
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    /* ===== CONCLUSION TRANSFORM ===== */
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto"
-                    >
-                        <motion.div
-                            className="w-20 h-20 bg-teal-100 rounded-full flex items-center justify-center mb-6"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ type: "spring" }}
-                        >
-                            <CheckCircle size={40} className="text-teal-600" />
-                        </motion.div>
-
-                        <h2 className="text-4xl font-black text-gray-800 mb-6">
-                            From <span className="text-teal-600">Compliance</span> to Impact
-                        </h2>
-
-                        <p className="text-xl text-gray-500 mb-12 max-w-2xl">
-                            FOS transforms routine audits into a continuous improvement engine driven by real employee data.
-                        </p>
-
-                        <div className="grid grid-cols-3 gap-6 w-full">
-                            {[
-                                { title: "Transparent", icon: FileText },
-                                { title: "Efficient", icon: Zap },
-                                { title: "Actionable", icon: TrendingUp },
-                            ].map((item, i) => (
+                        <div className="grid grid-cols-12 gap-6">
+                            {/* Left Column: Summary & Stats */}
+                            <div className="col-span-12 md:col-span-7 space-y-6">
+                                {/* Summary Box */}
                                 <motion.div
-                                    key={item.title}
+                                    initial={{ x: -20, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="rounded-xl p-6 text-white shadow-lg relative overflow-hidden"
+                                    style={{ background: `linear-gradient(135deg, ${BRAND.teal} 0%, ${BRAND.green} 100%)` }}
+                                >
+                                    <div className="relative z-10">
+                                        <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                                            <Sparkles size={18} className="text-[#F5A83C]" />
+                                            Key Insight
+                                        </h3>
+                                        <p className="opacity-90 leading-relaxed text-sm">
+                                            Analysis indicates a strong positive trend in <span className="font-bold text-[#F5A83C]">Management Cooperation</span>.
+                                            However, <span className="underline decoration-[#F5A83C] underline-offset-4 font-bold">Safety Equipment</span> availability requires immediate attention in Block B.
+                                        </p>
+                                    </div>
+                                    {/* Abstract shapes bg */}
+                                    <div className="absolute right-0 bottom-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-10 translate-y-10" />
+                                </motion.div>
+
+                                {/* Topic Analysis Table */}
+                                <motion.div
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
-                                    transition={{ delay: 0.3 + i * 0.1 }}
-                                    className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:border-teal-200 transition-colors"
+                                    transition={{ delay: 0.4 }}
+                                    className="bg-white rounded-xl border border-[#DEE2E6] shadow-sm overflow-hidden"
                                 >
-                                    <item.icon size={32} className="mx-auto mb-3 text-teal-600" />
-                                    <h3 className="font-bold text-gray-800">{item.title}</h3>
+                                    <div className="px-6 py-4 border-b border-[#DEE2E6] flex justify-between items-center">
+                                        <h4 className="font-bold text-[#284952] flex items-center gap-2">
+                                            <List size={18} className="text-[#60BA81]" /> Detailed Topic Analysis
+                                        </h4>
+                                    </div>
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-[#F5F5F7] text-[#284952]">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left font-bold">Topic</th>
+                                                <th className="px-6 py-3 text-center font-bold">%</th>
+                                                <th className="px-6 py-3 text-center font-bold">Sentiment</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-[#DEE2E6]">
+                                            {TOPIC_ANALYSIS.map((row, i) => (
+                                                <TopicRow key={i} row={row} index={i} />
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </motion.div>
-                            ))}
+                            </div>
+
+                            {/* Right Column: Sample Responses & Stats */}
+                            <div className="col-span-12 md:col-span-5 space-y-6">
+                                {/* Stats Grid */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[
+                                        { l: "Positive", v: "62%", c: "text-green-600", bg: "bg-green-50", i: CheckCircle },
+                                        { l: "Negative", v: "15%", c: "text-red-600", bg: "bg-red-50", i: AlertCircle },
+                                    ].map((s, i) => (
+                                        <motion.div
+                                            key={i}
+                                            initial={{ scale: 0.8, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            transition={{ delay: 0.6 + (i * 0.1) }}
+                                            className={`p-4 rounded-xl ${s.bg} border border-transparent hover:scale-105 transition-transform`}
+                                        >
+                                            <s.i size={20} className={`mb-2 ${s.c}`} />
+                                            <div className="text-2xl font-bold text-[#17161A]">{s.v}</div>
+                                            <div className="text-xs font-semibold opacity-60 uppercase">{s.l}</div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+
+                                {/* Sample Responses Panel */}
+                                <motion.div
+                                    initial={{ x: 20, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    transition={{ delay: 0.8 }}
+                                    className="bg-white rounded-xl border border-[#DEE2E6] shadow-sm p-6"
+                                >
+                                    <h4 className="font-bold text-[#284952] mb-4 flex items-center gap-2">
+                                        <MessageSquare size={18} className="text-[#F5A83C]" />
+                                        Sample Feedback
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {RAW_FEEDBACK.slice(0, 3).map((fb, i) => (
+                                            <div key={i} className="flex gap-3 text-xs bg-[#F5F5F7] p-3 rounded-lg border-l-4 border-[#60BA81]">
+                                                <span className="font-bold text-white bg-[#60BA81] w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    {i + 1}
+                                                </span>
+                                                <span className="text-[#17161A] leading-relaxed">{fb.text}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            </div>
                         </div>
+
+                        {/* Bottom Action Bar (Simulating Footer) */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1 }}
+                            className="mt-6 flex justify-center gap-4 border-t border-[#DEE2E6] pt-6"
+                        >
+                            <div className="flex items-center gap-2 px-4 py-2 bg-white border border-[#DEE2E6] rounded-lg shadow-sm text-sm text-[#767676]">
+                                <FileText size={16} /> Export Report
+                            </div>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-[#284952] text-white rounded-lg shadow-md text-sm font-medium">
+                                <Zap size={16} /> Take Action
+                            </div>
+                        </motion.div>
                     </motion.div>
                 )}
-            </div>
+            </AnimatePresence>
         </motion.div>
     )
 }
 
-const StatsCard = ({ icon: Icon, label, value, color, bg, border }: any) => (
-    <motion.div
-        className={`bg-white p-5 rounded-2xl shadow-sm border ${border} relative overflow-hidden`}
-        whileHover={{ scale: 1.02 }}
-    >
-        <div className="flex items-center gap-4 relative z-10">
-            <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center`}>
-                <Icon size={24} style={{ color }} />
-            </div>
-            <div className="flex-1">
-                <div className="text-sm font-medium text-gray-500">{label}</div>
-                <div className="text-3xl font-bold text-gray-800">{value}%</div>
-            </div>
-        </div>
-        {/* Progress Fill */}
+// Helper: Floating Card for Ingestion Phase
+const FloatingCard = ({ item, index, total, time }: any) => {
+    // Calculated circular starting position
+    const angle = (index / total) * Math.PI * 2
+    const radius = 250 // Distance from center
+    const startX = Math.cos(angle) * radius
+    const startY = Math.sin(angle) * radius
+
+    return (
         <motion.div
-            className={`absolute bottom-0 left-0 h-1 ${bg.replace('-50', '-500')} opacity-20`}
-            initial={{ width: 0 }}
-            animate={{ width: `${value}%` }}
-            transition={{ duration: 1 }}
-        />
-    </motion.div>
+            className="absolute bg-white p-3 rounded-lg border-l-4 shadow-sm w-48 text-xs z-0"
+            style={{
+                borderColor: item.type === 'positive' ? BRAND.green : item.type === 'negative' ? BRAND.orange : '#999',
+                left: '50%',
+                top: '50%'
+            }}
+            initial={{ x: startX, y: startY, opacity: 0, scale: 0.8 }}
+            animate={{
+                x: [startX, startX * 0.8, 0], // Move towards center
+                y: [startY, startY * 0.8, 0],
+                opacity: [0, 1, 0], // Fade in then out as it hits center
+                scale: [0.8, 1, 0.2], // Shrink into center
+            }}
+            transition={{
+                duration: 3,
+                delay: index * 0.5,
+                times: [0, 0.2, 1],
+                ease: "easeInOut"
+            }}
+        >
+            <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-gray-400">#{1024 + index}</span>
+                {item.type === 'positive' && <CheckCircle size={12} className="text-green-500" />}
+                {item.type === 'negative' && <AlertCircle size={12} className="text-orange-500" />}
+                {item.type === 'neutral' && <Minus size={12} className="text-gray-400" />}
+            </div>
+            <div className="text-gray-700 truncate">{item.text}</div>
+        </motion.div>
+    )
+}
+
+// Helper: Table Row with animation
+const TopicRow = ({ row, index }: any) => (
+    <motion.tr
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.5 + (index * 0.1) }}
+        className="hover:bg-[#F5F5F7] transition-colors"
+    >
+        <td className="px-6 py-4 font-semibold text-[#17161A]">{row.topic}</td>
+        <td className="px-6 py-4 text-center">
+            <span className="bg-[#284952]/10 text-[#284952] px-3 py-1 rounded-full text-xs font-bold">
+                {row.pct}%
+            </span>
+        </td>
+        <td className="px-6 py-4 text-center">
+            <span className={`px-3 py-1 rounded-full text-xs font-bold flex items-center justify-center gap-1 w-24 mx-auto
+                ${row.sent === 'positive' ? 'bg-[#60BA81]/10 text-[#60BA81]' :
+                    row.sent === 'negative' ? 'bg-[#F5A83C]/10 text-[#F5A83C]' : 'bg-gray-100 text-gray-600'}`}>
+                {row.sent === 'positive' && <CheckCircle size={12} />}
+                {row.sent === 'negative' && <AlertCircle size={12} />}
+                {row.sent === 'neutral' && <Minus size={12} />}
+                {row.sent.charAt(0).toUpperCase() + row.sent.slice(1)}
+            </span>
+        </td>
+    </motion.tr>
 )

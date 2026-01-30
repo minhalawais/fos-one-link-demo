@@ -1103,7 +1103,6 @@ const Slide: React.FC<SlideProps> = ({
 
       <motion.div
         className="absolute inset-0 overflow-hidden rounded-[28px]"
-        layout
         transition={IOS_SPRING}
         style={{
           backgroundColor: isIdle ? currentTheme.cardBg : '#FFFFFF',
@@ -1125,12 +1124,12 @@ const Slide: React.FC<SlideProps> = ({
       >
         {/* Shimmer removed for cleaner idle state */}
 
-        <AnimatePresence mode="sync" initial={false}>
+        <AnimatePresence initial={false}>
           {isIdle ? (
             // === IDLE STATE - Premium Production Grade Design ===
             <motion.div
               key="idle"
-              className="w-full h-full relative flex flex-col overflow-hidden"
+              className="w-full h-full absolute inset-0 flex flex-col overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.2 } }}
@@ -1363,7 +1362,7 @@ const Slide: React.FC<SlideProps> = ({
             // === EXPANDED / PLAYING STATE - Premium Redesign ===
             <motion.div
               key="expanded"
-              className="flex w-full h-full relative overflow-hidden"
+              className="flex w-full h-full absolute inset-0 overflow-hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -1659,7 +1658,7 @@ const Slide: React.FC<SlideProps> = ({
                   />
                 )}
 
-                <AnimatePresence mode="wait">
+                <AnimatePresence>
                   {isPlaying ? (
                     <motion.div
                       key="player-container"

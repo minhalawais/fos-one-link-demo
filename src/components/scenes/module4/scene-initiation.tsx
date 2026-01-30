@@ -4,11 +4,10 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
     BarChart3, Edit, Trash2, PieChart,
     Download, FileText, Clock, Calendar, Hash, HelpCircle,
-    X, ClipboardList, MessageCircle, CheckCircle2,
-    LayoutDashboard, Plus, Search, Filter, Shuffle, Check, List, MousePointer2,
-    Globe, Languages, ChevronDown
+    X, ClipboardList, CheckCircle2,
+    LayoutDashboard, MousePointer2
 } from "lucide-react"
-import { useRef, useEffect } from "react"
+import { useMemo } from "react"
 
 // --- SYSTEM COLORS ---
 const COLORS = {
@@ -20,7 +19,6 @@ const COLORS = {
     white: "#FFFFFF",
     bg: "#F5F5F7",
     border: "#DEE2E6",
-    softGreen: "rgba(96, 186, 129, 0.42)",
 }
 
 interface SceneProps {
@@ -35,7 +33,7 @@ const IntroView = () => (
     <motion.div
         key="intro"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="w-full h-full flex flex-col items-center justify-center bg-white z-50 absolute inset-0"
+        className="w-full h-full flex flex-col items-center justify-center bg-white z-10 absolute inset-0"
     >
         <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -223,9 +221,8 @@ const QuestionCard = ({ i, type, q, opts }: { i: number, type: string, q: string
 // ==========================================
 const DetailsView = ({ progress }: { progress: number }) => {
     // Scroll Logic: 8s -> 12s (4s duration)
-    // We scroll faster now since the view is shorter
     const localT = Math.max(0, progress - 8)
-    const scrollY = Math.min(600, localT * 150) // Scrolls 600px over 4s
+    const scrollY = Math.min(600, localT * 150)
 
     return (
         <motion.div
@@ -254,9 +251,9 @@ const DetailsView = ({ progress }: { progress: number }) => {
             <div className="flex-1 overflow-hidden relative">
                 <motion.div
                     className="p-8 space-y-8 pb-32"
-                    style={{ y: -scrollY }} // RESTORED SCROLL ANIMATION
+                    style={{ y: -scrollY }}
                 >
-                    {/* === TOP STATS SECTION (From Image 1) === */}
+                    {/* === TOP STATS SECTION === */}
                     <div className="space-y-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-3xl font-bold text-gray-800 font-serif" style={{ direction: "rtl" }}>
@@ -288,11 +285,6 @@ const DetailsView = ({ progress }: { progress: number }) => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="flex justify-center gap-4">
-                                {["Export Completed (6)", "Export Pending (0)", "Export All (6)"].map((label, i) => (
-                                    <button key={i} className="px-4 py-2 rounded bg-white/20 text-xs font-bold flex items-center gap-2 border border-white/20"><Download size={14} /> {label}</button>
-                                ))}
-                            </div>
                         </div>
 
                         <div className="grid grid-cols-5 gap-4">
@@ -310,26 +302,10 @@ const DetailsView = ({ progress }: { progress: number }) => {
                         </div>
                     </div>
 
-                    {/* === FILTER SECTION (RESTORED) === */}
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2"><Filter size={20} style={{ color: COLORS.green }} /> Survey Filters (1)</h3>
-                        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
-                            <span className="px-4 py-1.5 bg-purple-600 text-white rounded-full text-xs font-bold flex items-center gap-2">
-                                <Hash size={12} /> Employee id
-                            </span>
-                            <div className="flex flex-wrap gap-2">
-                                {["571849", "571132", "562408", "561289", "560272", "540059"].map(id => (
-                                    <span key={id} className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded">{id}</span>
-                                ))}
-                                <span className="px-3 py-1 bg-gray-50 text-gray-400 text-xs font-medium rounded">6 items</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* === QUESTIONS LIST (RESTORED) === */}
+                    {/* === QUESTIONS LIST === */}
                     <div className="space-y-4">
                         <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                            <List size={20} style={{ color: COLORS.green }} /> Questions (31)
+                            <ClipboardList size={20} style={{ color: COLORS.green }} /> Questions (31)
                         </h3>
 
                         <QuestionCard i={1} type="radio" q="Branch:" opts={["Johar Town", "Bahria Town", "Emporium Branch", "Cloud Kitchen", "Phase 6 Branch", "DHA CC Branch"]} />
@@ -344,251 +320,19 @@ const DetailsView = ({ progress }: { progress: number }) => {
 }
 
 // ==========================================
-// 4. ADD SURVEY MODAL VIEW (12-26s)
-// ==========================================
-const ModalView = ({ progress }: { progress: number }) => {
-    // Script Synced Typing: Starts at 12s
-    const localT = Math.max(0, progress - 12)
-    const contentRef = useRef<HTMLDivElement>(null)
-
-    // SCROLL LOGIC: At 16s (localT 4s), scroll to date/languages
-    useEffect(() => {
-        if (localT > 4 && localT < 5 && contentRef.current) {
-            contentRef.current.scrollTo({ top: 200, behavior: 'smooth' })
-        }
-        // At 24s (localT 12s), scroll to Filters
-        if (localT > 12 && contentRef.current) {
-            contentRef.current.scrollTo({ top: 400, behavior: 'smooth' })
-        }
-    }, [localT])
-
-    // DATA
-    const titleEn = "Employee Wellbeing Survey - Q1 2026"
-    const titleUr = "ملازمین کی بہبود کا سروے - سہ ماہی 1 2026"
-
-    const descEn = "A regular pulse check to screen the general sentiment, wellbeing and safety of our employees across all branches."
-    const descUr = "تمام برانچوں میں ہمارے ملازمین کے عمومی جذبات، بہبود اور حفاظت کی جانچ کرنے کے لیے ایک باقاعدہ نبض چیک۔"
-
-    // LANGUAGE MORPH TIMING (18s - 24s) -> localT 6s - 12s
-    const isUrdu = localT > 6 && localT < 12
-
-    // FOCUS LOGIC
-    let focusSection = 'none'
-    if (localT > 0 && localT < 2.5) focusSection = 'title'
-    else if (localT >= 2.5 && localT < 5) focusSection = 'desc'
-    else if (localT >= 5 && localT < 6.5) focusSection = 'date'
-    else if (localT >= 6.5 && localT < 12) focusSection = 'lang'
-    else if (localT >= 12) focusSection = 'all'
-
-    return (
-        <motion.div
-            key="modal"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="w-full h-full flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-8 absolute inset-0"
-        >
-            <motion.div
-                initial={{ scale: 0.9, y: 50 }} animate={{ scale: 1, y: 0 }}
-                className="w-full max-w-5xl bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-full"
-                layout
-            >
-                {/* Header with increased padding */}
-                <div className="h-28 flex items-center justify-between px-8 bg-gradient-to-r relative z-20"
-                    style={{ background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.darkTeal})` }}
-                >
-                    <div className="py-8">
-                        <div className="flex items-center gap-3 text-white mb-2">
-                            <Plus size={28} strokeWidth={3} /> <h2 className="text-3xl font-bold">Add New Survey</h2>
-                        </div>
-                        <p className="text-white/90 text-sm font-medium">Create a new survey with advanced filters and settings</p>
-                    </div>
-
-                    {/* Language Badge */}
-                    <div className="flex items-center gap-4">
-                        <AnimatePresence>
-                            {isUrdu && (
-                                <motion.div
-                                    initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}
-                                    className="bg-white text-green-700 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-2 shadow-lg"
-                                >
-                                    🌍 Native Language Support
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
-                            <X size={20} className="text-white" />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Content - Hidden Scrollbar */}
-                <div ref={contentRef} className="p-8 space-y-6 overflow-hidden relative h-full">
-
-                    {/* Fields Container */}
-                    <div className="space-y-6 relative z-10">
-                        {/* Title */}
-                        <FocusArea label="SURVEY TITLE" isActive={focusSection === 'title' || focusSection === 'lang'} icon={isUrdu ? <Languages size={12} /> : <Edit size={12} />}>
-                            <div className="h-full px-4 flex items-center text-sm text-gray-700 relative overflow-hidden">
-                                <AnimatePresence mode="wait">
-                                    <motion.span
-                                        key={isUrdu ? "ur" : "en"}
-                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }}
-                                        className={`block w-full ${isUrdu ? "font-serif text-right text-lg text-green-700" : ""}`}
-                                    >
-                                        {isUrdu ? titleUr : titleEn.substring(0, Math.floor(localT * 15))}
-                                    </motion.span>
-                                </AnimatePresence>
-                                {!isUrdu && localT < 3 && <span className="animate-pulse ml-1">|</span>}
-                            </div>
-                        </FocusArea>
-
-                        {/* Desc */}
-                        <FocusArea label="DESCRIPTION" isActive={focusSection === 'desc' || focusSection === 'lang'} icon={isUrdu ? <Languages size={12} /> : <FileText size={12} />} height="h-24">
-                            <div className="h-full p-4 text-sm text-gray-600 leading-relaxed relative overflow-hidden">
-                                <AnimatePresence mode="wait">
-                                    <motion.p
-                                        key={isUrdu ? "ur" : "en"}
-                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                        className={`w-full ${isUrdu ? "font-serif text-right text-base text-gray-800 leading-8" : ""}`}
-                                    >
-                                        {isUrdu ? descUr : (localT > 2 ? descEn.substring(0, Math.floor((localT - 2) * 25)) : "")}
-                                    </motion.p>
-                                </AnimatePresence>
-                                {!isUrdu && localT > 2 && localT < 5 && <span className="animate-pulse">|</span>}
-                            </div>
-                        </FocusArea>
-
-                        {/* Grid */}
-                        <motion.div
-                            animate={{
-                                filter: (focusSection === 'title' || focusSection === 'desc' || focusSection === 'date' || focusSection === 'lang') ? "blur(3px)" : "blur(0px)",
-                                opacity: (focusSection === 'title' || focusSection === 'desc' || focusSection === 'date' || focusSection === 'lang') ? 0.4 : 1
-                            }}
-                            className="grid grid-cols-2 gap-6"
-                        >
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">QUESTION COUNT:</label>
-                                <div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm">
-                                    {localT > 4 ? "35" : "0"}
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">ESTIMATED TIME (MINUTES):</label>
-                                <div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm">
-                                    {localT > 4 ? "15" : "5"}
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* Date & Language Toggle Row */}
-                        <div className="grid grid-cols-2 gap-6">
-                            <FocusArea label="EXPIRY DATE" isActive={focusSection === 'date'} icon={<Calendar size={12} />}>
-                                <div className="h-full px-4 flex items-center justify-between text-sm">
-                                    <span className={localT > 5 ? "text-gray-800" : "text-gray-400"}>
-                                        {localT > 5 ? "Feb 28, 2026" : "dd/mm/yyyy"}
-                                    </span>
-                                    <Calendar size={18} className="text-gray-400" />
-                                </div>
-                            </FocusArea>
-
-                            {/* New Language Dropdown */}
-                            <FocusArea label="SURVEY LANGUAGE" isActive={focusSection === 'lang'} icon={<Globe size={12} />}>
-                                <div className="h-full px-4 flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-2">
-                                        {isUrdu ? <span className="text-2xl">🇵🇰</span> : <span className="text-2xl">🇺🇸</span>}
-                                        <span className="font-bold text-gray-700">{isUrdu ? "Urdu (اردو)" : "English (Default)"}</span>
-                                    </div>
-                                    <ChevronDown size={16} className="text-gray-400" />
-                                </div>
-                            </FocusArea>
-                        </div>
-                    </div>
-
-                    {/* Filters (Blurred initially) */}
-                    <motion.div
-                        initial={{ opacity: 0.5, filter: "blur(2px)" }}
-                        animate={{ opacity: 0.5, filter: "blur(2px)" }}
-                        className="pt-2"
-                    >
-                        <div className="flex items-center gap-2 mb-4">
-                            <Filter size={20} style={{ color: COLORS.teal, fill: COLORS.teal }} />
-                            <h3 className="font-bold text-xl text-gray-800">Survey Filters</h3>
-                        </div>
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-4 opacity-70">
-                            {["OFFICES", "GENDER", "EMPLOYEE IDS", "DEPARTMENT", "COMPANY IDS", "CNICS"].map((label, i) => (
-                                <div key={label} className="space-y-1">
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">{label}:</label>
-                                    <div className={`bg-white border border-gray-300 rounded-lg p-3 text-sm shadow-sm ${i % 2 === 0 ? 'h-12 flex items-center' : 'h-24'}`}>
-                                        <span className="text-gray-400">Select options...</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* Footer */}
-                    <div className="pt-2 flex justify-end gap-3 opacity-80">
-                        <button className="px-6 py-3 rounded-lg border border-gray-200 text-gray-600 font-bold text-sm bg-white hover:bg-gray-50 shadow-sm">Cancel</button>
-                        <button className="px-6 py-3 rounded-lg text-white font-bold text-sm flex items-center gap-2 shadow-md" style={{ backgroundColor: COLORS.green }}>
-                            <Plus size={18} strokeWidth={3} /> Add Survey
-                        </button>
-                    </div>
-
-                </div>
-            </motion.div>
-        </motion.div>
-    )
-}
-
-
-// ==========================================
-// CUSTOM FOCUS HELPER (Reused from SceneTargeting)
-// ==========================================
-const FocusArea = ({ label, isActive, children, icon, height = "h-14" }: { label: string, isActive: boolean, children: React.ReactNode, icon: React.ReactNode, height?: string }) => {
-    return (
-        <div className="space-y-1 relative z-20">
-            <motion.div
-                animate={{ color: isActive ? COLORS.HeaderStart : "#6B7280" }}
-                className="flex items-center gap-1 mb-1"
-            >
-                <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
-                {isActive && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-green-600">{icon}</motion.span>}
-            </motion.div>
-
-            <motion.div
-                animate={{
-                    scale: isActive ? 1.05 : 1,
-                    borderColor: isActive ? COLORS.HeaderStart : "#D1D5DB",
-                    boxShadow: isActive ? "0 10px 25px -5px rgba(61, 139, 64, 0.2), 0 8px 10px -6px rgba(61, 139, 64, 0.1)" : "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                    zIndex: isActive ? 30 : 0
-                }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                className={`bg-white border rounded-lg ${height} overflow-hidden relative`}
-            >
-                {/* Active Indicator Strip */}
-                {isActive && <motion.div layoutId="activeStripInput" className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-green-600" />}
-
-                {children}
-            </motion.div>
-        </div>
-    )
-}
-
-// ==========================================
 // MAIN COMPONENT EXPORT
 // ==========================================
 export const SceneInitiation = ({ isActive, progress }: SceneProps) => {
     let view = 'intro'      // 0-4s
-    if (progress >= 4 && progress < 8) view = 'dashboard' // 4-8s (Click at 7.5s)
-    else if (progress >= 8 && progress < 12) view = 'details' // 8-12s (Details View)
-    else if (progress >= 12) view = 'modal' // 12-26s (Modal View)
+    if (progress >= 4 && progress < 8) view = 'dashboard' // 4-8s
+    else if (progress >= 8) view = 'details' // 8-12s
 
     return (
-        <div className="w-full h-full font-sans overflow-hidden relative" style={{ backgroundColor: COLORS.Background }}>
+        <div className="w-full h-full font-sans overflow-hidden relative">
             <AnimatePresence mode="wait">
                 {view === 'intro' && <IntroView />}
                 {view === 'dashboard' && <DashboardView progress={progress} />}
                 {view === 'details' && <DetailsView progress={progress} />}
-                {view === 'modal' && <ModalView progress={progress} />}
             </AnimatePresence>
         </div>
     )

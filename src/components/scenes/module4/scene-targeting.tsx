@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import {
-    X, Plus, Filter, Calendar, Check, Hash, Building2, Users, CreditCard
+    X, Plus, Filter, Calendar, Check, Hash, Building2, Users, CreditCard,
+    Languages, Globe, ChevronDown, FileText, Layers
 } from "lucide-react"
 import { useEffect, useRef } from "react"
 
@@ -16,7 +17,6 @@ const COLORS = {
     white: "#FFFFFF",
     bg: "#F5F5F7",
     border: "#DEE2E6",
-    softGreen: "rgba(96, 186, 129, 0.42)",
 }
 
 interface SceneProps {
@@ -24,284 +24,183 @@ interface SceneProps {
     progress: number
 }
 
-// ==========================================
-// SCENE TARGETING (26-46s)
-// "Spotlight Focus" Interaction Model
-// ==========================================
-
 export const SceneTargeting = ({ isActive, progress }: SceneProps) => {
     const modalContentRef = useRef<HTMLDivElement>(null)
+    const localT = Math.max(0, progress - 12)
 
-    // Local time relative to scene start (26s)
-    const localT = Math.max(0, progress - 26)
+    // SCROLL MANAGEMENT
+    const hasScrolledFilters = useRef(false)
+    const hasScrolledCNIC = useRef(false)
 
-    // Auto-scroll to Filters at start of scene (Run once)
-    const hasScrolledRef = useRef(false)
     useEffect(() => {
-        if (!hasScrolledRef.current && localT < 1 && modalContentRef.current) {
-            modalContentRef.current.scrollTo({ top: 400, behavior: 'smooth' })
-            hasScrolledRef.current = true
+        if (!modalContentRef.current) return
+
+        if (localT < 1) {
+            modalContentRef.current.scrollTo({ top: 0, behavior: 'auto' })
+            hasScrolledFilters.current = false
+            hasScrolledCNIC.current = false
+        }
+
+        if (!hasScrolledFilters.current && localT >= 14 && localT < 15) {
+            modalContentRef.current.scrollTo({ top: 320, behavior: 'smooth' })
+            hasScrolledFilters.current = true
+        }
+
+        if (!hasScrolledCNIC.current && localT >= 27) {
+            modalContentRef.current.scrollTo({ top: 650, behavior: 'smooth' })
+            hasScrolledCNIC.current = true
         }
     }, [localT])
 
-    // --- FOCUS LOGIC ---
-    // 0-2s: Offices
-    // 2-4s: Gender
-    // 4-6s: Dept
-    // 6s-13s: IDs (Sampling Start at 7s)
-    // 13s+: CNICs
-
+    // FOCUS & CONTENT LOGIC
     let currentFocus = 'none'
-    if (localT > 1 && localT < 3) currentFocus = 'offices'
-    else if (localT >= 3 && localT < 5) currentFocus = 'gender'
-    else if (localT >= 5 && localT < 7) currentFocus = 'dept'
-    else if (localT >= 7 && localT < 13) currentFocus = 'ids'
-    else if (localT >= 13) currentFocus = 'cnics'
+    if (localT < 2.5) currentFocus = 'title'
+    else if (localT < 5) currentFocus = 'desc'
+    else if (localT < 6.5) currentFocus = 'date'
+    else if (localT < 12) currentFocus = 'lang'
+    else if (localT < 16) currentFocus = 'offices'
+    else if (localT < 18) currentFocus = 'gender'
+    else if (localT < 20) currentFocus = 'dept'
+    else if (localT < 22) currentFocus = 'unit'
+    else if (localT < 27) currentFocus = 'ids'
+    else if (localT < 32) currentFocus = 'cnics'
 
-    // Typing simulation
-    const samplingT = Math.max(0, localT - 7)
-    const sampleIDs = "EMP-042, EMP-089, EMP-103, EMP-156, EMP-204"
-    const currentIDs = samplingT > 0 ? sampleIDs.substring(0, Math.floor(samplingT * 8)) : ""
+    const showLangDropdown = localT > 6.5 && localT < 11.5
+    const isUrduActive = localT >= 7.5 && localT < 12
+    const showSuccessToast = localT >= 32 && localT < 34.5
 
-    const sampleCNICs = "35202-1844932-1, 35201-9928374-3, 33100-9283711-2"
-    const currentCNICs = samplingT > 6 ? sampleCNICs.substring(0, Math.floor((samplingT - 6) * 10)) : ""
+    const currentTitle = isUrduActive ? "ملازمین کی بہبود کا سروے - سہ ماہی 1 2026" : "Employee Wellbeing Survey - Q1 2026"
+    const currentDesc = isUrduActive ? "تمام برانچوں میں ہمارے ملازمین کے عمومی جذبات، بہبود اور حفاظت کی جانچ کرنے کے لیے ایک باقاعدہ نبض چیک۔" : "A regular pulse check to screen the general sentiment, wellbeing and safety of our employees across all branches."
 
-    let showOffices = localT > 1
-    let showGender = localT > 3
-    let showDept = localT > 5
-
-    // EXIT LOGIC (Start at 18s local -> 44s global)
-    const isExiting = localT > 18
-
-    // Force visible when exiting
-    if (isExiting) {
-        showOffices = true
-        showGender = true
-        showDept = true
-        currentFocus = 'none'
-    }
+    const currentIDs = localT > 22 ? "EMP-042, EMP-089, EMP-103, EMP-156, EMP-204".substring(0, Math.floor((localT - 22) * 12)) : ""
+    const currentCNICs = localT > 27 ? "35202-1844932-1, 35201-9928374-3, 33100-9283711-2".substring(0, Math.floor((localT - 27) * 15)) : ""
 
     return (
-        <div className="w-full h-full font-sans overflow-hidden relative" style={{ backgroundColor: COLORS.bg }}>
-            <motion.div
-                initial={{ opacity: 1 }}
-                animate={isExiting ? { y: -800, opacity: 0 } : { y: 0, opacity: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut" }}
-                className="w-full h-full flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-8 absolute inset-0"
-            >
-                <div className="relative w-full max-w-5xl">
-                    {/* SUCCESS TOAST on Exit */}
+        <div className="w-full h-full font-sans overflow-hidden relative">
+            {/* Standard div instead of motion.div to avoid transition locks */}
+            <div className="w-full h-full flex items-center justify-center bg-black/50 backdrop-blur-[2px] z-10 p-6 absolute inset-0">
+                <div className="relative w-full max-w-4xl h-[85%] flex flex-col">
+
+                    {/* SUCCESS TOAST */}
                     <AnimatePresence>
-                        {isExiting && (
+                        {showSuccessToast && (
                             <motion.div
-                                initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                                initial={{ opacity: 0, y: 30, scale: 0.9 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-green-600 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 text-xl font-bold"
+                                exit={{ opacity: 0, y: -20 }}
+                                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-green-600 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-lg font-bold"
                             >
-                                <div className="p-2 bg-white/20 rounded-full"><Check size={24} /></div>
-                                Survey Launched Successfully!
+                                <Check size={20} /> Survey Launched Successfully!
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    <motion.div
-                        className="w-full bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-full"
-                        style={{ filter: isExiting ? "blur(4px)" : "none" }} // Blur the modal backing as we leave
-                        layout
-                    >
-                        {/* Header with increased padding matching SceneInitiation */}
-                        <div className="h-28 flex items-center justify-between px-8 bg-gradient-to-r relative z-20"
-                            style={{ background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.darkTeal})` }}
-                        >
-                            <div>
-                                <div className="flex items-center gap-3 text-white mb-2">
-                                    <Plus size={28} strokeWidth={3} /> <h2 className="text-3xl font-bold">Add New Survey</h2>
+                    <div className="w-full bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col h-full border border-gray-100 relative">
+                        {/* Header */}
+                        <div className="h-16 flex items-center justify-between px-6 shrink-0" style={{ background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.darkTeal})` }}>
+                            <div className="flex flex-col text-white">
+                                <div className="flex items-center gap-2">
+                                    <Plus size={20} strokeWidth={3} /> <h2 className="text-xl font-bold">Add New Survey</h2>
                                 </div>
-                                <p className="text-white/90 text-sm font-medium">Create a new survey with advanced filters and settings</p>
                             </div>
-                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors">
-                                <X size={20} className="text-white" />
+                            <X size={16} className="text-white cursor-pointer" />
+                        </div>
+
+                        {/* Scrollable Form Content */}
+                        <div ref={modalContentRef} className="p-6 space-y-6 overflow-y-auto flex-1 bg-[#F8FAFC]">
+                            <FocusArea label="SURVEY TITLE" isActive={currentFocus === 'title' || currentFocus === 'lang'} icon={<Languages size={10} />} height="h-10">
+                                <div className={`h-full px-3 flex items-center text-xs ${isUrduActive ? "text-right justify-end font-serif text-base text-green-700" : "text-gray-700"}`}>
+                                    {currentTitle}
+                                </div>
+                            </FocusArea>
+
+                            <FocusArea label="DESCRIPTION" isActive={currentFocus === 'desc' || currentFocus === 'lang'} icon={<FileText size={10} />} height="h-20">
+                                <div className={`h-full p-3 text-[11px] ${isUrduActive ? "text-right font-serif text-sm leading-relaxed" : "text-gray-600"}`}>
+                                    {currentDesc}
+                                </div>
+                            </FocusArea>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <FocusArea label="EXPIRY DATE" isActive={currentFocus === 'date'} icon={<Calendar size={10} />} height="h-10">
+                                    <div className="h-full px-3 flex items-center justify-between text-xs text-gray-800">
+                                        <span>Feb 28, 2026</span> <Calendar size={14} className="text-gray-400" />
+                                    </div>
+                                </FocusArea>
+
+                                <FocusArea label="SURVEY LANGUAGE" isActive={currentFocus === 'lang'} icon={<Globe size={10} />} height="h-10">
+                                    <div className="h-full px-3 flex items-center justify-between text-xs relative">
+                                        <div className="flex items-center gap-1.5 font-bold text-gray-700">
+                                            <span>{isUrduActive ? "🇵🇰 Urdu (اردو)" : "🇺🇸 English"}</span>
+                                        </div>
+                                        <ChevronDown size={14} className="text-gray-400" />
+                                        {showLangDropdown && (
+                                            <div className="absolute top-10 left-0 w-full bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-2">
+                                                <div className={`p-2 rounded flex justify-between text-[10px] ${isUrduActive ? 'bg-teal-50 text-teal-700' : 'text-gray-600'}`}>
+                                                    Urdu (اردو) {isUrduActive && <Check size={10} />}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </FocusArea>
+                            </div>
+
+                            {/* Targeted Filters */}
+                            <div className="pt-2 space-y-4">
+                                <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
+                                    <Filter size={16} style={{ color: COLORS.teal }} />
+                                    <h3 className="font-bold text-gray-800">Survey Filters</h3>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <FocusArea label="OFFICES" isActive={currentFocus === 'offices'} icon={<Building2 size={10} />} height="h-11">
+                                        <div className="h-full px-2 flex items-center">
+                                            {localT > 14 && <span className="bg-green-50 text-green-700 px-2 py-1 rounded text-[10px] font-bold">Head Office</span>}
+                                        </div>
+                                    </FocusArea>
+                                    <FocusArea label="GENDER" isActive={currentFocus === 'gender'} icon={<Users size={10} />} height="h-11">
+                                        <div className="h-full px-2 flex items-center">
+                                            {localT > 16 && <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded text-[10px] font-bold">Female</span>}
+                                        </div>
+                                    </FocusArea>
+                                    <FocusArea label="DEPARTMENT" isActive={currentFocus === 'dept'} icon={<Building2 size={10} />} height="h-11">
+                                        <div className="h-full px-2 flex items-center">
+                                            {localT > 18 && <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] font-bold">IT Support</span>}
+                                        </div>
+                                    </FocusArea>
+                                    <FocusArea label="DESIGNATION" isActive={currentFocus === 'unit'} icon={<Layers size={10} />} height="h-11">
+                                        <div className="h-full px-2 flex items-center">
+                                            {localT > 20 && <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded text-[10px] font-bold">Cloud Ops</span>}
+                                        </div>
+                                    </FocusArea>
+                                    <FocusArea label="EMPLOYEE IDS" isActive={currentFocus === 'ids'} icon={<Hash size={10} />} height="h-24">
+                                        <div className="h-full p-3 font-mono text-[11px] text-gray-800">{currentIDs}</div>
+                                    </FocusArea>
+                                    <FocusArea label="CNICS" isActive={currentFocus === 'cnics'} icon={<CreditCard size={10} />} height="h-24">
+                                        <div className="h-full p-3 font-mono text-[11px] text-gray-800">{currentCNICs}</div>
+                                    </FocusArea>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Content - Hidden Scrollbar */}
-                        <div
-                            ref={modalContentRef}
-                            className="p-8 space-y-8 overflow-hidden relative h-full bg-[#F8FAFC]"
-                        >
-
-                            {/* === SECTION 1: BASIC INFO (Blurred) === */}
-                            <motion.div
-                                animate={{
-                                    filter: isExiting ? "blur(0px)" : "blur(3px)",
-                                    opacity: isExiting ? 1 : 0.4,
-                                }}
-                                className="space-y-4 pointer-events-none origin-top"
-                            >
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">SURVEY TITLE:</label>
-                                    <div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm text-gray-700">
-                                        Employee Wellbeing Survey - Q1 2026
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">DESCRIPTION:</label>
-                                    <div className="h-24 bg-white border border-gray-300 rounded-lg p-4 text-sm shadow-sm text-gray-600">
-                                        A regular pulse check to screen the general sentiment, wellbeing and safety of our employees across all branches.
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">QUESTION COUNT:</label><div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm">35</div></div>
-                                    <div><label className="text-xs font-bold text-gray-500 uppercase mb-1 block">ESTIMATED TIME (MINUTES):</label><div className="h-12 bg-white border border-gray-300 rounded-lg px-4 flex items-center text-sm shadow-sm">15</div></div>
-                                </div>
-                            </motion.div>
-
-                            {/* === SECTION 2: FILTERS === */}
-                            <div className="pt-2 relative z-10">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Filter size={20} style={{ color: COLORS.teal, fill: COLORS.teal }} />
-                                    <h3 className="font-bold text-xl text-gray-800">Survey Filters</h3>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-
-                                    {/* 1. OFFICES */}
-                                    <FocusArea label="OFFICES" isActive={currentFocus === 'offices' || isExiting} icon={<Building2 size={12} />} height="h-12">
-                                        <div className="h-full px-1.5 flex items-center overflow-hidden">
-                                            <AnimatePresence>
-                                                {showOffices ? (
-                                                    <motion.div
-                                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-                                                        className="bg-green-100 text-green-700 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2"
-                                                    >
-                                                        <Building2 size={12} /> Head Office <X size={10} className="cursor-pointer hover:text-green-900" />
-                                                    </motion.div>
-                                                ) : <span className="text-gray-400 ml-2 text-sm">Select options...</span>}
-                                            </AnimatePresence>
-                                        </div>
-                                    </FocusArea>
-
-                                    {/* 2. GENDER */}
-                                    <FocusArea label="GENDER" isActive={currentFocus === 'gender' || isExiting} icon={<Users size={12} />} height="h-12">
-                                        <div className="h-full px-1.5 flex items-center overflow-hidden">
-                                            <AnimatePresence>
-                                                {showGender ? (
-                                                    <motion.div
-                                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-                                                        className="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2"
-                                                    >
-                                                        <Users size={12} /> Female <X size={10} className="cursor-pointer hover:text-purple-900" />
-                                                    </motion.div>
-                                                ) : <span className="text-gray-400 ml-2 text-sm">Select options...</span>}
-                                            </AnimatePresence>
-                                        </div>
-                                    </FocusArea>
-
-                                    {/* 3. EMPLOYEE IDS */}
-                                    <FocusArea
-                                        label="EMPLOYEE IDS"
-                                        isActive={currentFocus === 'ids' || isExiting}
-                                        icon={<Hash size={12} />}
-                                        height="h-24"
-                                    >
-                                        <div className="h-full p-3 font-mono text-sm leading-relaxed">
-                                            {currentIDs.length > 0 ? (
-                                                <span className="text-gray-800">{currentIDs}<span className="inline-block w-1.5 h-4 bg-green-500 ml-1 animate-pulse align-middle" /></span>
-                                            ) : <span className="text-gray-400 italic">Enter employee IDs...</span>}
-                                        </div>
-                                    </FocusArea>
-
-                                    {/* 4. DEPARTMENT */}
-                                    <FocusArea label="DEPARTMENT" isActive={currentFocus === 'dept' || isExiting} icon={<Building2 size={12} />} height="h-12">
-                                        <div className="h-full px-1.5 flex items-center overflow-hidden">
-                                            <AnimatePresence>
-                                                {showDept ? (
-                                                    <motion.div
-                                                        initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-                                                        className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-2"
-                                                    >
-                                                        <Building2 size={12} /> IT Support <X size={10} className="cursor-pointer hover:text-blue-900" />
-                                                    </motion.div>
-                                                ) : <span className="text-gray-400 ml-2 text-sm">Select options...</span>}
-                                            </AnimatePresence>
-                                        </div>
-                                    </FocusArea>
-
-                                    {/* 5. COMPANY IDS */}
-                                    <div className="space-y-1 opacity-50 filter blur-[2px]">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">COMPANY IDS:</label>
-                                        <div className="bg-white border border-gray-300 rounded-lg p-3 text-sm shadow-sm h-24 flex items-center">
-                                            <span className="text-gray-400">Enter company IDs...</span>
-                                        </div>
-                                    </div>
-
-                                    {/* 6. CNICS */}
-                                    <FocusArea
-                                        label="CNICS"
-                                        isActive={currentFocus === 'cnics' || isExiting}
-                                        icon={<CreditCard size={12} />}
-                                        height="h-24"
-                                    >
-                                        <div className="h-full p-3 font-mono text-sm leading-relaxed">
-                                            {currentCNICs.length > 0 ? (
-                                                <span className="text-gray-800">{currentCNICs}<span className="inline-block w-1.5 h-4 bg-green-500 ml-1 animate-pulse align-middle" /></span>
-                                            ) : <span className="text-gray-400 italic">Enter CNICs...</span>}
-                                        </div>
-                                    </FocusArea>
-
-                                </div>
-                            </div>
-
-                            {/* Footer */}
-                            <div className="pt-2 flex justify-end gap-3 opacity-80">
-                                <button className="px-6 py-3 rounded-lg border border-gray-200 text-gray-600 font-bold text-sm bg-white hover:bg-gray-50 shadow-sm">Cancel</button>
-                                <button className="px-6 py-3 rounded-lg text-white font-bold text-sm flex items-center gap-2 shadow-md" style={{ backgroundColor: COLORS.green }}>
-                                    <Plus size={18} strokeWidth={3} /> Add Survey
-                                </button>
-                            </div>
-
+                        <div className="px-6 py-3 bg-white border-t flex justify-end gap-3">
+                            <button className="px-6 py-1.5 rounded-lg text-white font-extrabold text-[11px]" style={{ backgroundColor: COLORS.green }}>
+                                Add Survey
+                            </button>
                         </div>
-                    </motion.div >
+                    </div>
                 </div>
-            </motion.div >
-        </div >
-    )
-}
-
-// ==========================================
-//  HELPER COMPONENTS
-// ==========================================
-
-const FocusArea = ({ label, isActive, children, icon, height = "h-24" }: { label: string, isActive: boolean, children: React.ReactNode, icon: React.ReactNode, height?: string }) => {
-    return (
-        <div className="space-y-1 relative z-20">
-            <motion.div
-                animate={{ color: isActive ? COLORS.teal : "#6B7280" }}
-                className="flex items-center gap-1 mb-1"
-            >
-                <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
-                {isActive && <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-green-600">{icon}</motion.span>}
-            </motion.div>
-
-            <motion.div
-                animate={{
-                    scale: isActive ? 1.05 : 1,
-                    borderColor: isActive ? COLORS.teal : "#D1D5DB",
-                    boxShadow: isActive ? `0 10px 25px -5px rgba(15, 150, 144, 0.2), 0 8px 10px -6px rgba(15, 150, 144, 0.1)` : "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                    zIndex: isActive ? 30 : 0,
-                    filter: isActive ? "blur(0px)" : "blur(2px)",
-                    opacity: isActive ? 1 : 0.5
-                }}
-                transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
-                className={`bg-white border rounded-lg ${height} overflow-hidden relative`}
-            >
-                {/* Active Indicator Strip */}
-                {isActive && <motion.div layoutId="activeStrip" className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-green-500 to-green-600" />}
-
-                {children}
-            </motion.div>
+            </div>
         </div>
     )
 }
 
-
+const FocusArea = ({ label, isActive, children, icon, height = "h-11" }: { label: string, isActive: boolean, children: React.ReactNode, icon: React.ReactNode, height?: string }) => (
+    <div className="space-y-1">
+        <div className="flex items-center gap-1 px-0.5">
+            <span className={`text-[9px] font-extrabold uppercase tracking-widest ${isActive ? 'text-teal-600' : 'text-gray-400'}`}>{label}</span>
+            {isActive && icon}
+        </div>
+        <div className={`bg-white border rounded-lg ${height} transition-all duration-300 ${isActive ? 'border-teal-500 shadow-md scale-[1.01]' : 'border-gray-200 opacity-60'}`}>
+            {children}
+        </div>
+    </div>
+)

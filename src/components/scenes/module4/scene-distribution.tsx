@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { Server, Radio, Users, MessageSquare, Smartphone, Check, Signal, Link } from "lucide-react"
+import { Server, Radio, Users, MessageSquare, Smartphone, Check, Signal, Link, ChevronRight, ArrowLeft } from "lucide-react"
 import { useMemo } from "react"
 
 // --- SYSTEM COLORS ---
@@ -13,14 +13,13 @@ const COLORS = {
     white: "#FFFFFF",
     bg: "#F5F5F7",
     orange: "#FB923C",
+    red: "#E53E3E",
 }
 
 interface SceneProps {
     isActive: boolean
     progress: number
 }
-
-
 
 // ==========================================
 // SCENE DISTRIBUTION (46s - 63s)
@@ -44,7 +43,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
     )), [])
 
     return (
-        <div className="w-full h-full font-sans overflow-hidden relative flex items-center justify-center p-8" style={{ backgroundColor: COLORS.bg }}>
+        <div className="w-full h-full font-sans overflow-hidden relative flex items-center justify-center p-8">
 
             {/* BACKGROUND PATTERN */}
             <div className="absolute inset-0 grid grid-cols-[repeat(20,minmax(0,1fr))] opacity-[0.03] pointer-events-none">
@@ -221,17 +220,17 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                         transition={{ type: "spring", damping: 20, stiffness: 100 }}
                         className="relative z-20"
                     >
-                        <div className="w-[300px] h-[580px] bg-[#1a1a1a] rounded-[48px] border-[12px] border-[#2c2c2c] shadow-2xl overflow-hidden relative flex flex-col">
+                        <div className="w-[300px] h-[600px] bg-[#1a1a1a] rounded-[48px] border-[12px] border-[#2c2c2c] shadow-2xl overflow-hidden relative flex flex-col">
 
                             {/* Dynamic Island */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-b-2xl z-20" />
 
                             {/* --- SCREEN CONTENT --- */}
-                            <div className="flex-1 bg-white relative flex flex-col overflow-hidden">
+                            <div className="flex-1 bg-white relative flex flex-col overflow-hidden rounded-[36px]">
 
                                 {/* Status Bar */}
                                 <div className="h-10 flex justify-between items-end px-6 pb-2 text-[10px] font-bold text-gray-800 bg-transparent z-10 relative">
-                                    <span>24 Jan</span>
+                                    <span>9:41</span>
                                     <div className="flex gap-1.5 items-center">
                                         <Signal size={12} />
                                         <div className="w-5 h-3 bg-gray-800 rounded-[3px]" />
@@ -239,92 +238,139 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                 </div>
 
                                 {/* LOCK SCREEN */}
-                                <AnimatePresence>
+                                <AnimatePresence mode="wait">
                                     {mobileState === 'lock' && (
                                         <motion.div
                                             key="lock"
-                                            exit={{ y: -600, opacity: 0 }}
-                                            transition={{ duration: 0.5, ease: "easeInOut" }}
-                                            className="absolute inset-0 z-10 bg-cover bg-center flex flex-col items-center pt-20"
-                                            style={{ backgroundImage: "linear-gradient(to bottom, #d1d5db, #9ca3af)" }}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0, scale: 1.1 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="absolute inset-0 z-10 flex flex-col items-center pt-20"
                                         >
-                                            <div className="text-6xl font-thin text-white mb-2 mix-blend-overlay">09:41</div>
-                                            <div className="text-sm font-medium text-white/90 mix-blend-overlay mb-8">Tuesday, January 24</div>
+                                            {/* Wallpaper */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-purple-500 opacity-20" />
+                                            <div className="absolute inset-0 backdrop-blur-md bg-white/30" />
+
+                                            {/* Time */}
+                                            <div className="relative text-6xl font-thin text-gray-800 mb-2 tracking-tighter">9:41</div>
+                                            <div className="relative text-sm font-medium text-gray-600 mb-8">Wednesday, January 28</div>
 
                                             {/* Notification */}
                                             <motion.div
-                                                initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-                                                className="w-[90%] bg-white/80 backdrop-blur-xl rounded-2xl p-4 shadow-lg"
+                                                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                                transition={{ delay: 0.2, type: "spring" }}
+                                                className="w-[90%] bg-white/60 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-white/40 cursor-pointer"
+                                                whileTap={{ scale: 0.98 }}
                                             >
                                                 <div className="flex justify-between items-center mb-2">
                                                     <div className="flex items-center gap-1.5">
-                                                        <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
+                                                        <div className="w-6 h-6 bg-gray-900 rounded-lg flex items-center justify-center">
                                                             <MessageSquare size={12} className="text-white" fill="white" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold text-gray-600 uppercase">MESSAGES</span>
+                                                        <span className="text-[10px] font-bold text-gray-600 uppercase tracking-wide">MESSAGES</span>
                                                     </div>
                                                     <span className="text-[10px] text-gray-500">now</span>
                                                 </div>
-                                                <div className="text-xs font-bold text-gray-900 mb-0.5">FOS Survey</div>
-                                                <div className="text-xs text-gray-600 leading-snug">
-                                                    You have been invited to participate in the Employee Wellbeing Survey...
+                                                <div className="text-xs font-bold text-gray-900 mb-0.5">FOS Hotline</div>
+                                                <div className="text-xs text-gray-600 leading-snug line-clamp-2">
+                                                    Dear Company A Employee, Company A has launched an Organizational Effectiveness & Engagement Survey...
                                                 </div>
                                             </motion.div>
 
-                                            <div className="mt-auto mb-8 w-32 h-1 bg-white/50 rounded-full" />
+                                            <div className="mt-auto mb-6 w-32 h-1 bg-gray-400/50 rounded-full" />
+                                        </motion.div>
+                                    )}
+
+                                    {/* SMS APP */}
+                                    {mobileState === 'sms' && (
+                                        <motion.div
+                                            key="sms"
+                                            initial={{ opacity: 0, y: 50 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="flex-1 bg-white flex flex-col pt-2"
+                                        >
+                                            {/* App Header */}
+                                            <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 bg-white/80 backdrop-blur-lg z-10">
+                                                <ArrowLeft size={20} className="text-blue-500" />
+                                                <div className="flex-1 flex flex-col items-center pr-5">
+                                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mb-1">
+                                                        <span className="text-[10px] font-bold text-gray-500">FT</span>
+                                                    </div>
+                                                    <span className="text-xs font-semibold text-gray-900">FOS Team - HRDD</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Messages */}
+                                            <div className="flex-1 p-4 bg-gray-50 overflow-y-auto">
+                                                <div className="text-center text-[10px] text-gray-400 font-medium mb-4">Text Message • Today 9:41 AM</div>
+
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.9, originX: 0 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    transition={{ type: "spring" }}
+                                                    className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm p-4 max-w-[95%] shadow-sm text-sm text-gray-900"
+                                                >
+                                                    <p className="mb-3 leading-relaxed">
+                                                        Dear Company A Employee,
+                                                        <br /><br />
+                                                        Company A has launched an Organizational Effectiveness & Engagement Survey.
+                                                        <br /><br />
+                                                        Please fill it using FOS Hotline App or this link:
+                                                    </p>
+
+                                                    {/* Link Preview */}
+                                                    <motion.div
+                                                        className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 mb-3 cursor-pointer"
+                                                        whileHover={{ scale: 1.02 }}
+                                                        whileTap={{ scale: 0.98 }}
+                                                    >
+                                                        <div className="h-24 bg-gray-50 flex items-center justify-center relative overflow-hidden group">
+                                                            <div className="absolute inset-0 bg-green-50 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                                            <div className="relative z-10 flex flex-col items-center gap-2">
+                                                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                                                    <Link size={20} />
+                                                                </div>
+                                                                <span className="font-bold text-green-700 text-xs">FOS Survey Portal</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="p-3 bg-white">
+                                                            <div className="text-xs font-bold text-gray-900 mb-0.5">Start Survey</div>
+                                                            <div className="text-[10px] text-gray-500">fruitofsustainability.com</div>
+                                                        </div>
+                                                    </motion.div>
+
+                                                    <p className="leading-relaxed text-xs text-gray-600">
+                                                        Your FOS ID is: <span className="font-bold text-gray-900 select-all">1019549</span> or use your CNIC.
+                                                        <br /><br />
+                                                        Regards,<br />
+                                                        FOS Team - HRDD Division
+                                                    </p>
+                                                </motion.div>
+
+                                                {/* Start Button Hint */}
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: 1.5 }}
+                                                    className="flex justify-center mt-6"
+                                                >
+                                                    <div className="bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 cursor-pointer animate-pulse">
+                                                        Tap link to start <ChevronRight size={12} />
+                                                    </div>
+                                                </motion.div>
+                                            </div>
+
+                                            {/* Input Area */}
+                                            <div className="p-3 bg-gray-50 border-t border-gray-200">
+                                                <div className="h-9 bg-white border border-gray-300 rounded-full px-4 flex items-center text-gray-400 text-xs">
+                                                    Text Message
+                                                </div>
+                                            </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-
-                                {/* SMS APP */}
-                                <motion.div className="flex-1 bg-white flex flex-col pt-12">
-                                    {/* App Header */}
-                                    <div className="h-14 border-b border-gray-100 flex items-center px-4 gap-3 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-                                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs">FS</div>
-                                        <div className="flex-1">
-                                            <div className="font-bold text-sm text-gray-900">FOS Survey</div>
-                                            <div className="text-[10px] text-gray-400">To: You</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Messages */}
-                                    <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-                                        <div className="text-center text-[10px] text-gray-400 font-medium my-4">Today 9:41 AM</div>
-
-                                        <motion.div
-                                            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-                                            className="bg-gray-100 rounded-2xl rounded-tl-sm p-4 max-w-[85%] self-start text-sm text-gray-800 leading-relaxed shadow-sm"
-                                        >
-                                            <p className="mb-3">Dear Employee, please complete the <span className="font-bold">Wellbeing Survey Q1</span>. Your feedback is valuable.</p>
-                                            <div className="bg-white rounded-xl p-3 border border-gray-200 flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600">
-                                                    <Link size={20} />
-                                                </div>
-                                                <div>
-                                                    <div className="font-bold text-xs text-teal-700">fruitofsustainability.com</div>
-                                                    <div className="text-[10px] text-gray-400">Tap to start survey</div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-
-                                        <motion.div
-                                            initial={{ opacity: 0, scale: 0 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 2, type: 'spring' }}
-                                            className="self-center mt-4"
-                                        >
-                                            <div className="bg-teal-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg cursor-pointer">
-                                                Start Survey &rarr;
-                                            </div>
-                                        </motion.div>
-                                    </div>
-
-                                    {/* Input Placeholder */}
-                                    <div className="h-16 border-t border-gray-100 p-3 flex items-center gap-3 bg-gray-50">
-                                        <div className="w-8 h-8 rounded-full bg-gray-200" />
-                                        <div className="flex-1 h-10 bg-white border border-gray-200 rounded-full" />
-                                    </div>
-                                </motion.div>
                             </div>
 
                             {/* Reflection Overlay */}
