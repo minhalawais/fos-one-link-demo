@@ -224,8 +224,8 @@ const LoginScreen = ({ stage }: { stage: number }) => {
             transition={{ delay: 0.15, duration: 0.4 }}
             className="text-center"
           >
-            <div className="w-20 h-20 mx-auto mb-4 relative rounded-full bg-gradient-to-br from-[#284952] to-[#60BA81] flex items-center justify-center">
-              <span className="text-white font-bold text-xl">FOS</span>
+            <div className="w-28 h-28 mx-auto mb-4 relative rounded-2xl bg-white flex items-center justify-center shadow-lg border border-gray-100 overflow-hidden">
+              <img src="/assets/images/FOS-01.png" alt="FOS Logo" className="w-[100%] h-[100%] object-contain" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight mb-2" style={{ color: COLORS.charcoal }}>
               Login
@@ -389,49 +389,57 @@ const PortalDashboard = ({ stage }: { stage: number }) => {
       style={{ backgroundColor: COLORS.lightGray }}
     >
       <div className="scale-[0.65] origin-top-left p-6 w-[154%]">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.1, duration: 0.5, ease: EASE }}
-            className="flex items-center gap-4"
-          >
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-bold"
-              style={{
-                backgroundColor: COLORS.deepTeal,
-                boxShadow: "0 4px 12px rgba(40, 73, 82, 0.3)",
-              }}
+        {/* Header / Topbar */}
+        <div
+          className="flex items-center justify-between mb-8 px-8 py-4 bg-white rounded-3xl shadow-sm border border-gray-100 relative"
+          style={{ height: "90px" }}
+        >
+          {/* Left Section (Logo) */}
+          <div className="w-1/4 flex justify-start">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="w-24 h-16 flex items-center justify-center p-1"
             >
-              FOS
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight" style={{ color: COLORS.charcoal }}>
-                Grievance Management Portal
-              </h1>
-              <p className="text-xs font-medium mt-0.5" style={{ color: COLORS.mediumGray }}>
+              <img src="/assets/images/vertical_logo.png" alt="FOS Logo" className="w-full h-full object-contain" />
+            </motion.div>
+          </div>
+
+          {/* Center Section (Heading) */}
+          <div className="flex-1 flex flex-col items-center justify-center text-center">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <p className="text-[11px] font-black tracking-[0.3em] mb-0.5 leading-none" style={{ color: COLORS.freshGreen }}>
                 MULTAN47
               </p>
-            </div>
-          </motion.div>
-          <motion.button
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            whileHover={{ scale: 1.02 }}
-            transition={{ delay: 0.1, duration: 0.5, ease: EASE }}
-            className="px-5 py-2.5 rounded-xl text-white text-sm font-semibold flex items-center gap-2"
-            style={{
-              backgroundColor: COLORS.freshGreen,
-              boxShadow: "0 4px 12px rgba(96, 186, 129, 0.25)",
-            }}
-          >
-            <span>Logout</span>
-          </motion.button>
+              <h1 className="text-2xl font-black tracking-tight leading-tight" style={{ color: COLORS.charcoal }}>
+                Grievance Management Portal
+              </h1>
+            </motion.div>
+          </div>
+
+          {/* Right Section (Logout Button) */}
+          <div className="w-1/4 flex justify-end">
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              whileHover={{ scale: 1.02 }}
+              className="px-5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md"
+              style={{
+                backgroundColor: COLORS.freshGreen,
+                boxShadow: "0 4px 12px rgba(96, 186, 129, 0.2)",
+              }}
+            >
+              Logout
+            </motion.button>
+          </div>
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-5 gap-6 mb-8 mt-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}

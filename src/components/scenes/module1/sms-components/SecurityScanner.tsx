@@ -3,18 +3,32 @@
 import { motion } from "framer-motion"
 import { ScanLine, Check, Lock, Fingerprint } from "lucide-react"
 
-export const SecurityScanner = ({ active }: { active: boolean }) => {
+export const SecurityScanner = ({ active, employee, fosId }: { active: boolean, employee: any, fosId: string }) => {
+    if (!employee) return null;
+
+    // Extract CNIC digits for highlighting - using last 4 chars because of the dash (e.g., "10-1")
+    const cnicTail = employee.cnic.slice(-4);
+    const fosIdTail = fosId.slice(-3);
     return (
         <div className="relative w-full max-w-lg h-40 flex items-center justify-between px-8">
 
             {/* Left Node: FOS ID */}
             <motion.div
-                className="w-24 h-24 bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col items-center justify-center relative z-10"
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: active ? 0 : 50, opacity: active ? 1 : 0 }}
+                className="w-28 h-24 bg-white rounded-xl shadow-lg border border-gray-100 flex flex-col items-center justify-center relative z-10 overflow-hidden"
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: active ? 0 : 30, opacity: active ? 1 : 0 }}
             >
                 <span className="text-[10px] text-gray-400 font-bold mb-1">FOS ID</span>
-                <span className="text-xl font-bold text-[#284952]">475<span className="text-[#60BA81]">02</span></span>
+                <span className="text-xl font-bold text-[#284952]">
+                    {fosId.slice(0, 3)}
+                    <span className="text-[#60BA81] border-b-2 border-[#60BA81]/30">{fosIdTail}</span>
+                </span>
+                {/* Match Pulse */}
+                <motion.div
+                    className="absolute inset-0 bg-[#60BA81]/5"
+                    animate={{ opacity: [0, 0.2, 0] }}
+                    transition={{ delay: 1.5, duration: 1, repeat: Infinity }}
+                />
             </motion.div>
 
             {/* Center Link: Scanner */}
@@ -46,28 +60,30 @@ export const SecurityScanner = ({ active }: { active: boolean }) => {
                         className="absolute top-4 bg-[#284952] text-white px-3 py-1 rounded-full text-[10px] flex items-center gap-1.5 shadow-xl z-30"
                     >
                         <Fingerprint size={10} className="text-[#60BA81]" />
-                        <span>Biometric Match</span>
+                        <span>Identity Mapping</span>
                     </motion.div>
                 )}
             </div>
 
             {/* Right Node: CNIC */}
             <motion.div
-                className="w-24 h-24 bg-[#E6F4EA] rounded-xl shadow-lg border border-[#60BA81]/20 flex flex-col items-center justify-center relative z-10"
-                initial={{ x: -50, opacity: 0 }}
-                animate={{ x: active ? 0 : -50, opacity: active ? 1 : 0 }}
+                className="w-28 h-24 bg-[#E6F4EA] rounded-xl shadow-lg border border-[#60BA81]/20 flex flex-col items-center justify-center relative z-10 overflow-hidden"
+                initial={{ x: -30, opacity: 0 }}
+                animate={{ x: active ? 0 : -30, opacity: active ? 1 : 0 }}
             >
                 <div className="absolute top-2 right-2">
                     <Lock size={10} className="text-[#60BA81]" />
                 </div>
-                <span className="text-[10px] text-[#60BA81] font-bold mb-1">CNIC</span>
-                <div className="flex gap-0.5">
-                    <div className="w-1 h-3 bg-[#60BA81] rounded-sm" />
-                    <div className="w-1 h-3 bg-[#60BA81] rounded-sm" />
-                    <div className="w-1 h-3 bg-[#60BA81] rounded-sm" />
-                    <div className="w-1 h-3 bg-[#60BA81]/50 rounded-sm" />
+                <span className="text-[10px] text-[#60BA81] font-bold mb-1">REGISTERED CNIC</span>
+                <span className="text-[10px] font-mono font-bold text-[#284952] tracking-tight">
+                    {employee.cnic.slice(0, -4)}
+                    <span className="text-white bg-[#60BA81] px-0.5 rounded ml-0.5">{cnicTail}</span>
+                </span>
+                <div className="flex gap-1 mt-2">
+                    <div className="w-1.5 h-1.5 bg-[#60BA81] rounded-full" />
+                    <div className="w-1.5 h-1.5 bg-[#60BA81] rounded-full" />
+                    <div className="w-1.5 h-1.5 bg-[#60BA81]/30 rounded-full" />
                 </div>
-                <span className="text-[8px] font-mono mt-1 text-[#284952]">35202-***</span>
             </motion.div>
 
         </div>

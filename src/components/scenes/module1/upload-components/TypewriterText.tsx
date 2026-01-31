@@ -1,48 +1,24 @@
-"use client"
+import React, { useState, useEffect } from "react"
 
-import React from "react"
-import { motion } from "framer-motion"
+export const TypewriterText = ({ text, delay = 0, className = "" }: any) => {
+    const [displayText, setDisplayText] = useState("")
 
-interface TypewriterTextProps {
-    text: string
-    speed?: number
-    cursor?: boolean
-    className?: string
-    onComplete?: () => void
-}
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            let i = 0
+            const interval = setInterval(() => {
+                if (i <= text.length) {
+                    setDisplayText(text.substring(0, i))
+                    i++
+                } else {
+                    clearInterval(interval)
+                }
+            }, 30)
+            return () => clearInterval(interval)
+        }, delay * 1000)
 
-export const TypewriterText: React.FC<TypewriterTextProps> = ({
-    text,
-    speed = 50,
-    cursor = true,
-    className = "",
-    onComplete
-}) => {
-    const [displayedText, setDisplayedText] = React.useState("")
-    const [currentIndex, setCurrentIndex] = React.useState(0)
+        return () => clearTimeout(timer)
+    }, [text, delay])
 
-    React.useEffect(() => {
-        if (currentIndex < text.length) {
-            const timeout = setTimeout(() => {
-                setDisplayedText((prev) => prev + text[currentIndex])
-                setCurrentIndex((prev) => prev + 1)
-            }, speed)
-            return () => clearTimeout(timeout)
-        } else if (onComplete) {
-            onComplete()
-        }
-    }, [currentIndex, text, speed, onComplete])
-
-    return (
-        <span className={className}>
-            {displayedText}
-            {cursor && currentIndex < text.length && (
-                <motion.span
-                    animate={{ opacity: [1, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity }}
-                    className="inline-block w-0.5 h-4 bg-current ml-0.5"
-                />
-            )}
-        </span>
-    )
+    return <span className={className}>{displayText}</span>
 }

@@ -12,7 +12,9 @@ import {
   FileCheck2,
   ScanLine,
   Landmark,
-  Gavel
+  Gavel,
+  Monitor,
+  Key
 } from "lucide-react"
 
 // --- TYPES & DATA ---
@@ -87,7 +89,7 @@ const cardVariants = {
 }
 
 export default function SceneOfficers({ isActive }: { isActive: boolean }) {
-  const [phase, setPhase] = useState<"APPOINTMENT" | "EXPANSION" | "RESPONSIBILITY">("APPOINTMENT")
+  const [phase, setPhase] = useState<"APPOINTMENT" | "EXPANSION" | "RESPONSIBILITY" | "PORTAL">("APPOINTMENT")
 
   // Script Timing Sync
   useEffect(() => {
@@ -98,10 +100,12 @@ export default function SceneOfficers({ isActive }: { isActive: boolean }) {
 
     const t1 = setTimeout(() => setPhase("EXPANSION"), 7000) // 7s: "Multiple officers..."
     const t2 = setTimeout(() => setPhase("RESPONSIBILITY"), 12000) // 12s: "...responsible for managing..."
+    const t3 = setTimeout(() => setPhase("PORTAL"), 18000) // 18s: "Portals Generated..."
 
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
+      clearTimeout(t3)
     }
   }, [isActive])
 
@@ -134,8 +138,12 @@ export default function SceneOfficers({ isActive }: { isActive: boolean }) {
             <AppointmentPhase key="appointment" />
           )}
 
-          {(phase === "EXPANSION" || phase === "RESPONSIBILITY") && (
-            <ExpansionPhase key="expansion" showDuties={phase === "RESPONSIBILITY"} />
+          {(phase === "EXPANSION" || phase === "RESPONSIBILITY" || phase === "PORTAL") && (
+            <ExpansionPhase
+              key="expansion"
+              showDuties={phase === "RESPONSIBILITY"}
+              showPortal={phase === "PORTAL"}
+            />
           )}
         </AnimatePresence>
 
@@ -192,7 +200,7 @@ const AppointmentPhase = () => {
         {/* Candidate Info */}
         <div className="text-center space-y-2 z-10 px-4">
           <div className="inline-block px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-400 mb-1">
-            CANDIDATE IDENTIFIED
+            Investigation Officer Appointed
           </div>
           <h3 className="text-xl font-bold text-[#284952]">Internal Employee</h3>
           <p className="text-xs text-gray-500">Processing Appointment...</p>
@@ -216,7 +224,7 @@ const AppointmentPhase = () => {
       >
         <Fingerprint className="text-[#F5A83C]" size={20} />
         <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-[#284952]">BIO-METRIC</span>
+          <span className="text-[10px] font-bold text-[#284952]">Identity</span>
           <span className="text-[8px] text-gray-400">VERIFIED</span>
         </div>
       </motion.div>
@@ -225,7 +233,8 @@ const AppointmentPhase = () => {
 }
 
 // --- PHASE 2 & 3: EXPANSION & RESPONSIBILITY ---
-const ExpansionPhase = ({ showDuties }: { showDuties: boolean }) => {
+// --- PHASE 2, 3 & 4: EXPANSION, RESPONSIBILITY & PORTAL ---
+const ExpansionPhase = ({ showDuties, showPortal }: { showDuties: boolean, showPortal: boolean }) => {
   return (
     <motion.div
       className="flex flex-col md:flex-row gap-6 items-center justify-center w-full"
@@ -235,7 +244,12 @@ const ExpansionPhase = ({ showDuties }: { showDuties: boolean }) => {
     >
       {OFFICERS.map((officer, index) => (
         <div key={officer.id} className="relative group">
-          <OfficerCard officer={officer} showDuties={showDuties} delay={index * 0.1} />
+          <OfficerCard
+            officer={officer}
+            showDuties={showDuties}
+            showPortal={showPortal}
+            delay={index * 0.1}
+          />
 
           {/* Connection Lines (Desktop only) */}
           {index < OFFICERS.length - 1 && (
@@ -247,7 +261,7 @@ const ExpansionPhase = ({ showDuties }: { showDuties: boolean }) => {
   )
 }
 
-const OfficerCard = ({ officer, showDuties, delay }: { officer: OfficerData, showDuties: boolean, delay: number }) => {
+const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: OfficerData, showDuties: boolean, showPortal: boolean, delay: number }) => {
   const Icon = officer.icon
 
   return (
@@ -305,7 +319,7 @@ const OfficerCard = ({ officer, showDuties, delay }: { officer: OfficerData, sho
         </div>
       </div>
 
-      {/* --- RESPONSIBILITY OVERLAY (Phase 3) --- */}
+      {/* --- RESPONSIBILITY OVERLAY (Phase 3) --- --- */}
       <AnimatePresence>
         {showDuties && (
           <motion.div
@@ -331,6 +345,51 @@ const OfficerCard = ({ officer, showDuties, delay }: { officer: OfficerData, sho
                 animate={{ width: "100%" }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- PORTAL ACCESS OVERLAY (Phase 4) --- --- */}
+      <AnimatePresence>
+        {showPortal && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.1 }}
+            className="absolute inset-0 bg-[#f8f9fc] flex flex-col items-center justify-center p-6 z-30"
+          >
+            <div className="w-full h-full border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center p-4 bg-white/50 relative overflow-hidden">
+              {/* Scanning Line */}
+              <motion.div
+                animate={{ top: ['0%', '100%', '0%'] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                className="absolute left-0 w-full h-[1px] bg-[#60BA81]/30 z-10"
+              />
+
+              <div className="mb-4 relative">
+                <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shadow-inner">
+                  <Monitor size={24} className="text-[#284952]" />
+                </div>
+                <motion.div
+                  initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }}
+                  className="absolute -top-1 -right-1 bg-[#60BA81] text-white rounded-full p-1"
+                >
+                  <Key size={10} />
+                </motion.div>
+              </div>
+
+              <h4 className="text-[11px] font-bold text-[#284952] uppercase tracking-tighter mb-1 text-center">Portal Generated</h4>
+              <div className="bg-[#60BA81]/10 px-2 py-0.5 rounded-full mb-3">
+                <span className="text-[9px] font-bold text-[#60BA81]">Credentials Assigned</span>
+              </div>
+
+              <div className="w-full space-y-1.5 opacity-60">
+                <div className="h-1 bg-gray-100 rounded-full w-full" />
+                <div className="h-1 bg-gray-100 rounded-full w-3/4 mx-auto" />
+              </div>
+
+              <p className="mt-4 text-[8px] font-mono text-gray-400">ACCESS: portal.fos.com</p>
             </div>
           </motion.div>
         )}

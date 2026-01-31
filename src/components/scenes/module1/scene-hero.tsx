@@ -31,14 +31,12 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
         >
           {/* Elegant Logo Treatment with subtle continuous float */}
           <motion.div
-            animate={{ y: [0, -2, 0] }}
-            transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
-            className="w-20 h-20 mx-auto mb-3 bg-white rounded-2xl shadow-2xl flex items-center justify-center border border-gray-100"
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
+            className="w-40 h-40 mx-auto mb-8 bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center justify-center ring-8 ring-white/40"
           >
-            {/* The FOS Cube */}
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#60BA81] to-[#284952] flex items-center justify-center">
-              <span className="text-white text-xl font-bold tracking-widest">FOS</span>
-            </div>
+            {/* The FOS Logo */}
+            <img src="/assets/images/FOS-01.png" alt="FOS" className="w-28 h-28 object-contain" />
           </motion.div>
         </motion.div>
 

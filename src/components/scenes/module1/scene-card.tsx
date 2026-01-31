@@ -123,10 +123,10 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
               <div className="px-6 pt-6 pb-2 flex justify-between items-start gap-4 z-20 relative">
                 {/* Left Logo (FOS) */}
                 <motion.div
-                  className="w-[72px] h-[64px] border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center bg-gray-50 shrink-0"
+                  className="w-[72px] h-[64px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0 overflow-hidden"
                   animate={getFocusStyle(false, isAnyFocused)}
                 >
-                  <div className="text-[10px] font-bold text-gray-400">LOGO</div>
+                  <img src="/assets/images/FOS-01.png" alt="FOS Logo" className="w-[85%] h-[85%] object-contain" />
                 </motion.div>
 
                 {/* Center: ID Focus (Primary Awareness) */}
@@ -159,12 +159,10 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
 
                 {/* Right Logo (Client) */}
                 <motion.div
-                  className="w-[72px] h-[64px] border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center bg-gray-50 shrink-0"
+                  className="w-[72px] h-[64px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0 overflow-hidden"
                   animate={getFocusStyle(false, isAnyFocused)}
                 >
-                  <div className="text-center">
-                    <div className="text-[10px] font-black text-[#F5A83C] italic leading-none">Company A</div>
-                  </div>
+                  <img src="/assets/images/company_a.png" alt="Company Logo" className="w-[85%] h-[85%] object-contain" />
                 </motion.div>
               </div>
 
