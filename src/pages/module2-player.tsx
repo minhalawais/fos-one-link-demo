@@ -3,7 +3,7 @@
 import { AnimatePresence } from "framer-motion"
 
 import { SceneIntro } from "../components/scenes/module2/scene-intro.tsx"
-import { SceneOmnichannel } from "../components/scenes/module2/scene-omnichannel.tsx"
+import SceneOmnichannel from "../components/scenes/module2/scene-omnichannel.tsx"
 import { SceneAssistedFiling } from "../components/scenes/module2/scene-assisted-filing.tsx"
 import { SceneAnonymity } from "../components/scenes/module2/scene-anonymity.tsx"
 import { SceneReview } from "../components/scenes/module2/scene-review.tsx"

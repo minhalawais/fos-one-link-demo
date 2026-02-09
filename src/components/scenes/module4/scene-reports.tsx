@@ -119,10 +119,8 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                             </div>
 
                             {/* Company Logo Circle */}
-                            <div className="w-24 h-24 rounded-full border-4 border-[#F5A83C] bg-white flex items-center justify-center shadow-lg">
-                                <span className="text-[#284952] font-bold text-center text-sm leading-tight px-2">
-                                    COMPANY<br />A
-                                </span>
+                            <div className="w-24 h-24 rounded-full border-4 border-[#F5A83C] bg-white flex items-center justify-center shadow-lg overflow-hidden">
+                                <img src="/assets/images/company_a.png" alt="Company A" className="w-full h-full object-contain p-2" />
                             </div>
                         </div>
                     </motion.div>
@@ -339,7 +337,7 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                                     {/* Sample Responses */}
                                     <div className="space-y-3">
                                         <h4 className="font-bold flex items-center text-sm" style={{ color: REPORT_COLORS.orange }}>
-                                            <MessageSquare size={14} className="mr-2" /> Sample Responses
+                                            <MessageSquare size={14} className="mr-2" />Responses from Survey
                                         </h4>
                                         {["Everything is available", "Safety shoes are missing", "No issues"].map((r, i) => (
                                             <div

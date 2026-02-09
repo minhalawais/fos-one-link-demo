@@ -1,22 +1,17 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { BarChart3, TrendingUp, Activity } from "lucide-react"
+import { ClipboardList, MessageSquare, Zap } from "lucide-react"
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
 
-interface SceneIntroProps {
-    isActive: boolean
-    progress: number
-}
-
-export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
+export const SceneIntro = ({ isActive }: { isActive: boolean }) => {
     return (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F5F5F7] overflow-hidden font-sans">
 
             {/* Dynamic Background Gradient */}
             <motion.div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vh] h-[150vh] min-w-[800px] bg-gradient-to-tr from-[#F5A83C]/10 via-[#284952]/5 to-transparent rounded-full blur-[100px]"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vh] h-[150vh] min-w-[800px] bg-gradient-to-tr from-[#60BA81]/15 via-[#284952]/5 to-transparent rounded-full blur-[100px]"
                 animate={{
                     scale: [1, 1.1, 1],
                     opacity: [0.3, 0.5, 0.3],
@@ -33,34 +28,34 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         initial={{ scale: 0.5, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-                        className="relative z-20 w-32 h-32 bg-gradient-to-br from-[#17161A] to-[#284952] rounded-[2.5rem] shadow-2xl shadow-[#17161A]/30 flex items-center justify-center text-white"
+                        className="relative z-20 w-32 h-32 bg-gradient-to-br from-[#60BA81] to-[#284952] rounded-[2.5rem] shadow-2xl shadow-[#60BA81]/30 flex items-center justify-center text-white"
                     >
-                        <BarChart3 size={56} strokeWidth={1.5} />
+                        <ClipboardList size={56} strokeWidth={1.5} />
 
-                        {/* Insights Badge */}
+                        {/* Listening Badge */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.6, type: "spring" }}
-                            className="absolute -top-3 -right-3 w-10 h-10 bg-[#F5A83C] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
+                            className="absolute -top-3 -right-3 w-10 h-10 bg-[#0f9690] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
                         >
-                            <TrendingUp size={16} className="text-white" />
+                            <MessageSquare size={16} className="text-white" />
                         </motion.div>
 
-                        {/* Analytics Badge */}
+                        {/* Proactive Badge */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.8, type: "spring" }}
-                            className="absolute -bottom-3 -left-3 w-10 h-10 bg-[#60BA81] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
+                            className="absolute -bottom-3 -left-3 w-10 h-10 bg-[#F5A83C] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
                         >
-                            <Activity size={16} className="text-white" />
+                            <Zap size={16} className="text-white" />
                         </motion.div>
                     </motion.div>
 
                     {/* Ripple Effect */}
                     <motion.div
-                        className="absolute inset-0 bg-[#17161A]/10 rounded-[2.5rem] blur-xl"
+                        className="absolute inset-0 bg-[#60BA81]/10 rounded-[2.5rem] blur-xl"
                         animate={{ scale: [0.8, 1.4, 0.8], opacity: [0.3, 0, 0.3] }}
                         transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
                     />
@@ -72,9 +67,9 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17161A]/5 text-[#17161A] text-xs font-bold uppercase tracking-widest mb-2"
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#60BA81]/5 text-[#284952] text-xs font-bold uppercase tracking-widest mb-2"
                     >
-                        Module 05
+                        Module 04
                     </motion.div>
 
                     <motion.h1
@@ -83,7 +78,7 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         transition={{ delay: 0.3, duration: 0.8, ease: IOS_EASE }}
                         className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#17161A]"
                     >
-                        Dashboards & Risk Insights
+                        Proactive Engagement
                     </motion.h1>
 
                     <motion.div
@@ -93,12 +88,12 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         className="flex items-center justify-center gap-6 mt-4"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#F5A83C]" />
-                            <span className="text-lg font-medium text-[#767676]">Visible</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#0f9690]" />
+                            <span className="text-lg font-medium text-[#767676]">Listening</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#60BA81]" />
-                            <span className="text-lg font-medium text-[#767676]">Interactive</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#F5A83C]" />
+                            <span className="text-lg font-medium text-[#767676]">Continuous Improvement</span>
                         </div>
                     </motion.div>
                 </div>

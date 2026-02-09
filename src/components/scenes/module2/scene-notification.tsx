@@ -56,9 +56,33 @@ const BarChart = () => (
     ))}
   </div>
 )
+// --- STYLES ---
+const customScrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+`;
 
 export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
   const [stage, setStage] = useState(0)
+
+  useEffect(() => {
+    // Inject styles
+    const styleTag = document.createElement("style");
+    styleTag.innerHTML = customScrollbarStyles;
+    document.head.appendChild(styleTag);
+    return () => { document.head.removeChild(styleTag); };
+  }, []);
 
   useEffect(() => {
     if (isActive) {
@@ -71,13 +95,13 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
       // 93.88s: "...without delay." (Interaction)
 
       const timers = [
-        setTimeout(() => setStage(1), 1000), // Officer moves Left (~83s)
-        setTimeout(() => setStage(2), 2500), // Beam starts (~84.5s)
-        setTimeout(() => setStage(3), 5200), // Phone Enters (~87.2s)
-        setTimeout(() => setStage(4), 6500), // Email Enters (~88.5s)
-        setTimeout(() => setStage(5), 7520), // Portal Enters (~89.52s)
-        setTimeout(() => setStage(6), 9500), // Row Appears (~91.5s)
-        setTimeout(() => setStage(7), 11000), // Cursor Interaction (~93s)
+        setTimeout(() => setStage(1), 1000),  // Officer moves Left (~114s)
+        setTimeout(() => setStage(2), 3000),  // Beam starts (~116s)
+        setTimeout(() => setStage(3), 6000),  // Phone Enters (~119s)
+        setTimeout(() => setStage(4), 9000),  // Email Enters (~122s)
+        setTimeout(() => setStage(5), 12000), // Portal Enters (~125s - "The case appears on their portals")
+        setTimeout(() => setStage(6), 15000), // Row Appears (~128s)
+        setTimeout(() => setStage(7), 17500), // Cursor Interaction (~130.5s)
       ]
       return () => timers.forEach(clearTimeout)
     }
@@ -140,7 +164,7 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
                     <motion.div
                       initial={{ opacity: 0, x: 300, scale: 1.3, filter: "blur(10px)" }}
                       animate={stage >= 1
-                        ? { opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }
+                        ? { opacity: 1, x: 0, scale: 1.4, filter: "blur(0px)" }
                         : { opacity: 1, x: 300, scale: 1.3, filter: "blur(0px)" }
                       }
                       transition={{
@@ -149,7 +173,7 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
                         damping: 20,
                         mass: 1.2
                       }}
-                      className="relative h-[90%] w-full flex justify-center items-end"
+                      className="relative h-[115%] w-full flex justify-center items-end"
                     >
                       {/* Officer Image */}
                       <motion.img
@@ -170,7 +194,7 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#60BA81] opacity-75"></span>
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-[#60BA81]"></span>
                         </div>
-                        <span className="text-[10px] font-bold text-[#284952] tracking-wide">IO ACTIVE</span>
+                        <span className="text-[10px] font-bold text-[#284952] tracking-wide">Investigation Officer</span>
                       </motion.div>
                     </motion.div>
                   )}
@@ -218,29 +242,128 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
                     transition={{ type: "spring", stiffness: 120, damping: 20, mass: 1 }}
                     className="absolute z-20"
                   >
-                    <div className="w-[340px] bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden ring-1 ring-black/5 font-sans transform-gpu">
-                      <div className="bg-[#284952] px-5 py-4 flex items-center justify-between">
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className="w-4 h-4 bg-white/20 rounded-sm backdrop-blur-sm" />
-                            <span className="text-white font-bold text-xs tracking-wide">FRUIT OF SUSTAINABILITY</span>
+                    <div className="w-[360px] h-[480px] bg-white rounded-xl shadow-2xl border border-gray-300 overflow-hidden flex flex-col transform-gpu ring-1 ring-black/10">
+
+                      {/* Gmail/Outlook Header Bar */}
+                      <div className="bg-[#f2f6fc] px-4 py-2 border-b border-gray-200 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-5 h-5 bg-[#ea4335] rounded-sm flex items-center justify-center">
+                            <Mail size={12} className="text-white" />
                           </div>
-                          <span className="text-white/80 text-[10px]">Complaint Management System</span>
+                          <span className="text-[11px] font-semibold text-gray-700">Gmail - Complaint #UE121228</span>
+                        </div>
+                        <div className="flex gap-1.5 opacity-40">
+                          <div className="w-2 h-2 rounded-full bg-gray-400" />
+                          <div className="w-2 h-2 rounded-full bg-gray-400" />
+                          <div className="w-2 h-2 rounded-full bg-gray-400" />
                         </div>
                       </div>
-                      <div className="p-6 bg-white">
-                        <motion.div initial={{ y: 20, opacity: 0 }} animate={stage >= 4 ? { y: 0, opacity: 1 } : {}} transition={{ delay: 0.2 }}>
-                          <h2 className="text-[14px] font-bold text-[#284952] mb-4 leading-tight">New Complaint Investigation Request</h2>
-                          <div className="space-y-3 mb-5">
-                            {["Ticket #: FL251141", "Category: Forced Labor", "Status: Pending Investigation"].map((text, i) => (
-                              <motion.div key={i} initial={{ x: -10, opacity: 0 }} animate={stage >= 4 ? { x: 0, opacity: 1 } : {}} transition={{ delay: 0.3 + (i * 0.1) }} className="flex gap-2 text-[10px] border-b border-gray-100 pb-2">
-                                <span className="font-bold text-gray-600 w-20">{text.split(":")[0]}:</span>
-                                <span className={text.includes("Pending") ? "text-[#F5A83C] font-bold" : "text-gray-800"}>{text.split(":")[1]}</span>
-                              </motion.div>
-                            ))}
+
+                      {/* Email Actions Bar */}
+                      <div className="bg-white px-4 py-2 border-b border-gray-100 flex items-center gap-4 shrink-0">
+                        <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 text-[12px]">←</div>
+                        <div className="w-5 h-5 text-gray-400 flex items-center justify-center">⋮</div>
+                        <div className="flex-1" />
+                        <div className="text-[10px] text-gray-400">1 of 124</div>
+                      </div>
+
+                      {/* Scrollable Email Body */}
+                      <div className="flex-1 overflow-y-auto bg-[#f7f7f7] p-2 custom-scrollbar">
+                        <div className="bg-white shadow-sm w-full mx-auto max-w-full">
+
+                          {/* FOS Production Email Styling Replicated Below */}
+
+                          {/* Header Block */}
+                          <div className="bg-[#284952] p-5 text-center">
+                            <div className="bg-white p-1 rounded inline-block mb-3">
+                              <img src="https://fruitofsustainability.com/assets/img/FOS-logo.webp" alt="FOS Logo" className="w-24 h-auto" />
+                            </div>
+                            <h1 className="text-white text-[13px] font-bold m-0 flex items-center justify-center gap-2 leading-tight">
+                              New Complaint <br /> Investigation Request
+                              <span className="bg-[#f5a83c] text-white text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider h-fit">HIGH PRIORITY</span>
+                            </h1>
                           </div>
-                          <motion.button whileHover={{ scale: 1.03, backgroundColor: "#4ea36e" }} whileTap={{ scale: 0.98 }} className="w-full bg-[#60BA81] text-white text-[11px] font-bold py-3 rounded-lg shadow-lg shadow-[#60BA81]/20 transition-all">Submit RCA & CAPA</motion.button>
-                        </motion.div>
+
+                          <div className="p-4 space-y-4 text-left">
+                            <p className="text-[11px] text-[#333] m-0">Dear Investigation Officer Minhal Awais,</p>
+
+                            <p className="text-[11px] text-[#333] m-0 leading-relaxed">
+                              A new complaint has been registered in the FOS Grievance Management System and requires your immediate attention and investigation.
+                            </p>
+
+                            {/* Complaint Information Box */}
+                            <div className="bg-[#f9f9f9] border-l-4 border-[#60BA81] p-3 shadow-sm">
+                              <h3 className="text-[#284952] text-[11px] font-bold mb-2">Complaint Information</h3>
+                              <div className="space-y-1 text-[10px]">
+                                <div className="flex border-b border-gray-100 pb-1">
+                                  <span className="w-28 text-gray-500 font-bold text-left">Ticket Number:</span>
+                                  <span className="font-bold text-gray-800">#UE121228-878863</span>
+                                </div>
+                                <div className="flex border-b border-gray-100 pb-1 pt-1">
+                                  <span className="w-28 text-gray-500 font-bold text-left">Category:</span>
+                                  <span className="text-gray-800">Unfair Employment</span>
+                                </div>
+                                <div className="flex border-b border-gray-100 pb-1 pt-1">
+                                  <span className="w-28 text-gray-500 font-bold text-left">Received On:</span>
+                                  <span className="text-gray-800">2025-12-12 14:01:38</span>
+                                </div>
+                                <div className="flex pt-1">
+                                  <span className="w-28 text-gray-500 font-bold text-left">Status:</span>
+                                  <span className="font-bold text-[#F5A83C]">Pending Investigation</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Complaint Summary Box */}
+                            <div className="bg-[#f9f9f9] border-l-4 border-[#60BA81] p-3 shadow-sm">
+                              <h3 className="text-[#284952] text-[11px] font-bold mb-2">Complaint Summary</h3>
+                              <p className="text-[10px] m-0 leading-relaxed text-gray-700 italic">
+                                "I would like to raise a serious concern regarding an <strong>unfair and forceful termination</strong>.
+                                Yesterday, I was called to the <strong>head office by Mr. Nabeel Ghazi</strong>, who informed me that <strong>Major Shehryar</strong> wanted to meet me..."
+                              </p>
+                              <div className="mt-1 text-center">
+                                <span className="text-[8px] text-gray-400 underline cursor-pointer hover:text-[#60BA81]">Read full summary...</span>
+                              </div>
+                            </div>
+
+                            {/* Action Required Box */}
+                            <div className="bg-[#f9f9f9] border-l-4 border-[#60BA81] p-3 shadow-sm">
+                              <h3 className="text-[#284952] text-[11px] font-bold mb-1">Action Required</h3>
+                              <p className="text-[10px] text-gray-700 m-0">Please conduct a thorough investigation and submit your RCA and CAPA plan using the link below.</p>
+                            </div>
+
+                            {/* Submit Button */}
+                            <div className="text-center py-2">
+                              <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="bg-[#60BA81] text-white text-[10px] font-bold py-2.5 px-6 rounded shadow-lg cursor-pointer inline-block"
+                              >
+                                Submit RCA & CAPA
+                              </motion.div>
+                            </div>
+
+                            {/* Important Notice */}
+                            <div className="bg-[#fff4e6] border border-[#f5a83c] p-2">
+                              <p className="text-[9px] text-[#333] m-0">
+                                <strong className="text-[#f5a83c]">Important:</strong> This link provides direct access to submit your findings. All details must be documented through this portal.
+                              </p>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="bg-[#284952] -mx-4 -mb-4 p-4 text-center mt-6">
+                              <p className="text-white/60 text-[8px] mb-1 text-center">Confidential: This communication is for Investigation Officer only.</p>
+                              <p className="text-white/80 text-[9px] font-bold mb-2 tracking-wide uppercase text-center">Fruit of Sustainability | CMS</p>
+                              <div className="flex justify-center gap-3 text-white/50 text-[7px] underline">
+                                <span className="cursor-pointer">Website</span>
+                                <span className="cursor-pointer">LinkedIn</span>
+                                <span className="cursor-pointer">Facebook</span>
+                              </div>
+                              <p className="text-white/40 text-[7px] mt-2 text-center">© 2026 Fruit of Sustainability. All rights reserved.</p>
+                            </div>
+
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -300,95 +423,100 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
             transition={spring}
             className="w-full h-full flex flex-col items-center justify-center p-2"
           >
-            <div className="w-full max-w-5xl bg-[#eeeeee] rounded-2xl shadow-2xl overflow-hidden border border-gray-300 flex flex-col h-[520px] relative">
+            <div className="w-full max-w-5xl bg-[#F5F5F7] rounded-[32px] shadow-2xl overflow-hidden border border-gray-200 flex flex-col h-[520px] relative">
 
-              {/* Header Bar */}
-              <div className="bg-white px-6 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-[#284952] rounded-full flex items-center justify-center">
-                      <div className="w-5 h-5 border-2 border-[#60BA81] rounded-full" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-[#284952]">FRUIT OF</div>
-                      <div className="text-xs font-semibold text-[#60BA81]">SUSTAINABILITY</div>
-                    </div>
+              {/* Header Bar - Matched to Module 1 Portal Style */}
+              <div className="bg-white px-8 py-4 flex justify-between items-center border-b border-gray-100 shadow-sm z-10 h-[80px]">
+                {/* Left Section (Logo) */}
+                <div className="w-1/4 flex justify-start">
+                  <div className="w-20 h-12 flex items-center justify-center">
+                    <img src="/assets/images/vertical_logo.png" alt="FOS Logo" className="w-full h-full object-contain" />
                   </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-[10px] text-[#284952] font-medium">MULTAN47</div>
-                  <div className="text-lg font-bold text-[#284952]">Grievance Management Portal</div>
+
+                {/* Center Section (Heading) */}
+                <div className="flex-1 flex flex-col items-center justify-center text-center">
+                  <p className="text-[10px] font-black tracking-[0.3em] mb-0.5 leading-none text-[#60BA81]">
+                    MULTAN47
+                  </p>
+                  <h1 className="text-xl font-black tracking-tight leading-tight text-[#17161A]">
+                    Grievance Management Portal
+                  </h1>
                 </div>
-                <div className="flex items-center gap-3">
+
+                {/* Right Section (Action/Logout) */}
+                <div className="w-1/4 flex justify-end items-center gap-4">
                   <div className="relative">
-                    <div className="w-9 h-9 bg-[#284952] rounded-lg flex items-center justify-center">
-                      <Bell size={18} className="text-white" />
+                    <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100">
+                      <Bell size={16} className="text-[#284952]" />
                     </div>
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[8px] text-white font-bold flex items-center justify-center"
+                      className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full text-[8px] text-white font-bold flex items-center justify-center border-2 border-white"
                     >
                       1
                     </motion.div>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>Logout</span>
-                    <LogOut size={16} />
-                  </div>
+                  <button className="px-4 py-1.5 rounded-xl text-white text-[11px] font-bold bg-[#60BA81] shadow-md shadow-[#60BA81]/20">
+                    Logout
+                  </button>
                 </div>
               </div>
 
-              {/* Dashboard */}
+              {/* Dashboard Content */}
               <div className="p-5 flex-1 overflow-hidden flex flex-col gap-4">
                 <div className="flex gap-4">
+                  {/* Status Card */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-                    className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col items-center justify-center min-w-[220px]"
+                    className="bg-white p-4 rounded-[24px] shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-50 flex flex-col items-center justify-center min-w-[220px]"
                   >
+                    <h3 className="w-full text-[9px] font-bold uppercase tracking-wider mb-2 text-gray-400 text-left px-2">Complaint Status</h3>
                     <DonutChart total={stage >= 6 ? 17 : 16} />
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-[8px]">
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#284952]" /><span className="text-gray-600">Unprocessed</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#2d9480]" /><span className="text-gray-600">In Process</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#60ba81]" /><span className="text-gray-600">Submitted</span></div>
-                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#f5a83c]" /><span className="text-gray-600">Bounced</span></div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3 text-[8px] font-medium">
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#284952]" /><span className="text-gray-500">Unprocessed</span></div>
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#2d9480]" /><span className="text-gray-500">In Process</span></div>
+                      <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#60ba81]" /><span className="text-gray-500">Submitted</span></div>
                     </div>
                   </motion.div>
 
+                  {/* Categories Card */}
                   <motion.div
                     initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
-                    className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex-1"
+                    className="bg-white p-4 rounded-[24px] shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-50 flex-1 flex flex-col"
                   >
+                    <h3 className="text-[9px] font-bold uppercase tracking-wider mb-2 text-gray-400">Complaints By Categories</h3>
                     <BarChart />
                   </motion.div>
                 </div>
 
+                {/* Table Card */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 flex-1 overflow-hidden flex flex-col"
+                  className="bg-white rounded-[24px] shadow-[0_2px_20px_rgba(0,0,0,0.06)] border border-gray-50 flex-1 overflow-hidden flex flex-col"
                 >
-                  <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-[10px] text-gray-600">
+                  <div className="px-4 py-2 border-b border-gray-100 flex justify-between items-center bg-[#FAFAFA]/50">
+                    <div className="flex items-center gap-2 text-[9px] text-gray-500 font-bold">
                       <span>Show entries</span>
+                      <div className="px-2 py-0.5 bg-white border border-gray-200 rounded text-gray-700">100</div>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px]">
-                      <span className="text-gray-600">Search:</span>
-                      <input type="text" className="border border-gray-300 rounded px-2 py-1 text-[10px] w-32" />
+                    <div className="flex items-center gap-2 text-[9px]">
+                      <span className="text-gray-500 font-bold uppercase tracking-tighter">Search:</span>
+                      <div className="h-6 w-32 bg-white border border-gray-200 rounded" />
                     </div>
                   </div>
 
                   <div className="flex-1 overflow-auto">
                     <table className="w-full text-[10px]">
-                      <thead className="bg-gray-50 sticky top-0">
-                        <tr className="border-b border-gray-200">
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">Sr.</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">Ticket Number</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">NAME</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">STATUS</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">COMPLAINT DATE</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">Mobile Number</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">Complaint Categories</th>
-                          <th className="px-3 py-2 text-left font-semibold text-gray-700">Additional Comments</th>
+                      <thead className="bg-[#FAFAFA] sticky top-0">
+                        <tr className="border-b border-gray-100">
+                          <th className="px-3 py-2 text-left font-bold text-gray-400 uppercase tracking-wider text-[8px]">Sr.</th>
+                          <th className="px-3 py-2 text-left font-bold text-gray-400 uppercase tracking-wider text-[8px]">Ticket Number</th>
+                          <th className="px-3 py-2 text-left font-bold text-gray-400 uppercase tracking-wider text-[8px]">NAME</th>
+                          <th className="px-3 py-2 text-left font-bold text-gray-400 uppercase tracking-wider text-[8px]">STATUS</th>
+                          <th className="px-3 py-2 text-left font-bold text-gray-400 uppercase tracking-wider text-[8px]">COMPLAINT DATE</th>
+                          <th className="px-3 py-2 text-left font-bold text-gray-400 uppercase tracking-wider text-[8px]">Mobile Number</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -396,31 +524,31 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
                           {stage >= 6 && (
                             <motion.tr
                               layout
-                              initial={{ opacity: 0, backgroundColor: "#e8f5e9" }}
+                              initial={{ opacity: 0, backgroundColor: "rgba(96, 186, 129, 0.1)" }}
                               animate={{ opacity: 1, backgroundColor: "#ffffff" }}
                               transition={{ duration: 1 }}
-                              className="border-b border-gray-100"
+                              className="border-b border-gray-100 group hover:bg-gray-50"
                             >
-                              <td className="px-3 py-3 text-gray-700 font-medium">457</td>
-                              <td className="px-3 py-3 font-semibold text-[#284952]">FL251141-475002</td>
-                              <td className="px-3 py-3 text-gray-800">Sana</td>
-                              <td className="px-3 py-3"><span className="px-3 py-1.5 rounded text-[9px] font-bold text-white bg-[#206e71]">Unprocessed</span></td>
-                              <td className="px-3 py-3 text-[#284952]">Tue, 25 Nov 2025 12:36 PM</td>
-                              <td className="px-3 py-3 text-gray-700">923164015542</td>
-                              <td className="px-3 py-3 text-[#284952] font-medium">Forced Labor</td>
-                              <td className="px-3 py-3 text-gray-500">-</td>
+                              <td className="px-3 py-3 text-gray-500 font-medium font-mono">457</td>
+                              <td className="px-3 py-3 font-bold text-[#284952] font-mono">FL251141-475002</td>
+                              <td className="px-3 py-3 text-[#17161A] font-semibold">Sana</td>
+                              <td className="px-3 py-3">
+                                <span className="px-2 py-1 rounded-full text-[8px] font-black uppercase text-[#284952] bg-[#284952]/10 border border-[#284952]/10">Unprocessed</span>
+                              </td>
+                              <td className="px-3 py-3 text-gray-500 tabular-nums">Tue, 25 Nov 2025 12:36 PM</td>
+                              <td className="px-3 py-3 text-gray-500 tabular-nums">923164015542</td>
                             </motion.tr>
                           )}
                         </AnimatePresence>
                         <tr className="border-b border-gray-100 opacity-60">
-                          <td className="px-3 py-3 text-gray-700">456</td>
-                          <td className="px-3 py-3 font-semibold text-[#284952]">FL211140-475002</td>
-                          <td className="px-3 py-3 text-gray-800">Sana</td>
-                          <td className="px-3 py-3"><span className="px-3 py-1.5 rounded text-[9px] font-bold text-white bg-[#f5a83c]">Bounced</span></td>
-                          <td className="px-3 py-3 text-[#284952]">Fri, 21 Nov 2025 11:44 AM</td>
-                          <td className="px-3 py-3 text-gray-700">923164015542</td>
-                          <td className="px-3 py-3 text-[#284952] font-medium">Forced Labor</td>
-                          <td className="px-3 py-3 text-gray-500">N/A</td>
+                          <td className="px-3 py-3 text-gray-500 font-mono">456</td>
+                          <td className="px-3 py-3 font-bold text-[#284952] font-mono">FL211140-475002</td>
+                          <td className="px-3 py-3 text-[#17161A] font-semibold">Sana</td>
+                          <td className="px-3 py-3">
+                            <span className="px-2 py-1 rounded-full text-[8px] font-black uppercase text-[#F5A83C] bg-[#F5A83C]/10 border border-[#F5A83C]/10">Bounced</span>
+                          </td>
+                          <td className="px-3 py-3 text-gray-500 tabular-nums">Fri, 21 Nov 2025 11:44 AM</td>
+                          <td className="px-3 py-3 text-gray-500 tabular-nums">923164015542</td>
                         </tr>
                       </tbody>
                     </table>
@@ -436,7 +564,7 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
                   transition={{ duration: 1.5, ease: "circOut" }}
                   className="absolute top-0 left-0 z-50 pointer-events-none"
                 >
-                  <MousePointer2 size={28} fill="#1d1d1f" stroke="white" strokeWidth={1.5} />
+                  <MousePointer2 size={24} fill="#1d1d1f" stroke="white" strokeWidth={1.5} />
                 </motion.div>
               )}
             </div>

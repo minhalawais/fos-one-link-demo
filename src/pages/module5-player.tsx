@@ -5,49 +5,42 @@ import { AnimatePresence } from "framer-motion"
 // Import all scene components from module5 folder
 import { SceneIntro } from "../components/scenes/module5/scene-intro.tsx"
 import { SceneBreakdown } from "../components/scenes/module5/scene-breakdown.tsx"
-import { SceneHeatmap } from "../components/scenes/module5/scene-heatmap.tsx"
 import { SceneMetrics } from "../components/scenes/module5/scene-metrics.tsx"
 import { SceneTimeline } from "../components/scenes/module5/scene-timeline.tsx"
 import { SceneNPS } from "../components/scenes/module5/scene-nps.tsx"
-import { SceneTrends } from "../components/scenes/module5/scene-trends.tsx"
 import { SceneExport } from "../components/scenes/module5/scene-export.tsx"
 import { SceneConclusion } from "../components/scenes/module5/scene-conclusion.tsx"
 import { SceneDashboard } from "../components/scenes/module5/scene-dashboard.tsx"
+import { SceneAI } from "../components/scenes/module5/scene-ai.tsx"
 
 // Updated scene configuration to match voiceover script timestamps
 const SCENES = [
-    // Intro: "It's time to explore the dashboards and risk insights..."
+    // 0-7: Intro
     { name: "intro", start: 0, end: 7, component: SceneIntro },
 
-    // Dashboard overview: "The dashboard provides a real-time view..."
-    { name: "dashboard", start: 7, end: 16, component: SceneDashboard },
+    // 7-51: Dashboard Overview (Multilayer structure, Filters, Snapshot)
+    { name: "dashboard_overview", start: 7, end: 51, component: SceneDashboard },
 
-    // Quick assessment: "This helps management quickly assess..."
-    { name: "assessment", start: 16, end: 20.2, component: SceneDashboard }, // Could be a variant of dashboard
+    // 51-88: Workforce Feedback Slider
+    { name: "analytics_feedback", start: 51, end: 88, component: SceneBreakdown },
 
-    // Categories breakdown: "Complaints are automatically grouped..."
-    { name: "breakdown", start: 20.2, end: 30.64, component: SceneBreakdown },
+    // 88-102: Counseling Sessions Analysis (Dashboard front view focus)
+    { name: "analytics_counseling", start: 88, end: 102, component: SceneDashboard },
 
-    // Heatmap insights: "This allows factories to identify recurring issues..."
-    { name: "heatmap", start: 30.64, end: 43.4, component: SceneHeatmap },
+    // 102-114: Resolution Performance
+    { name: "analytics_performance", start: 102, end: 114, component: SceneBreakdown },
 
-    // RCA/CAPA metrics: "The system also tracks RCA and CAPA performance..."
-    { name: "metrics", start: 43.4, end: 59.4, component: SceneMetrics },
+    // 114-137: Interactive Dashboard Deep Dive (includes AI Summaries & Case Timelines as modals)
+    { name: "interactive", start: 114, end: 137, component: SceneDashboard },
 
-    // Timeline monitoring: "Timeline monitoring highlights average investigation times..."
-    { name: "timeline", start: 59.4, end: 70.4, component: SceneTimeline },
+    // 137-155: Worker Happiness & Safety Scores
+    { name: "scores", start: 137, end: 155, component: SceneNPS },
 
-    // Worker satisfaction: "Workers' satisfaction indicators show how employees responded..."
-    { name: "nps", start: 70.4, end: 75.68, component: SceneNPS },
+    // 155+: Survey Reports
+    { name: "reports", start: 155, end: 170, component: SceneExport },
 
-    // Trends analysis: "You can also analyze trends over weeks, months..."
-    { name: "trends", start: 75.68, end: 90.28, component: SceneTrends },
-
-    // Export functionality: "And finally, all reports are exportable for HRDD..."
-    { name: "export", start: 90.28, end: 96.4, component: SceneExport },
-
-    // Conclusion: "Together, these dashboards turn grievance data..."
-    { name: "conclusion", start: 96.4, end: 102, component: SceneConclusion }
+    // 170+: Conclusion
+    { name: "conclusion", start: 170, end: 180, component: SceneConclusion }
 ]
 
 interface Module5PlayerProps {

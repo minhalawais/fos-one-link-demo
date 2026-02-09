@@ -8,12 +8,14 @@ import { AnimatePresence } from "framer-motion"
 import { SceneRCACAPAEvidence } from "../components/scenes/module3/scene-rca-capa-evidence.tsx"
 import { SceneFOSVerification } from "../components/scenes/module3/scene-fos-verification.tsx"
 import { SceneClosure } from "../components/scenes/module3/scene-closure.tsx"
+import { SceneIntro } from "../components/scenes/module3/scene-intro.tsx"
 import { SceneInvestigation } from "../components/scenes/module3/scene-1-unprocessed.tsx"
 import { Scene2InProcess } from "../components/scenes/module3/scene-2-in-process.tsx"
 
 const SCENES = [
-  { name: "intro", start: 0, end: 13, component: SceneInvestigation },
-  { name: "inProcess", start: 13, end: 28, component: Scene2InProcess },
+  { name: "intro", start: 0, end: 7, component: SceneIntro },
+  { name: "unprocessed", start: 7, end: 20, component: SceneInvestigation },
+  { name: "inProcess", start: 20, end: 28, component: Scene2InProcess },
   { name: "rootCause", start: 29, end: 113, component: SceneRCACAPAEvidence },
   { name: "verification", start: 113, end: 163, component: SceneFOSVerification },
   { name: "closure", start: 163, end: 177, component: SceneClosure },

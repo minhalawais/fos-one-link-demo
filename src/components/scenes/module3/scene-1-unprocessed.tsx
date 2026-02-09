@@ -39,13 +39,13 @@ const COLORS = {
 // --- TIMING CONSTANTS (0s - 21s) ---
 const TIMING = {
   START: 0,
-  INTRO_END: 8,          // "reflected in IO portal"
-  DASHBOARD_START: 8,
-  UNPROCESSED_VIEW: 10,  // "appears under unprocessed"
-  ACTION_START: 14,      // "IO reviews details..."
-  MODAL_OPEN: 15.5,      // Visual trigger for review
-  SUBMIT_CLICK: 19.0,    // "activates the case"
-  IN_PROCESS_END: 21.0   // "marking it in process"
+  INTRO_END: 7,          // Matches SceneIntro end
+  DASHBOARD_START: 7,    // Show dashboard immediately after intro
+  UNPROCESSED_VIEW: 9,   // "appears under unprocessed"
+  ACTION_START: 12,      // "IO reviews details..."
+  MODAL_OPEN: 14,        // Cursor reaches status and clicks
+  SUBMIT_CLICK: 17,      // IO clicks Submit inside modal
+  IN_PROCESS_END: 20     // Transition to Scene 2
 }
 
 // Spring Configs
@@ -235,9 +235,8 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
   // Simulate Cursor Movement for Original Layout
   const cursorVariants = {
     hidden: { opacity: 0, x: 200, y: 200 },
-    rowHover: { opacity: 1, x: 500, y: 560, transition: { duration: 1, ease: "easeOut" } }, // Target First Row Status
-    modalTrigger: { x: 500, y: 560, transition: { duration: 1.0, ease: "easeInOut" } }, // Click Status
-    modalSubmit: { x: 740, y: 620, transition: { delay: 0.2, duration: 1, ease: "easeInOut" } } // Click Submit inside Modal
+    rowHover: { opacity: 1, x: 500, y: 560, transition: { duration: 1.2, ease: "easeOut" } }, // Target First Row Status
+    modalSubmit: { x: 740, y: 620, opacity: 1, transition: { duration: 0.8, ease: "easeInOut" } } // Click Submit inside Modal
   }
 
   const complaints = [
@@ -438,11 +437,23 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
       {/* --- CURSOR SIMULATION --- */}
       {showCursor && (
         <motion.div
-          className="absolute z-50 pointer-events-none"
+          className="absolute z-[100] pointer-events-none"
           initial="hidden"
-          animate={showModal ? "modalSubmit" : "modalTrigger"}
+          animate={progress >= TIMING.SUBMIT_CLICK ? "modalSubmit" : (progress >= TIMING.MODAL_OPEN ? "modalSubmit" : "rowHover")}
           variants={cursorVariants}
         >
+          {/* Visual Click Pulse */}
+          <AnimatePresence>
+            {(progress >= TIMING.MODAL_OPEN - 0.2 && progress <= TIMING.MODAL_OPEN + 0.2) ||
+              (progress >= TIMING.SUBMIT_CLICK - 0.2 && progress <= TIMING.SUBMIT_CLICK + 0.2) ? (
+              <motion.div
+                initial={{ scale: 0.5, opacity: 1 }}
+                animate={{ scale: 2, opacity: 0 }}
+                exit={{ opacity: 0 }}
+                className="absolute top-0 left-0 w-8 h-8 -translate-x-1 -translate-y-1 bg-black/20 rounded-full"
+              />
+            ) : null}
+          </AnimatePresence>
           <MousePointer2
             size={32}
             className="fill-black stroke-white stroke-[2px]"

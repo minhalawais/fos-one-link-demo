@@ -942,6 +942,7 @@ const Slide: React.FC<SlideProps> = ({
   onClick,
   isPlaying,
   playerComponent,
+  totalSlides,
   currentTime,
   scenes,
   onSeek,
@@ -1168,8 +1169,8 @@ const Slide: React.FC<SlideProps> = ({
                 />
               </div>
 
-              {/* Content Container */}
-              <div className="relative z-10 h-full flex flex-col p-5">
+              {/* Content Container - Increased padding for breathability */}
+              <div className="relative z-10 h-full flex flex-col p-7">
                 {/* Top Section - Module indicator & Icon */}
                 <div className="flex justify-between items-start mb-auto">
                   {/* Step indicator with connecting line */}
@@ -1222,23 +1223,23 @@ const Slide: React.FC<SlideProps> = ({
                 <div className="flex-1 flex flex-col justify-center">
                   {/* Subtle module number - watermark style - Repositioned for depth */}
                   <div
-                    className="absolute -right-6 top-1/2 -translate-y-1/2 text-[160px] font-black leading-none select-none pointer-events-none z-0"
+                    className="absolute -right-4 top-1/2 -translate-y-1/2 text-[120px] font-black leading-none select-none pointer-events-none z-0"
                     style={{
                       color: currentTheme.accent,
-                      opacity: 0.08,
+                      opacity: 0.04,
                       fontVariantNumeric: 'tabular-nums',
-                      transform: 'rotate(-10deg)',
+                      transform: 'rotate(-5deg)',
                     }}
                   >
                     0{item.id}
                   </div>
 
-                  {/* Headline - Premium Gradient + Glow Effect */}
+                  {/* Headline - Rescaled for expert production-grade UI */}
                   <motion.h2
-                    className="text-[42px] leading-[1.05] mb-4 relative z-10"
+                    className="text-[32px] leading-[1.1] mb-5 relative z-10"
                     style={{
                       fontWeight: 900,
-                      letterSpacing: '-0.02em',
+                      letterSpacing: '-0.01em',
                       fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
                       textRendering: 'optimizeLegibility',
                       WebkitFontSmoothing: 'antialiased',
@@ -1269,11 +1270,11 @@ const Slide: React.FC<SlideProps> = ({
                     transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   />
 
-                  {/* Subheading - Enhanced readability with subtle glow */}
+                  {/* Subheading - Fine-tuned for breathability */}
                   <motion.p
-                    className="text-[16px] leading-[1.6] line-clamp-3 max-w-[95%] relative z-10"
+                    className="text-[14px] leading-[1.7] line-clamp-3 max-w-[90%] relative z-10"
                     style={{
-                      color: 'rgba(255, 255, 255, 0.85)',
+                      color: 'rgba(255, 255, 255, 0.75)',
                       fontWeight: 500,
                       letterSpacing: '0.01em',
                       fontFeatureSettings: '"kern" 1, "liga" 1',
@@ -1303,7 +1304,7 @@ const Slide: React.FC<SlideProps> = ({
                   <div className="flex items-center gap-3">
                     {/* Progress indicator dots */}
                     <div className="flex gap-1">
-                      {[1, 2, 3, 4].map((dot) => (
+                      {Array.from({ length: totalSlides }, (_, i) => i + 1).map((dot) => (
                         <motion.div
                           key={dot}
                           className="w-1.5 h-1.5 rounded-full transition-all duration-300"
@@ -1321,7 +1322,7 @@ const Slide: React.FC<SlideProps> = ({
                       className="text-[10px] font-bold uppercase tracking-[0.15em]"
                       style={{ color: currentTheme.textColor, opacity: 0.6 }}
                     >
-                      {item.id} of 4
+                      {item.id} of {totalSlides}
                     </span>
                   </div>
 
@@ -1342,14 +1343,14 @@ const Slide: React.FC<SlideProps> = ({
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                     />
                     <div
-                      className="relative w-10 h-10 rounded-full flex items-center justify-center"
+                      className="relative w-9 h-9 rounded-full flex items-center justify-center"
                       style={{
                         backgroundColor: currentTheme.accent,
-                        boxShadow: `0 4px 16px -3px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                        boxShadow: `0 4px 12px -3px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
                       }}
                     >
                       <ArrowRight
-                        size={16}
+                        size={14}
                         className={currentTheme.isDark ? "text-white" : "text-white"}
                         strokeWidth={2.5}
                       />
@@ -1613,7 +1614,7 @@ const Slide: React.FC<SlideProps> = ({
                       className="flex items-center gap-3 mt-auto pt-4"
                     >
                       <div className="flex gap-2">
-                        {[1, 2, 3, 4].map((step) => (
+                        {Array.from({ length: totalSlides }, (_, i) => i + 1).map((step) => (
                           <motion.div
                             key={step}
                             className="h-1.5 rounded-full transition-all duration-300"
@@ -1627,7 +1628,7 @@ const Slide: React.FC<SlideProps> = ({
                         ))}
                       </div>
                       <span className="text-xs font-medium text-[#8A9199]">
-                        {item.id} of 4 modules
+                        {item.id} of {totalSlides} modules
                       </span>
                     </motion.div>
                   )}

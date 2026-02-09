@@ -13,7 +13,9 @@ import {
     Globe,
     Bell,
     Users,
-    ChevronRight
+    ChevronRight,
+    WifiOff,
+    SignalHigh
 } from "lucide-react"
 
 // Import original components for the first half
@@ -188,6 +190,123 @@ const CharacterRobot = ({ isSending }: { isSending: boolean }) => (
         />
     </motion.div>
 )
+
+// 6. Feature Phone (Nokia Style - Premium)
+const FeaturePhone = () => (
+    <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: -20 }}
+        transition={{ duration: 0.6, ease: EASE_IOS }}
+        className="w-[200px] h-[400px] bg-[#1a1a1a] rounded-[30px] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] border-[4px] border-[#333] flex flex-col relative overflow-hidden"
+    >
+        {/* Earpiece */}
+        <div className="h-4 w-full flex justify-center items-center opacity-50">
+            <div className="w-12 h-1 bg-[#444] rounded-full" />
+        </div>
+
+        {/* Screen Area */}
+        <div className="px-3 pb-2 pt-1">
+            <div className="bg-[#d4ded4] h-[140px] rounded-sm border-2 border-black/10 shadow-inner flex flex-col font-mono text-[#1a1a1a] p-1.5 relative overflow-hidden">
+                {/* LCD Pixel Overlay */}
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none" />
+
+                {/* Status Bar */}
+                <div className="flex justify-between items-center text-[8px] border-b border-[#1a1a1a]/10 pb-0.5 mb-1.5 opacity-70">
+                    <span>Telenor</span>
+                    <div className="flex gap-1">
+                        <SignalHigh size={8} />
+                        <Battery size={8} />
+                    </div>
+                </div>
+
+                {/* Message Content */}
+                <div className="flex-1 overflow-hidden">
+                    <div className="bg-[#1a1a1a]/5 p-1 mb-1">
+                        <span className="text-[8px] font-bold block">FOS Hotline</span>
+                        <span className="text-[6px] opacity-60">9:41 AM</span>
+                    </div>
+                    <div className="text-[8px] leading-tight space-y-0.5">
+                        <p className="font-bold mb-1">Moaziz MTM Employee, Aap ka FOS ID hai: 475002</p>
+                        <p className="opacity-80 text-[7px]">For complaint/feedback:</p>
+                        <p className="text-[7px]">WA: 0329-9129999</p>
+                        <p className="text-[7px]">Call: 0800-91299</p>
+                        <p className="text-[7px]">Web: fruitofsustainability.com</p>
+                    </div>
+                </div>
+
+                {/* Bottom Action */}
+                <div className="mt-auto pt-1 border-t border-[#1a1a1a]/10 flex justify-between text-[7px] font-bold">
+                    <span>Options</span>
+                    <span>Back</span>
+                </div>
+            </div>
+        </div>
+
+        {/* Brand */}
+        <div className="flex justify-center py-2">
+            <span className="text-gray-500 text-[10px] font-bold tracking-[0.2em]">NOKIA</span>
+        </div>
+
+        {/* Navigation Key */}
+        <div className="h-12 flex justify-center items-center mb-2">
+            <div className="w-10 h-10 rounded-[10px] border-2 border-[#444] bg-[#222] flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+                <div className="w-4 h-4 bg-[#111] rounded shadow-inner" />
+            </div>
+            {/* Call Buttons */}
+            <div className="absolute w-[160px] flex justify-between px-2">
+                <div className="flex flex-col gap-2">
+                    <div className="w-8 h-[2px] bg-white/20 rounded-full" />
+                    <div className="w-8 h-6 rounded-md bg-[#222] border-t border-white/10 flex items-center justify-center">
+                        <span className="text-green-500 text-[10px]">📞</span>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-2 items-end">
+                    <div className="w-8 h-[2px] bg-white/20 rounded-full" />
+                    <div className="w-8 h-6 rounded-md bg-[#222] border-t border-white/10 flex items-center justify-center">
+                        <span className="text-red-500 text-[10px]">⏻</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Keypad */}
+        <div className="flex-1 px-4 pb-6 grid grid-cols-3 gap-1.5 content-start">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, '*', 0, '#'].map((k) => (
+                <div key={k} className="w-full h-7 bg-gradient-to-b from-[#2a2a2a] to-[#222] rounded-[4px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.5)] text-gray-300 text-[12px] font-bold border-t border-white/10 active:brightness-75 transition-all">
+                    {k}
+                </div>
+            ))}
+        </div>
+    </motion.div>
+)
+
+// 7. No Internet Badge
+const ZeroDataBadge = () => (
+    <motion.div
+        initial={{ scale: 0, rotate: -10 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: "spring", stiffness: 200 }}
+        className="absolute z-50 flex flex-col items-center"
+    >
+        <div className="bg-[#284952] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border-2 border-white/20">
+            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center relative">
+                <WifiOff size={18} className="text-white/50" />
+                <div className="absolute top-0 right-0 bg-red-500 w-3 h-3 rounded-full border-2 border-[#284952]" />
+            </div>
+            <div className="h-8 w-[1px] bg-white/20" />
+            <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wider">Accessibility</span>
+                <span className="text-sm font-bold text-[#60BA81] whitespace-nowrap">Zero Data Required</span>
+            </div>
+            <div className="ml-2 bg-[#60BA81]/20 p-1.5 rounded-lg">
+                <SignalHigh size={16} className="text-[#60BA81]" />
+            </div>
+        </div>
+        <div className="w-4 h-4 bg-[#284952] rotate-45 -mt-2 border-b-2 border-r-2 border-white/20" />
+    </motion.div>
+)
+
 export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: number }) => {
 
     // TIMELINE (Scene runs from 22s to 58s -> 36s duration)
@@ -219,9 +338,9 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
 
     // Phone Internal Timing (starts at localTime 20)
     const phoneTime = Math.max(0, localTime - 20)
-    const showPhoneIn = phoneTime >= 0
     const showApp = phoneTime >= 3.0 // 45s (22+20+3)
     const showActivation = phoneTime >= 8.0 // 50s (22+20+8)
+    const showFeaturePhone = phoneTime >= 8.0 // 50s mark (swaps to feature phone)
 
     return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-[#F5F5F7] relative overflow-hidden font-sans select-none p-8">
@@ -232,14 +351,6 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                     className="absolute inset-0 opacity-10"
                     style={{ backgroundImage: 'radial-gradient(#284952 1px, transparent 1px)', backgroundSize: '40px 40px' }}
                 />
-                {showPhoneSequence && (
-                    <motion.div
-                        initial={{ opacity: 0 }} animate={{ opacity: 0.1 }}
-                        className="absolute inset-0 flex items-center justify-center"
-                    >
-                        <div className="w-[600px] h-[600px] bg-[#60BA81] rounded-full blur-[120px]" />
-                    </motion.div>
-                )}
             </div>
 
             <div className="relative z-10 w-full max-w-7xl h-[800px] flex items-center justify-center">
@@ -298,186 +409,198 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                         </motion.div>
                     )}
 
-                    {/* --- PHASE 3: NEW MOBILE PHONE SEQUENCE (Refined with Character) --- */}
+                    {/* --- PHASE 3: MOBILE PHONE SEQUENCE (Refined with Character) --- */}
                     {showPhoneSequence && (
                         <motion.div
                             key="phase3-container"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="w-full flex items-center justify-between px-0 lg:px-4"
+                            className="w-full flex items-center justify-between px-0 lg:px-4 relative"
                         >
-                            {/* Left: Robot (Expanded) */}
-                            <div className="flex-1 flex justify-center items-center -ml-20">
+                            {/* Left: Robot */}
+                            <motion.div
+                                className="flex-1 flex justify-center items-center -ml-20"
+                            >
                                 <CharacterRobot isSending={phoneTime < 8} />
-                            </div>
+                            </motion.div>
 
                             {/* Center: Signal Visualization (Static Width) */}
                             <div className="w-1/6 relative h-64 hidden lg:block">
                                 <AnimatePresence>
-                                    {phoneTime < 8 && (
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="absolute inset-0"
-                                        >
-                                            {[0, 0.5, 1, 1.5, 2].map((d) => (
-                                                <SignalParticle key={d} delay={d} />
-                                            ))}
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0"
+                                    >
+                                        {phoneTime < 8 && [0, 0.5, 1, 1.5, 2].map((d) => (
+                                            <SignalParticle key={d} delay={d} />
+                                        ))}
 
-                                            {/* Data Beam Flow */}
-                                            <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                                                <motion.path
-                                                    d="M 50,128 Q 150,88 300,128"
-                                                    fill="none"
-                                                    stroke="url(#beamGradient)"
-                                                    strokeWidth="4"
-                                                    strokeDasharray="10 10"
-                                                    initial={{ strokeDashoffset: 100 }}
-                                                    animate={{ strokeDashoffset: 0 }}
-                                                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                                />
-                                                <defs>
-                                                    <linearGradient id="beamGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                        <stop offset="0%" stopColor="#60BA81" stopOpacity="0" />
-                                                        <stop offset="50%" stopColor="#60BA81" stopOpacity="0.5" />
-                                                        <stop offset="100%" stopColor="#60BA81" stopOpacity="0" />
-                                                    </linearGradient>
-                                                </defs>
-                                            </svg>
-                                        </motion.div>
-                                    )}
+                                        {/* Data Beam Flow (single beam) */}
+                                        <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                                            <motion.path
+                                                d="M 50,128 Q 150,88 300,128"
+                                                fill="none"
+                                                stroke="url(#beamGradient)"
+                                                strokeWidth="4"
+                                                strokeDasharray="10 10"
+                                                initial={{ strokeDashoffset: 100 }}
+                                                animate={{ strokeDashoffset: 0 }}
+                                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                            />
+                                            <defs>
+                                                <linearGradient id="beamGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stopColor="#60BA81" stopOpacity="0" />
+                                                    <stop offset="50%" stopColor="#60BA81" stopOpacity="0.5" />
+                                                    <stop offset="100%" stopColor="#60BA81" stopOpacity="0" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                    </motion.div>
                                 </AnimatePresence>
                             </div>
 
-                            {/* Right: Phone (Standard) */}
-                            <div className="flex-1 flex justify-center items-center">
-                                <motion.div
-                                    initial={{ y: 100, opacity: 0, rotate: 5 }}
-                                    animate={{ y: 0, opacity: 1, rotate: 0 }}
-                                    transition={{ duration: 1, ease: EASE_IOS }}
-                                    className="relative w-[260px] h-[520px] bg-white rounded-[35px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-[8px] border-[#1f1f1f] overflow-hidden"
-                                >
-                                    {/* Dynamic Island / Notch */}
-                                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[24px] bg-[#1f1f1f] rounded-b-xl z-50 flex justify-center items-center">
-                                        <div className="w-12 h-1 bg-[#333] rounded-full mt-1" />
-                                    </div>
+                            {/* Right Section: Device Swap Container */}
+                            <div className="flex-1 flex justify-center items-center relative h-[600px] w-[500px]">
+                                <AnimatePresence mode="wait">
+                                    {!showFeaturePhone ? (
+                                        /* 1. Smartphone (Exits) */
+                                        <motion.div
+                                            key="smartphone"
+                                            initial={{ y: 100, opacity: 0, rotate: 5 }}
+                                            animate={{ y: 0, opacity: 1, rotate: 0 }}
+                                            exit={{ y: 100, opacity: 0, rotate: -5, transition: { duration: 0.5 } }}
+                                            transition={{ duration: 1, ease: EASE_IOS }}
+                                            className="absolute z-20 w-[260px] h-[520px] bg-white rounded-[35px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-[8px] border-[#1f1f1f] overflow-hidden"
+                                        >
+                                            {/* Dynamic Island / Notch */}
+                                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[24px] bg-[#1f1f1f] rounded-b-xl z-50 flex justify-center items-center">
+                                                <div className="w-12 h-1 bg-[#333] rounded-full mt-1" />
+                                            </div>
 
-                                    {/* Screen Content */}
-                                    <div className="w-full h-full bg-[#f5f5f5] flex flex-col relative">
-                                        <StatusBar />
+                                            {/* Screen Content */}
+                                            <div className="w-full h-full bg-[#f5f5f5] flex flex-col relative">
+                                                <StatusBar />
 
-                                        {/* LOCK SCREEN */}
-                                        <AnimatePresence>
-                                            {!showApp && (
-                                                <motion.div
-                                                    key="lockscreen"
-                                                    initial={{ opacity: 1 }}
-                                                    exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
-                                                    transition={{ duration: 0.5 }}
-                                                    className="absolute inset-0 z-20 flex flex-col items-center pt-20 px-6 bg-cover bg-center"
-                                                    style={{ backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')" }}
-                                                >
-                                                    <div className="text-white text-6xl font-thin mb-2 tracking-tighter">09:41</div>
-                                                    <div className="text-white text-md font-medium opacity-80 mb-12">Monday, 24 Nov</div>
-
-                                                    {/* Notification Banner */}
-                                                    <motion.div
-                                                        initial={{ y: 20, opacity: 0, scale: 0.9 }}
-                                                        animate={{ y: 0, opacity: 1, scale: 1 }}
-                                                        transition={{ delay: 0.8, type: "spring", stiffness: 100 }}
-                                                        className="w-full bg-white/90 backdrop-blur-2xl rounded-2xl p-4 shadow-2xl flex items-start gap-3 cursor-pointer border border-white/20"
-                                                    >
-                                                        <div className="w-10 h-10 bg-[#284952] rounded-xl flex items-center justify-center text-white shrink-0 shadow-inner">
-                                                            <MessageSquare size={20} />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="flex justify-between items-baseline mb-0.5">
-                                                                <span className="text-[10px] font-bold text-black uppercase tracking-wider">FOS Notification</span>
-                                                                <span className="text-[9px] text-gray-500">now</span>
-                                                            </div>
-                                                            <p className="text-[11px] text-gray-800 leading-tight font-medium">
-                                                                Moaziz MTM Employee, Aap ka FOS ID hai: <span className="text-[#60BA81] font-bold">475002</span>
-                                                            </p>
-                                                        </div>
-                                                    </motion.div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-
-                                        {/* SMS APP */}
-                                        {showApp && (
-                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col bg-white">
-                                                {/* App Header */}
-                                                <div className="h-12 border-b flex items-center px-4 gap-3 bg-white/95 backdrop-blur z-10 shadow-sm">
-                                                    <div className="w-5 h-5 flex items-center justify-center">
-                                                        <span className="text-[#007AFF] text-2xl leading-none">‹</span>
-                                                    </div>
-                                                    <div className="flex flex-col items-center flex-1 pr-6">
-                                                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#60BA81] to-[#284952] flex items-center justify-center mb-0.5 shadow-sm">
-                                                            <Users size={12} className="text-white" />
-                                                        </div>
-                                                        <span className="text-[9px] text-black font-bold uppercase tracking-tighter">FOS Hotline</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Messages Area */}
-                                                <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 bg-[#F2F2F7]">
-                                                    <div className="text-[9px] text-gray-400 text-center my-4 font-bold uppercase tracking-widest">Today 9:41 AM</div>
-
-                                                    <SMSBubble
-                                                        message={
-                                                            <>
-                                                                Moaziz MTM Employee, Aap ka FOS ID hai: <span className="font-bold text-[#60BA81] bg-[#60BA81]/10 px-1 rounded">475002</span>
-                                                                {"\n\n"}
-                                                                For any complaint/feedback:
-                                                                {"\n"}<span className="text-[#284952] font-semibold">Whatsapp:</span> <span className="text-[#007AFF]">0329-9129999</span>
-                                                                {"\n"}<span className="text-[#284952] font-semibold">Toll-free:</span> <span className="text-[#007AFF]">0800-91299</span>
-                                                                {"\n"}<span className="text-[#284952] font-semibold">Portal:</span> <span className="text-[#007AFF] underline">fruitofsustainability.com</span>
-                                                            </>
-                                                        }
-                                                        delay={0.2}
-                                                    />
-
-                                                    {/* Register Complaint Button */}
-                                                    <motion.div
-                                                        initial={{ opacity: 0, y: 10 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: 1.5 }}
-                                                        className="flex"
-                                                    >
-                                                        <div
-                                                            className="text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 cursor-pointer animate-pulse"
-                                                            style={{ backgroundColor: COLORS.green }}
+                                                {/* LOCK SCREEN */}
+                                                <AnimatePresence>
+                                                    {!showApp && (
+                                                        <motion.div
+                                                            key="lockscreen"
+                                                            initial={{ opacity: 1 }}
+                                                            exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
+                                                            transition={{ duration: 0.5 }}
+                                                            className="absolute inset-0 z-20 flex flex-col items-center pt-20 px-6 bg-cover bg-center"
+                                                            style={{ backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')" }}
                                                         >
-                                                            Register a new complaint <ChevronRight size={12} />
+                                                            <div className="text-white text-6xl font-thin mb-2 tracking-tighter">09:41</div>
+                                                            <div className="text-white text-md font-medium opacity-80 mb-12">Monday, 24 Nov</div>
+
+                                                            {/* Notification Banner */}
+                                                            <motion.div
+                                                                initial={{ y: 20, opacity: 0, scale: 0.9 }}
+                                                                animate={{ y: 0, opacity: 1, scale: 1 }}
+                                                                transition={{ delay: 0.8, type: "spring", stiffness: 100 }}
+                                                                className="w-full bg-white/90 backdrop-blur-2xl rounded-2xl p-4 shadow-2xl flex items-start gap-3 cursor-pointer border border-white/20"
+                                                            >
+                                                                <div className="w-10 h-10 bg-[#284952] rounded-xl flex items-center justify-center text-white shrink-0 shadow-inner">
+                                                                    <MessageSquare size={20} />
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="flex justify-between items-baseline mb-0.5">
+                                                                        <span className="text-[10px] font-bold text-black uppercase tracking-wider">FOS Notification</span>
+                                                                        <span className="text-[9px] text-gray-500">now</span>
+                                                                    </div>
+                                                                    <p className="text-[11px] text-gray-800 leading-tight font-medium">
+                                                                        Moaziz MTM Employee, Aap ka FOS ID hai: <span className="text-[#60BA81] font-bold">475002</span>
+                                                                    </p>
+                                                                </div>
+                                                            </motion.div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+
+                                                {/* SMS APP */}
+                                                {showApp && (
+                                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col bg-white">
+                                                        {/* App Header */}
+                                                        <div className="h-12 border-b flex items-center px-4 gap-3 bg-white/95 backdrop-blur z-10 shadow-sm">
+                                                            <div className="w-5 h-5 flex items-center justify-center">
+                                                                <span className="text-[#007AFF] text-2xl leading-none">‹</span>
+                                                            </div>
+                                                            <div className="flex flex-col items-center flex-1 pr-6">
+                                                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#60BA81] to-[#284952] flex items-center justify-center mb-0.5 shadow-sm">
+                                                                    <Users size={12} className="text-white" />
+                                                                </div>
+                                                                <span className="text-[9px] text-black font-bold uppercase tracking-tighter">FOS Hotline</span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Messages Area */}
+                                                        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 bg-[#F2F2F7]">
+                                                            <div className="text-[9px] text-gray-400 text-center my-4 font-bold uppercase tracking-widest">Today 9:41 AM</div>
+
+                                                            <SMSBubble
+                                                                message={
+                                                                    <>
+                                                                        Moaziz MTM Employee, Aap ka FOS ID hai: <span className="font-bold text-[#60BA81] bg-[#60BA81]/10 px-1 rounded">475002</span>
+                                                                        {"\n\n"}
+                                                                        For any complaint/feedback:
+                                                                        {"\n"}<span className="text-[#284952] font-semibold">Whatsapp:</span> <span className="text-[#007AFF]">0329-9129999</span>
+                                                                        {"\n"}<span className="text-[#284952] font-semibold">Toll-free:</span> <span className="text-[#007AFF]">0800-91299</span>
+                                                                        {"\n"}<span className="text-[#284952] font-semibold">Portal:</span> <span className="text-[#007AFF] underline">fruitofsustainability.com</span>
+                                                                    </>
+                                                                }
+                                                                delay={0.2}
+                                                            />
+
+                                                            {/* Register Complaint Button */}
+                                                            <motion.div
+                                                                initial={{ opacity: 0, y: 10 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                transition={{ delay: 1.5 }}
+                                                                className="flex"
+                                                            >
+                                                                <div
+                                                                    className="text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 cursor-pointer animate-pulse"
+                                                                    style={{ backgroundColor: COLORS.green }}
+                                                                >
+                                                                    Register a new complaint <ChevronRight size={12} />
+                                                                </div>
+                                                            </motion.div>
+                                                        </div>
+
+                                                        {/* Input Area */}
+                                                        <div className="p-3 border-t bg-gray-50 flex items-center gap-2">
+                                                            <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-light text-xl">
+                                                                +
+                                                            </div>
+                                                            <div className="flex-1 h-8 rounded-full border border-gray-300 bg-white px-3 flex items-center text-[11px] text-gray-400">
+                                                                iMessage
+                                                            </div>
+                                                            <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
+                                                                <div className="w-3 h-3 bg-white rounded-full shadow-inner" />
+                                                            </div>
                                                         </div>
                                                     </motion.div>
-                                                </div>
+                                                )}
 
-                                                {/* Input Area */}
-                                                <div className="p-3 border-t bg-gray-50 flex items-center gap-2">
-                                                    <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-light text-xl">
-                                                        +
-                                                    </div>
-                                                    <div className="flex-1 h-8 rounded-full border border-gray-300 bg-white px-3 flex items-center text-[11px] text-gray-400">
-                                                        iMessage
-                                                    </div>
-                                                    <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
-                                                        <div className="w-3 h-3 bg-white rounded-full shadow-inner" />
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        )}
+                                                {/* Activation Overlay */}
+                                                <ActivationBadge isVisible={showActivation && !showFeaturePhone} />
+                                            </div>
 
-                                        {/* Activation Overlay */}
-                                        <ActivationBadge isVisible={showActivation} />
-                                    </div>
-
-                                    {/* Phone Reflection Effect */}
-                                    <div className="absolute inset-0 rounded-[35px] pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-white/10 z-[60]" />
-                                </motion.div>
+                                            {/* Phone Reflection Effect */}
+                                            <div className="absolute inset-0 rounded-[35px] pointer-events-none bg-gradient-to-tr from-transparent via-white/5 to-white/10 z-[60]" />
+                                        </motion.div>
+                                    ) : (
+                                        /* 2. Feature Phone (Swaps In) */
+                                        <div className="absolute z-20 flex items-center justify-center">
+                                            <FeaturePhone />
+                                        </div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </motion.div>
                     )}
@@ -485,31 +608,6 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                 </AnimatePresence>
             </div>
 
-            {/* Floating Elements (Accessibility) - ONLY during phone phase */}
-            {showPhoneSequence && showActivation && (
-                <div className="absolute inset-0 pointer-events-none z-20">
-                    {[1, 2, 3].map((i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, scale: 0 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.2 }}
-                            className="absolute"
-                            style={{
-                                top: `${30 + i * 20}%`,
-                                left: i % 2 === 0 ? "15%" : "75%"
-                            }}
-                        >
-                            <div className="bg-white p-2 rounded-xl shadow-lg flex items-center gap-2">
-                                <div className="w-8 h-8 bg-[#60BA81] rounded-full flex items-center justify-center text-white">
-                                    {i === 1 ? <Globe size={16} /> : i === 2 ? <Smartphone size={16} /> : <Lock size={16} />}
-                                </div>
-                                <span className="text-[10px] font-bold text-[#284952]">Connected</span>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-            )}
 
         </div>
     )

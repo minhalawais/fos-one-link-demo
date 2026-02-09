@@ -8,7 +8,7 @@ import { SceneCard } from "../components/scenes/module1/scene-card.tsx"
 import SceneOfficers from "../components/scenes/module1/scene-officers.tsx"
 import { ScenePortal } from "../components/scenes/module1/scene-portal.tsx"
 import SceneTraining from "../components/scenes/module1/scene-training.tsx"
-import SceneIOTraining from "../components/scenes/module1/scene-io-training.tsx" // Import new scene
+import SceneIOTraining from "../components/scenes/module1/scene-io-training.tsx"
 import SceneClosing from "../components/scenes/module1/scene-closing.tsx"
 
 const SCENES = [

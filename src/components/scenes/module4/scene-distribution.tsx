@@ -59,25 +59,43 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.8 }}
                         className="flex flex-col items-center justify-center relative z-10"
                     >
-                        {/* Central Server Icon */}
-                        <div className="relative mb-12">
+                        {/* Central FOSSMS Mascot - Enhanced Hero Section */}
+                        <div className="relative mb-6 group flex flex-col items-center">
                             <motion.div
-                                animate={{ scale: [1, 1.1, 1], boxShadow: ["0 0 0px rgba(15, 150, 144, 0)", "0 0 50px rgba(15, 150, 144, 0.5)", "0 0 0px rgba(15, 150, 144, 0)"] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="w-32 h-32 bg-white rounded-3xl shadow-2xl flex items-center justify-center relative z-20 border border-t-2 border-b-8 border-gray-100"
+                                animate={{
+                                    y: [0, -15, 0],
+                                    filter: [
+                                        "drop-shadow(0 0 10px rgba(96, 186, 129, 0.2))",
+                                        "drop-shadow(0 0 30px rgba(96, 186, 129, 0.4))",
+                                        "drop-shadow(0 0 10px rgba(96, 186, 129, 0.2))"
+                                    ]
+                                }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="relative z-20 flex items-center justify-center"
                             >
-                                <Server size={64} style={{ color: COLORS.teal }} />
+                                <img
+                                    src="/assets/images/fos_sms_frontshot1.png"
+                                    alt="FOSSMS Mascot"
+                                    className="w-[210px] h-[200px] object-contain drop-shadow-[0_0_15px_rgba(96,186,129,0.3)] transition-transform duration-700"
+                                />
+
+                                {/* Inner Screen Core Glow */}
+                                <div className="absolute top-[35%] w-[40%] h-[30%] bg-[#60BA81]/15 blur-[40px] rounded-full animate-pulse mix-blend-screen" />
                             </motion.div>
 
-                            {/* Orbital Rings */}
+                            {/* Electronic Signal Waves (Ripple Effect from Antennas) */}
                             {[1, 2, 3].map(i => (
                                 <motion.div
                                     key={i}
-                                    className="absolute inset-0 rounded-full border-2 border-dashed border-teal-500/20"
-                                    initial={{ scale: 1.5, opacity: 0 }}
-                                    animate={{ scale: 3 + i, opacity: [0, 0.5, 0], rotate: 360 }}
-                                    transition={{ duration: 4, delay: i, repeat: Infinity, ease: "linear" }}
-                                    style={{ left: '50%', top: '50%', marginLeft: '-4rem', marginTop: '-4rem', width: '8rem', height: '8rem' }}
+                                    className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full border-t-4 border-green-500/30"
+                                    initial={{ width: 80, height: 25, opacity: 0, scale: 0.8 }}
+                                    animate={{
+                                        width: [150, 500],
+                                        height: [40, 140],
+                                        opacity: [0, 0.35, 0],
+                                        y: [-50, -220]
+                                    }}
+                                    transition={{ duration: 3.5, delay: i * 0.8, repeat: Infinity, ease: "easeOut" }}
                                 />
                             ))}
                         </div>

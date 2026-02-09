@@ -19,8 +19,8 @@ import NavigationPill from "./components/NavigationPill.tsx"
 
 // --- DESIGN SYSTEM CONSTANTS ---
 export const SPRING_PHYSICS = { type: "spring", stiffness: 120, damping: 20, mass: 1.1 }
-const SLIDE_GAP_IDLE = 16
-const SLIDE_GAP_EXPANDED = 24
+const SLIDE_GAP_IDLE = 24
+const SLIDE_GAP_EXPANDED = 32
 
 // --- LIGHTWEIGHT CINEMATIC ENTRANCE ANIMATIONS ---
 // Using CSS animations for GPU acceleration and smooth performance
@@ -299,7 +299,7 @@ export default function App() {
       shortTitle: "Insights",
       headline: "Dashboards & Risk Insights",
       subtext: "Data Intelligence for HRDD reporting and risk monitoring.",
-      duration: 102,
+      duration: 180,
       audioPath: "/assets/Module 5 Script.mp3",
       icon: Activity,
       playerComponent: <Module5Player progress={currentTime} />,
@@ -431,7 +431,7 @@ export default function App() {
         <LayoutGroup>
           <motion.div
             ref={containerRef}
-            className="w-full h-[75vh] flex items-center justify-center pb-10"
+            className="w-full h-[80vh] flex items-center justify-center pb-10"
             layout
           >
             <motion.div

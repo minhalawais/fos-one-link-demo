@@ -217,8 +217,11 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
   // RCA Typing Effect - Complete within stage 7 (3 seconds: 48-51s)
   // RCA text is ~320 chars, faster typing to complete in time
+  // Pre-fill if we're past stage 7
   useEffect(() => {
-    if (stage === 7 && rcaText.length < rcaFullText.length) {
+    if (stage > 7 && rcaText.length < rcaFullText.length) {
+      setRcaText(rcaFullText)
+    } else if (stage === 7 && rcaText.length < rcaFullText.length) {
       const interval = setInterval(() => {
         setRcaText((prev) => {
           if (prev.length < rcaFullText.length) {
@@ -233,8 +236,11 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
   }, [stage, rcaText.length])
 
   // Deadline Typing Effect - Stage 8 (4 seconds: 51-55s)
+  // Pre-fill if we're past stage 8
   useEffect(() => {
-    if (stage === 8 && deadlineText.length < deadlineFullText.length) {
+    if (stage > 8 && deadlineText.length < deadlineFullText.length) {
+      setDeadlineText(deadlineFullText)
+    } else if (stage === 8 && deadlineText.length < deadlineFullText.length) {
       const interval = setInterval(() => {
         setDeadlineText((prev) => {
           if (prev.length < deadlineFullText.length) {
@@ -249,8 +255,11 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
   // CAPA Typing Effect - Complete within stages 10-11 (8 seconds: 61-69s)
   // CAPA text is ~310 chars, faster typing to complete in time
+  // Pre-fill if we're past stage 11
   useEffect(() => {
-    if (stage >= 10 && stage <= 11 && capaText.length < capaFullText.length) {
+    if (stage > 11 && capaText.length < capaFullText.length) {
+      setCapaText(capaFullText)
+    } else if (stage >= 10 && stage <= 11 && capaText.length < capaFullText.length) {
       const interval = setInterval(() => {
         setCapaText((prev) => {
           if (prev.length < capaFullText.length) {
@@ -418,11 +427,14 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
   const transform = getTransform()
 
   // PHASE 1: Evidence Examination Visualization (Stages 1-4)
+  // Synced with script: 29-42s
+  // "The investigation officer examines the complaint, reviews evidence, conducts worker interviews 
+  // and cross checks records such as attendance, payroll or security records where needed."
   if (stage >= 1 && stage <= 4) {
     return (
-      <div className="w-full h-full overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex items-center justify-center font-sans relative">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-[0.02]">
+      <div className="w-full h-full overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex flex-col items-center justify-center font-sans relative px-8">
+        {/* Subtle Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03]">
           <div
             className="w-full h-full"
             style={{
@@ -432,189 +444,213 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
           />
         </div>
 
-        {/* Evidence Examination View */}
-        <div className="relative z-10 w-full max-w-5xl px-8">
+        {/* Page Header - Investigation Title */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center mb-8 z-10"
+        >
+          <h1 className="text-2xl font-bold text-[#284952]">Root Cause Analysis</h1>
+          <div className="flex items-center justify-center gap-2 mt-2">
+            <FileSearch size={16} className="text-teal-600" />
+            <span className="text-teal-600 font-mono text-sm">Complaint #XX211117-11XXXX</span>
+          </div>
+        </motion.div>
+
+        {/* Main Content Area - 3 Row Layout */}
+        <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-4xl">
+
+          {/* Row 1: Worker Interviews (Stage 2+) */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="flex items-center justify-center gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: stage >= 2 ? 1 : 0 }}
+            transition={{ duration: 0.4 }}
           >
-            {/* Header */}
-            <div className="px-6 py-4 flex items-center justify-between bg-gradient-to-r from-[#0f9690] to-[#284952]">
-              <div className="flex items-center gap-3">
-                <FileSearch size={24} className="text-white" />
-                <div>
-                  <h2 className="text-white font-bold text-lg">Evidence Examination in Progress</h2>
-                  <p className="text-white/80 text-xs">Case ID: XX211117-11XXXX</p>
+            {[
+              { id: "worker1", name: "Ahmed", role: "Kitchen Staff" },
+              { id: "worker2", name: "Fatima", role: "Supervisor" },
+              { id: "worker3", name: "Omar", role: "Security Guard" },
+            ].map((worker, idx) => (
+              <motion.div
+                key={worker.id}
+                initial={{ opacity: 0, y: -30, scale: 0.8 }}
+                animate={stage >= 2 ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -30, scale: 0.8 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 15,
+                  delay: stage >= 2 ? 0.1 + idx * 0.15 : 0
+                }}
+                className="flex flex-col items-center"
+              >
+                <div className="w-36 bg-white rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: "#60BA81" }}>
+                  <div className="px-3 py-2 flex items-center gap-2 bg-[#60BA81]">
+                    <User size={14} className="text-white" />
+                    <span className="text-white font-bold text-[10px]">Worker Interview</span>
+                  </div>
+                  <div className="px-3 py-2 bg-white">
+                    <div className="text-gray-800 font-semibold text-xs">{worker.name}</div>
+                    <div className="text-gray-500 text-[10px]">{worker.role}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="text-white text-sm">IO-MULTAN47</div>
-            </div>
-
-            {/* Content Grid */}
-            <div className="p-8 grid grid-cols-2 gap-6">
-              {/* Left: Investigation Activities */}
-              <div className="space-y-4">
-                <h3 className="font-bold text-gray-800 text-sm uppercase tracking-wider mb-4">Investigation Activities</h3>
-
-                {/* Worker Interviews - Only show structure in stage 1, activity starts at stage 2 */}
+                {/* Connection line down to IO */}
                 <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{
-                    opacity: stage >= 1 ? 1 : 0.3,
-                    x: 0,
-                    borderColor: stage >= 2 ? COLORS.teal : "#e5e7eb"
-                  }}
-                  className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-lg p-4 border-2"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center">
-                      <Users size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-gray-800">Worker Interviews</h4>
-                      <p className="text-xs text-gray-600">Conducting on-site interviews</p>
+                  className="w-0.5 bg-gradient-to-b from-[#60BA81] to-transparent"
+                  initial={{ height: 0 }}
+                  animate={stage >= 2 ? { height: 24 } : { height: 0 }}
+                  transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Row 2: Central IO Hub */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="relative flex flex-col items-center"
+          >
+            {/* Pulsing Glow Ring */}
+            <motion.div
+              className="absolute w-52 h-52 rounded-full -z-10"
+              style={{ background: `radial-gradient(circle, ${COLORS.teal}15 0%, transparent 70%)` }}
+              animate={{ scale: [1, 1.08, 1], opacity: [0.5, 0.8, 0.5] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            />
+
+            {/* IO Avatar Card */}
+            <motion.div
+              className="bg-white rounded-2xl shadow-2xl p-5 flex flex-col items-center border-2"
+              style={{ borderColor: COLORS.teal }}
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-md mb-2" style={{ borderColor: COLORS.teal }}>
+                <img src={ASSETS.officer_pc} alt="Investigation Officer" className="w-full h-full object-cover" />
+              </div>
+              <span className="text-[#284952] font-bold text-sm">Investigation Officer</span>
+              <span className="text-teal-600 text-[10px] font-mono mb-2">IO-MULTAN47</span>
+
+              {/* Status Badge */}
+              <div
+                className="px-4 py-1.5 rounded-full flex items-center gap-2"
+                style={{ backgroundColor: `${COLORS.teal}12` }}
+              >
+                <motion.div
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: stage === 4 ? "#60BA81" : COLORS.teal }}
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+                <span className="text-teal-700 text-[10px] font-medium">
+                  {stage === 1 && "Examining Complaint..."}
+                  {stage === 2 && "Conducting Interviews"}
+                  {stage === 3 && "Cross-Checking Records"}
+                  {stage === 4 && "Analysis Complete"}
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Row 3: Department Records (Stage 3+) */}
+          <motion.div
+            className="flex items-start justify-center gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: stage >= 3 ? 1 : 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {[
+              { id: "attendance", icon: Calendar, label: "Attendance Records", detail: "Last 30 Days Log", color: "#0f9690", showAt: 3 },
+              { id: "payroll", icon: FileText, label: "Payroll Records", detail: "Wage Slips & Deductions", color: "#F5A83C", showAt: 4 },
+              { id: "security", icon: Monitor, label: "Security Records", detail: "CCTV & Access Logs", color: "#284952", showAt: 4 },
+            ].map((record, idx) => (
+              <motion.div
+                key={record.id}
+                className="flex flex-col items-center"
+                initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                animate={stage >= record.showAt ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.8 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 15,
+                  delay: stage >= record.showAt ? 0.1 + idx * 0.15 : 0
+                }}
+              >
+                {/* Connection line up to IO */}
+                <motion.div
+                  className="w-0.5 bg-gradient-to-t from-transparent"
+                  style={{ background: `linear-gradient(to top, transparent, ${record.color})` }}
+                  initial={{ height: 0 }}
+                  animate={stage >= record.showAt ? { height: 24 } : { height: 0 }}
+                  transition={{ duration: 0.4, delay: 0.2 + idx * 0.1 }}
+                />
+                <div className="w-40 bg-white rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: record.color }}>
+                  <div className="px-3 py-2 flex items-center gap-2" style={{ backgroundColor: record.color }}>
+                    <record.icon size={14} className="text-white" />
+                    <span className="text-white font-bold text-[10px]">{record.label}</span>
+                  </div>
+                  <div className="px-3 py-2 bg-white">
+                    <div className="flex items-center gap-2 text-[10px] text-gray-600">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={stage >= record.showAt ? { scale: 1 } : { scale: 0 }}
+                        transition={{ type: "spring", delay: 0.5 + idx * 0.1 }}
+                      >
+                        <CheckCircle2 size={12} style={{ color: record.color }} />
+                      </motion.div>
+                      <span>{record.detail}</span>
                     </div>
                   </div>
-                  {/* Only show interview items starting from stage 2 (29s) */}
-                  {stage >= 2 && (
-                    <motion.div className="space-y-2">
-                      {evidenceItems.slice(0, 3).map((_, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.2 }}
-                          className="flex items-center gap-2 text-xs bg-white/60 rounded px-3 py-2"
-                        >
-                          <UserCheck size={14} className="text-teal-600" />
-                          <span className="text-gray-700">Interview {idx + 1} completed</span>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  )}
-                </motion.div>
-
-                {/* Records Cross-Check - Only show structure in stage 1-2, activity starts at stage 3 */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{
-                    opacity: stage >= 1 ? 1 : 0.3,
-                    x: 0,
-                    borderColor: stage >= 3 ? COLORS.green : "#e5e7eb"
-                  }}
-                  transition={{ delay: stage === 1 ? 0.2 : 0 }}
-                  className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-lg p-4 border-2"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
-                      <FolderOpen size={20} className="text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-sm text-gray-800">Records Cross-Check</h4>
-                      <p className="text-xs text-gray-600">Attendance, Payroll, Security</p>
-                    </div>
-                  </div>
-                  {/* Only show record items starting from stage 3 (33s) */}
-                  {stage >= 3 && (
-                    <motion.div className="space-y-2">
-                      {["Attendance Records", "Payroll Data", "Security Logs", "HR Policies", "Time Sheets"].slice(0, evidenceItems.length).map((record, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.15 }}
-                          className="flex items-center gap-2 text-xs bg-white/60 rounded px-3 py-2"
-                        >
-                          <CheckCircle2 size={14} className="text-green-600" />
-                          <span className="text-gray-700">{record} verified</span>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  )}
-                </motion.div>
-              </div>
-
-              {/* Right: Officer Visualization */}
-              <div className="flex flex-col items-center justify-center">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="relative"
-                >
-                  {/* Glow effect */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full bg-teal-400/30 blur-2xl"
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 0.8, 0.5],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                    }}
-                  />
-
-                  <div className="relative w-64 h-64 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 border-4 border-white shadow-2xl">
-                    <img src={ASSETS.officer_pc} alt="Investigation Officer" className="w-full h-full object-cover" />
-
-                    {/* Status Badge */}
-                    <motion.div
-                      className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white rounded-full px-4 py-2 shadow-lg border-2"
-                      style={{ borderColor: COLORS.teal }}
-                      animate={{
-                        y: [0, -5, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <motion.div
-                          className="w-2 h-2 rounded-full bg-green-500"
-                          animate={{ opacity: [1, 0.3, 1] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                        />
-                        <span className="text-xs font-bold text-gray-800">
-                          {stage === 2 && "Interviewing Workers"}
-                          {stage === 3 && "Verifying Records"}
-                          {stage === 4 && "Analyzing Evidence"}
-                          {stage === 1 && "Preparing Investigation"}
-                        </span>
-                      </div>
-                    </motion.div>
-                  </div>
-                </motion.div>
-
-                {/* Evidence Summary (Stage 4) */}
-                {stage === 4 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-6 bg-gradient-to-r from-green-50 to-teal-50 rounded-xl p-4 border-2"
-                    style={{ borderColor: COLORS.green }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <ClipboardList size={20} className="text-green-600" />
-                      <h4 className="font-bold text-sm text-gray-800">Evidence Summary</h4>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                      <div className="bg-white rounded-lg p-2">
-                        <div className="text-2xl font-bold text-teal-600">5</div>
-                        <div className="text-gray-600">Interviews</div>
-                      </div>
-                      <div className="bg-white rounded-lg p-2">
-                        <div className="text-2xl font-bold text-green-600">8</div>
-                        <div className="text-gray-600">Documents</div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-            </div>
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
+
+        {/* Evidence Summary Panel (Stage 4) */}
+        <AnimatePresence>
+          {stage === 4 && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.6 }}
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-xl px-6 py-3 border-2 shadow-xl z-20"
+              style={{ borderColor: COLORS.green }}
+            >
+              <div className="flex items-center gap-5">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.green}20` }}>
+                    <CheckCircle2 size={18} className="text-green-600" />
+                  </div>
+                  <span className="text-gray-800 font-bold text-sm">Evidence Review Complete</span>
+                </div>
+                <div className="h-6 w-px bg-gray-200" />
+                <div className="flex gap-4 text-center">
+                  <div>
+                    <div className="text-base font-black text-[#60BA81]">3</div>
+                    <div className="text-gray-500 text-[8px] uppercase">Interviews</div>
+                  </div>
+                  <div>
+                    <div className="text-base font-black text-[#0f9690]">✓</div>
+                    <div className="text-gray-500 text-[8px] uppercase">Attendance</div>
+                  </div>
+                  <div>
+                    <div className="text-base font-black text-[#F5A83C]">✓</div>
+                    <div className="text-gray-500 text-[8px] uppercase">Payroll</div>
+                  </div>
+                  <div>
+                    <div className="text-base font-black text-[#284952]">✓</div>
+                    <div className="text-gray-500 text-[8px] uppercase">Security</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     )
   }

@@ -165,8 +165,22 @@ const LoginScreen = ({ stage }: { stage: number }) => {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
 
+  const userTyped = useRef(false)
+  const passTyped = useRef(false)
+
   useEffect(() => {
-    if (stage >= 1) {
+    // Reset if back to start
+    if (stage === 0) {
+      setUsername("")
+      setPassword("")
+      userTyped.current = false
+      passTyped.current = false
+      return
+    }
+
+    // Type Username
+    if (stage >= 1 && !userTyped.current) {
+      userTyped.current = true
       const user = "multan47"
       let i = 0
       const typeUser = setInterval(() => {
@@ -182,7 +196,9 @@ const LoginScreen = ({ stage }: { stage: number }) => {
   }, [stage])
 
   useEffect(() => {
-    if (stage >= 2) {
+    // Type Password
+    if (stage >= 2 && !passTyped.current) {
+      passTyped.current = true
       const pass = "........"
       let i = 0
       const typePass = setInterval(() => {

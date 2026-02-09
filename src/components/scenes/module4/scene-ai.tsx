@@ -45,8 +45,9 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
 
     // Stages:
     // 0-6s: Ingestion (Raw feedback floating into brain)
-    // 6s+: Result (Dashboard view expansion)
-    const showDashboard = localT > 6
+    // 6-14s: Dashboard (Structured results)
+    // 14s+: Transformation (Reactive → Proactive message)
+    const stage = localT < 6 ? 'ingestion' : localT < 14 ? 'dashboard' : 'transformation'
 
     return (
         <motion.div
@@ -63,7 +64,7 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
             </div>
 
             <AnimatePresence mode="wait">
-                {!showDashboard ? (
+                {stage === 'ingestion' ? (
                     /* ===== PHASE 1: INGESTION (Raw Data -> AI) ===== */
                     <motion.div
                         key="ingestion"
@@ -100,8 +101,8 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="absolute -bottom-16 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white px-4 py-2 rounded-full shadow-lg border border-teal-100 flex items-center gap-2"
                             >
-                                <Sparkles size={16} className="text-teal-600 animate-pulse" />
-                                <span className="text-sm font-bold text-teal-800">Processing Feedback...</span>
+                                <img src="/assets/images/FOS-01.png" alt="FOS" className="w-6 h-6 object-contain" />
+                                <span className="text-sm font-bold text-teal-800">FOS Engine Processing...</span>
                             </motion.div>
                         </div>
 
@@ -117,24 +118,25 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                         ))}
 
                     </motion.div>
-                ) : (
+                ) : stage === 'dashboard' ? (
                     /* ===== PHASE 2: DASHBOARD (Structured Results) ===== */
                     <motion.div
                         key="dashboard"
                         initial={{ opacity: 0, scale: 1.1 }}
                         animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
                         className="w-full max-w-5xl p-6 z-20"
                     >
                         {/* 1. Header Section */}
                         <div className="flex items-center gap-4 mb-8">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#284952] to-[#60BA81] flex items-center justify-center shadow-lg text-white">
-                                <Brain size={24} />
+                            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-lg border-2 border-[#284952] p-1">
+                                <img src="/assets/images/FOS-01.png" alt="FOS" className="w-full h-full object-contain" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-[#284952]">AI Analysis Summary</h1>
+                                <h1 className="text-2xl font-bold text-[#284952]">FOS AI Analysis Summary</h1>
                                 <p className="text-[#767676] text-sm flex items-center gap-2">
                                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    Analysis Complete • 335 Responses Processed
+                                    FOS Engine Analysis Complete • 335 Responses
                                 </p>
                             </div>
                         </div>
@@ -153,11 +155,11 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                                     <div className="relative z-10">
                                         <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
                                             <Sparkles size={18} className="text-[#F5A83C]" />
-                                            Key Insight
+                                            FOS Key Insight
                                         </h3>
                                         <p className="opacity-90 leading-relaxed text-sm">
-                                            Analysis indicates a strong positive trend in <span className="font-bold text-[#F5A83C]">Management Cooperation</span>.
-                                            However, <span className="underline decoration-[#F5A83C] underline-offset-4 font-bold">Safety Equipment</span> availability requires immediate attention in Block B.
+                                            <span className="font-bold text-[#F5A83C]">FOS AI Analysis</span> indicates a strong positive trend in <span className="font-bold text-[#F5A83C]">Management Cooperation</span>.
+                                            However, <span className="underline decoration-[#F5A83C] underline-offset-4 font-bold">Safety Equipment</span> availability requires attention in Block B.
                                         </p>
                                     </div>
                                     {/* Abstract shapes bg */}
@@ -173,7 +175,7 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                                 >
                                     <div className="px-6 py-4 border-b border-[#DEE2E6] flex justify-between items-center">
                                         <h4 className="font-bold text-[#284952] flex items-center gap-2">
-                                            <List size={18} className="text-[#60BA81]" /> Detailed Topic Analysis
+                                            <List size={18} className="text-[#60BA81]" /> FOS Detailed Topic Analysis
                                         </h4>
                                     </div>
                                     <table className="w-full text-sm">
@@ -255,6 +257,168 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                             </div>
                         </motion.div>
                     </motion.div>
+                ) : (
+                    /* ===== PHASE 3: TRANSFORMATION (Reactive → Proactive) ===== */
+                    /* Script: "This digital survey module helps organizations switch from reactive grievance handling to proactive employee engagement and continuous improvement." */
+                    <motion.div
+                        key="transformation"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="w-full max-w-5xl p-4 z-20 flex flex-col items-center justify-center h-full scale-[0.85] origin-center"
+                    >
+                        {/* Header with floating effect */}
+                        <motion.div
+                            initial={{ y: -30, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            className="text-center mb-16 relative z-30"
+                        >
+                            <motion.div
+                                animate={{ y: [0, -5, 0] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#284952] to-[#60BA81] rounded-full text-white shadow-2xl mb-6 ring-4 ring-teal-50"
+                            >
+                                <img src="/assets/images/FOS-01.png" alt="FOS" className="w-8 h-8 object-contain brightness-0 invert" />
+                                <span className="font-bold text-lg tracking-wide">FOS Digital Transformation</span>
+                            </motion.div>
+                            <h1 className="text-4xl font-extrabold text-[#284952] mb-3 tracking-tight">From Reactive to Proactive</h1>
+                            <p className="text-[#767676] text-lg font-medium">Empowering continuous improvement with FOS engagement modules</p>
+                        </motion.div>
+
+                        {/* Transformation Visual - 3D Perspective Container */}
+                        <div className="flex items-center justify-center gap-12 w-full perspective-1000 mb-8">
+
+                            {/* Reactive Side (The Past) */}
+                            <motion.div
+                                initial={{ opacity: 0, rotateY: 45, x: -50 }}
+                                animate={{ opacity: 1, rotateY: 15, x: 0 }}
+                                transition={{ delay: 0.3, duration: 0.8 }}
+                                className="flex-1 max-w-[300px] relative group"
+                            >
+                                <div className="absolute inset-0 bg-red-500/5 blur-3xl rounded-full transform -translate-x-10 -translate-y-10" />
+
+                                <motion.div
+                                    className="bg-white/80 backdrop-blur-sm rounded-3xl border-2 border-dashed border-[#DEE2E6] p-6 shadow-xl relative overflow-hidden grayscale-[0.3] group-hover:grayscale-0 transition-all duration-500"
+                                >
+                                    {/* Dynamic Strikethrough */}
+                                    <motion.div
+                                        initial={{ pathLength: 0, opacity: 0 }}
+                                        animate={{ pathLength: 1, opacity: 1 }}
+                                        transition={{ delay: 1.5, duration: 0.8, ease: "easeInOut" }}
+                                        className="absolute inset-0 z-20 pointer-events-none"
+                                    >
+                                        <svg width="100%" height="100%" className="absolute inset-0">
+                                            <motion.line
+                                                x1="10%" y1="10%" x2="90%" y2="90%"
+                                                stroke="#E53E3E" strokeWidth="4" opacity="0.6"
+                                            />
+                                            <motion.line
+                                                x1="10%" y1="90%" x2="90%" y2="10%"
+                                                stroke="#E53E3E" strokeWidth="4" opacity="0.6"
+                                            />
+                                        </svg>
+                                    </motion.div>
+
+                                    <div className="text-center mb-4 opacity-70">
+                                        <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-orange-100 shadow-inner">
+                                            <AlertCircle size={32} className="text-[#F5A83C]" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-[#284952] mb-1">Reactive</h3>
+                                        <p className="text-[10px] font-semibold text-[#F5A83C] uppercase tracking-widest">Grievance Handling</p>
+                                    </div>
+                                    <div className="space-y-3 opacity-70">
+                                        {["Wait for complaints", "Manual tracking", "Delayed responses"].map((text, i) => (
+                                            <div key={i} className="flex items-center gap-2.5 p-2 bg-orange-50/50 rounded-lg border border-orange-100/50">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                                                <span className="text-[#555] font-medium text-xs">{text}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+
+                            {/* Digital Stream Arrow */}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.8 }}
+                                className="flex flex-col items-center justify-center relative w-24"
+                            >
+                                <motion.div
+                                    animate={{
+                                        boxShadow: ["0 0 0 0 rgba(96, 186, 129, 0)", "0 0 20px 10px rgba(96, 186, 129, 0.3)", "0 0 0 0 rgba(96, 186, 129, 0)"],
+                                        scale: [1, 1.1, 1]
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    className="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-teal-500 z-10"
+                                >
+                                    <TrendingUp size={20} className="text-teal-600" />
+                                </motion.div>
+                                <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest mt-3 bg-white/80 px-2 py-0.5 rounded backdrop-blur whitespace-nowrap">Transforming</span>
+                            </motion.div>
+
+                            {/* Proactive Side (The Future) */}
+                            <motion.div
+                                initial={{ opacity: 0, rotateY: -45, x: 50 }}
+                                animate={{ opacity: 1, rotateY: -15, x: 0 }}
+                                transition={{ delay: 0.5, duration: 0.8 }}
+                                className="flex-1 max-w-[300px] relative"
+                            >
+                                <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full transform translate-x-10 translate-y-10 animate-pulse" />
+
+                                <motion.div
+                                    className="bg-white rounded-3xl border-2 border-[#60BA81] p-6 shadow-[0_20px_50px_rgba(96,186,129,0.3)] relative overflow-hidden z-10"
+                                    animate={{ y: [-5, 5, -5] }}
+                                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                                >
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#60BA81]/20 to-transparent rounded-bl-full" />
+
+                                    <div className="text-center mb-4 relative z-10">
+                                        <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-green-200 shadow-md">
+                                            <Zap size={32} className="text-[#60BA81]" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-[#284952] mb-1">Proactive</h3>
+                                        <p className="text-[10px] font-semibold text-[#60BA81] uppercase tracking-widest">Employee Engagement</p>
+                                    </div>
+                                    <div className="space-y-3 relative z-10">
+                                        {[
+                                            { t: "Continuous Feedback", i: MessageSquare },
+                                            { t: "AI-Powered Insights", i: Brain },
+                                            { t: "Continuous Improvement", i: TrendingUp }
+                                        ].map((item, i) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ x: 20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                transition={{ delay: 1.5 + (i * 0.2) }}
+                                                className="flex items-center gap-2.5 p-2.5 bg-green-50 rounded-xl border border-green-100 shadow-sm hover:shadow-md transition-shadow cursor-default"
+                                            >
+                                                <div className="bg-white p-1.5 rounded-lg shadow-sm">
+                                                    <item.i size={14} className="text-[#60BA81]" />
+                                                </div>
+                                                <span className="text-[#284952] font-bold text-xs">{item.t}</span>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        </div>
+
+                        {/* Bottom Message */}
+                        <motion.div
+                            initial={{ y: 30, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 2.2 }}
+                            className="text-center mt-6"
+                        >
+                            <div className="inline-flex items-center gap-3 px-8 py-3 bg-white rounded-full border border-[#DEE2E6] shadow-lg">
+                                <img src="/assets/images/FOS-01.png" alt="FOS" className="w-6 h-6 object-contain" />
+                                <span className="text-base font-medium text-[#284952]">
+                                    FOS Survey Module • Powering <span className="text-[#60BA81] font-bold">Continuous Improvement</span>
+                                </span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </motion.div>
@@ -292,7 +456,10 @@ const FloatingCard = ({ item, index, total, time }: any) => {
             }}
         >
             <div className="flex items-center justify-between mb-1">
-                <span className="font-bold text-gray-400">#{1024 + index}</span>
+                <div className="flex items-center gap-1.5">
+                    <img src="/assets/images/FOS-01.png" alt="FOS" className="w-3 h-3 object-contain opacity-50" />
+                    <span className="font-bold text-gray-400">#{1024 + index}</span>
+                </div>
                 {item.type === 'positive' && <CheckCircle size={12} className="text-green-500" />}
                 {item.type === 'negative' && <AlertCircle size={12} className="text-orange-500" />}
                 {item.type === 'neutral' && <Minus size={12} className="text-gray-400" />}

@@ -83,59 +83,79 @@ interface FormDataState {
 
 // --- SUB-COMPONENTS ---
 
-const DataWave = ({ color, direction = "right" }: { color: string, direction?: "left" | "right" }) => (
-  <div className="flex gap-1.5 items-center justify-center overflow-hidden w-24">
-    {[...Array(5)].map((_, i) => (
-      <motion.div
-        key={i}
-        className="w-1.5 h-1.5 rounded-full"
-        style={{ backgroundColor: color }}
-        animate={{
-          scale: [0.8, 1.4, 0.8],
-          opacity: [0.3, 1, 0.3],
-          x: direction === "right" ? [0, 10, 0] : [0, -10, 0]
-        }}
-        transition={{
-          duration: 1.5,
-          repeat: Infinity,
-          delay: i * 0.2,
-          ease: "easeInOut"
-        }}
-      />
-    ))}
+const DataStream = ({ color, isActive, direction = "right" }: { color: string, isActive: boolean, direction?: "left" | "right" }) => (
+  <div className="flex gap-2 items-center justify-center overflow-visible w-24 relative h-6">
+    <AnimatePresence>
+      {isActive && (
+        <>
+          {/* Base Beam Line */}
+          <motion.div
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            exit={{ opacity: 0, scaleX: 0 }}
+            className="absolute h-[1px] w-full bg-gradient-to-r from-transparent via-current to-transparent opacity-20"
+            style={{ color }}
+          />
+          {/* Animated Particles */}
+          {[...Array(4)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1.5 h-1.5 rounded-full blur-[1px]"
+              style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}` }}
+              initial={{ x: direction === "right" ? -40 : 40, opacity: 0, scale: 0 }}
+              animate={{
+                x: direction === "right" ? 40 : -40,
+                opacity: [0, 1, 0],
+                scale: [0.5, 1, 0.5]
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                delay: i * 0.3,
+                ease: "linear"
+              }}
+            />
+          ))}
+        </>
+      )}
+    </AnimatePresence>
   </div>
 )
 
-const SpeakingPulse = ({ color }: { color: string }) => (
+const SpeakingPulse = ({ color, isActive }: { color: string, isActive: boolean }) => (
   <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-    {[1, 2, 3].map((i) => (
-      <motion.div
-        key={i}
-        className="absolute w-full h-full rounded-full border-2 opacity-0"
-        style={{ borderColor: color }}
-        animate={{
-          scale: [1, 1.5],
-          opacity: [0.6, 0]
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          delay: i * 0.6,
-          ease: "easeOut"
-        }}
-      />
-    ))}
+    <AnimatePresence>
+      {isActive && [1, 2].map((i) => (
+        <motion.div
+          key={i}
+          className="absolute w-full h-full rounded-full border-2"
+          style={{ borderColor: color }}
+          initial={{ scale: 1, opacity: 0 }}
+          animate={{
+            scale: [1, 1.4],
+            opacity: [0.5, 0]
+          }}
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            delay: i * 1,
+            ease: "easeOut"
+          }}
+        />
+      ))}
+    </AnimatePresence>
   </div>
 )
 
 const FormField = ({ label, children, delay = 0, className = "" }: { label: string, children: React.ReactNode, delay?: number, className?: string }) => (
   <motion.div
-    initial={{ opacity: 0, y: 10 }}
+    initial={{ opacity: 0, y: 15 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.5, ease: IOS_EASE }}
+    transition={{ delay, duration: 0.6, ease: IOS_EASE }}
     className={`flex flex-col gap-1.5 ${className}`}
   >
-    <label className="text-[10px] font-bold text-[#17161A] ml-1">{label}</label>
+    <label className="text-[10px] font-extrabold text-[#284952]/60 ml-1 uppercase tracking-wider">{label}</label>
     {children}
   </motion.div>
 )
@@ -209,8 +229,8 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
 
         // --- DATA FILLING SIMULATION (Post 9.5s) ---
         // Basic Info
-        setTimeout(() => { setTypingField("fosId"); setFormData(p => ({ ...p, fosId: "FOS-24-" })) }, 10500),
-        setTimeout(() => { setFormData(p => ({ ...p, fosId: "FOS-24-8921" })); setTypingField("name") }, 11000),
+        setTimeout(() => { setTypingField("fosId"); setFormData(p => ({ ...p, fosId: "475002" })) }, 10500),
+        setTimeout(() => { setFormData(p => ({ ...p, fosId: "475002" })); setTypingField("name") }, 11000),
         setTimeout(() => { setFormData(p => ({ ...p, name: "Ahmed Khan" })); setTypingField("company") }, 11500),
         setTimeout(() => { setFormData(p => ({ ...p, company: "Pearl Textiles" })); setTypingField("workerType") }, 12000),
         setTimeout(() => { setFormData(p => ({ ...p, workerType: "Operator" })); setTypingField("department") }, 12300),
@@ -279,51 +299,26 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
         <motion.div
           className="flex items-center gap-2"
           layout
-          transition={{ duration: 1, ease: IOS_EASE }}
+          transition={{ duration: 1.2, ease: IOS_EASE }}
         >
 
-          {/* === 1. WORKER (LEFT) - UPDATED VISUALS === */}
+          {/* === 1. WORKER (LEFT) === */}
           <motion.div
             layout
             className="flex flex-col items-center relative z-20 shrink-0"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.9, x: -20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: IOS_EASE }}
           >
             <div className="relative flex items-center justify-center">
 
-              {/* --- CALLING WAVES (Explicit "Ringing" effect) --- */}
-              {stage < 2 && (
-                <div className="absolute inset-0 z-0 flex items-center justify-center">
-                  {/* Wave 1 */}
-                  <motion.div
-                    className="absolute w-full h-full rounded-full border-[3px] border-[#60BA81]"
-                    initial={{ scale: 1, opacity: 0.8 }}
-                    animate={{ scale: 2.4, opacity: 0 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                  />
-                  {/* Wave 2 */}
-                  <motion.div
-                    className="absolute w-full h-full rounded-full border-[3px] border-[#284952]"
-                    initial={{ scale: 1, opacity: 0.8 }}
-                    animate={{ scale: 1.8, opacity: 0 }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 0.5, ease: "easeOut" }}
-                  />
-                  {/* Wave 3 (Inner pulse) */}
-                  <motion.div
-                    className="absolute w-full h-full rounded-full bg-[#F5A83C]/20"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  />
-                </div>
-              )}
-
-              {/* --- SPEAKING PULSE (Connected State) --- */}
-              {stage >= 2 && <SpeakingPulse color="#60BA81" />}
+              {/* --- RINGING / SPEAKING PULSES --- */}
+              <SpeakingPulse color="#60BA81" isActive={stage >= 1} />
 
               {/* Avatar */}
               <motion.div
+                layout
                 className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl relative z-10 bg-white"
-                layoutId="worker-avatar"
                 animate={stage < 2 ? {
                   scale: [1, 1.05, 1],
                   transition: { duration: 2, repeat: Infinity }
@@ -332,415 +327,390 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                 <img src={ASSETS.worker} alt="Worker" className="w-full h-full object-cover scale-110" />
               </motion.div>
 
-              {/* Connecting Status Badge */}
-              {stage < 2 && (
-                <motion.div
-                  className="absolute -bottom-4 z-20 bg-white/95 backdrop-blur-sm border border-[#60BA81]/30 px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <Wifi size={10} className="text-[#60BA81] animate-pulse" />
-                  <span className="text-[10px] font-bold text-[#284952] tracking-wide">Connecting...</span>
-                </motion.div>
-              )}
+              {/* Status Badge */}
+              <AnimatePresence>
+                {stage < 2 && (
+                  <motion.div
+                    className="absolute -bottom-4 z-20 bg-white px-3 py-1 rounded-full shadow-lg border border-[#60BA81]/20 flex items-center gap-1.5"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                  >
+                    <Wifi size={10} className="text-[#60BA81] animate-pulse" />
+                    <span className="text-[10px] font-bold text-[#284952] tracking-wide uppercase">Connecting</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              {/* Multi-Channel Icons - Floating around */}
+              {/* Floating Channels (Only in Stage 1) */}
               <AnimatePresence>
                 {stage < 2 && (
                   <>
-                    {/* 1. Phone (Top Left) */}
-                    <motion.div
-                      className="absolute w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center z-20 border border-[#F5A83C]/20"
-                      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                      animate={{ opacity: 1, scale: 1, x: -70, y: -50 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{ delay: 0.2, type: "spring" }}
-                      style={{ top: '50%', left: '50%', marginTop: -24, marginLeft: -24 }}
-                    >
-                      <div className="absolute -top-6 bg-[#F5A83C] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">Phone</div>
-                      <Phone size={20} className="text-[#F5A83C]" />
-                      <motion.div className="absolute inset-0 rounded-full border border-[#F5A83C]" animate={{ scale: [1, 1.3], opacity: [1, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} />
-                    </motion.div>
-
-                    {/* 2. SMS (Top Right) */}
-                    <motion.div
-                      className="absolute w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center z-20 border border-[#284952]/20"
-                      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                      animate={{ opacity: 1, scale: 1, x: 70, y: -50 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{ delay: 0.8, type: "spring" }}
-                      style={{ top: '50%', left: '50%', marginTop: -22, marginLeft: -22 }}
-                    >
-                      <div className="absolute -top-5 bg-[#284952] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">SMS</div>
-                      <Smartphone size={18} className="text-[#284952]" />
-                    </motion.div>
-
-                    {/* 3. WhatsApp (Bottom Right) */}
-                    <motion.div
-                      className="absolute w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center z-20 border border-[#60BA81]/20"
-                      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                      animate={{ opacity: 1, scale: 1, x: 70, y: 50 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{ delay: 1.6, type: "spring" }}
-                      style={{ top: '50%', left: '50%', marginTop: -24, marginLeft: -24 }}
-                    >
-                      <div className="absolute -bottom-6 bg-[#60BA81] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">WhatsApp</div>
-                      <MessageCircle size={22} className="text-[#60BA81] fill-[#60BA81]/20" />
-                    </motion.div>
-
-                    {/* 4. Email (Bottom Left) */}
-                    <motion.div
-                      className="absolute w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center z-20 border border-[#17161A]/20"
-                      initial={{ opacity: 0, scale: 0, x: 0, y: 0 }}
-                      animate={{ opacity: 1, scale: 1, x: -70, y: 50 }}
-                      exit={{ opacity: 0, scale: 0 }}
-                      transition={{ delay: 2.4, type: "spring" }}
-                      style={{ top: '50%', left: '50%', marginTop: -22, marginLeft: -22 }}
-                    >
-                      <div className="absolute -bottom-5 bg-[#17161A] text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm">Email</div>
-                      <Mail size={18} className="text-[#17161A]" />
-                    </motion.div>
+                    {[
+                      { icon: Phone, color: "#F5A83C", label: "Phone", x: -75, y: -50, delay: 0.2 },
+                      { icon: Smartphone, color: "#284952", label: "SMS", x: 75, y: -50, delay: 0.4 },
+                      { icon: MessageCircle, color: "#60BA81", label: "WhatsApp", x: 75, y: 50, delay: 0.6 },
+                      { icon: Mail, color: "#17161A", label: "Email", x: -75, y: 50, delay: 0.8 },
+                    ].map((ch, i) => (
+                      <motion.div
+                        key={i}
+                        className="absolute w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center z-20 border border-gray-100"
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1, x: ch.x, y: ch.y }}
+                        exit={{ opacity: 0, scale: 0, filter: "blur(10px)" }}
+                        transition={{ delay: ch.delay, type: "spring", stiffness: 100 }}
+                        style={{ top: '50%', left: '50%', marginTop: -24, marginLeft: -24 }}
+                      >
+                        <div className="absolute -top-6 bg-white border border-gray-100 text-[#284952] text-[8px] font-black px-2 py-0.5 rounded-full shadow-sm uppercase tracking-tighter">
+                          {ch.label}
+                        </div>
+                        <ch.icon size={20} style={{ color: ch.color }} />
+                      </motion.div>
+                    ))}
                   </>
                 )}
               </AnimatePresence>
             </div>
 
-            <motion.div className="mt-8 text-center bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white shadow-sm z-30 relative">
-              <h3 className="text-sm font-bold text-[#284952]">Factory Worker</h3>
-              <p className="text-[10px] text-[#767676] font-medium uppercase tracking-wide">Complainant</p>
+            <motion.div layout className="mt-8 text-center bg-white/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/50 shadow-sm z-30 relative">
+              <h3 className="text-sm font-black text-[#284952] tracking-tight">Factory Worker</h3>
+              <p className="text-[10px] text-[#767676] font-extrabold uppercase tracking-widest opacity-60">Complainant</p>
             </motion.div>
           </motion.div>
 
 
-          {/* === CONNECTION: WORKER -> OFFICER === */}
-          <AnimatePresence>
-            {stage >= 2 && (
-              <motion.div
-                layout
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: stage >= 3 ? "100px" : "180px" }} // Shrink when form appears
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center shrink-0 overflow-hidden"
-              >
-                <span className="text-[9px] font-bold text-[#60BA81] uppercase tracking-widest mb-2 whitespace-nowrap">Live Assist</span>
-                <DataWave color="#60BA81" direction="right" />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* === INTER-CHARACTER FLOW === */}
+          <motion.div
+            layout
+            className="flex items-center justify-center overflow-hidden"
+            initial={{ width: 0, opacity: 0 }}
+            animate={{
+              width: stage >= 2 ? (stage >= 3 ? 80 : 160) : 0,
+              opacity: stage >= 2 ? 1 : 0
+            }}
+            transition={{ duration: 0.8, ease: IOS_EASE }}
+          >
+            <DataStream color="#60BA81" isActive={stage >= 2} direction="right" />
+          </motion.div>
 
 
           {/* === 2. OFFICER (CENTER HUB) === */}
-          <AnimatePresence>
+          <AnimatePresence mode="popLayout">
             {stage >= 2 && (
               <motion.div
                 layout
                 className="flex flex-col items-center relative z-30 shrink-0"
-                initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.8, ease: IOS_EASE }}
               >
-                {/* Big Avatar for Officer */}
                 <div className="relative flex items-center justify-center">
+                  <SpeakingPulse color="#284952" isActive={stage >= 2} />
 
-                  {/* --- SPEAKING PULSE (Connected State) --- */}
-                  <SpeakingPulse color="#284952" />
-
-                  <div className="w-44 h-44 rounded-full border-[6px] border-white shadow-[0_20px_40px_-12px_rgba(40,73,82,0.2)] overflow-hidden bg-[#F0F4F8] relative z-10">
-                    <img src={ASSETS.officer} alt="Officer" className="w-full h-full object-cover" />
-                  </div>
-
-                  {/* Badge */}
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.3, type: "spring" }}
-                    className="absolute bottom-2 right-2 bg-[#284952] p-3 rounded-full shadow-lg border-2 border-white z-20"
+                    layout
+                    className="w-44 h-44 rounded-full border-[6px] border-white shadow-2xl overflow-hidden bg-white/80 relative z-10"
+                  >
+                    <img src={ASSETS.officer} alt="Officer" className="w-full h-full object-cover scale-105" />
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ scale: 0, rotate: -45 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ delay: 0.5, type: "spring" }}
+                    className="absolute bottom-2 right-2 bg-gradient-to-br from-[#284952] to-[#1e363d] p-3 rounded-full shadow-2xl border-2 border-white z-20"
                   >
                     <Headset size={20} className="text-white" />
                   </motion.div>
                 </div>
 
-                <motion.div className="mt-6 text-center bg-white/80 backdrop-blur-md px-6 py-3 rounded-xl border border-white shadow-sm relative z-10">
-                  <h3 className="text-lg font-bold text-[#284952]">Grievance Officer</h3>
-                  <p className="text-[10px] text-[#767676] font-medium uppercase tracking-wide">FOS Support</p>
+                <motion.div layout className="mt-6 text-center bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/50 shadow-sm relative z-10">
+                  <h3 className="text-lg font-black text-[#284952] tracking-tight">Grievance Officer</h3>
+                  <p className="text-[10px] text-[#767676] font-extrabold uppercase tracking-widest opacity-60">FOS System Support</p>
                 </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
 
 
-          {/* === CONNECTION: OFFICER -> FORM === */}
-          <AnimatePresence>
-            {stage >= 3 && (
-              <motion.div
-                layout
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "100px" }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center shrink-0 overflow-hidden"
-              >
-                <span className="text-[9px] font-bold text-[#284952] uppercase tracking-widest mb-2 whitespace-nowrap">Filling</span>
-                <DataWave color="#284952" direction="right" />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* === DATA FLOW TO FORM === */}
+          <motion.div
+            layout
+            className="flex items-center justify-center overflow-hidden"
+            initial={{ width: 0, opacity: 0 }}
+            animate={{
+              width: stage >= 3 ? 80 : 0,
+              opacity: stage >= 3 ? 1 : 0
+            }}
+            transition={{ duration: 0.8, ease: IOS_EASE }}
+          >
+            <DataStream color="#284952" isActive={stage >= 3} direction="right" />
+          </motion.div>
 
 
-          {/* === 3. FORM (RIGHT) === */}
+          {/* === 3. BROWSER FORM (RIGHT) === */}
           <AnimatePresence>
             {stage >= 3 && (
               <motion.div
                 layout
                 className="relative z-20 shrink-0"
-                initial={{ opacity: 0, x: 100, scale: 0.9 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                transition={{ duration: 0.8, ease: IOS_EASE }}
+                initial={{ opacity: 0, x: 100, rotateY: 20, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
+                transition={{ duration: 1, ease: IOS_EASE }}
+                style={{ perspective: 1000 }}
               >
-                {/* BROWSER FRAME CONTAINER */}
-                <div className="w-[420px] bg-white rounded-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] overflow-hidden border border-[#DEE2E6] flex flex-col">
+                {/* BROWSER FRAME */}
+                <div className="w-[420px] bg-white rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] overflow-hidden border border-[#DEE2E6] flex flex-col">
 
-                  {/* BROWSER CHROME (Header) */}
-                  <div className="bg-[#F3F4F6] px-4 py-3 flex items-center gap-4 border-b border-[#DEE2E6] shrink-0">
-                    {/* Traffic Lights */}
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F57] border border-[#E0443E]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E] border border-[#D89E24]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#28C840] border border-[#1AAB29]" />
+                  {/* HEADER CHROME */}
+                  <div className="bg-[#F3F4F6] px-4 py-3.5 flex items-center gap-4 border-b border-[#DEE2E6] shrink-0">
+                    <div className="flex gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#FF5F57] shadow-inner" />
+                      <div className="w-3 h-3 rounded-full bg-[#FEBC2E] shadow-inner" />
+                      <div className="w-3 h-3 rounded-full bg-[#28C840] shadow-inner" />
                     </div>
 
-                    {/* Address Bar */}
-                    <div className="flex-1 bg-white h-7 rounded-md border border-[#DEE2E6] shadow-sm flex items-center justify-center gap-2 px-2">
-                      <div className="w-3 h-3 text-[#767676]"><Lock size={10} /></div>
-                      <span className="text-[10px] text-[#17161A] font-medium selection:bg-[#60BA81]/20">fos.org/complaint</span>
+                    <div className="flex-1 bg-white h-8 rounded-lg border border-[#DEE2E6] shadow-sm flex items-center justify-center gap-2 px-3">
+                      <Lock size={10} className="text-[#284952]/40" />
+                      <span className="text-[11px] text-[#17161A]/60 font-medium tracking-tight">fos.org/complaint/assisted</span>
                     </div>
                   </div>
 
                   {/* FORM CONTENT (Existing Layout) */}
                   <div className="flex flex-col max-h-[420px]"> {/* Constrain height here */}
 
-                    {/* Header */}
-                    <div className="bg-[#284952] p-6 text-center text-white relative overflow-hidden shrink-0">
-                      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10" />
-                      {/* Abstract Header Shape */}
-                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#60BA81] rounded-full blur-2xl opacity-20" />
+                    {/* FORM BODY */}
+                    <div className="flex flex-col max-h-[460px]">
 
-                      <h1 className="text-xl font-bold relative z-10 tracking-tight">Complaint Filing</h1>
-                      <div className="flex items-center justify-center gap-2 mt-2 opacity-80">
-                        <span className="w-1.5 h-1.5 bg-[#60BA81] rounded-full animate-pulse" />
-                        <p className="text-[10px] uppercase tracking-widest font-semibold relative z-10">Assisted Mode Active</p>
+                      {/* Brand Header */}
+                      <div className="bg-[#284952] p-6 text-center text-white relative overflow-hidden shrink-0">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#60BA81]/20 to-transparent opacity-40" />
+                        <h1 className="text-xl font-black relative z-10 tracking-tight">Case Filing Assistant</h1>
+                        <div className="flex items-center justify-center gap-2 mt-2">
+                          <motion.div
+                            animate={{ opacity: [0.4, 1, 0.4] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="w-2 h-2 bg-[#60BA81] rounded-full shadow-[0_0_8px_#60BA81]"
+                          />
+                          <p className="text-[9px] uppercase tracking-[0.2em] font-black opacity-70">Secured FOS Uplink</p>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Form Body (Scrollable) */}
-                    <div
-                      ref={scrollContainerRef}
-                      className="p-5 bg-white overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] scroll-smooth"
-                    >
-                      {/* Search Field */}
-                      <div className="bg-[#F8FAFB] p-3 rounded-xl border border-[#DEE2E6] mb-4">
-                        <FormField label="FOS ID Lookup">
-                          <div className="flex gap-2">
-                            <div className="flex-1 relative">
-                              <FormInput value={formData.fosId} isTyping={typingField === "fosId"} placeholder="Enter ID..." />
+                      {/* Scrollable Content */}
+                      <div
+                        ref={scrollContainerRef}
+                        className="p-6 bg-white overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] scroll-smooth"
+                      >
+                        {/* Lookup Section */}
+                        <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 mb-6">
+                          <FormField label="Identity Verification">
+                            <div className="flex gap-2">
+                              <FormInput
+                                className="flex-1"
+                                value={formData.fosId}
+                                isTyping={typingField === "fosId"}
+                                placeholder="FOS-ID..."
+                              />
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="bg-[#60BA81] text-white text-[10px] font-black px-4 rounded-xl shadow-lg shadow-[#60BA81]/20 uppercase tracking-widest"
+                              >
+                                Verify
+                              </motion.button>
                             </div>
-                            <button className="bg-[#F5A83C] text-white text-[10px] font-bold px-4 rounded-lg shadow-sm hover:bg-[#E69426] transition-colors">
-                              Verify
-                            </button>
-                          </div>
-                        </FormField>
-                      </div>
+                          </FormField>
+                        </div>
 
-                      {/* Auto-Filling Grid */}
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <FormField label="Worker Name">
-                          <FormInput value={formData.name} isTyping={typingField === "name"} placeholder="Name" />
-                        </FormField>
-                        <FormField label="Factory / Unit">
-                          <FormInput value={formData.company} isTyping={typingField === "company"} placeholder="Company" />
-                        </FormField>
+                        {/* Main Data Grid */}
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                          {[
+                            { label: "Worker Name", key: "name", placeholder: "Name" },
+                            { label: "Factory Unit", key: "company", placeholder: "Company" },
+                            { label: "Employment", key: "workerType", placeholder: "Type" },
+                            { label: "Department", key: "department", placeholder: "Dept" },
+                            { label: "Designation", key: "designation", placeholder: "Desig" },
+                            { label: "Gender", key: "gender", placeholder: "Gender" },
+                          ].map((field, i) => (
+                            <FormField key={field.key} label={field.label} delay={0.1 + (i * 0.05)}>
+                              <FormInput
+                                value={formData[field.key as keyof FormDataState]}
+                                isTyping={typingField === field.key}
+                                placeholder={field.placeholder}
+                              />
+                            </FormField>
+                          ))}
 
-                        <FormField label="Emp Type">
-                          <FormInput value={formData.workerType} isTyping={typingField === "workerType"} placeholder="Type" />
-                        </FormField>
-                        <FormField label="Department">
-                          <FormInput value={formData.department} isTyping={typingField === "department"} placeholder="Dept" />
-                        </FormField>
-
-                        <FormField label="Designation">
-                          <FormInput value={formData.designation} isTyping={typingField === "designation"} placeholder="Desig" />
-                        </FormField>
-                        <FormField label="Gender">
-                          <FormInput value={formData.gender} isTyping={typingField === "gender"} placeholder="Gender" />
-                        </FormField>
-
-                        <div className="col-span-2 grid grid-cols-2 gap-3">
-                          <FormField label="Mobile Contact">
+                          <FormField label="Contact" className="col-span-1">
                             <FormInput value={formData.mobile} isTyping={typingField === "mobile"} placeholder="+92..." icon={<Phone size={12} />} />
                           </FormField>
-                          <FormField label="Incident Date">
+                          <FormField label="Incident Date" className="col-span-1">
                             <FormInput value={formData.date} isTyping={typingField === "date"} placeholder="DD/MM/YYYY" icon={<Calendar size={12} />} />
                           </FormField>
                         </div>
-                      </div>
 
-                      {/* Categories Grid */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: stage >= 3.5 ? 1 : 0 }}
-                        className="space-y-2 mb-4"
-                      >
-                        <label className="text-[10px] font-bold text-[#17161A] ml-1 uppercase tracking-wider">Classification</label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {COMPLAINT_CATEGORIES.slice(0, 6).map((cat, i) => (
-                            <motion.div
-                              key={i}
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: stage >= 4 ? 1 : 0, scale: stage >= 4 ? 1 : 0.9 }}
-                              transition={{ delay: i * 0.05 }}
-                              className={`
-                                p-2 rounded-lg border flex flex-col items-center gap-1.5 text-center cursor-pointer transition-all duration-300
+                        {/* Classification Grid */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: stage >= 4 ? 1 : 0 }}
+                          className="mb-8"
+                        >
+                          <label className="text-[10px] font-black text-[#284952]/40 ml-1 uppercase tracking-widest block mb-3">Classification</label>
+                          <div className="grid grid-cols-3 gap-2">
+                            {COMPLAINT_CATEGORIES.slice(0, 6).map((cat, i) => (
+                              <motion.div
+                                key={i}
+                                whileHover={{ scale: 1.05 }}
+                                className={`
+                                p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all duration-500
                                 ${selectedCategory === i
-                                  ? "bg-[#60BA81] border-[#60BA81] text-white shadow-lg scale-105"
-                                  : "bg-white border-[#DEE2E6] text-[#767676] opacity-60"}
+                                    ? "bg-[#60BA81] border-[#60BA81] text-white shadow-xl shadow-[#60BA81]/30 scale-105"
+                                    : "bg-white border-gray-100 text-[#284952]/40"}
                               `}
-                            >
-                              <cat.icon size={14} />
-                              <span className="text-[8px] font-bold leading-tight">{cat.label}</span>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-
-                      {/* Additional Details (New Fields) */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: stage >= 4 ? 1 : 0 }}
-                        className="space-y-3 mb-4"
-                      >
-                        <FormField label="Additional Comments">
-                          <FormInput
-                            value={formData.additionalComments}
-                            isTyping={typingField === "additionalComments"}
-                            placeholder="Details..."
-                            multiline
-                            icon={<MessageSquareQuote size={12} />}
-                          />
-                        </FormField>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <FormField label="Complaint Against">
-                            <FormInput
-                              value={formData.complaintAgainst}
-                              isTyping={typingField === "complaintAgainst"}
-                              placeholder="Person Name"
-                              icon={<User size={12} />}
-                            />
-                          </FormField>
-                          <FormField label="Concerned Dept">
-                            <FormInput
-                              value={formData.concernedDept}
-                              isTyping={typingField === "concernedDept"}
-                              placeholder="Department"
-                              icon={<Building size={12} />}
-                            />
-                          </FormField>
-                        </div>
-
-                        <FormField label="Previous History">
-                          <FormInput
-                            value={formData.history}
-                            isTyping={typingField === "history"}
-                            placeholder="Any prior issues..."
-                          />
-                        </FormField>
-
-                        <FormField label="Proposed Solution">
-                          <FormInput
-                            value={formData.solution}
-                            isTyping={typingField === "solution"}
-                            placeholder="Desired outcome..."
-                          />
-                        </FormField>
-                      </motion.div>
-
-                      {/* File Upload Simulation */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: stage >= 4.5 ? 1 : 0 }}
-                        className="mb-4"
-                      >
-                        <label className="text-[10px] font-bold text-[#17161A] ml-1 uppercase tracking-wider mb-2 block">Evidence</label>
-                        <div className="border-2 border-dashed border-[#60BA81]/40 bg-[#60BA81]/5 rounded-xl p-4 flex flex-col items-center justify-center text-center gap-2">
-                          <div className="w-8 h-8 bg-white rounded-full shadow-sm flex items-center justify-center text-[#60BA81]">
-                            <UploadCloud size={16} />
+                              >
+                                <cat.icon size={16} strokeWidth={selectedCategory === i ? 2.5 : 2} />
+                                <span className="text-[8px] font-black leading-tight uppercase tracking-tighter">{cat.label}</span>
+                              </motion.div>
+                            ))}
                           </div>
-                          <p className="text-[10px] text-[#284952] font-medium">
-                            <span className="font-bold">Evidence Uploaded</span><br />
-                            <span className="text-[#767676] font-normal">payslip_nov.pdf (1.2MB)</span>
-                          </p>
-                          <div className="w-full h-1 bg-[#DEE2E6] rounded-full overflow-hidden mt-1 max-w-[100px]">
+                        </motion.div>
+
+                        {/* Deep Details */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: stage >= 4 ? 1 : 0 }}
+                          className="space-y-4 mb-8"
+                        >
+                          <FormField label="Case Description">
+                            <FormInput
+                              value={formData.additionalComments}
+                              isTyping={typingField === "additionalComments"}
+                              placeholder="Detailed account..."
+                              multiline
+                              icon={<MessageSquareQuote size={12} />}
+                            />
+                          </FormField>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField label="Respondent">
+                              <FormInput
+                                value={formData.complaintAgainst}
+                                isTyping={typingField === "complaintAgainst"}
+                                placeholder="Name/Role"
+                                icon={<User size={12} />}
+                              />
+                            </FormField>
+                            <FormField label="Involved Dept">
+                              <FormInput
+                                value={formData.concernedDept}
+                                isTyping={typingField === "concernedDept"}
+                                placeholder="Department"
+                                icon={<Building size={12} />}
+                              />
+                            </FormField>
+                          </div>
+                        </motion.div>
+
+                        {/* Evidence Vault */}
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: stage >= 4.5 ? 1 : 0 }}
+                          className="mb-6"
+                        >
+                          <label className="text-[10px] font-black text-[#284952]/40 ml-1 uppercase tracking-widest block mb-3">Supporting Evidence</label>
+                          <div className="border-2 border-dashed border-[#60BA81]/20 bg-gray-50/50 rounded-2xl p-6 flex flex-col items-center text-center gap-3">
                             <motion.div
-                              className="h-full bg-[#60BA81]"
-                              initial={{ width: 0 }}
-                              animate={{ width: "100%" }}
-                              transition={{ duration: 1.5, delay: 0.5 }}
-                            />
+                              animate={{ y: [0, -4, 0] }}
+                              transition={{ duration: 2, repeat: Infinity }}
+                              className="w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center text-[#60BA81]"
+                            >
+                              <UploadCloud size={20} />
+                            </motion.div>
+                            <div className="space-y-1">
+                              <p className="text-[11px] text-[#284952] font-black uppercase tracking-tight">Evidence Secured</p>
+                              <p className="text-[10px] text-[#767676] font-medium opacity-60 italic">payslip_nov_24.pdf (1.2MB)</p>
+                            </div>
+                            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-2 max-w-[140px]">
+                              <motion.div
+                                className="h-full bg-gradient-to-r from-[#60BA81] to-[#28C840]"
+                                initial={{ width: 0 }}
+                                animate={{ width: "100%" }}
+                                transition={{ duration: 2, delay: 0.5 }}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      </motion.div>
+                        </motion.div>
 
-                      {/* Submit Area */}
-                      <div className="mt-5 pt-4 border-t border-[#DEE2E6] flex justify-end">
-                        <div className="flex items-center gap-2">
-                          <div className="text-[9px] text-right text-[#767676] leading-tight">
-                            Verified by<br />Officer
+                        {/* Actions */}
+                        <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-[8px] font-black text-[#284952]/30 uppercase tracking-[0.2em]">Verified By</span>
+                            <span className="text-[10px] font-bold text-[#284952]">FOS-SYSTEM-ID-99</span>
                           </div>
-                          <button className="bg-gradient-to-r from-[#284952] to-[#1e363d] text-white px-8 py-2 rounded-lg font-bold text-xs shadow-lg transform transition-transform active:scale-95">
-                            Submit Case
-                          </button>
+                          <motion.button
+                            whileHover={{ scale: 1.05, x: 4 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="bg-gradient-to-r from-[#284952] to-[#1e363d] text-white px-8 py-3 rounded-xl font-black text-[10px] shadow-xl uppercase tracking-widest flex items-center gap-2"
+                          >
+                            Establish Case
+                            <CheckCircle2 size={14} className="text-[#60BA81]" />
+                          </motion.button>
                         </div>
+
                       </div>
-
                     </div>
+
+                    {/* --- REPLICATED TICKET CONFIRMATION OVERLAY --- */}
+                    <AnimatePresence>
+                      {stage >= 5 && (
+                        <motion.div
+                          className="absolute inset-0 bg-[#F8F9FA]/95 backdrop-blur-md z-50 flex items-center justify-center p-6"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                        >
+                          <motion.div
+                            className="w-full max-w-md bg-white shadow-2xl rounded-lg overflow-hidden border-t-[6px] border-[#198754]"
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                          >
+                            <div className="p-8 flex flex-col items-center">
+                              {/* Success Icon */}
+                              <div className="mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="text-[#198754]" width="75" height="75"
+                                  fill="currentColor" viewBox="0 0 16 16">
+                                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                  <path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z" />
+                                </svg>
+                              </div>
+
+                              {/* Content */}
+                              <div className="text-center">
+                                <h1 className="text-[25px] font-bold text-[#212529] mb-3">WH020289-1121437</h1>
+                                <p className="text-[#6C757D] text-sm mb-8">
+                                  Your ticket number has been generated successfully.
+                                </p>
+
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  className="px-6 py-2.5 border border-[#198754] text-[#198754] rounded font-medium text-sm hover:bg-[#198754] hover:text-white transition-colors duration-300"
+                                >
+                                  Register Another Complaint
+                                </motion.button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
-
-                  {/* --- SUCCESS OVERLAY --- */}
-                  <AnimatePresence>
-                    {stage >= 5 && (
-                      <motion.div
-                        className="absolute inset-0 bg-white/95 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-8"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      >
-                        <motion.div
-                          initial={{ scale: 0, rotate: -20 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                          className="w-20 h-20 bg-[#60BA81]/10 rounded-full flex items-center justify-center mb-4"
-                        >
-                          <CheckCircle2 size={40} className="text-[#60BA81]" />
-                        </motion.div>
-
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.2 }}
-                          className="text-center"
-                        >
-                          <h2 className="text-2xl font-bold text-[#284952] mb-1">FOS-24-8921</h2>
-                          <p className="text-xs text-[#767676] font-medium uppercase tracking-wide mb-8">Case Filed Successfully</p>
-
-                          <button className="w-full px-8 py-2.5 border-2 border-[#60BA81] text-[#60BA81] rounded-xl hover:bg-[#60BA81] hover:text-white transition-all font-bold text-xs">
-                            Close & Notify Worker
-                          </button>
-                        </motion.div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
+
 
         </motion.div>
       </div>

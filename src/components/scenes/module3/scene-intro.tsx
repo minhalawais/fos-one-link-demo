@@ -1,92 +1,101 @@
-
 "use client"
 
 import { motion } from "framer-motion"
-import { Search, FileCheck, CheckCircle2, ListFilter } from "lucide-react"
+import { Search, ShieldCheck, Activity, SearchIcon } from "lucide-react"
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
 
-export const SceneInvestigation = ({ isActive }: { isActive: boolean }) => {
+export const SceneIntro = ({ isActive }: { isActive: boolean }) => {
   return (
-    <div className="w-full h-full flex items-center justify-center bg-[#F5F5F7] relative overflow-hidden font-sans">
-      
-      {/* Background Mesh */}
-      <div className="absolute inset-0 opacity-[0.03]" 
-            style={{ backgroundImage: 'radial-gradient(#284952 1px, transparent 1px)', backgroundSize: '30px 30px' }} 
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F5F5F7] overflow-hidden font-sans">
+
+      {/* Dynamic Background Gradient */}
+      <motion.div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vh] h-[150vh] min-w-[800px] bg-gradient-to-tr from-[#0f9690]/10 via-[#284952]/5 to-transparent rounded-full blur-[100px]"
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.3, 0.5, 0.3],
+          rotate: [0, 90, 0]
+        }}
+        transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
       />
 
-      <div className="relative z-10 flex flex-col items-center">
-        
-        {/* Animated Process Visual */}
-        <div className="relative w-80 h-40 flex items-center justify-center mb-10">
-            {/* The Document */}
+      <div className="relative z-10 flex flex-col items-center justify-center">
+
+        {/* Main Icon Composition */}
+        <div className="relative mb-8">
+          <motion.div
+            initial={{ scale: 0.5, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+            className="relative z-20 w-32 h-32 bg-gradient-to-br from-[#284952] to-[#1a2e33] rounded-[2.5rem] shadow-2xl shadow-[#284952]/30 flex items-center justify-center text-white"
+          >
+            <Search size={56} strokeWidth={1.5} />
+
+            {/* Resolution Badge */}
             <motion.div
-                initial={{ x: -100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 1, ease: IOS_EASE }}
-                className="w-24 h-32 bg-white rounded-xl shadow-xl border border-[#DEE2E6] flex flex-col p-3 gap-2 relative z-0"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.6, type: "spring" }}
+              className="absolute -top-3 -right-3 w-10 h-10 bg-[#60BA81] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
             >
-                <div className="w-8 h-8 rounded-full bg-[#F5F5F7] flex items-center justify-center mb-1">
-                    <ListFilter size={14} className="text-[#284952]" />
-                </div>
-                <div className="w-full h-2 bg-[#F5F5F7] rounded-full" />
-                <div className="w-2/3 h-2 bg-[#F5F5F7] rounded-full" />
-                <div className="w-full h-2 bg-[#F5F5F7] rounded-full mt-auto" />
-                
-                {/* Result Stamp */}
-                <motion.div 
-                    initial={{ opacity: 0, scale: 1.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 1.2, type: "spring" }}
-                    className="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-[2px] rounded-xl"
-                >
-                    <CheckCircle2 size={40} className="text-[#60BA81]" />
-                </motion.div>
+              <ShieldCheck size={16} className="text-white" />
             </motion.div>
 
-            {/* The Scanner / Glass */}
+            {/* Tracking Badge */}
             <motion.div
-                initial={{ x: -60, opacity: 0 }}
-                animate={{ x: 60, opacity: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.2 }}
-                className="absolute z-20"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.8, type: "spring" }}
+              className="absolute -bottom-3 -left-3 w-10 h-10 bg-[#F5A83C] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
             >
-                <div className="w-20 h-20 rounded-full border-[6px] border-[#284952] bg-white/20 backdrop-blur-md shadow-2xl flex items-center justify-center">
-                    <Search size={32} className="text-[#284952]" strokeWidth={3} />
-                </div>
-                {/* Handle */}
-                <div className="absolute top-[85%] left-[85%] w-4 h-12 bg-[#284952] rounded-full -rotate-45 origin-top-left -z-10" />
+              <Activity size={16} className="text-white" />
             </motion.div>
+          </motion.div>
+
+          {/* Ripple Effect */}
+          <motion.div
+            className="absolute inset-0 bg-[#284952]/10 rounded-[2.5rem] blur-xl"
+            animate={{ scale: [0.8, 1.4, 0.8], opacity: [0.3, 0, 0.3] }}
+            transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          />
         </div>
 
-        {/* Text Composition */}
-        <div className="text-center">
+        {/* Typography */}
+        <div className="text-center space-y-2">
           <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#284952]/5 text-[#284952] text-xs font-bold uppercase tracking-widest mb-4"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#284952]/5 text-[#284952] text-xs font-bold uppercase tracking-widest mb-2"
           >
             Module 03
           </motion.div>
-          
+
           <motion.h1
+            initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
+            animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+            transition={{ delay: 0.3, duration: 0.8, ease: IOS_EASE }}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#17161A]"
+          >
+            Investigation & Resolution
+          </motion.h1>
+
+          <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8, ease: IOS_EASE }}
-            className="text-5xl md:text-6xl font-bold tracking-tighter text-[#1d1d1f] mb-3"
+            transition={{ delay: 0.5, duration: 0.8, ease: IOS_EASE }}
+            className="flex items-center justify-center gap-6 mt-4"
           >
-            Investigation
-          </motion.h1>
-          
-          <motion.p
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8, ease: IOS_EASE }}
-            className="text-xl text-[#767676] max-w-md mx-auto leading-relaxed"
-          >
-            Systematic workflows for fair and transparent resolution.
-          </motion.p>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#60BA81]" />
+              <span className="text-lg font-medium text-[#767676]">Fair</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#0f9690]" />
+              <span className="text-lg font-medium text-[#767676]">Transparent</span>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

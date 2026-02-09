@@ -8,6 +8,7 @@ import {
     LayoutDashboard, MousePointer2
 } from "lucide-react"
 import { useMemo } from "react"
+import { SceneIntro } from "./module4-intro.tsx"
 
 // --- SYSTEM COLORS ---
 const COLORS = {
@@ -26,29 +27,6 @@ interface SceneProps {
     progress: number
 }
 
-// ==========================================
-// 1. INTRO VIEW (0-4s)
-// ==========================================
-const IntroView = () => (
-    <motion.div
-        key="intro"
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="w-full h-full flex flex-col items-center justify-center bg-white z-10 absolute inset-0"
-    >
-        <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center shadow-xl"
-            style={{ background: `linear-gradient(135deg, ${COLORS.teal}, ${COLORS.darkTeal})` }}
-        >
-            <LayoutDashboard size={48} className="text-white" />
-        </motion.div>
-        <h1 className="text-5xl font-bold mb-3" style={{ color: COLORS.teal }}>
-            Survey Management
-        </h1>
-        <p className="text-xl text-gray-500 font-medium tracking-wide">Create. Manage. Analyze.</p>
-    </motion.div>
-)
 
 // ==========================================
 // 2. DASHBOARD LIST VIEW (4-8s)
@@ -330,7 +308,7 @@ export const SceneInitiation = ({ isActive, progress }: SceneProps) => {
     return (
         <div className="w-full h-full font-sans overflow-hidden relative">
             <AnimatePresence mode="wait">
-                {view === 'intro' && <IntroView />}
+                {view === 'intro' && <SceneIntro isActive={isActive} />}
                 {view === 'dashboard' && <DashboardView progress={progress} />}
                 {view === 'details' && <DetailsView progress={progress} />}
             </AnimatePresence>

@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
 import {
   Building2,
@@ -20,6 +19,9 @@ import {
   ShieldCheck,
   CheckCircle2,
 } from "lucide-react"
+
+import { SceneAI } from "./scene-ai.tsx"
+import { SceneTimeline } from "./scene-timeline.tsx"
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
 
@@ -56,21 +58,84 @@ interface SceneDashboardProps {
   progress: number
 }
 
-// Site data matching the exact screenshot - with Treedom icons
-const SITES = [
-  { name: "(OLD) F-7", hasLogo: true },
-  { name: "1 COMMERCIAL", hasLogo: true },
-  { name: "BAHRIA PHASE-4", hasLogo: true },
-  { name: "BAHRIA PHASE-7", hasLogo: true },
-  { name: "CENTAURUS", hasLogo: true, selected: true },
-  { name: "CHAKLALA SCH...", hasLogo: true },
-  { name: "F-10 MARKAZ", hasLogo: true },
-  { name: "GIGA MALL", hasLogo: true },
-  { name: "GOLRA MOR", hasLogo: true },
-  { name: "GULBAHAR ROA...", hasLogo: true },
-]
+// --- MANAGEMENT ROLE DATA (DYNAMIC) ---
+const ROLE_DATA = {
+  CEO: {
+    title: "COMPANY_A",
+    subtitle: "CEO OF COMPANY A",
+    stats: { total: 482, anonymous: 64, completed: 395, inProcess: 87 },
+    sites: [
+      { name: "ILO", hasLogo: true },
+      { name: "CENTAURUS", hasLogo: true, selected: true },
+      { name: "BAHRIA-4", hasLogo: true },
+      { name: "BAHRIA-7", hasLogo: true },
+      { name: "F-10 MARKAZ", hasLogo: true },
+      { name: "GIGA MALL", hasLogo: true },
+    ]
+  },
+  REGIONAL: {
+    title: "LAHORE REGION",
+    subtitle: "REGIONAL MANAGER (LAHORE)",
+    stats: { total: 142, anonymous: 18, completed: 112, inProcess: 30 },
+    sites: [
+      { name: "NORTH UNIT", hasLogo: true },
+      { name: "SOUTH UNIT", hasLogo: true, selected: true },
+      { name: "EAST UNIT", hasLogo: true },
+      { name: "WEST UNIT", hasLogo: true },
+      { name: "W/HOUSE 1", hasLogo: true },
+      { name: "W/HOUSE 2", hasLogo: true },
+    ]
+  },
+  SITE: {
+    title: "CENTAURUS SITE",
+    subtitle: "SITE COMPLIANCE TEAM",
+    stats: { total: 37, anonymous: 12, completed: 25, inProcess: 12 },
+    sites: [
+      { name: "FLOOR 1", hasLogo: true },
+      { name: "FLOOR 2", hasLogo: true, selected: true },
+      { name: "FLOOR 3", hasLogo: true },
+      { name: "ASSEMBLY", hasLogo: true },
+      { name: "PACKING", hasLogo: true },
+      { name: "DRYING", hasLogo: true },
+    ]
+  }
+}
 
-// Complaints categories data - exact from screenshot
+const FILTER_TRANSITION_DATA = {
+  SITES: [
+    { name: "ILO", hasLogo: true },
+    { name: "CENTAURUS", hasLogo: true, selected: true },
+    { name: "BAHRIA-4", hasLogo: true },
+    { name: "BAHRIA-7", hasLogo: true },
+    { name: "F-10 MARKAZ", hasLogo: true },
+    { name: "GIGA MALL", hasLogo: true },
+  ],
+  DEPARTMENTS: [
+    { name: "HUMAN RES.", hasLogo: false },
+    { name: "PRODUCTION", hasLogo: false, selected: true },
+    { name: "I.T. DEPT", hasLogo: false },
+    { name: "MAINTENANCE", hasLogo: false },
+    { name: "LOGISTICS", hasLogo: false },
+    { name: "ENG. TEAM", hasLogo: false },
+  ],
+  SUPPLIERS: [
+    { name: "SUPPLIER A", hasLogo: false },
+    { name: "GLOB. FABRIC", hasLogo: false, selected: true },
+    { name: "TEXTILE PRO", hasLogo: false },
+    { name: "ECO YARN", hasLogo: false },
+    { name: "PRIME LABEL", hasLogo: false },
+    { name: "FAST LOG.", hasLogo: false },
+  ],
+  BRANCHES: [
+    { name: "LAHORE H.Q.", hasLogo: false },
+    { name: "KARACHI B.", hasLogo: false, selected: true },
+    { name: "ISL. PLANT", hasLogo: false },
+    { name: "MULTAN CTR.", hasLogo: false },
+    { name: "PESHAWAR U.", hasLogo: false },
+    { name: "QUETTA DEP.", hasLogo: false },
+  ]
+}
+
 const COMPLAINT_CATEGORIES = [
   { name: "Workplace Health, Safety and Environment", percentage: 0 },
   { name: "Freedom of Association", percentage: 0 },
@@ -85,7 +150,6 @@ const COMPLAINT_CATEGORIES = [
   { name: "Workplace Discipline", percentage: 56 },
 ]
 
-// Gender complaint data - exact from screenshot
 const GENDER_DATA = [
   { category: "Workplace Hea...", male: 0, female: 0 },
   { category: "Freedom of Asso...", male: 0, female: 0 },
@@ -100,7 +164,6 @@ const GENDER_DATA = [
   { category: "Discipline", male: 20, female: 0 },
 ]
 
-// Resolution time data - exact from screenshot
 const RESOLUTION_TIME = [
   { label: "Within same day", count: 21 },
   { label: "Within 3 days", count: 3 },
@@ -108,21 +171,13 @@ const RESOLUTION_TIME = [
   { label: "More than 10 days", count: 0 },
 ]
 
-// Survey reports - exact from screenshot
 const SURVEY_REPORTS = [
   { title: "Exit Interview Report June-25", date: "Jul 10, 2025", hasView: true },
-  {
-    title: "Employee Well Being Survey (CHZ Call Centre)",
-    date: "Jun 30, 2025",
-    hasView: true,
-    hasPdf: true,
-    hasCsv: true,
-  },
+  { title: "Employee Well Being Survey (CHZ Call Centre)", date: "Jun 30, 2025", hasView: true, hasPdf: true, hasCsv: true },
   { title: "Quaterly Employee Due Diligence Survey & Assessment Report May-25", date: "Jun 19, 2025", hasView: true },
   { title: "Exit Interview Report May-25", date: "Jun 4, 2025", hasView: true },
 ]
 
-// Feedback items - exact from screenshot
 const FEEDBACK_ITEMS = [
   { title: "Poor Fitting Company Jackets", date: "Nov 13, 2025" },
   { title: "Shift Change Request Denied Unfairly", date: "Nov 12, 2025" },
@@ -131,29 +186,48 @@ const FEEDBACK_ITEMS = [
 
 const loadScript = (src: string) =>
   new Promise<void>((resolve, reject) => {
-    // Check if script is already loaded
     const existingScript = document.querySelector(`script[src="${src}"]`);
     if (existingScript) {
       resolve();
       return;
     }
-
     const script = document.createElement("script");
     script.src = src;
     script.async = true;
-    
-    script.onload = () => {
-      console.log(`Script loaded: ${src}`);
-      resolve();
-    };
-    
-    script.onerror = () => {
-      console.error(`Failed to load script: ${src}`);
-      reject(new Error(`Failed to load script: ${src}`));
-    };
-    
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
     document.head.appendChild(script);
   });
+
+// --- LIGHTWEIGHT STATIC GAUGE (Fallback for Transitions) ---
+const StaticGauge = ({ value, color }: { value: number; color: string }) => {
+  return (
+    <div className="relative w-[160px] h-[160px] flex items-center justify-center">
+      <svg className="w-full h-full" viewBox="0 0 200 200">
+        {/* Background Track */}
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#F0F2F5" strokeWidth="20" strokeLinecap="round" />
+        {/* Value Arc (Simple Approximation) */}
+        <circle
+          cx="100"
+          cy="100"
+          r="80"
+          fill="none"
+          stroke={color}
+          strokeWidth="20"
+          strokeLinecap="round"
+          strokeDasharray="502" // 2 * pi * 80
+          strokeDashoffset={502 - (502 * value) / 100}
+          transform="rotate(-90 100 100)"
+          className="transition-all duration-1000 ease-out"
+        />
+      </svg>
+      <div className="absolute flex flex-col items-center">
+        <span className="text-3xl font-bold text-[#284952]">{value}</span>
+        <span className="text-[10px] text-gray-400 font-bold uppercase">% Score</span>
+      </div>
+    </div>
+  )
+}
 
 const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId: string }) => {
   const chartRef = useRef<HTMLDivElement>(null)
@@ -162,48 +236,30 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
 
   useEffect(() => {
     let mounted = true
-
     const loadScripts = async () => {
       try {
         await loadScript("/assets/jscharting.js")
         await loadScript("/assets/types.js")
         await new Promise((resolve) => setTimeout(resolve, 200))
-
-        if (mounted) {
-          setScriptsLoaded(true)
-        }
+        if (mounted) setScriptsLoaded(true)
       } catch (error) {
         console.error("Failed to load JSCharting scripts:", error)
       }
     }
-
     loadScripts()
-
-    return () => {
-      mounted = false
-    }
+    return () => { mounted = false }
   }, [])
 
   useEffect(() => {
     if (!scriptsLoaded || !chartRef.current) return
-
     let mounted = true
 
     const initChart = async () => {
       // @ts-ignore
       const JSC = window.JSC
-
-      if (!JSC || !mounted) {
-        console.warn("JSC not available or component unmounted")
-        return
-      }
-
+      if (!JSC || !mounted) return
       if (chartInstance.current) {
-        try {
-          chartInstance.current.dispose()
-        } catch (e) {
-          console.warn("Error disposing old chart:", e)
-        }
+        try { chartInstance.current.dispose() } catch (e) { }
       }
 
       const minValue = 0
@@ -215,54 +271,36 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
           width: 180,
           height: 180,
           license: { jscharting: "no-logo-button" },
-
           legend_visible: false,
           defaultTooltip_enabled: false,
           xAxis_spacingPercentage: 0.4,
-
           yAxis: [
             {
               id: "ax1",
               defaultTick: { padding: 10, enabled: false },
               customTicks: [0, 25, 50, 75, 100],
-              line: {
-                width: 10,
-                breaks: {},
-                color: "smartPalette:pal1",
-              },
+              line: { width: 10, breaks: {}, color: "smartPalette:pal1" },
               scale_range: [minValue, maxValue],
             },
-
             {
               id: "ax2",
               scale_range: [minValue, maxValue],
               defaultTick: { padding: 10, enabled: false },
               customTicks: [minValue, maxValue],
-              line: {
-                width: 10,
-                color: "smartPalette:pal2",
-              },
+              line: { width: 10, color: "smartPalette:pal2" },
             },
           ],
-
           defaultSeries: {
             type: "gauge column roundcaps",
             shape: {
-              label: {
-                text: "%max",
-                align: "center",
-                verticalAlign: "middle",
-                style_fontSize: 20,
-              },
+              label: { text: "%max", align: "center", verticalAlign: "middle", style_fontSize: 20 },
             },
           },
-
           series: [
             {
               type: "column roundcaps",
               name: "Temperatures",
               yAxis: "ax1",
-
               palette: {
                 id: "pal1",
                 pointValue: "%yValue",
@@ -273,7 +311,6 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
                   { value: [75, 100], color: "#21D683" },
                 ],
               },
-
               points: [["x", [0, value]]],
             },
           ],
@@ -282,18 +319,12 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
         console.error("Error initializing JSCharting chart:", error)
       }
     }
-
     const timer = setTimeout(initChart, 100)
-
     return () => {
       mounted = false
       clearTimeout(timer)
       if (chartInstance.current) {
-        try {
-          chartInstance.current.dispose()
-        } catch (e) {
-          console.warn("Error disposing chart on unmount:", e)
-        }
+        try { chartInstance.current.dispose() } catch (e) { }
       }
     }
   }, [scriptsLoaded, value])
@@ -324,6 +355,7 @@ const ScoreCard = ({
   delay = 0,
   showFactors,
   iconColor,
+  staticMode = false // New Prop for preventing crashes
 }: {
   title: string
   icon: React.ElementType
@@ -334,6 +366,7 @@ const ScoreCard = ({
   delay?: number
   showFactors: boolean
   iconColor: string
+  staticMode?: boolean
 }) => {
   return (
     <motion.div
@@ -342,12 +375,8 @@ const ScoreCard = ({
       transition={{ duration: 0.6, delay, ease: "backOut" }}
       className="bg-white rounded-xl border border-[#DEE2E6]/60 p-3 flex flex-col items-center relative overflow-hidden shadow-sm"
     >
-      {/* HEADER */}
       <div className="flex items-center gap-2 mb-1">
-        <div
-          className="w-6 h-6 rounded-full flex items-center justify-center"
-          style={{ backgroundColor: `${iconColor}15` }}
-        >
+        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: `${iconColor}15` }}>
           <Icon size={14} style={{ color: iconColor }} />
         </div>
         <h2 className="text-[10px] font-bold" style={{ color: COLORS.deepTeal }}>
@@ -355,77 +384,174 @@ const ScoreCard = ({
         </h2>
       </div>
 
-      {/* CHART */}
       <div className="relative flex items-center justify-center" style={{ minHeight: 160 }}>
-        <JSChartingCircularColorBar value={value} chartId={chartId} />
+        {/* Conditional Rendering: Static SVG vs Heavy JSChart */}
+        {staticMode ? (
+          <StaticGauge value={value} color={iconColor} />
+        ) : (
+          <JSChartingCircularColorBar value={value} chartId={chartId} />
+        )}
       </div>
-
-      
     </motion.div>
   )
 }
 
 export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
-  const sceneStart = 6
-  const sceneEnd = 16
-  const sceneProgress = Math.max(0, Math.min(1, (progress - sceneStart) / (sceneEnd - sceneStart)))
+  // --- TIMING CONSTANTS (Aligned with Script) ---
+  const TIMING = {
+    ROLE_SWAP_1: 11,
+    ROLE_SWAP_2: 17,
+    ROLE_SWAP_3: 22,
+    FILTERS_HIGHLIGHT: 24,
+    FILTER_SITE: 26.5,
+    FILTER_DEPT: 28.5,
+    FILTER_SUPP: 30.5,
+    FILTER_BRANCH: 32.5,
+    DATE_RANGE_OPEN: 34,
+    FILTERS_END: 35.5,
+    OVERVIEW_HIGHLIGHT: 40,
+    OVERVIEW_TOTAL: 41.5,
+    OVERVIEW_ANON: 43.5,
+    OVERVIEW_CLOSED: 45.5,
+    OVERVIEW_INPROCESS: 47.5,
+    OVERVIEW_BOUNCED: 49.5,
+    OVERVIEW_END: 51,
+    HEAVY_CHARTS_END: 60,
+    COUNSELING_START: 88,
+    COUNSELING_END: 102,
+    INTERACTIVE_START: 110,
+  }
 
-  // Animation timeline synced with voiceover
-  const showDashboard = sceneProgress > 0.05
-  const showHeader = sceneProgress > 0.1
-  const showFilters = sceneProgress > 0.15
-  const showStatCards = sceneProgress > 0.25
-  const highlightTotal = sceneProgress > 0.35 && sceneProgress < 0.5
-  const highlightOpen = sceneProgress > 0.45 && sceneProgress < 0.6
-  const highlightInProcess = sceneProgress > 0.55 && sceneProgress < 0.7
-  const highlightResolved = sceneProgress > 0.65 && sceneProgress < 0.8
-  const showFullDashboard = sceneProgress > 0.75
-  const showHappinessFactors = sceneProgress > 0.78
-  const showSafetyFactors = sceneProgress > 0.82
+  const showHeader = isActive
+  const showFilters = isActive
+  const showStatCards = isActive
+  const showFullDashboard = isActive
+  const showHappinessFactors = isActive
+  const showSafetyFactors = isActive
+
+  const getManagementInfo = () => {
+    if (progress < TIMING.ROLE_SWAP_1) return ROLE_DATA.CEO
+    if (progress < TIMING.ROLE_SWAP_2) return ROLE_DATA.REGIONAL
+    return ROLE_DATA.SITE
+  }
+
+  const role = getManagementInfo()
+
+  const isSwap1 = Math.abs(progress - TIMING.ROLE_SWAP_1) < 0.8
+  const isSwap2 = Math.abs(progress - TIMING.ROLE_SWAP_2) < 0.8
+  const isSwap3 = Math.abs(progress - TIMING.ROLE_SWAP_3) < 0.8
+  const isFocusing = isSwap1 || isSwap2 || isSwap3
+
+  const showFiltersGlow = progress >= TIMING.FILTERS_HIGHLIGHT && progress <= TIMING.FILTERS_END
+  const showStatCardsGlow = progress >= TIMING.OVERVIEW_HIGHLIGHT && progress <= TIMING.OVERVIEW_END
+  const isBouncedHighlight = progress >= TIMING.OVERVIEW_BOUNCED && progress < TIMING.OVERVIEW_END
+  const isCounselingHighlight = progress >= 89.5 && progress < 101
+
+  const shouldRenderHeavyCharts = progress < TIMING.HEAVY_CHARTS_END || progress > TIMING.INTERACTIVE_START
+  const showDetailModal = progress >= 118 && progress < 128
+  const showTimelineModal = progress >= 128 && progress < 137
+  const anyFocusActive = showFiltersGlow || isBouncedHighlight || isCounselingHighlight || showDetailModal || showTimelineModal
+
+  // Updated Blur Logic: Reduced blur radius (3px) and increased opacity (0.8)
+  const headerBlurDuringFilters = anyFocusActive ? "blur(3px) opacity(0.8)" : "blur(0px) opacity(1)"
+  const dashboardDimFilter = (showDetailModal || showTimelineModal) ? "blur(20px) brightness(0.7) grayscale(20%)" : "none"
+
+  const headerScale = isFocusing ? 1.15 : 1
+  const headerZIndex = isFocusing ? 100 : 50
 
   return (
     <div className="w-full h-full bg-[#F5F5F7] relative overflow-hidden font-sans">
-      {/* Subtle ambient glow */}
       <motion.div
         className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#60BA81]/5 rounded-full blur-[120px]"
         animate={{ opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
       />
 
-      {/* Dashboard Container */}
+      {/* Simulated Cursor and Click for Cinematic Transition (114s - 118s) */}
+      <AnimatePresence>
+        {progress >= 114 && progress < 118 && (
+          <motion.div
+            initial={{ x: 600, y: 400, opacity: 0 }}
+            animate={{
+              x: 110, y: 190, // Move towards "Total Complaints" card (below statistics)
+              opacity: 1
+            }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="absolute z-[1000] pointer-events-none"
+          >
+            {/* Simple SVG Cursor */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <motion.path
+                d="M3 3L21 11L13 13L11 21L3 3Z"
+                fill="white"
+                stroke="black"
+                strokeWidth="2"
+                animate={{
+                  scale: progress >= 116 && progress < 116.5 ? [1, 0.8, 1] : 1
+                }}
+              />
+              {/* Click Pulse */}
+              {progress >= 116 && (
+                <motion.circle
+                  cx="3" cy="3" r="20"
+                  stroke="#60BA81"
+                  strokeWidth="2"
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: [0, 1, 0], scale: [0, 2] }}
+                  transition={{ duration: 0.6 }}
+                />
+              )}
+            </svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{
-          opacity: showDashboard ? 1 : 0,
-          scale: showDashboard ? 1 : 0.95,
-          y: showDashboard ? 0 : 30,
+          opacity: isActive ? 1 : 0,
+          scale: progress >= 117 && progress < 118 ? 1.05 : 1, // Slight predictive zoom before modal
+          filter: dashboardDimFilter
         }}
+        exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
         transition={{ duration: 0.8, ease: IOS_EASE }}
         className="relative z-10 w-full h-full flex flex-col"
       >
-        {/* ===== HEADER BAR - Exact match ===== */}
+        {/* ===== HEADER BAR ===== */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: showHeader ? 1 : 0, y: showHeader ? 0 : -20 }}
-          transition={{ duration: 0.5, ease: IOS_EASE }}
-          className="bg-white border-b border-[#DEE2E6] px-4 py-2 flex items-center justify-between"
+          animate={{
+            scale: headerScale,
+            zIndex: headerZIndex,
+            y: isFocusing ? 100 : 0,
+            filter: headerBlurDuringFilters,
+            boxShadow: isFocusing ? "0 40px 100px rgba(0,0,0,0.3)" : "0 1px 2px rgba(0,0,0,0.05)"
+          }}
+          transition={{ duration: 0.8, ease: IOS_EASE }}
+          className="bg-white border-b border-[#DEE2E6] px-4 py-2 flex items-center justify-between relative"
         >
           <div className="flex items-center gap-3">
-            {/* FOS Logo */}
             <div className="w-10 h-10 flex items-center justify-center">
-              <img
-                src="/assets/vertical_logo.png"
-                alt="Fruit of Sustainability Logo"
-                className="w-32 h-32 object-contain"
-              />
+              <img src="/assets/vertical_logo.png" alt="Fruit of Sustainability Logo" className="w-32 h-32 object-contain" />
             </div>
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] text-[#60BA81] font-semibold tracking-wide">COMPANY_A</span>
-            <span className="text-sm font-bold text-[#284952]">Human Rights Due Diligence Dashboard</span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={role.subtitle}
+                initial={{ opacity: 0, y: 10, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
+                transition={{ duration: 0.4 }}
+                className={`font-bold text-[#284952] transition-all duration-500 ${isFocusing ? 'text-lg' : 'text-sm'}`}
+              >
+                {role.subtitle}
+              </motion.span>
+            </AnimatePresence>
+            <span className="text-[10px] text-[#60BA81] font-bold tracking-[0.15em] uppercase">
+              Human Rights Due Diligence Dashboard
+            </span>
           </div>
           <div className="flex items-center gap-3">
-            {/* Company Logo */}
             <div className="w-8 h-8 flex items-center justify-center">
               <img src="/assets/company_logo.png" alt="Company Logo" className="w-8 h-8 object-contain rounded-full" />
             </div>
@@ -437,59 +563,97 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
         </motion.div>
 
         {/* ===== MAIN CONTENT ===== */}
-        <div className="flex-1 overflow-hidden p-2">
-          {/* ===== TOP FILTER ROW - Wrapped in gray card like HTML ===== */}
+        <div className="flex-1 overflow-visible p-2">
+          {/* ===== TOP FILTER ROW ===== */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: showFilters ? 1 : 0, y: showFilters ? 0 : 10 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: IOS_EASE }}
-            className="bg-[#DEE2E6] rounded-lg p-2 mb-2"
+            animate={{
+              boxShadow: showFiltersGlow ? "0 0 80px rgba(96, 186, 129, 0.8)" : "none",
+              border: showFiltersGlow ? "3px solid #60BA81" : "2px solid transparent",
+              scale: showFiltersGlow ? 1.08 : 1,
+              zIndex: showFiltersGlow ? 200 : 1,
+              y: showFiltersGlow ? 80 : 0,
+              backgroundColor: showFiltersGlow ? "#FFFFFF" : "#DEE2E6",
+              // Apply gentle blur when OTHER things (like Counseling) are focused
+              filter: (anyFocusActive && !showFiltersGlow) ? "blur(3px) opacity(0.8) grayscale(20%)" : "none"
+            }}
+            transition={{ duration: 0.8, ease: IOS_EASE }}
+            className="rounded-lg p-2 mb-2 relative overflow-visible"
           >
+            {showFiltersGlow && (
+              <motion.div
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+              />
+            )}
             <div className="grid grid-cols-12 gap-2">
-              {/* Statistics Section */}
-              <div className="col-span-3 bg-white rounded-lg p-2">
+              <motion.div
+                className="col-span-3 bg-white rounded-lg p-2 relative"
+                animate={{
+                  scale: 1,
+                  boxShadow: "none"
+                }}
+              >
                 <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">STATISTICS</div>
                 <div className="bg-gradient-to-r from-[#60BA81] to-[#4e9e6b] rounded-md px-3 py-2 flex items-center justify-center gap-2">
                   <span className="text-white text-[9px] font-medium">All Time Complaints:</span>
-                  <span className="text-white text-lg font-bold bg-white/20 px-2 py-0.5 rounded">365</span>
+                  <motion.span
+                    key={role.stats.total}
+                    initial={{ scale: 1.2, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="text-white text-lg font-bold bg-white/20 px-2 py-0.5 rounded"
+                  >
+                    {role.stats.total}
+                  </motion.span>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Sites Filter */}
               <div className="col-span-6 bg-white rounded-lg p-2">
-                <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">SITES FILTER</div>
-                <div className="flex items-center gap-1 overflow-hidden">
-                  <button className="shrink-0 w-5 h-5 flex items-center justify-center">
-                    <ChevronDown size={12} className="text-[#284952]" />
-                  </button>
-                  <div className="flex gap-1.5 overflow-hidden items-end">
-                    {SITES.slice(0, 11).map((site, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: showFilters ? 1 : 0, scale: showFilters ? 1 : 0.8 }}
-                        transition={{ delay: 0.2 + i * 0.02 }}
-                        className="flex flex-col items-center shrink-0"
-                      >
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${
-                            site.selected ? "border-[#284952] bg-[#284952]" : "border-[#60BA81]/30 bg-white"
-                          }`}
-                        >
-                          <img
-                            src={`/assets/${i + 1}.png`}
-                            alt={`Site ${i + 1}`}
-                            className={`w-10 h-10 object-contain ${site.selected ? "filter brightness-0 invert" : ""}`}
-                          />
-                        </div>
-                        <span className="text-[5px] text-[#767676] mt-0.5 w-10 text-center truncate">{site.name}</span>
-                      </motion.div>
-                    ))}
-                  </div>
+                <motion.div
+                  key={!showFiltersGlow ? "NORMAL" : progress < TIMING.FILTER_DEPT ? "SITE" : progress < TIMING.FILTER_SUPP ? "DEPT" : progress < TIMING.FILTER_BRANCH ? "SUPP" : "BRANCH"}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-[8px] font-bold text-[#17161A] mb-1 text-center font-mono tracking-widest uppercase"
+                >
+                  {!showFiltersGlow ? "UNIT FILTER (ACCESS LEVEL)" :
+                    progress < TIMING.FILTER_DEPT ? "VIEW BY SITE" :
+                      progress < TIMING.FILTER_SUPP ? "VIEW BY DEPARTMENT" :
+                        progress < TIMING.FILTER_BRANCH ? "VIEW BY SUPPLIER" : "VIEW BY BRANCH"}
+                </motion.div>
+                <div className="flex items-center gap-2 justify-center py-1">
+                  <AnimatePresence mode="popLayout">
+                    {(!showFiltersGlow ? role.sites :
+                      progress < TIMING.FILTER_DEPT ? FILTER_TRANSITION_DATA.SITES :
+                        progress < TIMING.FILTER_SUPP ? FILTER_TRANSITION_DATA.DEPARTMENTS :
+                          progress < TIMING.FILTER_BRANCH ? FILTER_TRANSITION_DATA.SUPPLIERS :
+                            FILTER_TRANSITION_DATA.BRANCHES).map((item, i) => (
+                              <motion.div
+                                key={item.name}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8, position: 'absolute' }}
+                                transition={{ delay: i * 0.03, duration: 0.3 }}
+                                className="flex flex-col items-center shrink-0"
+                              >
+                                <motion.div
+                                  animate={{
+                                    scale: item.selected ? 1.15 : 1,
+                                    backgroundColor: item.selected ? "#206E71" : "#FFFFFF",
+                                    borderColor: item.selected ? "#206E71" : "#DEE2E6"
+                                  }}
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow-md transition-colors duration-300`}
+                                >
+                                  <Building2 size={16} className={item.selected ? "text-white" : "text-[#284952]"} />
+                                </motion.div>
+                                <span className={`text-[7px] mt-1 w-14 text-center truncate font-medium ${item.selected ? "text-[#206E71] font-bold" : "text-[#284952]"}`}>
+                                  {item.name}
+                                </span>
+                              </motion.div>
+                            ))}
+                  </AnimatePresence>
                 </div>
               </div>
-              {/* Filters & Search */}
-              <div className="col-span-3 bg-white rounded-lg p-2">
+              <div className="col-span-3 bg-white rounded-lg p-2 relative">
                 <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">FILTERS</div>
                 <div className="grid grid-cols-2 gap-1">
                   <div>
@@ -498,161 +662,225 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                       <Search size={10} className="text-[#767676]" />
                     </div>
                   </div>
-                  <div>
+                  <div className="relative">
                     <div className="text-[6px] text-[#767676] text-center mb-0.5">DATE RANGE</div>
-                    <div className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center px-1">
+                    <motion.div
+                      animate={{
+                        borderColor: progress >= TIMING.DATE_RANGE_OPEN ? "#60BA81" : "transparent",
+                        boxShadow: progress >= TIMING.DATE_RANGE_OPEN ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none"
+                      }}
+                      className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center px-1 border-2"
+                    >
                       <span className="text-[6px] text-[#17161A]">Oct 28, 2025 - Nov 26, 2025</span>
-                    </div>
+                    </motion.div>
+
+                    <AnimatePresence>
+                      {progress >= TIMING.DATE_RANGE_OPEN && progress <= TIMING.FILTERS_END && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                          transition={{ duration: 0.4, ease: IOS_EASE }}
+                          className="absolute top-8 left-0 right-0 bg-white rounded-lg shadow-2xl border border-[#DEE2E6] p-2 z-50"
+                        >
+                          <div className="grid grid-cols-7 gap-0.5 mb-1">
+                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                              <div key={i} className="text-[5px] text-center text-[#767676] font-bold">{d}</div>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-7 gap-0.5">
+                            {[...Array(28)].map((_, i) => {
+                              const day = i + 1
+                              const isInRange = day >= 10 && day <= 26
+                              const isStart = day === 10
+                              const isEnd = day === 26
+                              return (
+                                <motion.div
+                                  key={i}
+                                  initial={{ opacity: 0, scale: 0.5 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: i * 0.01, duration: 0.2 }}
+                                  className={`text-[5px] w-3 h-3 flex items-center justify-center rounded-full 
+                                    ${isStart || isEnd ? 'bg-[#60BA81] text-white' : ''}
+                                    ${isInRange && !isStart && !isEnd ? 'bg-[#60BA81]/20 text-[#284952]' : ''}
+                                    ${!isInRange ? 'text-[#767676]' : ''}
+                                  `}
+                                >
+                                  {day}
+                                </motion.div>
+                              )
+                            })}
+                          </div>
+                          <div className="mt-1 pt-1 border-t border-[#DEE2E6] flex justify-between items-center">
+                            <span className="text-[5px] text-[#60BA81] font-bold">17 days selected</span>
+                            <motion.div
+                              animate={{ scale: [1, 1.1, 1] }}
+                              transition={{ repeat: Infinity, duration: 1 }}
+                              className="bg-[#60BA81] text-white text-[5px] px-1.5 py-0.5 rounded"
+                            >
+                              Apply
+                            </motion.div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* ===== STAT CARDS ROW - 4 green cards ===== */}
+          {/* ===== STAT CARDS ROW ===== */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: showStatCards ? 1 : 0 }}
-            className="grid grid-cols-4 gap-2 mb-2"
+            animate={{
+              filter: (showFiltersGlow || isBouncedHighlight || isCounselingHighlight) ? "blur(3px) opacity(0.8) grayscale(20%)" : "none",
+              zIndex: showStatCardsGlow ? 250 : 10
+            }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-4 gap-2 mb-2 relative"
           >
+            {/* ... (Stat cards content unchanged) ... */}
             {/* Total Complaints */}
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{
-                opacity: showStatCards ? 1 : 0,
-                y: showStatCards ? 0 : 20,
-                scale: highlightTotal ? 1.05 : 1,
-                boxShadow: highlightTotal ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none",
+                scale: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON) ? 1.15 :
+                  (progress >= 116 && progress < 117) ? 1.05 : 1,
+                boxShadow: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON)
+                  ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)" :
+                  (progress >= 116 && progress < 117) ? "0 0 40px rgba(96, 186, 129, 0.5)"
+                    : "none",
+                y: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON) ? -15 : 0,
+                zIndex: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON || (progress >= 116 && progress < 117)) ? 100 : 1,
+                filter: (showStatCardsGlow && !(progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON))
+                  ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
+                borderWidth: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON || (progress >= 116 && progress < 117)) ? 3 : 0,
+                borderColor: "#FFFFFF"
               }}
-              transition={{ duration: 0.4, ease: IOS_EASE }}
-              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden"
+              transition={{ duration: 0.5, ease: IOS_EASE }}
+              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
             >
-              {highlightTotal && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.8, 0] }}
-                  transition={{ duration: 0.8, repeat: 3 }}
-                  className="absolute inset-0 border-3 border-white rounded-lg"
-                />
-              )}
-              <p className="text-2xl font-bold text-white">37</p>
+              <motion.p key={role.stats.total} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
+                {role.stats.total}
+              </motion.p>
               <p className="text-[9px] text-white/90">Total Complaints</p>
             </motion.div>
 
             {/* Anonymous Complaints */}
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{
-                opacity: showStatCards ? 1 : 0,
-                y: showStatCards ? 0 : 20,
-                scale: highlightOpen ? 1.05 : 1,
-                boxShadow: highlightOpen ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none",
+                scale: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 1.15 : 1,
+                boxShadow: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED
+                  ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
+                  : "none",
+                y: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? -15 : 0,
+                zIndex: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 100 : 1,
+                filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED)
+                  ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
+                borderWidth: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 3 : 0,
+                borderColor: "#FFFFFF"
               }}
-              transition={{ duration: 0.4, delay: 0.1, ease: IOS_EASE }}
-              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden"
+              transition={{ duration: 0.5, ease: IOS_EASE }}
+              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
             >
-              {highlightOpen && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.8, 0] }}
-                  transition={{ duration: 0.8, repeat: 3 }}
-                  className="absolute inset-0 border-3 border-white rounded-lg"
-                />
-              )}
-              <p className="text-2xl font-bold text-white">12</p>
+              <motion.p key={role.stats.anonymous} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
+                {role.stats.anonymous}
+              </motion.p>
               <p className="text-[9px] text-white/90">Anonymous Complaints</p>
             </motion.div>
 
-            {/* Completed Complaints */}
+            {/* Completed/Closed Complaints */}
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{
-                opacity: showStatCards ? 1 : 0,
-                y: showStatCards ? 0 : 20,
-                scale: highlightResolved ? 1.05 : 1,
-                boxShadow: highlightResolved ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none",
+                scale: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 1.15 : 1,
+                boxShadow: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS
+                  ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
+                  : "none",
+                y: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? -15 : 0,
+                zIndex: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 100 : 1,
+                filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS)
+                  ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
+                borderWidth: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 3 : 0,
+                borderColor: "#FFFFFF"
               }}
-              transition={{ duration: 0.4, delay: 0.2, ease: IOS_EASE }}
-              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden"
+              transition={{ duration: 0.5, ease: IOS_EASE }}
+              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
             >
-              {highlightResolved && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.8, 0] }}
-                  transition={{ duration: 0.8, repeat: 3 }}
-                  className="absolute inset-0 border-3 border-white rounded-lg"
-                />
-              )}
-              <p className="text-2xl font-bold text-white">25</p>
-              <p className="text-[9px] text-white/90">Completed Complaints</p>
+              <motion.p key={role.stats.completed} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
+                {role.stats.completed}
+              </motion.p>
+              <p className="text-[9px] text-white/90">Closed Complaints</p>
             </motion.div>
 
             {/* In Process Complaints */}
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{
-                opacity: showStatCards ? 1 : 0,
-                y: showStatCards ? 0 : 20,
-                scale: highlightInProcess ? 1.05 : 1,
-                boxShadow: highlightInProcess ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none",
+                scale: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 1.15 : 1,
+                boxShadow: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED
+                  ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
+                  : "none",
+                y: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? -15 : 0,
+                zIndex: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 100 : 1,
+                filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED)
+                  ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
+                borderWidth: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 3 : 0,
+                borderColor: "#FFFFFF"
               }}
-              transition={{ duration: 0.4, delay: 0.3, ease: IOS_EASE }}
-              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden"
+              transition={{ duration: 0.5, ease: IOS_EASE }}
+              className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
             >
-              {highlightInProcess && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.8, 0] }}
-                  transition={{ duration: 0.8, repeat: 3 }}
-                  className="absolute inset-0 border-3 border-white rounded-lg"
-                />
-              )}
-              <p className="text-2xl font-bold text-white">12</p>
+              <motion.p key={role.stats.inProcess} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
+                {role.stats.inProcess}
+              </motion.p>
               <p className="text-[9px] text-white/90">In Process Complaints</p>
             </motion.div>
           </motion.div>
 
           {/* ===== MAIN DASHBOARD GRID ===== */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: showFullDashboard ? 1 : 0 }}
+            animate={{
+              opacity: isActive ? 1 : 0,
+            }}
             transition={{ duration: 0.5 }}
             className="grid grid-cols-12 gap-2"
             style={{ height: "calc(100% - 140px)" }}
           >
             {/* LEFT COLUMN - 25% width */}
-            <div className="col-span-3 flex flex-col gap-2">
+            <div className="col-span-3 flex flex-col gap-2 relative">
               {/* Complaints Status Card */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : -20 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
+                animate={{
+                  opacity: showFullDashboard ? 1 : 0,
+                  x: isBouncedHighlight ? 300 : (showFullDashboard ? 0 : -20),
+                  y: isBouncedHighlight ? 100 : 0,
+                  scale: isBouncedHighlight ? 1.8 : 1,
+                  zIndex: isBouncedHighlight ? 500 : 1,
+                  boxShadow: isBouncedHighlight ? "0 40px 80px rgba(0,0,0,0.5)" : "0 1px 2px rgba(0,0,0,0.05)",
+                  borderColor: isBouncedHighlight ? "#60BA81" : "#DEE2E6",
+                  filter: (anyFocusActive && !isBouncedHighlight) ? "blur(3px) opacity(0.8) grayscale(20%)" : "none"
+                }}
+                transition={{ duration: 0.6, ease: IOS_EASE }}
+                className="bg-white rounded-lg border p-2 shadow-sm"
               >
                 <h3 className="text-[9px] font-semibold text-[#284952] mb-2">Complaints Status</h3>
                 <div className="flex justify-around">
-                  {/* Bounced 1.0 */}
                   <div className="text-center">
                     <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                      <img src="/assets/bounced_image.png" alt="Bounced 1.0" className="w-6 h-6 object-contain" />
+                      <img src="/assets/images/bounce_image.png" alt="Bounced 1.0" className="w-6 h-6 object-contain" />
                     </div>
                     <p className="text-[7px] text-[#284952]">Bounced 1.0</p>
                     <p className="text-sm font-bold text-[#284952]">2.7%</p>
                   </div>
-
-                  {/* Bounced 2.0 */}
                   <div className="text-center">
                     <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                      <img src="/assets/bounced_image1.png" alt="Bounced 2.0" className="w-6 h-6 object-contain" />
+                      <img src="/assets/images/bounce_image1.png" alt="Bounced 2.0" className="w-6 h-6 object-contain" />
                     </div>
                     <p className="text-[7px] text-[#284952]">Bounced 2.0</p>
                     <p className="text-sm font-bold text-[#284952]">0.0%</p>
                   </div>
-
-                  {/* Unclosed */}
                   <div className="text-center">
                     <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                      <img src="/assets/unclosed_image.png" alt="Unclosed" className="w-6 h-6 object-contain" />
+                      <img src="/assets/images/unclosed_image.png" alt="Unclosed" className="w-6 h-6 object-contain" />
                     </div>
                     <p className="text-[7px] text-[#284952]">Unclosed</p>
                     <p className="text-sm font-bold text-[#284952]">0.0%</p>
@@ -660,23 +888,46 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                 </div>
               </motion.div>
 
-              {/* Counseling Sessions Analysis - Nested Donut */}
+              {/* Counseling Sessions Analysis - CENTERED NOW */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : -20 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm flex-1"
+                animate={{
+                  opacity: showFullDashboard ? 1 : 0,
+                  // Expert Centering: 150% x-offset perfectly centers a 3-column card in a 12-column grid
+                  x: isCounselingHighlight ? "150%" : (showFullDashboard ? 0 : -20),
+                  y: isCounselingHighlight ? -126 : 0,
+                  scale: isCounselingHighlight ? 2.2 : 1,
+                  transformZ: isCounselingHighlight ? 0.1 : 0, // Force high-fidelity GPU composition
+                  zIndex: isCounselingHighlight ? 500 : 1,
+                  // Expert Filter Fix: 'none' is used instead of 'blur(0px)' to avoid subpixel rasterization blur
+                  filter: (anyFocusActive && !isCounselingHighlight)
+                    ? "blur(3px) opacity(0.8) grayscale(20%)"
+                    : "none",
+                  boxShadow: isCounselingHighlight ? "0 60px 100px rgba(0,0,0,0.4)" : "0 1px 2px rgba(0,0,0,0.05)",
+                  borderColor: isCounselingHighlight ? "#60BA81" : "#DEE2E6"
+                }}
+                style={{
+                  willChange: "transform, opacity",
+                  transformStyle: "preserve-3d",
+                  backfaceVisibility: "hidden"
+                }}
+                transition={{ duration: 0.6, ease: IOS_EASE }}
+                className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm flex-1 flex flex-col"
               >
                 <h3 className="text-[9px] font-semibold text-[#284952] mb-1">Counseling Sessions Analysis</h3>
-                <div className="flex items-center justify-center h-24">
-                  <CounselingDonutChart showAnimation={showFullDashboard} />
+                <div className="flex-1 flex items-center justify-center">
+                  <CounselingDonutChart showAnimation={showFullDashboard} progress={progress} />
                 </div>
               </motion.div>
 
               {/* Complaints By Categories */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : -20 }}
+                animate={{
+                  opacity: showFullDashboard ? 1 : 0,
+                  x: showFullDashboard ? 0 : -20,
+                  filter: anyFocusActive ? "blur(3px) opacity(0.8) grayscale(20%)" : "blur(0px) opacity(1)"
+                }}
                 transition={{ delay: 0.3 }}
                 className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm flex-1 overflow-hidden"
               >
@@ -685,15 +936,19 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   {COMPLAINT_CATEGORIES.map((cat, i) => (
                     <div key={i} className="flex items-center gap-1">
                       <span className="text-[5px] text-[#767676] w-20 truncate">{cat.name}</span>
-                      <div className="flex-1 h-2.5 bg-[#e6f5d7] rounded overflow-hidden">
+                      <div className="flex-1 h-2.5 bg-[#e6f5d7] rounded relative overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: showFullDashboard ? `${cat.percentage}%` : 0 }}
                           transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
                           className="h-full bg-[#206E71] rounded"
                         />
+                        {cat.percentage > 0 && (
+                          <span className="absolute inset-y-0 right-1 flex items-center text-[4px] text-white pointer-events-none">
+                            {cat.percentage}%
+                          </span>
+                        )}
                       </div>
-                      <span className="text-[6px] text-[#284952] w-6 text-right font-medium">{cat.percentage}%</span>
                     </div>
                   ))}
                 </div>
@@ -702,9 +957,14 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
             </div>
 
             {/* CENTER COLUMN - 50% width */}
-            <div className="col-span-6 flex flex-col gap-2">
+            <motion.div
+              animate={{
+                filter: anyFocusActive ? "blur(3px) opacity(0.8) grayscale(20%)" : "blur(0px) opacity(1)"
+              }}
+              className="col-span-6 flex flex-col gap-2"
+            >
               <div className="grid grid-cols-2 gap-2">
-                {/* Worker Happiness Score */}
+                {/* Worker Happiness Score - Using Static Mode to prevent crashes */}
                 <ScoreCard
                   title="Worker Happiness Score"
                   icon={Smile}
@@ -715,9 +975,10 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   delay={0}
                   showFactors={showHappinessFactors}
                   iconColor={COLORS.freshGreen}
+                  staticMode={!shouldRenderHeavyCharts} // Pass the flag
                 />
 
-                {/* Worker Safety Score */}
+                {/* Worker Safety Score - Using Static Mode */}
                 <ScoreCard
                   title="Worker Safety Score"
                   icon={ShieldCheck}
@@ -728,10 +989,11 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   delay={0.1}
                   showFactors={showSafetyFactors}
                   iconColor={COLORS.warmOrange}
+                  staticMode={!shouldRenderHeavyCharts} // Pass the flag
                 />
               </div>
 
-              {/* Employees Feedback Section - Orange header */}
+              {/* Employees Feedback Section */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
@@ -742,9 +1004,7 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   <div className="flex items-center justify-center gap-2">
                     <h3 className="text-[10px] font-bold text-white">Employees Feedback / Suggestion List</h3>
                     <span className="bg-white/20 text-white text-[7px] px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <span className="bg-white text-[#F5A83C] text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                        46
-                      </span>
+                      <span className="bg-white text-[#F5A83C] text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">46</span>
                       Feedbacks
                     </span>
                   </div>
@@ -767,7 +1027,7 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                 </div>
               </motion.div>
 
-              {/* Complaints by Gender - Horizontal bar chart */}
+              {/* Complaints by Gender */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
@@ -805,7 +1065,6 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                     </div>
                   ))}
                 </div>
-                {/* Gender Summary */}
                 <div className="flex justify-center gap-6 mt-1.5 pt-1.5 border-t border-[#DEE2E6]">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[#4A90D9] text-[7px]">♂ MALE</span>
@@ -819,11 +1078,15 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   </div>
                 </div>
               </motion.div>
-            </div>
+            </motion.div>
 
             {/* RIGHT COLUMN - 25% width */}
-            <div className="col-span-3 flex flex-col gap-2">
-              {/* Executive Summary */}
+            <motion.div
+              animate={{
+                filter: anyFocusActive ? "blur(3px) opacity(0.8) grayscale(20%)" : "blur(0px) opacity(1)"
+              }}
+              className="col-span-3 flex flex-col gap-2"
+            >
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
@@ -857,7 +1120,6 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                 </div>
               </motion.div>
 
-              {/* Resolution Time Per Complaint - Table */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
@@ -868,12 +1130,8 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-[#2D9480]">
-                      <th className="text-[6px] text-white text-left px-1.5 py-1 rounded-l font-semibold">
-                        TIME TAKEN
-                      </th>
-                      <th className="text-[6px] text-white text-right px-1.5 py-1 rounded-r font-semibold">
-                        NO OF COMPLAINTS
-                      </th>
+                      <th className="text-[6px] text-white text-left px-1.5 py-1 rounded-l font-semibold">TIME TAKEN</th>
+                      <th className="text-[6px] text-white text-right px-1.5 py-1 rounded-r font-semibold">NO OF COMPLAINTS</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -893,7 +1151,6 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                 </table>
               </motion.div>
 
-              {/* Survey Reports - Green gradient card */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
@@ -925,9 +1182,7 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                               <Eye size={6} /> View
                             </button>
                           )}
-                          {report.hasPdf && (
-                            <button className="bg-[#E74C3C] text-white text-[5px] px-1 py-0.5 rounded">PDF</button>
-                          )}
+                          {report.hasPdf && <button className="bg-[#E74C3C] text-white text-[5px] px-1 py-0.5 rounded">PDF</button>}
                           {report.hasCsv && (
                             <button className="bg-[#F5A83C] text-white text-[5px] px-1 py-0.5 rounded flex items-center gap-0.5">
                               <Download size={5} /> CSV
@@ -939,146 +1194,196 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   ))}
                 </div>
               </motion.div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
-      </motion.div>
-    </div>
+      </motion.div >
+
+      {/* --- CINEMATIC MODAL OVERLAYS --- */}
+      <AnimatePresence>
+        {showDetailModal && (
+          <motion.div
+            key="detail-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[2000] flex items-center justify-center"
+          >
+            <SceneAI isActive={true} progress={progress} />
+          </motion.div>
+        )}
+        {showTimelineModal && (
+          <motion.div
+            key="timeline-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[2000] flex items-center justify-center"
+          >
+            <SceneTimeline isActive={true} progress={progress} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div >
   )
 }
 
-function CounselingDonutChart({ showAnimation }: { showAnimation: boolean }) {
+function CounselingDonutChart({ showAnimation, progress }: { showAnimation: boolean; progress: number }) {
+  // Determine cinematic focus based on timing (88s - 102s)
+  const getActiveData = () => {
+    if (progress < 90) return null
+    if (progress >= 90 && progress < 93) return { id: "out-green", label: "Production", value: "124", color: "#60BA81", type: "DEPARTMENT" }
+    if (progress >= 93 && progress < 96) return { id: "out-red", label: "HR & Admin", value: "38", color: "#E74C3C", type: "DEPARTMENT" }
+    if (progress >= 96 && progress < 99) return { id: "in-green", label: "Lahore HQ", value: "102", color: "#60BA81", type: "BRANCH" }
+    if (progress >= 99 && progress < 102) return { id: "in-red", label: "Karachi Unit", value: "22", color: "#E74C3C", type: "BRANCH" }
+    return null
+  }
+
+  const activeData = getActiveData()
+  const isFocusMode = !!activeData
+
+  // Helper for opacity
+  const getOpacity = (id: string) => {
+    if (!isFocusMode) return 1
+    return activeData.id === id ? 1 : 0.1
+  }
+
   return (
-    <svg viewBox="0 0 100 100" className="w-28 h-28">
-      {/* Outer ring - 5 segments with exact colors from screenshot */}
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke="#60BA81"
-        strokeWidth="12"
-        strokeDasharray="70 251.2"
-        strokeDashoffset="0"
-        initial={{ strokeDasharray: "0 251.2" }}
-        animate={{ strokeDasharray: showAnimation ? "70 251.2" : "0 251.2" }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke="#F5A83C"
-        strokeWidth="12"
-        strokeDasharray="55 251.2"
-        strokeDashoffset="-70"
-        initial={{ strokeDasharray: "0 251.2" }}
-        animate={{ strokeDasharray: showAnimation ? "55 251.2" : "0 251.2" }}
-        transition={{ delay: 0.4, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke="#284952"
-        strokeWidth="12"
-        strokeDasharray="50 251.2"
-        strokeDashoffset="-125"
-        initial={{ strokeDasharray: "0 251.2" }}
-        animate={{ strokeDasharray: showAnimation ? "50 251.2" : "0 251.2" }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke="#E74C3C"
-        strokeWidth="12"
-        strokeDasharray="40 251.2"
-        strokeDashoffset="-175"
-        initial={{ strokeDasharray: "0 251.2" }}
-        animate={{ strokeDasharray: showAnimation ? "40 251.2" : "0 251.2" }}
-        transition={{ delay: 0.6, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke="#9CA3AF"
-        strokeWidth="12"
-        strokeDasharray="36.2 251.2"
-        strokeDashoffset="-215"
-        initial={{ strokeDasharray: "0 251.2" }}
-        animate={{ strokeDasharray: showAnimation ? "36.2 251.2" : "0 251.2" }}
-        transition={{ delay: 0.7, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
+    <div className="relative w-36 h-36 flex items-center justify-center">
+      <svg viewBox="0 0 100 100" className="w-full h-full absolute inset-0" style={{ shapeRendering: "geometricPrecision" }}>
+        {/* Outer ring - 5 segments */}
+        {/* GREEN (Production) */}
+        <motion.circle
+          cx="50" cy="50" r="40" fill="none" stroke="#60BA81"
+          strokeWidth={activeData?.id === "out-green" ? 16 : 12}
+          strokeDasharray="70 251.2"
+          initial={{ strokeDasharray: "0 251.2" }}
+          animate={{
+            strokeDasharray: showAnimation ? "70 251.2" : "0 251.2",
+            opacity: getOpacity("out-green")
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
+        {/* YELLOW */}
+        <motion.circle
+          cx="50" cy="50" r="40" fill="none" stroke="#F5A83C" strokeWidth="12"
+          strokeDasharray="55 251.2" strokeDashoffset="-70"
+          initial={{ strokeDasharray: "0 251.2" }}
+          animate={{
+            strokeDasharray: showAnimation ? "55 251.2" : "0 251.2",
+            opacity: isFocusMode ? 0.1 : 1
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
+        {/* TEAL */}
+        <motion.circle
+          cx="50" cy="50" r="40" fill="none" stroke="#284952" strokeWidth="12"
+          strokeDasharray="50 251.2" strokeDashoffset="-125"
+          initial={{ strokeDasharray: "0 251.2" }}
+          animate={{
+            strokeDasharray: showAnimation ? "50 251.2" : "0 251.2",
+            opacity: isFocusMode ? 0.1 : 1
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
+        {/* RED (HR & Admin) */}
+        <motion.circle
+          cx="50" cy="50" r="40" fill="none" stroke="#E74C3C"
+          strokeWidth={activeData?.id === "out-red" ? 16 : 12}
+          strokeDasharray="40 251.2" strokeDashoffset="-175"
+          initial={{ strokeDasharray: "0 251.2" }}
+          animate={{
+            strokeDasharray: showAnimation ? "40 251.2" : "0 251.2",
+            opacity: getOpacity("out-red")
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
+        {/* GRAY */}
+        <motion.circle
+          cx="50" cy="50" r="40" fill="none" stroke="#9CA3AF" strokeWidth="12"
+          strokeDasharray="36.2 251.2" strokeDashoffset="-215"
+          initial={{ strokeDasharray: "0 251.2" }}
+          animate={{
+            strokeDasharray: showAnimation ? "36.2 251.2" : "0 251.2",
+            opacity: isFocusMode ? 0.1 : 1
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
 
-      {/* Inner ring - 3 segments */}
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="24"
-        fill="none"
-        stroke="#60BA81"
-        strokeWidth="10"
-        strokeDasharray="90 150.8"
-        strokeDashoffset="0"
-        initial={{ strokeDasharray: "0 150.8" }}
-        animate={{ strokeDasharray: showAnimation ? "90 150.8" : "0 150.8" }}
-        transition={{ delay: 0.8, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="24"
-        fill="none"
-        stroke="#E74C3C"
-        strokeWidth="10"
-        strokeDasharray="35 150.8"
-        strokeDashoffset="-90"
-        initial={{ strokeDasharray: "0 150.8" }}
-        animate={{ strokeDasharray: showAnimation ? "35 150.8" : "0 150.8" }}
-        transition={{ delay: 0.9, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="24"
-        fill="none"
-        stroke="#F5A83C"
-        strokeWidth="10"
-        strokeDasharray="25.8 150.8"
-        strokeDashoffset="-125"
-        initial={{ strokeDasharray: "0 150.8" }}
-        animate={{ strokeDasharray: showAnimation ? "25.8 150.8" : "0 150.8" }}
-        transition={{ delay: 1, duration: 0.8 }}
-        transform="rotate(-90 50 50)"
-      />
+        {/* Inner ring - 3 segments */}
+        {/* INNER GREEN (Lahore HQ) */}
+        <motion.circle
+          cx="50" cy="50" r="24" fill="none" stroke="#60BA81"
+          strokeWidth={activeData?.id === "in-green" ? 14 : 10}
+          strokeDasharray="90 150.8"
+          initial={{ strokeDasharray: "0 150.8" }}
+          animate={{
+            strokeDasharray: showAnimation ? "90 150.8" : "0 150.8",
+            opacity: getOpacity("in-green")
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
+        {/* INNER RED (Karachi Unit) */}
+        <motion.circle
+          cx="50" cy="50" r="24" fill="none" stroke="#E74C3C"
+          strokeWidth={activeData?.id === "in-red" ? 14 : 10}
+          strokeDasharray="35 150.8" strokeDashoffset="-90"
+          initial={{ strokeDasharray: "0 150.8" }}
+          animate={{
+            strokeDasharray: showAnimation ? "35 150.8" : "0 150.8",
+            opacity: getOpacity("in-red")
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
+        {/* INNER YELLOW */}
+        <motion.circle
+          cx="50" cy="50" r="24" fill="none" stroke="#F5A83C" strokeWidth="10"
+          strokeDasharray="25.8 150.8" strokeDashoffset="-125"
+          initial={{ strokeDasharray: "0 150.8" }}
+          animate={{
+            strokeDasharray: showAnimation ? "25.8 150.8" : "0 150.8",
+            opacity: isFocusMode ? 0.1 : 1
+          }}
+          transition={{ duration: 0.5 }}
+          transform="rotate(-90 50 50)"
+        />
 
-      {/* Labels matching screenshot */}
-      <text x="25" y="25" className="text-[7px] fill-[#60BA81] font-bold">
-        22
-      </text>
-      <text x="70" y="32" className="text-[7px] fill-[#F5A83C] font-bold">
-        38
-      </text>
-      <text x="60" y="72" className="text-[7px] fill-[#284952] font-bold">
-        102
-      </text>
-      <text x="28" y="75" className="text-[7px] fill-[#E74C3C] font-bold">
-        124
-      </text>
-    </svg>
+        {/* Labels - hide during focus for central overlay */}
+        {!isFocusMode && (
+          <>
+            <text x="75" y="30" className="text-[3px] fill-white font-medium" textAnchor="middle">22</text>
+            <text x="20" y="40" className="text-[3px] fill-white font-medium" textAnchor="middle">38</text>
+            <text x="70" y="75" className="text-[3px] fill-white font-medium" textAnchor="middle">102</text>
+            <text x="30" y="80" className="text-[3px] fill-white font-medium" textAnchor="middle">124</text>
+          </>
+        )}
+      </svg>
+
+      {/* Cinematic Center Overlay */}
+      <AnimatePresence>
+        {activeData && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5, filter: "blur(10px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, scale: 0.5, filter: "blur(10px)" }}
+            className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none"
+          >
+            <span className="text-[5px] font-bold tracking-widest text-gray-400 mb-0.5">{activeData.type}</span>
+            <span className="text-[7px] font-black uppercase leading-tight mb-0.5" style={{ color: activeData.color }}>{activeData.label}</span>
+            <div className="flex flex-col items-center">
+              <span className="text-xl font-black text-[#284952] leading-none">{activeData.value}</span>
+              <span className="text-[5px] text-[#767676] font-bold uppercase tracking-widest mt-0.5">Counsellings</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
