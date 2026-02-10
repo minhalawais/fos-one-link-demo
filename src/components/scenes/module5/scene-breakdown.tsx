@@ -138,7 +138,16 @@ export const SceneBreakdown = ({ isActive, sceneProgress, progress }: SceneBreak
     ? Math.min(1, zoomPhase * 4) // Zooming in fast
     : Math.max(0, 1 - (zoomPhase - 0.7) * 4) // Zooming out fast
 
-  const activeIds = zoomPhase > 0.3 ? ["wages", "hours", "harassment", "health"] : []
+  // Two-phase highlight: first script-mentioned categories, then swap to remaining ones
+  // Phase 1 (51-60s | zoomPhase 0.3-0.6): wages, hours, harassment, health (said in narration)
+  // Phase 2 (60-66s | zoomPhase 0.6-1.0): remaining categories (corrective action targets)
+  const SCRIPT_CATEGORIES = ["wages", "hours", "harassment", "health"]
+  const OTHER_CATEGORIES = ["discipline", "unfair", "ethical", "freedom", "child", "forced", "discrimination"]
+  const activeIds = zoomPhase > 0.6
+    ? OTHER_CATEGORIES
+    : zoomPhase > 0.3
+      ? SCRIPT_CATEGORIES
+      : []
 
   const anyFocusActive = focusGender || focusDaily || focusFeedback || focusPerformance
 
@@ -147,8 +156,8 @@ export const SceneBreakdown = ({ isActive, sceneProgress, progress }: SceneBreak
       className="w-full h-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
-      transition={{ duration: 0.8, ease: IOS_EASE }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
     >
       <ResponsiveContainer>
         <div className="w-full h-full relative">
@@ -293,9 +302,12 @@ const MockDashboardBottomGrid = ({ isBlurred, focusGender, focusDaily, focusFeed
   const feedbackPhaseProgress = Math.min(1, Math.max(0, (calculatedProgress - 0.40) / 0.19))
 
   // Ensure we don't scroll into empty white space by limiting the max translation
-  const maxTranslation = -(FEEDBACKS.length * 200) + 600
+  // Each card is 280px + 16px gap = 296px. Show ~2 cards visible (600px viewport).
+  const totalSliderWidth = FEEDBACKS.length * 296
+  const visibleWidth = 560
+  const maxTranslation = Math.min(0, -(totalSliderWidth - visibleWidth))
   const sliderTranslateX = Math.max(
-    -feedbackPhaseProgress * (FEEDBACKS.length * 200),
+    -feedbackPhaseProgress * (totalSliderWidth - visibleWidth),
     maxTranslation
   )
 
@@ -353,7 +365,7 @@ const MockDashboardBottomGrid = ({ isBlurred, focusGender, focusDaily, focusFeed
                 <motion.div
                   className="flex gap-4 h-full"
                   animate={{ x: focusFeedback ? sliderTranslateX : 0 }}
-                  transition={{ type: "spring", stiffness: 45, damping: 15 }}
+                  transition={{ type: "tween", duration: 8, ease: "linear" }}
                 >
                   {FEEDBACKS.map((item) => (
                     <div
@@ -416,12 +428,13 @@ const MockDashboardBottomGrid = ({ isBlurred, focusGender, focusDaily, focusFeed
           <motion.div
             style={getBlurStyle(focusPerformance)}
             animate={{
-              scale: focusPerformance ? 1.05 : 1,
+              scale: focusPerformance ? 1.25 : 1,
               zIndex: focusPerformance ? 100 : 10,
-              boxShadow: focusPerformance ? "0 30px 60px -12px rgba(96,186,129,0.3)" : "0 1px 3px rgba(0,0,0,0.1)"
+              boxShadow: focusPerformance ? "0 40px 80px -15px rgba(96,186,129,0.35)" : "0 1px 3px rgba(0,0,0,0.1)"
             }}
             transition={SPRING_CONFIG}
             className="bg-white rounded-xl border border-[#DEE2E6] p-4 shadow-sm flex flex-col overflow-hidden"
+            style2-ignore="origin"
           >
             <h3 className="text-xs font-bold text-[#17161A] mb-4">Resolution Time Per Complaint</h3>
 
@@ -436,21 +449,46 @@ const MockDashboardBottomGrid = ({ isBlurred, focusGender, focusDaily, focusFeed
               </div>
 
               <div className="flex flex-col border-x border-b border-gray-100 rounded-b-lg overflow-hidden">
-                {[
-                  { t: "Within same day", v: 22 },
-                  { t: "Within 3 days", v: 1 },
-                  { t: "Within 10 days", v: 2 },
-                  { t: "More than 10 days", v: 0 }
-                ].map((row, i) => (
-                  <div key={i} className={`flex justify-between items-center ${i % 2 === 0 ? "bg-[#F8F9FA]" : "bg-white"}`}>
-                    <div className="flex-1 py-3 px-4 text-center border-r border-gray-50">
-                      <span className="text-[10px] text-gray-400 font-medium">{row.t}</span>
-                    </div>
-                    <div className="flex-1 py-3 px-4 text-center">
-                      <span className="text-[11px] text-[#60BA81] font-black">{row.v}</span>
-                    </div>
-                  </div>
-                ))}
+                {(() => {
+                  const rows = [
+                    { t: "Within same day", v: 22 },
+                    { t: "Within 3 days", v: 1 },
+                    { t: "Within 10 days", v: 2 },
+                    { t: "More than 10 days", v: 0 }
+                  ]
+                  // Performance phase: calculatedProgress 0.81 → 1.0
+                  const perfProgress = focusPerformance
+                    ? Math.min(1, Math.max(0, (calculatedProgress - 0.81) / 0.19))
+                    : 0
+                  // Only the current row is highlighted, previous rows go back to default
+                  const activeRow = focusPerformance ? Math.min(3, Math.floor(perfProgress * 4)) : -1
+
+                  return rows.map((row, i) => {
+                    const isCurrent = i === activeRow
+                    return (
+                      <motion.div
+                        key={i}
+                        animate={{
+                          backgroundColor: isCurrent ? "#60BA81" : (i % 2 === 0 ? "#F8F9FA" : "#FFFFFF"),
+                          scale: isCurrent ? 1.04 : 1,
+                        }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="flex justify-between items-center"
+                      >
+                        <div className="flex-1 py-3 px-4 text-center border-r border-gray-50">
+                          <span className={`text-[10px] font-medium transition-all duration-300 ${isCurrent ? "text-white font-bold" : "text-gray-400"}`}>
+                            {row.t}
+                          </span>
+                        </div>
+                        <div className="flex-1 py-3 px-4 text-center">
+                          <span className={`text-[11px] font-black transition-all duration-300 ${isCurrent ? "text-white" : "text-[#60BA81]"}`}>
+                            {row.v}
+                          </span>
+                        </div>
+                      </motion.div>
+                    )
+                  })
+                })()}
               </div>
             </div>
           </motion.div>

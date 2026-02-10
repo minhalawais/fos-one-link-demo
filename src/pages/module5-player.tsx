@@ -52,11 +52,9 @@ export default function Module5Player({ progress }: Module5PlayerProps) {
     const CurrentSceneComponent = currentSceneConfig.component
 
     return (
-        <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
+        <div className="w-full h-full bg-[#F5F5F7] relative overflow-hidden font-sans select-none">
             <div className="absolute inset-0 z-0">
-                <AnimatePresence mode="wait">
-                    <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
-                </AnimatePresence>
+                <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
             </div>
         </div>
     )
