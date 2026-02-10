@@ -6,14 +6,15 @@ import { useMemo } from "react"
 
 // --- SYSTEM COLORS ---
 const COLORS = {
-    teal: "#0f9690",
-    darkTeal: "#284952",
-    green: "#60BA81",
+    teal: "#3B82F6",
+    darkTeal: "#1E40AF",
+    green: "#10B981",
     charcoal: "#17161A",
     white: "#FFFFFF",
-    bg: "#F5F5F7",
-    orange: "#FB923C",
-    red: "#E53E3E",
+    bg: "#F8FAFC",
+    vibrantBlue: "#3B82F6",
+    cyan: "#06B6D4",
+    red: "#EF4444",
 }
 
 interface SceneProps {
@@ -138,7 +139,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                 initial={{ scale: 0 }}
                                                 animate={{
                                                     scale: 1,
-                                                    backgroundColor: isSent ? COLORS.green : COLORS.orange
+                                                    backgroundColor: isSent ? COLORS.green : COLORS.vibrantBlue
                                                 }}
                                                 transition={{
                                                     delay: 1 + i * 0.2,
@@ -203,7 +204,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                     initial={{ opacity: 0, y: 5 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -5 }}
-                                                    className={`text-[10px] font-bold uppercase tracking-wider ${isSent ? 'text-teal-600' : 'text-orange-500'}`}
+                                                    className={`text-[10px] font-bold uppercase tracking-wider ${isSent ? 'text-blue-600' : 'text-[#3B82F6]'}`}
                                                 >
                                                     {isSent ? "SENT" : "PENDING..."}
                                                 </motion.div>
@@ -215,8 +216,8 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                 transition={{ delay: 1.5 + i * 0.2 }}
                                                 className="mt-2 w-3 h-3 rounded-full shadow-lg ring-4 transition-colors duration-500"
                                                 style={{
-                                                    backgroundColor: isSent ? COLORS.green : COLORS.orange,
-                                                    boxShadow: `0 0 0 4px ${isSent ? 'rgba(96, 186, 129, 0.2)' : 'rgba(251, 146, 60, 0.2)'}`
+                                                    backgroundColor: isSent ? COLORS.green : COLORS.vibrantBlue,
+                                                    boxShadow: `0 0 0 4px ${isSent ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)'}`
                                                 }}
                                             />
                                         </div>

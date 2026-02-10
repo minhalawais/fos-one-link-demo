@@ -562,3 +562,228 @@
   animation: blobDrift2 25s ease-in-out infinite;
   will-change: transform;
 }
+
+/* === SPLASH SCREEN ANIMATIONS === */
+
+/* Radial bloom background */
+@keyframes splashRadialBloom {
+  0% {
+    transform: scale3d(0.3, 0.3, 1);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+.splash-radial-bloom {
+  animation: splashRadialBloom 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Orbiting particles around the logo */
+@keyframes splashOrbit {
+  0% {
+    transform: translate3d(var(--orbit-radius), 0, 0) scale(0);
+    opacity: 0;
+  }
+
+  10% {
+    transform: translate3d(var(--orbit-radius), 0, 0) scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: rotate(360deg) translate3d(var(--orbit-radius), 0, 0) scale(1);
+    opacity: 0.8;
+  }
+}
+
+.splash-orbit {
+  animation: splashOrbit linear infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+  transform-origin: 50% 50%;
+}
+
+/* Rising leaf particle */
+@keyframes splashLeafRise {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0);
+    opacity: 0;
+  }
+
+  15% {
+    transform: translate3d(calc(var(--leaf-drift) * 0.15), -15vh, 0) scale(1);
+    opacity: 0.5;
+  }
+
+  85% {
+    transform: translate3d(calc(var(--leaf-drift) * 0.85), -85vh, 0) scale(0.8);
+    opacity: 0.3;
+  }
+
+  100% {
+    transform: translate3d(var(--leaf-drift), -105vh, 0) scale(0);
+    opacity: 0;
+  }
+}
+
+.splash-leaf-rise {
+  animation: splashLeafRise ease-out infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Glow ring rotation behind logo */
+@keyframes splashGlowRing {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.splash-glow-ring {
+  animation: splashGlowRing 6s linear infinite;
+  will-change: transform;
+}
+
+/* Blob ambient pulse */
+@keyframes splashBlobPulse {
+
+  0%,
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale3d(1.15, 1.15, 1);
+    opacity: 0.8;
+  }
+
+  70% {
+    opacity: 1;
+  }
+}
+
+.splash-blob-pulse {
+  animation: splashBlobPulse 5s ease-in-out infinite;
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+}
+
+/* Loading dots bounce */
+@keyframes splashLoaderDot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 0.4;
+  }
+
+  40% {
+    transform: scale3d(1.6, 1.6, 1);
+    opacity: 1;
+  }
+}
+
+.splash-loader-dot {
+  animation: splashLoaderDot 1.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Mesh gradient drift — 3 blobs with different paths */
+@keyframes splashMeshDrift1 {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(5vw, 3vh, 0);
+  }
+
+  66% {
+    transform: translate3d(-3vw, 5vh, 0);
+  }
+}
+
+.splash-mesh-drift-1 {
+  animation: splashMeshDrift1 12s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes splashMeshDrift2 {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(-4vw, -3vh, 0);
+  }
+
+  66% {
+    transform: translate3d(3vw, -5vh, 0);
+  }
+}
+
+.splash-mesh-drift-2 {
+  animation: splashMeshDrift2 15s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes splashMeshDrift3 {
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  33% {
+    transform: translate3d(4vw, 4vh, 0);
+  }
+
+  66% {
+    transform: translate3d(-5vw, -2vh, 0);
+  }
+}
+
+.splash-mesh-drift-3 {
+  animation: splashMeshDrift3 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Progress bar sweep */
+@keyframes splashProgressSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.splash-progress-sweep {
+  animation: splashProgressSweep 1.8s ease-in-out infinite;
+  will-change: transform;
+}

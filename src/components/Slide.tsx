@@ -35,6 +35,7 @@ import {
   Eye,
   Zap,
   CheckCircle,
+  Smile,
 } from "lucide-react"
 
 // --- PREMIUM PHYSICS ---
@@ -615,13 +616,13 @@ const InvestigationVisual = () => (
 const SurveyVisual = () => (
   <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
     {/* Survey gradient background */}
-    <div className="absolute inset-0 bg-gradient-to-br from-[#F8F5FF] via-white to-[#F0FAFF]" />
+    <div className="absolute inset-0 bg-gradient-to-br from-[#EEF2FF] via-white to-[#E0F2FE]" />
 
     {/* Subtle pattern */}
     <div
-      className="absolute inset-0 opacity-[0.02]"
+      className="absolute inset-0 opacity-[0.03]"
       style={{
-        backgroundImage: 'radial-gradient(circle at 2px 2px, #8B5CF6 1px, transparent 0)',
+        backgroundImage: 'radial-gradient(circle at 2px 2px, #3B82F6 1px, transparent 0)',
         backgroundSize: '24px 24px',
       }}
     />
@@ -635,10 +636,10 @@ const SurveyVisual = () => (
         transition={{ delay: 0.2 }}
       >
         {[
-          { Icon: MessageSquare, label: 'Create', color: '#8B5CF6' },
-          { Icon: Users, label: 'Target', color: '#3B82F6' },
-          { Icon: Mail, label: 'Invite', color: '#60BA81' },
-          { Icon: BarChart3, label: 'Analyze', color: '#F5A83C' },
+          { Icon: MessageSquare, label: 'Create', color: '#3B82F6' },
+          { Icon: Users, label: 'Target', color: '#06B6D4' },
+          { Icon: Mail, label: 'Invite', color: '#6366F1' },
+          { Icon: BarChart3, label: 'Analyze', color: '#1E40AF' },
         ].map(({ Icon, label, color }, i) => (
           <motion.div
             key={label}
@@ -650,11 +651,11 @@ const SurveyVisual = () => (
           >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: `${color}12`, color }}
+              style={{ backgroundColor: `${color}15`, color }}
             >
               <Icon size={18} strokeWidth={2} />
             </div>
-            <span className="text-[8px] font-bold text-[#284952]/70 uppercase tracking-wider">{label}</span>
+            <span className="text-[8px] font-bold text-[#1E3A8A]/70 uppercase tracking-wider">{label}</span>
           </motion.div>
         ))}
       </motion.div>
@@ -669,16 +670,16 @@ const SurveyVisual = () => (
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#7C3AED] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3B82F6] to-[#1E40AF] flex items-center justify-center">
                 <ClipboardCheck size={18} className="text-white" />
               </div>
               <div>
-                <div className="font-bold text-[#1A1D21] text-sm">Employee Wellbeing Survey</div>
-                <div className="text-[10px] text-[#8A9199]">Multi-language • 847 responses</div>
+                <div className="font-bold text-[#0F172A] text-sm">Employee Wellbeing Survey</div>
+                <div className="text-[10px] text-[#64748B]">Multi-language • 847 responses</div>
               </div>
             </div>
             <motion.div
-              className="px-2.5 py-1 rounded-full bg-[#60BA81]/15 text-[#60BA81] text-[10px] font-bold"
+              className="px-2.5 py-1 rounded-full bg-[#10B981]/15 text-[#10B981] text-[10px] font-bold"
               animate={{ opacity: [1, 0.6, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
@@ -689,33 +690,33 @@ const SurveyVisual = () => (
           {/* Response Stats */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             {[
-              { label: 'Sent', value: '1,250', color: '#3B82F6' },
-              { label: 'Responded', value: '847', color: '#60BA81' },
-              { label: 'Rate', value: '68%', color: '#8B5CF6' },
+              { label: 'Sent', value: '1,250', color: '#1E40AF' },
+              { label: 'Responded', value: '847', color: '#10B981' },
+              { label: 'Rate', value: '68%', color: '#3B82F6' },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
-                className="bg-gray-50 rounded-xl p-2.5 text-center"
+                className="bg-slate-50/50 rounded-xl p-2.5 text-center border border-slate-100/50"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 + i * 0.1 }}
               >
-                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
-                <div className="text-[9px] font-medium text-gray-400 uppercase">{stat.label}</div>
+                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.val || stat.value}</div>
+                <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-tight">{stat.label}</div>
               </motion.div>
             ))}
           </div>
 
           {/* Sentiment Analysis */}
-          <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-[#3B82F6]/10 rounded-xl p-3">
+          <div className="bg-gradient-to-r from-[#EFF6FF] to-[#ECFEFF] rounded-xl p-3 border border-blue-50">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={14} className="text-[#8B5CF6]" />
-              <span className="text-[10px] font-bold text-[#284952]">AI Sentiment Analysis</span>
+              <Sparkles size={14} className="text-[#3B82F6]" />
+              <span className="text-[10px] font-bold text-[#1E3A8A]">AI Sentiment Analysis</span>
             </div>
             <div className="flex gap-2">
               {[
-                { label: 'Positive', pct: 62, color: '#60BA81' },
-                { label: 'Neutral', pct: 28, color: '#F5A83C' },
+                { label: 'Positive', pct: 62, color: '#10B981' },
+                { label: 'Neutral', pct: 28, color: '#F59E0B' },
                 { label: 'Negative', pct: 10, color: '#EF4444' },
               ].map((item, i) => (
                 <motion.div
@@ -726,7 +727,7 @@ const SurveyVisual = () => (
                   transition={{ delay: 0.8 + i * 0.1 }}
                 >
                   <div className="text-sm font-bold" style={{ color: item.color }}>{item.pct}%</div>
-                  <div className="text-[8px] text-gray-500">{item.label}</div>
+                  <div className="text-[8px] font-medium text-slate-500">{item.label}</div>
                 </motion.div>
               ))}
             </div>
@@ -738,7 +739,7 @@ const SurveyVisual = () => (
 )
 
 // === MODULE 5: DASHBOARDS & INSIGHTS VISUAL ===
-// Content: Dashboard with total/open/overdue cases, categories, RCA/CAPA performance, timeline monitoring, satisfaction indicators, exports
+// Content: Executive Pulse View - Summary Ribbon, Integrity Ring, Vital Signs
 const DashboardVisual = () => (
   <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
     {/* Analytics gradient background */}
@@ -747,149 +748,128 @@ const DashboardVisual = () => (
     {/* Animated glow spots */}
     <motion.div
       className="absolute top-20 left-20 w-40 h-40 rounded-full"
-      style={{ background: 'radial-gradient(circle, rgba(59,130,246,0.1), transparent 70%)', filter: 'blur(30px)' }}
+      style={{ background: 'radial-gradient(circle, rgba(96,186,129,0.1), transparent 70%)', filter: 'blur(30px)' }}
       animate={{ scale: [1, 1.3, 1] }}
       transition={{ duration: 5, repeat: Infinity }}
     />
 
-    <div className="relative z-10 flex flex-col items-center gap-4">
-      {/* Header Stats Row */}
+    <div className="relative z-10 flex flex-col items-center gap-6 w-full px-6">
+      {/* 1. Metric Ribbon (Header) */}
       <motion.div
-        className="flex gap-3"
+        className="flex justify-between w-full max-w-[400px]"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
         {[
-          { label: 'Total', value: '1,284', Icon: BarChart3, color: '#284952' },
-          { label: 'Open', value: '156', Icon: AlertCircle, color: '#F5A83C' },
-          { label: 'Overdue', value: '12', Icon: Clock, color: '#EF4444' },
-          { label: 'Resolved', value: '892', Icon: CheckCircle2, color: '#60BA81' },
+          { label: 'Total', value: '482', color: '#284952' },
+          { label: 'Anonymous', value: '64', color: '#284952' },
+          { label: 'Closed', value: '395', color: '#60BA81' },
+          { label: 'In Process', value: '87', color: '#F5A83C' },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
-            className="bg-white rounded-xl px-4 py-3 shadow-lg shadow-black/5 border border-gray-100 flex items-center gap-3"
+            className="flex flex-col items-center"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 + i * 0.08 }}
-            whileHover={{ y: -2 }}
           >
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: `${stat.color}12` }}
-            >
-              <stat.Icon size={16} style={{ color: stat.color }} />
-            </div>
-            <div>
-              <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
-              <div className="text-[8px] font-medium text-gray-400 uppercase tracking-wider">{stat.label}</div>
-            </div>
+            <div className="text-2xl font-black leading-none" style={{ color: stat.color }}>{stat.value}</div>
+            <div className="text-[9px] font-bold text-gray-400 uppercase tracking-wider mt-1">{stat.label}</div>
           </motion.div>
         ))}
       </motion.div>
 
-      {/* Main Dashboard Card */}
+      {/* 2. Executive Pulse Card */}
       <motion.div
         initial={{ y: 20, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ delay: 0.4, ...IOS_SPRING }}
+        className="w-full max-w-[420px]"
       >
-        <GlassSurface className="w-[440px] p-5">
-          <div className="flex gap-4">
-            {/* Left: Categories */}
-            <div className="flex-1 space-y-3">
-              <div className="flex items-center gap-2 mb-3">
-                <PieChart size={14} className="text-[#3B82F6]" />
-                <span className="text-xs font-bold text-[#1A1D21]">Complaint Categories</span>
-              </div>
-              {[
-                { name: 'Wages & Benefits', pct: 35, color: '#3B82F6' },
-                { name: 'Working Hours', pct: 28, color: '#60BA81' },
-                { name: 'Health & Safety', pct: 22, color: '#F5A83C' },
-                { name: 'Harassment', pct: 15, color: '#EF4444' },
-              ].map((cat, i) => (
-                <motion.div
-                  key={cat.name}
-                  className="space-y-1"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 + i * 0.1 }}
-                >
-                  <div className="flex justify-between text-[9px]">
-                    <span className="font-medium text-[#284952]">{cat.name}</span>
-                    <span className="font-bold" style={{ color: cat.color }}>{cat.pct}%</span>
-                  </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{ backgroundColor: cat.color }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${cat.pct}%` }}
-                      transition={{ delay: 0.8 + i * 0.1, duration: 0.8 }}
-                    />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+        <GlassSurface className="w-full p-5 flex gap-8 items-center justify-center">
+          {/* Left: Integrity Ring (Nested Donut) */}
+          <div className="relative w-36 h-36 flex-shrink-0">
+            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90 drop-shadow-xl">
+              {/* Outer Ring Segments - Production(Green), HR(Orange), Admin(Teal), Issues(Red) */}
+              <motion.circle cx="50" cy="50" r="40" fill="none" stroke="#60BA81" strokeWidth="8"
+                strokeDasharray="70 251" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 251" }} animate={{ strokeDasharray: "70 251" }} transition={{ duration: 1, delay: 0.5 }} />
+              <motion.circle cx="50" cy="50" r="40" fill="none" stroke="#F5A83C" strokeWidth="8"
+                strokeDasharray="55 251" strokeDashoffset="-78" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 251" }} animate={{ strokeDasharray: "55 251" }} transition={{ duration: 1, delay: 0.6 }} />
+              <motion.circle cx="50" cy="50" r="40" fill="none" stroke="#284952" strokeWidth="8"
+                strokeDasharray="50 251" strokeDashoffset="-140" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 251" }} animate={{ strokeDasharray: "50 251" }} transition={{ duration: 1, delay: 0.7 }} />
+              <motion.circle cx="50" cy="50" r="40" fill="none" stroke="#EF4444" strokeWidth="8"
+                strokeDasharray="40 251" strokeDashoffset="-198" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 251" }} animate={{ strokeDasharray: "40 251" }} transition={{ duration: 1, delay: 0.8 }} />
 
-            {/* Right: Satisfaction Ring + Timeline */}
-            <div className="w-36 flex flex-col items-center gap-3">
-              {/* Satisfaction Ring */}
-              <div className="relative w-20 h-20">
-                <svg viewBox="0 0 36 36" className="-rotate-90 w-full h-full">
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#60BA81" strokeWidth="3" opacity="0.15" />
-                  <motion.circle
-                    cx="18" cy="18" r="14"
-                    fill="none" stroke="#60BA81" strokeWidth="3"
-                    strokeDasharray="88"
-                    initial={{ strokeDashoffset: 88 }}
-                    animate={{ strokeDashoffset: 24 }}
-                    transition={{ duration: 1.5, ease: IOS_EASE, delay: 0.6 }}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-lg font-bold text-[#1A1D21]">73%</span>
-                  <span className="text-[7px] font-medium text-[#8A9199]">Satisfied</span>
-                </div>
-              </div>
-
-              {/* Timeline Indicator */}
-              <motion.div
-                className="w-full bg-gray-50 rounded-xl p-2.5 text-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.8 }}
-              >
-                <div className="text-[8px] font-bold text-[#284952]/50 uppercase tracking-wider mb-1">Avg Resolution</div>
-                <div className="text-sm font-bold text-[#284952]">4.2 <span className="text-[9px] font-normal">days</span></div>
-              </motion.div>
+              {/* Inner Ring Segments - Lahore(Green), Karachi(Red), Remote(Orange) */}
+              <motion.circle cx="50" cy="50" r="26" fill="none" stroke="#60BA81" strokeWidth="6"
+                strokeDasharray="90 163" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 163" }} animate={{ strokeDasharray: "90 163" }} transition={{ duration: 1, delay: 0.9 }} />
+              <motion.circle cx="50" cy="50" r="26" fill="none" stroke="#EF4444" strokeWidth="6"
+                strokeDasharray="35 163" strokeDashoffset="-98" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 163" }} animate={{ strokeDasharray: "35 163" }} transition={{ duration: 1, delay: 1.0 }} />
+              <motion.circle cx="50" cy="50" r="26" fill="none" stroke="#F5A83C" strokeWidth="6"
+                strokeDasharray="20 163" strokeDashoffset="-140" strokeLinecap="round"
+                initial={{ strokeDasharray: "0 163" }} animate={{ strokeDasharray: "20 163" }} transition={{ duration: 1, delay: 1.1 }} />
+            </svg>
+            {/* Center Label */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-3xl font-black text-[#284952] tracking-tighter">98%</span>
+              <span className="text-[7px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Integrity</span>
             </div>
           </div>
 
-          {/* Export Options */}
-          <motion.div
-            className="flex gap-2 mt-4 pt-3 border-t border-gray-100"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-          >
-            {[
-              { label: 'HRDD Report', Icon: FileText },
-              { label: 'ESG Export', Icon: Download },
-              { label: 'Audit Ready', Icon: CheckCircle2 },
-            ].map((item, i) => (
-              <motion.div
-                key={item.label}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-[#284952]/5 rounded-lg py-2 hover:bg-[#284952]/10 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.02 }}
-              >
-                <item.Icon size={12} className="text-[#284952]" />
-                <span className="text-[8px] font-bold text-[#284952] uppercase tracking-wider">{item.label}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+          {/* Right: Vital Signs */}
+          <div className="flex flex-col gap-3 w-32">
+            {/* Happiness Score */}
+            <motion.div
+              className="flex flex-col gap-1 bg-white rounded-xl p-3 border border-gray-100 shadow-sm items-center"
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="flex items-center gap-2 w-full justify-center">
+                <Smile size={18} className="text-[#60BA81]" strokeWidth={2.5} />
+                <span className="text-xl font-bold text-[#284952]">85</span>
+              </div>
+              <div className="text-[7px] font-bold text-gray-400 uppercase tracking-wider">Happiness</div>
+            </motion.div>
+
+            {/* Safety Score */}
+            <motion.div
+              className="flex flex-col gap-1 bg-white rounded-xl p-3 border border-gray-100 shadow-sm items-center"
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="flex items-center gap-2 w-full justify-center">
+                <ShieldCheck size={18} className="text-[#F5A83C]" strokeWidth={2.5} />
+                <span className="text-xl font-bold text-[#284952]">92</span>
+              </div>
+              <div className="text-[7px] font-bold text-gray-400 uppercase tracking-wider">Safety</div>
+            </motion.div>
+          </div>
         </GlassSurface>
+      </motion.div>
+
+      {/* Footer: Active Monitoring Pulse */}
+      <motion.div
+        className="flex items-center gap-2 bg-[#60BA81]/10 px-3 py-1.5 rounded-full"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2 }}
+      >
+        <div className="relative w-2 h-2">
+          <div className="absolute inset-0 bg-[#60BA81] rounded-full animate-ping opacity-75" />
+          <div className="absolute inset-0 bg-[#60BA81] rounded-full" />
+        </div>
+        <span className="text-[9px] font-bold text-[#60BA81] uppercase tracking-widest">Live System Monitoring</span>
       </motion.div>
     </div>
   </div>
@@ -1026,19 +1006,19 @@ const Slide: React.FC<SlideProps> = ({
       isDark: true,
     },
     {
-      // Card 4 - Dark Slate with Orange accent
+      // Card 4 - Vibrant Electric Blue for Surveys
       cardBg: "#1F2830",
       textColor: "#FFFFFF",
       subtextColor: "rgba(255,255,255,0.7)",
-      accent: "#F5A83C",
-      accentLight: "rgba(245,168,60,0.12)",
-      secondaryAccent: "#60BA81",
-      iconBg: "rgba(245,168,60,0.15)",
+      accent: "#3B82F6", // Electric Blue
+      accentLight: "rgba(59,130,246,0.15)",
+      secondaryAccent: "#06B6D4", // Cyan
+      iconBg: "rgba(59,130,246,0.2)",
       gradient: "from-[#1F2830] via-[#263238] to-[#1a2228]",
-      glow: "rgba(245,168,60,0.35)",
-      decorativeColor: "#F5A83C",
-      innerGlow: "radial-gradient(ellipse at top center, rgba(245,168,60,0.1) 0%, transparent 55%)",
-      borderGradient: "linear-gradient(135deg, rgba(245,168,60,0.4) 0%, rgba(245,168,60,0.1) 50%, rgba(245,168,60,0.25) 100%)",
+      glow: "rgba(59,130,246,0.45)",
+      decorativeColor: "#3B82F6",
+      innerGlow: "radial-gradient(ellipse at top center, rgba(59,130,246,0.15) 0%, transparent 55%)",
+      borderGradient: "linear-gradient(135deg, rgba(59,130,246,0.5) 0%, rgba(6,182,212,0.2) 50%, rgba(59,130,246,0.3) 100%)",
       featureTags: ["Real-Time", "AI Insights", "HRDD Ready"],
       isDark: true,
     },

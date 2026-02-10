@@ -5,30 +5,30 @@ import { Brain, MessageSquare, PieChart } from "lucide-react"
 
 // --- PROFESSIONAL COLOR PALETTE (Light Theme - Original for Stages 1-3) ---
 const COLORS = {
-    coverOrange: "#E8A838",
-    coverTeal1: "#0F9690",
-    coverTeal2: "#4A9989",
-    coverGreen: "#7AB97A",
-    bg: "#F3F4F6",
+    coverBlue: "#3B82F6",
+    coverTeal1: "#06B6D4",
+    coverTeal2: "#6366F1",
+    coverGreen: "#10B981",
+    bg: "#F8FAFC",
     white: "#FFFFFF",
-    teal: "#0F9690",
-    navy: "#1E3A5F",
-    green: "#60BA81",
-    orange: "#F5A83C",
-    yellow: "#F5C83C",
-    red: "#E53935",
+    teal: "#3B82F6",
+    navy: "#1E40AF",
+    green: "#10B981",
+    vibrantBlue: "#3B82F6",
+    yellow: "#F59E0B",
+    red: "#EF4444",
 }
 
 // --- REPORT STYLING (For Stage 3 & 4 - From survey_web_report.html) ---
 const REPORT_COLORS = {
-    teal: "#284952",       // brand-teal
-    green: "#60BA81",      // brand-green
-    orange: "#F5A83C",     // brand-orange
-    bg: "#F5F5F7",         // brand-light-gray
-    border: "#DEE2E6",     // brand-border
-    red: "#E53E3E",
-    grayMedium: "#767676",
-    charcoal: "#17161A",
+    teal: "#1E40AF",       // brand-blue-dark
+    green: "#10B981",      // brand-green
+    vibrantBlue: "#3B82F6",  // brand-blue
+    bg: "#F8FAFC",         // brand-slate-50
+    border: "#E2E8F0",     // brand-blue-gray
+    red: "#EF4444",
+    grayMedium: "#64748B",
+    charcoal: "#0F172A",
 }
 
 interface SceneProps {
@@ -77,7 +77,7 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                     >
                         {/* 4-color stripes background */}
                         <div className="absolute inset-0 flex opacity-90">
-                            {[COLORS.coverOrange, COLORS.coverTeal1, COLORS.coverTeal2, COLORS.coverGreen].map((color, i) => (
+                            {[COLORS.coverBlue, COLORS.coverTeal1, COLORS.coverTeal2, COLORS.coverGreen].map((color, i) => (
                                 <motion.div
                                     key={i}
                                     className="w-1/4 h-full"
@@ -114,12 +114,12 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                         {/* Logos */}
                         <div className="absolute bottom-10 right-16 flex items-center gap-6 z-10">
                             {/* FOS Logo Circle */}
-                            <div className="w-24 h-24 rounded-full border-4 border-[#F5A83C] bg-white flex items-center justify-center shadow-lg overflow-hidden relative">
+                            <div className="w-24 h-24 rounded-full border-4 border-[#3B82F6] bg-white flex items-center justify-center shadow-lg overflow-hidden relative">
                                 <img src="/assets/images/logo.png" alt="FOS" className="w-full h-full object-contain p-2" />
                             </div>
 
                             {/* Company Logo Circle */}
-                            <div className="w-24 h-24 rounded-full border-4 border-[#F5A83C] bg-white flex items-center justify-center shadow-lg overflow-hidden">
+                            <div className="w-24 h-24 rounded-full border-4 border-[#3B82F6] bg-white flex items-center justify-center shadow-lg overflow-hidden">
                                 <img src="/assets/images/company_a.png" alt="Company A" className="w-full h-full object-contain p-2" />
                             </div>
                         </div>
@@ -185,7 +185,7 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                                     {[
                                         { label: "Total", value: 335, bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-100" },
                                         { label: "Filled", value: 163, bg: "bg-green-50", text: "text-green-700", border: "border-green-100" },
-                                        { label: "Pending", value: 172, bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-100" },
+                                        { label: "Pending", value: 172, bg: "bg-blue-50", text: "text-[#3B82F6]", border: "border-blue-100" },
                                     ].map((stat, i) => (
                                         <motion.div
                                             key={i}
@@ -278,7 +278,7 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                                     {[
                                         { l: "Excellent", v: 45, c: REPORT_COLORS.green },
                                         { l: "Good", v: 30, c: REPORT_COLORS.teal },
-                                        { l: "Average", v: 15, c: REPORT_COLORS.orange },
+                                        { l: "Average", v: 15, c: REPORT_COLORS.vibrantBlue },
                                         { l: "Poor", v: 10, c: REPORT_COLORS.red }
                                     ].map((row, i) => (
                                         <div key={i} className="flex items-center gap-4">
@@ -336,7 +336,7 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
 
                                     {/* Sample Responses */}
                                     <div className="space-y-3">
-                                        <h4 className="font-bold flex items-center text-sm" style={{ color: REPORT_COLORS.orange }}>
+                                        <h4 className="font-bold flex items-center text-sm" style={{ color: REPORT_COLORS.vibrantBlue }}>
                                             <MessageSquare size={14} className="mr-2" />Responses from Survey
                                         </h4>
                                         {["Everything is available", "Safety shoes are missing", "No issues"].map((r, i) => (
@@ -374,7 +374,7 @@ export const SceneReports = ({ isActive, progress }: SceneProps) => {
                                     <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                                         <LegendItem color={REPORT_COLORS.green} label="Spinning (25%)" />
                                         <LegendItem color={REPORT_COLORS.teal} label="Processing (38%)" />
-                                        <LegendItem color={REPORT_COLORS.orange} label="Knitting (20%)" />
+                                        <LegendItem color={REPORT_COLORS.vibrantBlue} label="Knitting (20%)" />
                                         <LegendItem color={REPORT_COLORS.red} label="Other (17%)" />
                                     </div>
                                 </div>
@@ -403,7 +403,7 @@ const QuestionCard = ({ order, type, required, question, subtext, responses, chi
                         {type}
                     </span>
                     {required && (
-                        <span className="bg-[#F5A83C]/10 text-[#F5A83C] text-sm font-semibold px-3 py-1 rounded-full border border-[#F5A83C]/20">
+                        <span className="bg-[#3B82F6]/10 text-[#3B82F6] text-sm font-semibold px-3 py-1 rounded-full border border-[#3B82F6]/20">
                             Required
                         </span>
                     )}
@@ -439,7 +439,7 @@ const TableRow = ({ topic, pct, sent, keys }: any) => (
         </div>
         <div className="text-center">
             {sent === 'positive' && <span className="px-2 py-0.5 rounded text-xs font-bold" style={{ backgroundColor: `${REPORT_COLORS.green}1A`, color: REPORT_COLORS.green }}>Positive</span>}
-            {sent === 'negative' && <span className="px-2 py-0.5 rounded text-xs font-bold" style={{ backgroundColor: `${REPORT_COLORS.orange}1A`, color: REPORT_COLORS.orange }}>Negative</span>}
+            {sent === 'negative' && <span className="px-2 py-0.5 rounded text-xs font-bold" style={{ backgroundColor: `${REPORT_COLORS.vibrantBlue}1A`, color: REPORT_COLORS.vibrantBlue }}>Negative</span>}
             {sent === 'neutral' && <span className="px-2 py-0.5 rounded text-xs font-bold" style={{ backgroundColor: `${REPORT_COLORS.grayMedium}1A`, color: '#767676' }}>Neutral</span>}
         </div>
         <div className="text-xs text-[#767676]">

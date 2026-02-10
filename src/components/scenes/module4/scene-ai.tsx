@@ -5,16 +5,16 @@ import { Brain, Sparkles, MessageSquare, List, CheckCircle, AlertCircle, Minus, 
 
 // --- BRAND COLORS (Matching survey_web_report.html) ---
 const BRAND = {
-    teal: '#284952',
-    green: '#60BA81',
-    orange: '#F5A83C',
-    charcoal: '#17161A',
-    lightGray: '#F5F5F7',
-    border: '#DEE2E6',
+    teal: '#1E40AF',
+    green: '#10B981',
+    vibrantBlue: '#3B82F6',
+    charcoal: '#0F172A',
+    lightGray: '#F8FAFC',
+    border: '#E2E8F0',
     white: '#FFFFFF',
-    greenLight: 'rgba(96, 186, 129, 0.1)',
-    orangeLight: 'rgba(245, 168, 60, 0.1)',
-    tealLight: 'rgba(40, 73, 82, 0.05)'
+    greenLight: 'rgba(16, 185, 129, 0.1)',
+    blueLight: 'rgba(59, 130, 246, 0.1)',
+    tealLight: 'rgba(30, 64, 175, 0.05)'
 }
 
 interface SceneAIProps {
@@ -154,12 +154,12 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                                 >
                                     <div className="relative z-10">
                                         <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                                            <Sparkles size={18} className="text-[#F5A83C]" />
+                                            <Sparkles size={18} className="text-[#3B82F6]" />
                                             FOS Key Insight
                                         </h3>
                                         <p className="opacity-90 leading-relaxed text-sm">
-                                            <span className="font-bold text-[#F5A83C]">FOS AI Analysis</span> indicates a strong positive trend in <span className="font-bold text-[#F5A83C]">Management Cooperation</span>.
-                                            However, <span className="underline decoration-[#F5A83C] underline-offset-4 font-bold">Safety Equipment</span> availability requires attention in Block B.
+                                            <span className="font-bold text-[#3B82F6]">FOS AI Analysis</span> indicates a strong positive trend in <span className="font-bold text-[#3B82F6]">Management Cooperation</span>.
+                                            However, <span className="underline decoration-[#3B82F6] underline-offset-4 font-bold">Safety Equipment</span> availability requires attention in Block B.
                                         </p>
                                     </div>
                                     {/* Abstract shapes bg */}
@@ -225,7 +225,7 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                                     className="bg-white rounded-xl border border-[#DEE2E6] shadow-sm p-6"
                                 >
                                     <h4 className="font-bold text-[#284952] mb-4 flex items-center gap-2">
-                                        <MessageSquare size={18} className="text-[#F5A83C]" />
+                                        <MessageSquare size={18} className="text-[#3B82F6]" />
                                         Sample Feedback
                                     </h4>
                                     <div className="space-y-3">
@@ -324,12 +324,12 @@ export const SceneAI = ({ isActive, progress }: SceneAIProps) => {
                                             <AlertCircle size={32} className="text-[#F5A83C]" />
                                         </div>
                                         <h3 className="text-xl font-bold text-[#284952] mb-1">Reactive</h3>
-                                        <p className="text-[10px] font-semibold text-[#F5A83C] uppercase tracking-widest">Grievance Handling</p>
+                                        <p className="text-[10px] font-semibold text-[#3B82F6] uppercase tracking-widest">Grievance Handling</p>
                                     </div>
                                     <div className="space-y-3 opacity-70">
                                         {["Wait for complaints", "Manual tracking", "Delayed responses"].map((text, i) => (
                                             <div key={i} className="flex items-center gap-2.5 p-2 bg-orange-50/50 rounded-lg border border-orange-100/50">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                                                 <span className="text-[#555] font-medium text-xs">{text}</span>
                                             </div>
                                         ))}
@@ -437,7 +437,7 @@ const FloatingCard = ({ item, index, total, time }: any) => {
         <motion.div
             className="absolute bg-white p-3 rounded-lg border-l-4 shadow-sm w-48 text-xs z-0"
             style={{
-                borderColor: item.type === 'positive' ? BRAND.green : item.type === 'negative' ? BRAND.orange : '#999',
+                borderColor: item.type === 'positive' ? BRAND.green : item.type === 'negative' ? BRAND.vibrantBlue : '#999',
                 left: '50%',
                 top: '50%'
             }}
@@ -461,7 +461,7 @@ const FloatingCard = ({ item, index, total, time }: any) => {
                     <span className="font-bold text-gray-400">#{1024 + index}</span>
                 </div>
                 {item.type === 'positive' && <CheckCircle size={12} className="text-green-500" />}
-                {item.type === 'negative' && <AlertCircle size={12} className="text-orange-500" />}
+                {item.type === 'negative' && <AlertCircle size={12} className="text-blue-500" />}
                 {item.type === 'neutral' && <Minus size={12} className="text-gray-400" />}
             </div>
             <div className="text-gray-700 truncate">{item.text}</div>
@@ -486,7 +486,7 @@ const TopicRow = ({ row, index }: any) => (
         <td className="px-6 py-4 text-center">
             <span className={`px-3 py-1 rounded-full text-xs font-bold flex items-center justify-center gap-1 w-24 mx-auto
                 ${row.sent === 'positive' ? 'bg-[#60BA81]/10 text-[#60BA81]' :
-                    row.sent === 'negative' ? 'bg-[#F5A83C]/10 text-[#F5A83C]' : 'bg-gray-100 text-gray-600'}`}>
+                    row.sent === 'negative' ? 'bg-[#3B82F6]/10 text-[#3B82F6]' : 'bg-gray-100 text-gray-600'}`}>
                 {row.sent === 'positive' && <CheckCircle size={12} />}
                 {row.sent === 'negative' && <AlertCircle size={12} />}
                 {row.sent === 'neutral' && <Minus size={12} />}

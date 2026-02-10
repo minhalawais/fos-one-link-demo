@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, AnimatePresence, LayoutGroup, useMotionValue, useTransform } from "framer-motion"
 import { Zap, ShieldCheck, Search, ClipboardList, Activity } from "lucide-react"
 
@@ -16,6 +16,7 @@ import { MODULE_DATA } from "./lib/module-data.ts"
 
 import Slide from "./components/Slide.tsx"
 import NavigationPill from "./components/NavigationPill.tsx"
+import SplashScreen from "./components/SplashScreen.tsx"
 
 // --- DESIGN SYSTEM CONSTANTS ---
 export const SPRING_PHYSICS = { type: "spring", stiffness: 120, damping: 20, mass: 1.1 }
@@ -240,11 +241,14 @@ const EtherealBackground = ({ activeSlide }: { activeSlide: number | null }) => 
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true)
   const [activeSlide, setActiveSlide] = useState<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [volume, setVolume] = useState(1)
   const [isMuted, setIsMuted] = useState(false)
+
+  const handleSplashComplete = useCallback(() => setShowSplash(false), [])
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -413,6 +417,9 @@ export default function App() {
 
   return (
     <div className="h-screen w-full font-sans overflow-hidden flex flex-col relative text-[#17161A] bg-[#F5F5F7]">
+      {/* ═══ Splash Screen (split-screen exit) ═══ */}
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+
       <EtherealBackground activeSlide={activeSlide} />
       <AmbientParticles />
       <LightRays />

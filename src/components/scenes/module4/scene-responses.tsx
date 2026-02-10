@@ -5,17 +5,17 @@ import { CheckCircle, Lock, Shield, ArrowLeft, Signal, HelpCircle, Clock, Calend
 
 // --- SYSTEM COLORS (Matching App) ---
 const COLORS = {
-    teal: "#0f9690",
-    green: "#60BA81",
-    orange: "#F5A83C",
+    teal: "#3B82F6",
+    green: "#10B981",
+    vibrantBlue: "#3B82F6",
     charcoal: "#17161A",
     white: "#FFFFFF",
-    bg: "#F5F5F7",
-    surface: "#F8F8F8",
-    text: "#2D3748",
-    textMuted: "#718096",
+    bg: "#F8FAFC",
+    surface: "#FFFFFF",
+    text: "#0F172A",
+    textMuted: "#64748B",
     border: "#E2E8F0",
-    red: "#E53E3E",
+    red: "#EF4444",
 }
 
 interface SceneProps {
@@ -259,7 +259,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                         <div className="flex gap-4 text-xs mb-3">
                                                             <div className="flex items-center gap-1">
                                                                 <HelpCircle size={14} style={{ color: COLORS.green }} />
-                                                                <span className="font-bold" style={{ color: COLORS.orange }}>40 Qs</span>
+                                                                <span className="font-bold" style={{ color: COLORS.vibrantBlue }}>40 Qs</span>
                                                             </div>
                                                             <div className="flex items-center gap-1">
                                                                 <Clock size={14} style={{ color: COLORS.green }} />

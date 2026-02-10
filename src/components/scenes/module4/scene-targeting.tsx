@@ -11,12 +11,13 @@ import { useEffect, useRef } from "react"
 const COLORS = {
     teal: "#0f9690",
     darkTeal: "#284952",
-    green: "#60BA81",
+    green: "#10B981",
     charcoal: "#17161A",
-    orange: "#F5A83C",
+    vibrantBlue: "#3B82F6",
+    cyan: "#06B6D4",
     white: "#FFFFFF",
-    bg: "#F5F5F7",
-    border: "#DEE2E6",
+    bg: "#F8FAFC",
+    border: "#E2E8F0",
 }
 
 interface SceneProps {
@@ -147,7 +148,7 @@ export const SceneTargeting = ({ isActive, progress }: SceneProps) => {
                             {/* Targeted Filters */}
                             <div className="pt-2 space-y-4">
                                 <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
-                                    <Filter size={16} style={{ color: COLORS.teal }} />
+                                    <Filter size={16} style={{ color: COLORS.vibrantBlue }} />
                                     <h3 className="font-bold text-gray-800">Survey Filters</h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -168,7 +169,7 @@ export const SceneTargeting = ({ isActive, progress }: SceneProps) => {
                                     </FocusArea>
                                     <FocusArea label="DESIGNATION" isActive={currentFocus === 'unit'} icon={<Layers size={10} />} height="h-11">
                                         <div className="h-full px-2 flex items-center">
-                                            {localT > 20 && <span className="bg-orange-50 text-orange-700 px-2 py-1 rounded text-[10px] font-bold">Cloud Ops</span>}
+                                            {localT > 20 && <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-[10px] font-bold">Cloud Ops</span>}
                                         </div>
                                     </FocusArea>
                                     <FocusArea label="EMPLOYEE IDS" isActive={currentFocus === 'ids'} icon={<Hash size={10} />} height="h-24">
@@ -196,10 +197,10 @@ export const SceneTargeting = ({ isActive, progress }: SceneProps) => {
 const FocusArea = ({ label, isActive, children, icon, height = "h-11" }: { label: string, isActive: boolean, children: React.ReactNode, icon: React.ReactNode, height?: string }) => (
     <div className="space-y-1">
         <div className="flex items-center gap-1 px-0.5">
-            <span className={`text-[9px] font-extrabold uppercase tracking-widest ${isActive ? 'text-teal-600' : 'text-gray-400'}`}>{label}</span>
+            <span className={`text-[9px] font-extrabold uppercase tracking-widest ${isActive ? 'text-blue-600' : 'text-gray-400'}`}>{label}</span>
             {isActive && icon}
         </div>
-        <div className={`bg-white border rounded-lg ${height} transition-all duration-300 ${isActive ? 'border-teal-500 shadow-md scale-[1.01]' : 'border-gray-200 opacity-60'}`}>
+        <div className={`bg-white border rounded-lg ${height} transition-all duration-300 ${isActive ? 'border-blue-500 shadow-md scale-[1.01]' : 'border-gray-200 opacity-60'}`}>
             {children}
         </div>
     </div>

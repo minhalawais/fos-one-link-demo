@@ -14,12 +14,13 @@ import { SceneIntro } from "./module4-intro.tsx"
 const COLORS = {
     teal: "#0f9690",
     darkTeal: "#284952",
-    green: "#60BA81",
+    green: "#10B981",
     charcoal: "#17161A",
-    orange: "#F5A83C",
+    vibrantBlue: "#3B82F6",
+    cyan: "#06B6D4",
     white: "#FFFFFF",
-    bg: "#F5F5F7",
-    border: "#DEE2E6",
+    bg: "#F8FAFC",
+    border: "#E2E8F0",
 }
 
 interface SceneProps {
@@ -49,7 +50,7 @@ const DashboardView = ({ progress }: { progress: number }) => {
             <div className="grid grid-cols-4 gap-6">
                 {[
                     { label: "TOTAL SURVEYS", val: "13", icon: ClipboardList, col: COLORS.green },
-                    { label: "TOTAL QUESTIONS", val: "260", icon: HelpCircle, col: COLORS.orange },
+                    { label: "TOTAL QUESTIONS", val: "260", icon: HelpCircle, col: COLORS.vibrantBlue },
                     { label: "AVG. TIME", val: "5 min", icon: Clock, col: COLORS.charcoal },
                     { label: "ACTIVE", val: "13", icon: CheckCircle2, col: COLORS.green },
                 ].map((stat, i) => (
@@ -108,7 +109,7 @@ const DashboardView = ({ progress }: { progress: number }) => {
                                 <span className="text-[9px] font-bold text-gray-400 uppercase">QUESTIONS</span>
                             </div>
                             <div className="flex-1 bg-gray-50 rounded p-2 text-center border border-gray-100">
-                                <span className="block text-xl font-bold" style={{ color: COLORS.orange }}>{survey.time}</span>
+                                <span className="block text-xl font-bold" style={{ color: COLORS.vibrantBlue }}>{survey.time}</span>
                                 <span className="text-[9px] font-bold text-gray-400 uppercase">EST. TIME</span>
                             </div>
                         </div>
@@ -116,7 +117,7 @@ const DashboardView = ({ progress }: { progress: number }) => {
                         {/* Date */}
                         <div className="flex justify-between text-[10px] font-medium text-gray-400 mb-4">
                             <span className="flex items-center gap-1"><Calendar size={10} /> Jan 27, 2026</span>
-                            <span className="flex items-center gap-1" style={{ color: COLORS.orange }}><Clock size={10} /> {survey.exp}</span>
+                            <span className="flex items-center gap-1" style={{ color: COLORS.vibrantBlue }}><Clock size={10} /> {survey.exp}</span>
                         </div>
 
                         {/* Buttons */}
@@ -136,7 +137,7 @@ const DashboardView = ({ progress }: { progress: number }) => {
                                     />
                                 )}
                             </motion.button>
-                            <button className="w-full py-2 text-white text-xs font-bold rounded flex items-center justify-center gap-2" style={{ backgroundColor: COLORS.orange }}>
+                            <button className="w-full py-2 text-white text-xs font-bold rounded flex items-center justify-center gap-2" style={{ backgroundColor: COLORS.vibrantBlue }}>
                                 <Edit size={12} /> Edit Questions
                             </button>
                             <div className="flex gap-2">
@@ -269,7 +270,7 @@ const DetailsView = ({ progress }: { progress: number }) => {
                             {[
                                 { val: "40", lbl: "SURVEY ID", bg: COLORS.teal, icon: Hash },
                                 { val: "31", lbl: "QUESTIONS", bg: "#2962FF", icon: HelpCircle },
-                                { val: "15", lbl: "EST. TIME", bg: COLORS.orange, icon: Clock },
+                                { val: "15", lbl: "EST. TIME", bg: COLORS.vibrantBlue, icon: Clock },
                                 { val: "12/1/2025", lbl: "CREATED", bg: "#7B1FA2", icon: Calendar },
                                 { val: "12/31/2025", lbl: "EXPIRES", bg: "#F44336", icon: Calendar },
                             ].map((c, i) => (

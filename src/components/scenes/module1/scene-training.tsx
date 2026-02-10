@@ -4,271 +4,421 @@ import React, { useMemo } from 'react'
 import { motion, AnimatePresence } from "framer-motion"
 import {
   MapPin,
-  ScanFace,
-  BarChart3,
   CheckCircle2,
-  Users,
-  Building2,
-  LayoutDashboard,
   ShieldCheck,
   Target,
-  FileText,
-  Activity
+  GraduationCap,
+  Briefcase,
+  Monitor,
+  ClipboardList,
 } from "lucide-react"
 
-// --- ASSETS ---
-const TRAINING_IMAGES = [
-  "/assets/training.jpg",  // 0: Site 1
-  "/assets/training1.jpg", // 1: Site 2
-  "/assets/training2.jpg", // 2: Site 3
-  "/assets/training3.jpg", // 3: Worker 1
-  "/assets/training4.jpg", // 4: Worker 2
-  "/assets/training.jpg",  // 5: Worker 3
-  "/assets/training1.jpg", // 6: Mgmt 1
-  "/assets/training2.jpg", // 7: Mgmt 2
-  "/assets/training3.jpg", // 8: Mgmt 3
-  "/assets/training4.jpg", // 9: Mgmt 4
-]
-
-const COLORS = {
-  Teal: "#284952",
-  Green: "#60BA81",
-  Orange: "#F5A83C",
-  White: "#FFFFFF",
+// ─── IMAGE ASSETS ───
+const PHASE_IMAGES = {
+  SITE: [
+    "/assets/setup1.jpeg",
+    "/assets/setup2.jpeg",
+    "/assets/setup3.jpeg",
+  ],
+  WORKER: [
+    "/assets/training1.jpg",
+    "/assets/training2.jpeg",
+    "/assets/training3.jpeg",
+  ],
+  MGMT: [
+    "/assets/briefing1.jpg",
+    "/assets/briefing2.jpeg",
+    "/assets/briefing3.jpeg",
+  ],
 }
 
-// --- AUGMENTED REALITY OVERLAYS ---
+// ─── BRAND COLORS ───
+const C = {
+  teal: "#284952",
+  green: "#60BA81",
+  orange: "#F5A83C",
+  white: "#FFFFFF",
+  bg: "#F8FAFC",
+  charcoal: "#17161A",
+}
 
-// 1. SITE OVERLAY: "Mapping the Facility"
-const SiteOverlay = ({ label }: { label: string }) => (
+// ─── PHASE CONFIGURATION ───
+const PHASES = [
+  {
+    key: 'SITE' as const,
+    label: 'On-Site Setup',
+    subtitle: 'Facility Walkthrough & Mapping',
+    color: C.orange,
+    colorLight: 'rgba(245,168,60,0.12)',
+    icon: MapPin,
+    captions: ["Facility walkthrough", "Safety zone mapping", "Physical assessment"],
+  },
+  {
+    key: 'WORKER' as const,
+    label: 'Worker Training',
+    subtitle: 'Empowering Reporting',
+    color: C.green,
+    colorLight: 'rgba(96,186,129,0.12)',
+    icon: GraduationCap,
+    captions: ["Reporting mechanisms", "Rights awareness", "Hands-on practice"],
+  },
+  {
+    key: 'MGMT' as const,
+    label: 'Management Briefing',
+    subtitle: 'System & Dashboard Overview',
+    color: C.teal,
+    colorLight: 'rgba(40,73,82,0.12)',
+    icon: Briefcase,
+    captions: ["Dashboard walkthrough", "Admin responsibilities", "Full system overview"],
+  },
+]
+
+// ─── OVERLAY COMPONENTS ───
+
+const SiteOverlay = ({ caption }: { caption: string }) => (
   <div className="absolute inset-0 pointer-events-none">
-    {/* Animated Dashed Border */}
-    <div className="absolute inset-4 border-2 border-dashed border-white/50 rounded-lg opacity-70" />
+    <div className="absolute top-4 left-4 w-10 h-10 border-t-2 border-l-2 border-white/60 rounded-tl-lg" />
+    <div className="absolute top-4 right-4 w-10 h-10 border-t-2 border-r-2 border-white/60 rounded-tr-lg" />
+    <div className="absolute bottom-4 left-4 w-10 h-10 border-b-2 border-l-2 border-white/60 rounded-bl-lg" />
+    <div className="absolute bottom-4 right-4 w-10 h-10 border-b-2 border-r-2 border-white/60 rounded-br-lg" />
 
-    {/* Floating Location Pin */}
+    <motion.div
+      className="absolute left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#F5A83C]/60 to-transparent"
+      animate={{ top: ["10%", "90%", "10%"] }}
+      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+    />
+
+    <motion.div
+      initial={{ x: -30, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ delay: 0.3, type: "spring" }}
+      className="absolute top-6 left-6 bg-black/60 backdrop-blur-lg px-4 py-2.5 rounded-xl flex items-center gap-3 border border-white/10"
+    >
+      <div className="w-8 h-8 rounded-lg bg-[#F5A83C] flex items-center justify-center">
+        <MapPin size={16} className="text-white" />
+      </div>
+      <div>
+        <div className="text-[8px] font-bold text-white/50 uppercase tracking-[0.15em]">Site Assessment</div>
+        <div className="text-xs font-bold text-white">{caption}</div>
+      </div>
+    </motion.div>
+
+    <motion.div
+      className="absolute bottom-6 right-6"
+      animate={{ rotate: [0, 360] }}
+      transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+    >
+      <Target size={28} className="text-white/30" strokeWidth={1} />
+    </motion.div>
+  </div>
+)
+
+const WorkerOverlay = ({ caption }: { caption: string }) => (
+  <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <motion.div
+      className="absolute left-0 right-0 h-32 bg-gradient-to-b from-[#60BA81]/15 to-transparent"
+      animate={{ top: ["-15%", "100%"] }}
+      transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+    />
+
+    <motion.div
+      initial={{ scale: 0.7, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+      className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#284952]/90 backdrop-blur-lg text-white px-5 py-2.5 rounded-full shadow-2xl border border-[#60BA81]/40 flex items-center gap-3"
+    >
+      <motion.div
+        animate={{ scale: [1, 1.3, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+        className="w-2 h-2 rounded-full bg-[#60BA81]"
+      />
+      <span className="text-xs font-bold tracking-wide">{caption}</span>
+      <CheckCircle2 size={14} className="text-[#60BA81]" />
+    </motion.div>
+
     <motion.div
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.2, type: "spring" }}
-      className="absolute top-8 left-8 bg-white/90 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg flex items-center gap-3"
+      transition={{ delay: 0.4 }}
+      className="absolute top-6 right-6 bg-black/50 backdrop-blur-lg p-3 rounded-xl border border-white/10"
     >
-      <div className="bg-[#F5A83C] p-1.5 rounded-full text-white">
-        <MapPin size={16} />
-      </div>
-      <div>
-        <div className="text-[9px] font-bold text-[#767676] uppercase tracking-wider">Site Checked</div>
-        <div className="text-sm font-black text-[#284952] leading-none">{label}</div>
-      </div>
-    </motion.div>
-
-    {/* Technical Crosshairs */}
-    <motion.div
-      className="absolute bottom-8 right-8 text-white/80"
-      initial={{ rotate: 90, opacity: 0 }}
-      animate={{ rotate: 0, opacity: 1 }}
-    >
-      <Target size={32} strokeWidth={1} />
+      <ShieldCheck size={20} className="text-[#60BA81]" />
     </motion.div>
   </div>
 )
 
-// 2. WORKER OVERLAY: "Empowering & Reporting"
-const WorkerOverlay = ({ label }: { label: string }) => (
-  <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-    {/* Soft Scan Light */}
-    <motion.div
-      className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-[#60BA81]/20 to-transparent z-10"
-      animate={{ top: ["-20%", "120%"] }}
-      transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-    />
-
-    {/* Interactive Badge Pop-up */}
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#284952] text-white px-5 py-2 rounded-full shadow-2xl border border-[#60BA81] flex items-center gap-3 z-20"
-    >
-      <ScanFace size={18} className="text-[#60BA81]" />
-      <span className="text-xs font-bold tracking-wide">Report Mechanism: <span className="text-[#60BA81]">Active</span></span>
-    </motion.div>
-  </div>
-)
-
-// 3. MANAGEMENT OVERLAY: "System Briefing"
-const ManagementOverlay = ({ label }: { label: string }) => (
+const MgmtOverlay = ({ caption }: { caption: string }) => (
   <div className="absolute inset-0 pointer-events-none">
-    {/* Glassmorphism Sidebar Widget */}
     <motion.div
-      initial={{ x: 50, opacity: 0 }}
+      initial={{ x: 40, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      transition={{ delay: 0.3 }}
-      className="absolute top-8 right-8 w-48 bg-white/80 backdrop-blur-xl p-4 rounded-xl shadow-2xl border border-white/50"
+      transition={{ delay: 0.3, type: "spring" }}
+      className="absolute top-6 right-6 w-52 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-2xl border border-white/60"
     >
-      <div className="flex items-center gap-2 mb-3 border-b border-[#284952]/10 pb-2">
-        <LayoutDashboard size={14} className="text-[#284952]" />
-        <span className="text-[10px] font-black text-[#284952] uppercase">System Overview</span>
+      <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200/60">
+        <Monitor size={14} className="text-[#284952]" />
+        <span className="text-[10px] font-black text-[#284952] uppercase tracking-wider">System Dashboard</span>
       </div>
-
-      {/* Fake Charts */}
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <span className="text-[9px] text-[#767676] font-bold">Usage</span>
-          <div className="h-1.5 w-16 bg-[#F0F2F5] rounded-full overflow-hidden">
-            <motion.div initial={{ width: 0 }} animate={{ width: "80%" }} className="h-full bg-[#60BA81]" />
+      <div className="space-y-2.5">
+        {[
+          { label: "Readiness", pct: 85, color: C.green },
+          { label: "Modules", pct: 100, color: C.teal },
+          { label: "Alerts", pct: 30, color: C.orange },
+        ].map((bar) => (
+          <div key={bar.label} className="flex items-center gap-2">
+            <span className="text-[9px] font-bold text-gray-500 w-14">{bar.label}</span>
+            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${bar.pct}%` }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="h-full rounded-full"
+                style={{ backgroundColor: bar.color }}
+              />
+            </div>
+            <span className="text-[9px] font-bold" style={{ color: bar.color }}>{bar.pct}%</span>
           </div>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-[9px] text-[#767676] font-bold">Alerts</span>
-          <div className="h-1.5 w-16 bg-[#F0F2F5] rounded-full overflow-hidden">
-            <motion.div initial={{ width: 0 }} animate={{ width: "40%" }} className="h-full bg-[#F5A83C]" />
-          </div>
-        </div>
+        ))}
       </div>
     </motion.div>
 
-    {/* Context Label */}
     <motion.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="absolute bottom-6 left-6 bg-[#60BA81] text-white px-4 py-1.5 rounded-lg shadow-lg text-xs font-bold"
+      transition={{ delay: 0.4 }}
+      className="absolute bottom-6 left-6 bg-[#284952] text-white px-5 py-2.5 rounded-xl shadow-xl flex items-center gap-2"
     >
-      {label}
+      <ClipboardList size={14} className="text-[#60BA81]" />
+      <span className="text-xs font-bold">{caption}</span>
     </motion.div>
   </div>
 )
 
-// --- MAIN COMPONENT ---
+// ─── MAIN COMPONENT ───
 
-export default function SceneTraining({ isActive, progress }: { isActive: boolean, progress: number }) {
-  // Logic
+export default function SceneTraining({ isActive, progress }: { isActive: boolean; progress: number }) {
   const sceneStart = 101
   const localTime = isActive ? Math.max(0, progress - sceneStart) : 0
 
-  // Script Sync Logic (19s Total)
-  // "FOS team visits... on site sessions" -> 0-6s
-  // "training workers on how to report..." -> 6-12s
-  // "briefing management on dashboards..." -> 12-19s
-  const phase = useMemo(() => {
-    if (localTime < 6) return 'SITE'
-    if (localTime < 12) return 'WORKER'
-    return 'MGMT'
+  // Clamped Phase Index: Ensures we never exceed index 2 even if the progress is exactly at the boundary
+  const phaseIndex = useMemo(() => {
+    if (localTime < 6) return 0
+    if (localTime < 12) return 1
+    return 2
   }, [localTime])
 
-  // Active Image Calculation
-  const globalImageIndex = useMemo(() => {
-    if (phase === 'SITE') return Math.min(2, Math.floor(localTime / 2))
-    if (phase === 'WORKER') return Math.min(5, 3 + Math.floor((localTime - 6) / 2))
-    return Math.min(9, 6 + Math.floor((localTime - 12) / 1.75)) // Faster pace for 4 images
-  }, [localTime, phase])
+  const phase = PHASES[phaseIndex]
 
-  const currentImage = TRAINING_IMAGES[globalImageIndex]
+  // Image cycling logic: Fixed boundary overshoots to prevent "sticking"
+  const imageIndex = useMemo(() => {
+    if (phaseIndex === 0) return Math.min(2, Math.floor(localTime / 2))
+    if (phaseIndex === 1) return Math.min(2, Math.floor((localTime - 6) / 2))
+    // Uses 2.33s for Mgmt phase to ensure all 3 images fit comfortably in the final 7s (12-19s)
+    return Math.min(2, Math.floor((localTime - 12) / 2.33))
+  }, [localTime, phaseIndex])
 
-  // Context Labels synced with script
-  const labels = [
-    "Facility Walkthrough", "Safety Zone Setup", "Physical Inspection", // Site
-    "Reporting Tools", "Voice Mechanism", "Worker Rights",              // Worker
-    "Dashboard Setup", "Admin Controls", "Responsibility Matrix", "Full Rollout" // Mgmt
-  ]
+  const currentImages = PHASE_IMAGES[phase.key]
+  const currentImage = currentImages[imageIndex]
+  const currentCaption = phase.captions[imageIndex]
+  const PhaseIcon = phase.icon
 
   return (
-    <div className="w-full h-full bg-white relative overflow-hidden font-sans flex flex-col items-center justify-center">
+    <div className="w-full h-full bg-gradient-to-br from-[#F8FAFC] via-white to-[#F1F5F9] relative overflow-hidden font-sans flex flex-col">
 
-      {/* 1. CLEAN BACKGROUND ELEMENTS */}
+      {/* ── AMBIENT BACKGROUND ── */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Subtle Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(#E5E7EB_1px,transparent_1px),linear-gradient(90deg,#E5E7EB_1px,transparent_1px)] bg-[size:40px_40px] opacity-40" />
-
-        {/* Creative Ambient Blobs (FOS Colors) */}
+        <div className="absolute inset-0 bg-[linear-gradient(#E2E8F0_1px,transparent_1px),linear-gradient(90deg,#E2E8F0_1px,transparent_1px)] bg-[size:48px_48px] opacity-30" />
         <motion.div
-          animate={{ x: [0, 50, 0], y: [0, -30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#60BA81]/5 rounded-full blur-3xl"
+          animate={{ x: [0, 40, 0], y: [0, -20, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[100px]"
+          style={{ backgroundColor: `${phase.color}08` }}
         />
         <motion.div
-          animate={{ x: [0, -30, 0], y: [0, 50, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#F5A83C]/5 rounded-full blur-3xl"
+          animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full blur-[100px]"
+          style={{ backgroundColor: `${C.green}08` }}
         />
       </div>
 
-      {/* 2. HEADER: Phase Title (Synced with Voiceover) */}
-      <div className="absolute top-10 z-30 flex flex-col items-center">
+      {/* ── TOP HEADER ── */}
+      <div className="relative z-20 pt-4 pb-2 flex flex-col items-center shrink-0">
         <AnimatePresence mode="wait">
           <motion.div
-            key={phase}
-            initial={{ y: -10, opacity: 0 }}
+            key={phase.key}
+            initial={{ y: -15, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 10, opacity: 0 }}
+            exit={{ y: 15, opacity: 0 }}
+            transition={{ duration: 0.4 }}
             className="flex flex-col items-center gap-1"
           >
-            <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em] 
-              ${phase === 'SITE' ? 'bg-[#F5F5F7] text-[#284952]' :
-                phase === 'WORKER' ? 'bg-[#284952] text-[#60BA81]' :
-                  'bg-[#60BA81] text-white'}`}
+            <div
+              className="flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em]"
+              style={{ backgroundColor: phase.colorLight, color: phase.color }}
             >
-              {phase === 'SITE' ? 'Step 1: On-Site Sessions' : phase === 'WORKER' ? 'Step 2: Worker Training' : 'Step 3: Management Briefing'}
+              <PhaseIcon size={11} />
+              Phase {phaseIndex + 1} of 3
             </div>
-            <h2 className="text-3xl font-black text-[#284952] tracking-tight">
-              {phase === 'SITE' ? 'Facility Visits' : phase === 'WORKER' ? 'Reporting Concerns' : 'System Walkthrough'}
+
+            <h2 className="text-2xl font-black text-[#0F172A] tracking-tight leading-tight">
+              {phase.label}
             </h2>
+            <p className="text-xs font-medium text-slate-400">{phase.subtitle}</p>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* 3. MAIN HERO STAGE */}
-      <div className="relative z-20 w-[80%] h-[60%] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] rounded-2xl bg-white p-2">
-        <div className="w-full h-full relative rounded-xl overflow-hidden bg-gray-100">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={globalImageIndex}
-              className="w-full h-full relative"
-              initial={{ scale: 1.05, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-            >
-              {/* Image */}
-              <img src={currentImage} alt="Training" className="w-full h-full object-cover" />
+      {/* ── MAIN CONTENT AREA ── */}
+      <div className="flex-1 min-h-0 relative z-10 flex items-center justify-center px-8 py-2">
+        <div className="w-full h-full max-w-[90%] max-h-full flex gap-4 items-stretch">
 
-              {/* Overlay Logic */}
-              {phase === 'SITE' && <SiteOverlay label={labels[globalImageIndex]} />}
-              {phase === 'WORKER' && <WorkerOverlay label={labels[globalImageIndex]} />}
-              {phase === 'MGMT' && <ManagementOverlay label={labels[globalImageIndex]} />}
-            </motion.div>
-          </AnimatePresence>
+          {/* ── HERO IMAGE ── */}
+          <div className="flex-1 min-w-0 relative rounded-2xl overflow-hidden shadow-[0_25px_80px_-15px_rgba(0,0,0,0.15)] bg-white p-1.5">
+            <div className="w-full h-full relative rounded-xl overflow-hidden bg-slate-100">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${phase.key}-${imageIndex}`}
+                  className="absolute inset-0"
+                  initial={{ scale: 1.08, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <motion.img
+                    src={currentImage}
+                    alt={currentCaption}
+                    className="w-full h-full object-cover"
+                    animate={{ scale: [1, 1.06] }}
+                    transition={{ duration: 6, ease: "easeOut" }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
+
+                  {phaseIndex === 0 && <SiteOverlay caption={currentCaption} />}
+                  {phaseIndex === 1 && <WorkerOverlay caption={currentCaption} />}
+                  {phaseIndex === 2 && <MgmtOverlay caption={currentCaption} />}
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="absolute bottom-4 left-4 z-30 flex items-center gap-1.5">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="h-1 rounded-full"
+                    animate={{
+                      width: i === imageIndex ? 24 : 8,
+                      backgroundColor: i === imageIndex ? phase.color : 'rgba(255,255,255,0.4)',
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── THUMBNAIL STRIP ── */}
+          <div className="w-24 flex flex-col gap-2 shrink-0">
+            {currentImages.map((thumb, i) => (
+              <motion.div
+                key={`${phase.key}-thumb-${i}`}
+                className="flex-1 relative rounded-xl overflow-hidden cursor-pointer"
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.1 + i * 0.1 }}
+                style={{
+                  border: i === imageIndex ? `2px solid ${phase.color}` : '2px solid transparent',
+                  boxShadow: i === imageIndex ? `0 0 15px ${phase.color}30` : '0 4px 12px rgba(0,0,0,0.06)',
+                }}
+              >
+                <img
+                  src={thumb}
+                  alt={phase.captions[i]}
+                  className="w-full h-full object-cover"
+                  style={{
+                    filter: i === imageIndex ? 'none' : 'brightness(0.6)',
+                    transition: 'filter 0.3s ease',
+                  }}
+                />
+                {i === imageIndex && (
+                  <motion.div
+                    layoutId="activeThumb"
+                    className="absolute inset-0 border-2 rounded-xl"
+                    style={{ borderColor: phase.color }}
+                  />
+                )}
+                <div
+                  className="absolute top-1.5 left-1.5 w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black"
+                  style={{
+                    backgroundColor: i === imageIndex ? phase.color : 'rgba(0,0,0,0.5)',
+                    color: C.white,
+                  }}
+                >
+                  {i + 1}
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* 4. PROGRESS FOOTER (No Counts, Just Flow) */}
-      <div className="absolute bottom-12 z-30 w-[60%] flex flex-col gap-2">
-        <div className="flex w-full h-1 bg-[#F0F2F5] rounded-full overflow-hidden">
-          {/* Site Bar */}
-          <motion.div
-            className="h-full bg-[#F5A83C]"
-            initial={{ width: 0 }}
-            animate={{ width: phase === 'SITE' ? `${(localTime / 6) * 33}%` : '33%' }}
-          />
-          {/* Worker Bar */}
-          <motion.div
-            className="h-full bg-[#60BA81]"
-            initial={{ width: 0 }}
-            animate={{ width: phase === 'WORKER' ? `${((localTime - 6) / 6) * 33}%` : phase === 'MGMT' ? '33%' : '0%' }}
-          />
-          {/* Mgmt Bar */}
-          <motion.div
-            className="h-full bg-[#284952]"
-            initial={{ width: 0 }}
-            animate={{ width: phase === 'MGMT' ? `${((localTime - 12) / 7) * 34}%` : '0%' }}
-          />
-        </div>
+      {/* ── BOTTOM PHASE PROGRESS ── */}
+      <div className="relative z-20 py-3 px-12 shrink-0">
+        <div className="flex items-center gap-3">
+          {PHASES.map((p, i) => {
+            const isPhaseActive = i === phaseIndex
+            const isPhaseComplete = i < phaseIndex
+            const PIcon = p.icon
+            return (
+              <React.Fragment key={p.key}>
+                <motion.div
+                  className="flex items-center gap-2.5 px-4 py-2 rounded-xl transition-all duration-300"
+                  style={{
+                    backgroundColor: isPhaseActive ? p.colorLight : isPhaseComplete ? `${p.color}08` : 'transparent',
+                    border: isPhaseActive ? `1.5px solid ${p.color}40` : '1.5px solid transparent',
+                  }}
+                  animate={{ scale: isPhaseActive ? 1 : 0.95 }}
+                >
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                    style={{
+                      backgroundColor: isPhaseActive || isPhaseComplete ? p.color : '#E2E8F0',
+                    }}
+                  >
+                    {isPhaseComplete ? (
+                      <CheckCircle2 size={14} className="text-white" />
+                    ) : (
+                      <PIcon size={14} className={isPhaseActive ? "text-white" : "text-slate-400"} />
+                    )}
+                  </div>
+                  <div>
+                    <div
+                      className="text-[10px] font-black uppercase tracking-wider"
+                      style={{ color: isPhaseActive ? p.color : isPhaseComplete ? p.color : '#94A3B8' }}
+                    >
+                      {p.label}
+                    </div>
+                  </div>
+                </motion.div>
 
-        <div className="flex justify-between text-[10px] font-bold text-[#284952]/40 uppercase tracking-widest">
-          <span className={phase === 'SITE' ? "text-[#F5A83C]" : ""}>Setup</span>
-          <span className={phase === 'WORKER' ? "text-[#60BA81]" : ""}>Training</span>
-          <span className={phase === 'MGMT' ? "text-[#284952]" : ""}>Briefing</span>
+                {i < PHASES.length - 1 && (
+                  <div className="flex-1 h-px relative">
+                    <div className="absolute inset-0 bg-slate-200" />
+                    {isPhaseComplete && (
+                      <motion.div
+                        className="absolute inset-0 h-px"
+                        style={{ backgroundColor: p.color }}
+                        initial={{ width: 0 }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: 0.6 }}
+                      />
+                    )}
+                  </div>
+                )}
+              </React.Fragment>
+            )
+          })}
         </div>
       </div>
-
     </div>
   )
 }
