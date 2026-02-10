@@ -1,43 +1,353 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/assets/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="FOS One Link Demo"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/assets/logo.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<html lang="en" dir="ltr">
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>FOS One Link Demo</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://code.jscharting.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com; media-src 'self';" />
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  <!-- ===== SEARCH ENGINE VERIFICATION (Replace with your actual codes) ===== -->
+  <!-- <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE" /> -->
+  <!-- <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" /> -->
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
+  <!-- ===== PRIMARY SEO ===== -->
+  <title>FOS One Link — AI-Powered Worker Grievance & HRDD Compliance Platform Demo</title>
+  <meta name="description"
+    content="Interactive demo of FOS One Link by Fruit of Sustainability — Pakistan's first AI-enabled independent worker complaint hotline & HRDD compliance SaaS platform. Explore 5 modules: Deployment, Grievance Intake, Investigation, Digital Surveys, and Risk Dashboards." />
+  <meta name="keywords"
+    content="FOS, Fruit of Sustainability, FOS One Link, worker grievance, HRDD, human rights due diligence, complaint hotline, ESG compliance, supply chain, Pakistan, ethical trade, UNGP, OECD, worker complaint, grievance mechanism, factory compliance, labor rights, SaaS platform, AI grievance, supply chain due diligence" />
+  <meta name="author" content="Fruit of Sustainability (SMC-Private) Limited" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://demo.fruitofsustainability.com/" />
+
+  <!-- ===== OPEN GRAPH (Facebook, LinkedIn, WhatsApp) ===== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="Fruit of Sustainability" />
+  <meta property="og:title" content="FOS One Link — AI-Powered Worker Grievance & HRDD Compliance Platform Demo" />
+  <meta property="og:description"
+    content="Experience the FOS SaaS platform walkthrough: 5 interactive cinematic modules covering grievance deployment, intake, investigation, digital surveys, and AI-powered risk dashboards. Aligned with UNGP & OECD guidelines." />
+  <meta property="og:image" content="https://demo.fruitofsustainability.com/og_image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="FOS One Link Platform — AI-powered worker grievance management dashboard" />
+  <meta property="og:url" content="https://demo.fruitofsustainability.com/" />
+
+  <!-- ===== TWITTER CARD ===== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="FOS One Link — AI-Powered Grievance & HRDD Platform Demo" />
+  <meta name="twitter:description"
+    content="Interactive walkthrough of Pakistan's first AI-enabled worker complaint & HRDD compliance platform. 5 cinematic modules covering the full grievance lifecycle." />
+  <meta name="twitter:image" content="https://demo.fruitofsustainability.com/og_image.jpg" />
+  <meta name="twitter:image:alt" content="FOS One Link Platform Demo" />
+
+  <!-- ===== THEME & BRANDING ===== -->
+  <meta name="theme-color" content="#284952" />
+  <meta name="msapplication-TileColor" content="#284952" />
+  <meta name="apple-mobile-web-app-title" content="FOS One Link Demo" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- ===== GEOGRAPHIC & LANGUAGE ===== -->
+  <meta name="geo.region" content="PK" />
+  <meta name="geo.placename" content="Pakistan" />
+  <meta name="language" content="English" />
+
+  <!-- ===== FAVICONS & ICONS ===== -->
+  <link rel="icon" href="%PUBLIC_URL%/assets/logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/assets/logo.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/assets/logo.png" />
+
+  <!-- ===== PERFORMANCE HINTS ===== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://fruitofsustainability.com" />
+  <link rel="preload" href="%PUBLIC_URL%/assets/logo.png" as="image" type="image/png" />
+  <link rel="preload" href="%PUBLIC_URL%/og_image.jpg" as="image" type="image/jpeg" />
+
+  <!-- ===== MANIFEST ===== -->
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+  <!-- ===== STRUCTURED DATA (JSON-LD) ===== -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "FOS One Link",
+      "alternateName": "Fruit of Sustainability One Link Demo",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "browserRequirements": "Requires JavaScript. Best on Chrome, Firefox, Safari, Edge.",
+      "description": "AI-powered independent worker grievance management, investigation tracking, and HRDD compliance platform. Features 5 modules: Deployment, Grievance Intake, Investigation & Remediation, Digital Surveys, and Risk Dashboards & Insights.",
+      "url": "https://demo.fruitofsustainability.com",
+      "image": "https://demo.fruitofsustainability.com/og_image.jpg",
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "provider": {
+        "@type": "Organization",
+        "name": "Fruit of Sustainability (SMC-Private) Limited",
+        "url": "https://fruitofsustainability.com",
+        "logo": "https://fruitofsustainability.com/assets/logo.png",
+        "description": "Pakistan's First AI Enabled Independent Worker Complaint Hotline",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "PK"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+92-800-91299",
+          "contactType": "customer service",
+          "availableLanguage": ["English", "Urdu", "Punjabi", "Sindhi", "Saraiki"],
+          "hoursAvailable": "Mo-Su 00:00-23:59"
+        },
+        "sameAs": [
+          "https://fruitofsustainability.com",
+          "https://www.facebook.com/fruitofsustainability",
+          "https://www.youtube.com/@FruitofSustainability",
+          "https://www.linkedin.com/company/fruit-of-sustainability/"
+        ]
+      },
+      "offers": {
+        "@type": "Offer",
+        "category": "SaaS",
+        "availability": "https://schema.org/InStock"
+      },
+      "featureList": [
+        "AI-Powered Grievance Management",
+        "Multi-channel Complaint Registration (Toll-free, SMS, WhatsApp, Email)",
+        "Automated Complaint Ticketing & Tracking",
+        "Investigation & Remediation Workflow",
+        "Digital Employee Surveys",
+        "Real-time Risk Dashboards with AI Analytics",
+        "UNGP & OECD Compliant Grievance Mechanism",
+        "Supply Chain Due Diligence Reporting",
+        "Worker Happiness & Safety Scoring",
+        "Multi-language Support"
+      ]
+    }
+    </script>
+
+  <!-- ===== BREADCRUMB STRUCTURED DATA ===== -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Fruit of Sustainability",
+          "item": "https://fruitofsustainability.com"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Platform Demo",
+          "item": "https://demo.fruitofsustainability.com"
+        }
+      ]
+    }
+    </script>
+
+  <!-- ===== FAQ STRUCTURED DATA (For Rich Snippets) ===== -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is FOS One Link?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FOS One Link is an AI-powered SaaS platform by Fruit of Sustainability that provides independent worker grievance management, investigation tracking, and HRDD compliance for global supply chains. It features multi-channel complaint registration (toll-free calls, SMS, WhatsApp, email), automated ticketing, real-time dashboards, and AI-powered risk analytics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does FOS help with HRDD compliance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FOS One Link aligns with UN Guiding Principles on Business and Human Rights (UNGP) and OECD Recommendations on Supply Chain Grievance Mechanisms. It provides end-to-end grievance management from complaint registration to investigation, remediation verification, and compliance reporting — helping brands and suppliers meet requirements of laws like the German Supply Chain Act, EU CSDDD, and UK Modern Slavery Act."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What channels can workers use to register complaints?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Workers can register complaints through 6 channels: toll-free calls (0800 91299), SMS (+923299129999), WhatsApp (+923299129999), email, online web form, and the FOS mobile app. The hotline operates 24/7 with agents proficient in Urdu, Punjabi, Sindhi, Saraiki, and English."
+          }
+        }
+      ]
+    }
+    </script>
+
+  <!-- ===== VIDEO STRUCTURED DATA (Platform Walkthrough) ===== -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": "FOS One Link — SaaS Platform Video Walkthrough",
+      "description": "Complete cinematic walkthrough of FOS One Link, Pakistan's first AI-enabled worker grievance management and HRDD compliance platform. Covers 5 modules: Deployment, Grievance Intake, Investigation & Remediation, Digital Surveys, and AI-Powered Risk Dashboards.",
+      "thumbnailUrl": "https://demo.fruitofsustainability.com/og_image.jpg",
+      "uploadDate": "2026-02-01",
+      "duration": "PT15M",
+      "contentUrl": "https://demo.fruitofsustainability.com/",
+      "embedUrl": "https://demo.fruitofsustainability.com/",
+      "interactionStatistic": {
+        "@type": "InteractionCounter",
+        "interactionType": { "@type": "WatchAction" },
+        "userInteractionCount": 0
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Fruit of Sustainability (SMC-Private) Limited",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://fruitofsustainability.com/assets/logo.png"
+        }
+      }
+    }
+    </script>
+
+  <!-- ===== HOWTO STRUCTURED DATA ===== -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How the FOS One Link Grievance Platform Works",
+      "description": "Step-by-step overview of how FOS One Link manages the complete worker grievance lifecycle — from complaint registration to resolution and compliance reporting.",
+      "image": "https://demo.fruitofsustainability.com/og_image.jpg",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Deployment",
+          "text": "FOS cards with unique QR/FOS IDs are distributed to workers. Officers are trained, and SMS notifications inform workers of the grievance hotline."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Grievance Intake",
+          "text": "Workers register complaints through 6 channels: toll-free calls, SMS, WhatsApp, email, web form, or mobile app. Each complaint is automatically ticketed and tracked."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Investigation & Remediation",
+          "text": "FOS conducts Root Cause Analysis (RCA), examines evidence, implements CAPA (Corrective & Preventive Actions), verifies remediation, and closes the case."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Digital Surveys",
+          "text": "CNIC-authenticated employee engagement surveys assess worker well-being, satisfaction, and working conditions across factory sites."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 5,
+          "name": "Dashboards & Risk Insights",
+          "text": "Real-time analytics dashboards provide complaint breakdowns, resolution tracking, AI-powered risk prediction, and worker happiness scoring for HRDD compliance reporting."
+        }
+      ]
+    }
+    </script>
+
+  <!-- ===== ADDITIONAL FAQ QUESTIONS ===== -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Which global HRDD laws does FOS help comply with?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FOS One Link helps organizations comply with the German Supply Chain Due Diligence Act (LkSG), EU Corporate Sustainability Due Diligence Directive (CSDDD), UK Modern Slavery Act, French Duty of Vigilance Law, Australian Modern Slavery Act, US Uyghur Forced Labour Prevention Act, Norwegian Transparency Act, and other emerging HRDD legislation worldwide."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does FOS protect worker identity and handle anonymous complaints?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FOS supports identity protection and anonymous reporting as per the worker's request. Workers can choose to remain anonymous during complaint registration. The platform assigns unique FOS IDs for tracking without exposing personal information to factory management."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the FOS One Link interactive demo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The FOS One Link demo at demo.fruitofsustainability.com is an interactive cinematic walkthrough of the entire SaaS platform. It features 5 narrated modules with synchronized animations showing real platform screens — from worker onboarding and complaint registration to investigation workflows, digital surveys, and AI-powered risk dashboards."
+          }
+        }
+      ]
+    }
+    </script>
+
+  <!-- ===== GOOGLE ANALYTICS (GA4) — Replace YOUR_MEASUREMENT_ID ===== -->
+  <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'YOUR_MEASUREMENT_ID');
+    </script>
     -->
-  </body>
+</head>
+
+<body>
+  <!-- ===== NOSCRIPT FALLBACK (Critical for SEO crawlers) ===== -->
+  <noscript>
+    <div style="padding: 40px; font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
+      <h1>FOS One Link — AI-Powered Worker Grievance & HRDD Compliance Platform</h1>
+      <p>Welcome to the interactive demo of <strong>FOS One Link</strong> by <a
+          href="https://fruitofsustainability.com">Fruit of Sustainability</a> — Pakistan's first AI-enabled independent
+        worker complaint hotline and HRDD compliance SaaS platform.</p>
+
+      <h2>Platform Modules</h2>
+      <ul>
+        <li><strong>Module 1: Deployment</strong> — Onboarding workers, distributing FOS Hotline cards, SMS
+          notifications, and officer training across factory sites.</li>
+        <li><strong>Module 2: Grievance Intake</strong> — Multi-channel complaint registration via toll-free calls, SMS,
+          WhatsApp, email, and mobile app with automated ticketing.</li>
+        <li><strong>Module 3: Investigation & Remediation</strong> — Root Cause Analysis (RCA), evidence examination,
+          CAPA implementation, FOS verification, and case closure workflow.</li>
+        <li><strong>Module 4: Digital Surveys</strong> — Employee engagement surveys with CNIC-based authentication,
+          worker well-being assessment, and exit interview reporting.</li>
+        <li><strong>Module 5: Dashboards & Risk Insights</strong> — Real-time analytics, complaint category breakdown,
+          resolution time tracking, counseling analysis, AI-powered risk prediction, and worker happiness scoring.</li>
+      </ul>
+
+      <h2>Key Features</h2>
+      <ul>
+        <li>AI-Powered Grievance Management with Predictive Risk Analytics</li>
+        <li>24/7 Complaint Registration (Toll-free: 0800 91299)</li>
+        <li>UNGP & OECD Compliant Grievance Mechanism</li>
+        <li>Supply Chain Due Diligence Reporting</li>
+        <li>Multi-language Support (Urdu, Punjabi, Sindhi, Saraiki, English)</li>
+      </ul>
+
+      <h2>Compliance Coverage</h2>
+      <p>FOS One Link helps organizations comply with: German Supply Chain Act, EU Corporate Sustainability Due
+        Diligence Directive, UK Modern Slavery Act, French Duty of Vigilance Law, Australian Modern Slavery Act, US
+        Uyghur Forced Labour Prevention Act, Norwegian Transparency Act, and other global HRDD legislation.</p>
+
+      <p><strong>You need to enable JavaScript to experience the interactive demo.</strong></p>
+      <p>Visit our main website: <a href="https://fruitofsustainability.com">fruitofsustainability.com</a></p>
+    </div>
+  </noscript>
+
+  <div id="root"></div>
+</body>
+
 </html>

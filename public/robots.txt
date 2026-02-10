@@ -1,3 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
+# FOS One Link Demo — demo.fruitofsustainability.com
+
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /static/js/*.map
+Disallow: /static/css/*.map
+
+# Sitemap
+Sitemap: https://demo.fruitofsustainability.com/sitemap.xml
