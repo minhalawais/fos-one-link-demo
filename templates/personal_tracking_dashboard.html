@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Dashboard | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    colors: {
+                        teal: {
+                            DEFAULT: '#284952',
+                            light: '#3A6D7A',
+                            dark: '#1e363c'
+                        },
+                        green: {
+                            DEFAULT: '#60BA81',
+                            soft: 'rgba(96, 186, 129, 0.42)',
+                            subtle: 'rgba(96, 186, 129, 0.12)',
+                            hover: '#4FA772'
+                        },
+                        orange: {
+                            DEFAULT: '#F5A83C',
+                            soft: 'rgba(245, 168, 60, 0.15)'
+                        },
+                        charcoal: '#17161A',
+                        grayLight: '#F5F5F7',
+                        grayMedium: '#767676',
+                        borderGray: '#DEE2E6'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/tracking-dashboard.css') }}" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- API URL Configuration -->
+    <script>
+        window.DASHBOARD_API_URLS = {
+            crudBreakdown: "/api/tracking/crud_breakdown",
+            officerActions: "/api/tracking/officer_actions",
+            hourly: "/api/tracking/hourly",
+            timeline: "/api/tracking/timeline",
+            moduleDetails: "/api/tracking/module",
+            moduleData: "/api/tracking/module",
+            buyerBreakdown: "/api/tracking/buyer_breakdown",
+            buyerDetails: "/api/tracking/buyer_details",
+            buyerTimeline: "/api/tracking/buyer_timeline",
+            systemLogs: "/api/tracking/system_logs"
+        };
+    </script>
+</head>
+
+<body class="bg-grayLight text-charcoal min-h-screen">
+
+    <!-- Navbar Include -->
+    {% include 'partials/personal_navbar.html' %}
+
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Hero Section -->
+        <div class="hero-bg rounded-2xl p-8 mb-8 animate-fade-in">
+            <div class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div>
+                    <h1 class="page-title mb-2">
+                        <span
+                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-light to-teal flex items-center justify-center text-white shadow-lg text-xl">
+                            <i class="fas fa-chart-pie"></i>
+                        </span>
+                        Tracking Dashboard
+                    </h1>
+                    <p class="page-subtitle ml-1">Real-time overview of system activities and performance metrics.</p>
+                </div>
+
+                <!-- Filters Toolbar -->
+                <div
+                    class="header-actions flex flex-col sm:flex-row gap-4 bg-white/90 p-3 rounded-xl shadow-sm border border-borderGray">
+                    <!-- Segmented Control -->
+                    <div class="segmented-control">
+                        <button class="segment-btn quick-btn active" data-range="today">Today</button>
+                        <button class="segment-btn quick-btn" data-range="week">Week</button>
+                        <button class="segment-btn quick-btn" data-range="month">Month</button>
+                    </div>
+
+                    <div class="hidden sm:block w-px bg-borderGray"></div>
+
+                    <!-- Date Range Picker -->
+                    <div class="date-filter-wrapper">
+                        <div class="date-input-group">
+                            <i class="far fa-calendar text-grayMedium text-xs mr-2"></i>
+                            <input type="date" id="startDate" class="date-input">
+                        </div>
+                        <span class="text-grayMedium font-medium text-sm">to</span>
+                        <div class="date-input-group">
+                            <i class="far fa-calendar-check text-grayMedium text-xs mr-2"></i>
+                            <input type="date" id="endDate" class="date-input">
+                        </div>
+                        <button onclick="applyDateFilter()"
+                            class="w-10 h-10 rounded-lg bg-green text-white flex items-center justify-center hover:bg-green-hover transition-colors shadow-md">
+                            <i class="fas fa-search text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4-Column Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Inserted -->
+            <div class="stat-card-modern stat-card-green animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-plus-circle"></i>
+                </div>
+                <div>
+                    <h3 class="stat-value text-gradient-green" id="totalInserted">0</h3>
+                    <p class="stat-label">Records Created</p>
+                </div>
+            </div>
+
+            <!-- Total Modified -->
+            <div class="stat-card-modern stat-card-blue animate-slide-up" style="animation-delay: 0.15s;">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div>
+                    <h3 class="stat-value text-blue-500" id="totalModified">0</h3>
+                    <p class="stat-label">Updates Applied</p>
+                </div>
+            </div>
+
+            <!-- Total Deleted -->
+            <div class="stat-card-modern stat-card-red animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <div>
+                    <h3 class="stat-value text-red-500" id="totalDeleted">0</h3>
+                    <p class="stat-label">Records Removed</p>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="stat-card-modern stat-card-orange animate-slide-up cursor-pointer hover:shadow-lg transition-shadow"
+                onclick="openModuleDetails('errors')" style="animation-delay: 0.25s;">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div>
+                    <h3 class="stat-value text-orange" id="totalErrors">0</h3>
+                    <p class="stat-label" id="errorStatus">System Status</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+
+            <!-- Left Column: Modules, Charts (8 Cols) -->
+            <div class="xl:col-span-8 space-y-8">
+
+                <!-- Modules Grid (Primary Focus) -->
+                <div class="animate-slide-up" style="animation-delay: 0.3s;">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="section-title mb-0">Breakdown by Module</h3>
+                        <button onclick="loadCrudBreakdown()"
+                            class="text-sm font-semibold text-green hover:text-green-hover transition-colors flex items-center gap-1.5">
+                            <i class="fas fa-sync-alt text-xs"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5" id="crudBreakdownGrid">
+                        <!-- JS Populated Modules -->
+                    </div>
+                </div>
+
+                <!-- Charts Row: Activity Volume & Distribution -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Hourly Activity -->
+                    <div class="chart-container animate-slide-up" style="animation-delay: 0.35s;">
+                        <h3 class="chart-title mb-6" id="activityChartTitle">
+                            <i class="far fa-clock text-blue-500"></i>
+                            Activity Volume
+                        </h3>
+                        <div class="h-64 w-full">
+                            <canvas id="hourlyActivityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Distribution -->
+                    <div class="chart-container animate-slide-up" style="animation-delay: 0.4s;">
+                        <h3 class="chart-title mb-6">
+                            <i class="fas fa-chart-pie text-orange"></i>
+                            Module Distribution
+                        </h3>
+                        <div class="h-48 w-full mb-4 relative flex justify-center">
+                            <canvas id="moduleDistributionChart"></canvas>
+                        </div>
+                        <div id="moduleLegend" class="flex flex-wrap gap-2 justify-center"></div>
+                    </div>
+                </div>
+
+                <!-- Officer Activity Analysis (Replaces Operation Trends) -->
+                <div class="chart-container animate-slide-up" style="animation-delay: 0.45s;">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-user-shield text-indigo-500"></i>
+                            Officer Activity Analysis
+                        </h3>
+                        <div class="officer-tabs-container">
+                            <button class="officer-tab-btn active" data-tab="default"
+                                onclick="switchOfficerTab('default')">
+                                Default
+                            </button>
+                            <button class="officer-tab-btn" data-tab="analysis" onclick="switchOfficerTab('analysis')">
+                                Analysis
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Officer Table (Full Width - Chart Removed) -->
+                    <div id="officerTableContainer" class="overflow-auto max-h-[500px]">
+                        <p class="text-gray-400 text-center py-12">Loading officer data...</p>
+                    </div>
+                </div>
+
+                <!-- System Logs & Issues Section -->
+                <div class="chart-container animate-slide-up" style="animation-delay: 0.5s;">
+                    <div class="chart-header">
+                        <h3 class="chart-title">
+                            <i class="fas fa-exclamation-triangle text-amber-500"></i>
+                            System Logs & Issues
+                        </h3>
+                        <span class="text-xs text-gray-400">Last 24 hours</span>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div onclick="openLogsModal('ERROR')"
+                            class="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                            <div class="text-red-500 text-3xl font-bold" id="systemErrorCount">-</div>
+                            <div class="text-red-600 text-xs font-semibold uppercase mt-1">Errors</div>
+                            <div class="text-red-400 text-xs mt-2"><i class="fas fa-external-link-alt"></i> View Details
+                            </div>
+                        </div>
+                        <div onclick="openLogsModal('WARNING')"
+                            class="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                            <div class="text-amber-600 text-3xl font-bold" id="systemWarningCount">-</div>
+                            <div class="text-amber-700 text-xs font-semibold uppercase mt-1">Warnings</div>
+                            <div class="text-amber-400 text-xs mt-2"><i class="fas fa-external-link-alt"></i> View
+                                Details</div>
+                        </div>
+                        <div onclick="openLogsModal('ALL')"
+                            class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                            <div class="text-blue-600 text-3xl font-bold" id="systemTotalCount">-</div>
+                            <div class="text-blue-700 text-xs font-semibold uppercase mt-1">Total Logs</div>
+                            <div class="text-blue-400 text-xs mt-2"><i class="fas fa-external-link-alt"></i> View All
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Issues Table -->
+                    <div id="recentIssuesContainer" class="overflow-auto max-h-64">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 text-gray-600 text-xs uppercase sticky top-0">
+                                <tr>
+                                    <th class="px-3 py-2 text-left">Time</th>
+                                    <th class="px-3 py-2 text-left">Level</th>
+                                    <th class="px-3 py-2 text-left">Module</th>
+                                    <th class="px-3 py-2 text-left">Message</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentIssuesBody" class="divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="4" class="text-center py-8 text-gray-400">Loading logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Timeline (4 Cols) -->
+            <div class="xl:col-span-4 flex flex-col h-full animate-slide-up" style="animation-delay: 0.3s;">
+                <div class="chart-container flex-1 flex flex-col h-full !p-0 overflow-hidden sticky top-8"
+                    style="max-height: calc(100vh - 4rem);">
+
+                    <!-- Header -->
+                    <div class="p-6 border-b border-borderGray bg-white">
+                        <h3 class="chart-title justify-between mb-5">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-green animate-pulse"></span>
+                                Live Activity Feed
+                            </span>
+                            <span class="badge badge-success">Real-time</span>
+                        </h3>
+                        <div class="relative">
+                            <select id="moduleFilter" onchange="filterTimeline()"
+                                class="w-full appearance-none bg-grayLight border border-borderGray text-charcoal text-sm font-medium rounded-lg px-4 py-3 outline-none focus:border-green focus:ring-2 focus:ring-green-subtle transition-all cursor-pointer">
+                                <option value="all">All Modules</option>
+                                <option value="employees">Employees</option>
+                                <option value="complaints">Complaints</option>
+                                <option value="surveys">Surveys</option>
+                                <option value="counseling">Counseling</option>
+                                <option value="sms">SMS</option>
+                                <option value="email">Emails</option>
+                                <option value="users">Users</option>
+                                <option value="companies">Companies</option>
+                            </select>
+                            <i
+                                class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-grayMedium text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Content -->
+                    <div class="flex-1 overflow-y-auto custom-scroll p-6 bg-grayLight/50" id="timelineContainer">
+                        <!-- JS populated items -->
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="p-4 bg-white border-t border-borderGray flex justify-between items-center">
+                        <span class="text-xs text-grayMedium flex items-center gap-2" id="paginationInfo">
+                            <i class="fas fa-arrow-down animate-pulse text-green"></i> Scroll for more
+                        </span>
+                        <button onclick="loadAllTimeline()" id="loadAllBtn" class="btn-secondary text-xs py-2 px-4">
+                            Load All
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buyer Breakdown Section -->
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-borderGray p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-building text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-charcoal">Breakdown by Buyer</h2>
+                        <p class="text-sm text-grayMedium">Module activity per buyer organization</p>
+                    </div>
+                </div>
+            </div>
+            <div id="buyer-breakdown-container">
+                <div class="flex justify-center py-12">
+                    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Diagnostics Section -->
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-borderGray p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+                        <i class="fas fa-stethoscope text-rose-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-charcoal">System Diagnostics</h2>
+                        <p class="text-sm text-grayMedium">Data integrity and filter coverage analysis</p>
+                    </div>
+                </div>
+                <!-- Action Button -->
+                <button onclick="runSystemDiagnostics()" id="btnRunDiagnostics"
+                    class="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 rounded-lg shadow-lg shadow-rose-200 transition-all font-medium">
+                    <i class="fas fa-play-circle"></i>
+                    Execute System Diagnostics
+                </button>
+            </div>
+
+            <!-- Diagnostics Loader -->
+            <div id="diagnosticsLoader" class="hidden py-12 text-center">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-rose-500 mb-4"></i>
+                <p class="text-gray-500">Running comprehensive system checks...</p>
+            </div>
+
+            <!-- Diagnostics Error -->
+            <div id="diagnosticsError"
+                class="hidden bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6 flex items-center gap-3">
+                <i class="fas fa-exclamation-circle text-xl"></i>
+                <span id="diagnosticsErrorMessage"></span>
+            </div>
+
+            <!-- Diagnostics Content -->
+            <div id="diagnosticsResults" class="hidden">
+
+                <!-- SECTION: DATA INTEGRITY -->
+                <div class="mb-10">
+                    <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                        <div class="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800">Data Integrity</h3>
+                    </div>
+
+                    <div class="space-y-6">
+
+                        <!-- Contamination Alert (Full Width) -->
+                        <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm" id="contaminationSection">
+                            <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                <span class="flex items-center gap-2">
+                                    <span
+                                        class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </span>
+                                    Data Isolation & Security Check
+                                </span>
+                                <span id="contaminationBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                            </h4>
+                            <p class="text-xs text-gray-500 mb-4">Verifies that users cannot access data belonging to
+                                other
+                                buyers.</p>
+                            <div id="contaminationResultContainer">
+                                <!-- populated by js -->
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Orphans Info -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-link mr-2 text-gray-500"></i> Orphaned Records</span>
+                                    <span id="orphanBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                </h4>
+                                <div id="orphansResultContainer" class="space-y-4">
+                                    <!-- populated by js -->
+                                </div>
+                            </div>
+
+                            <!-- Coverage Info -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-eye-slash mr-2 text-gray-500"></i> Visibility Coverage</span>
+                                    <span id="coverageBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                    H4>
+                                    <div id="coverageResultContainer" class="space-y-3">
+                                        <!-- populated by js -->
+                                    </div>
+                            </div>
+
+                            <!-- Office Coverage Info -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-building mr-2 text-rose-500"></i> Office Coverage</span>
+                                    <span id="officeCoverageBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">Detects offices not covered by any IO Portal
+                                    filter.</p>
+                                <div id="officeCoverageResultContainer" class="space-y-3">
+                                    <!-- populated by js -->
+                                </div>
+                            </div>
+
+                            <!-- Lifecycle Integrity -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-route mr-2 text-blue-500"></i> Lifecycle Integrity</span>
+                                    <span id="lifecycleBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">Validates required fields for each complaint
+                                    status.</p>
+                                <div id="lifecycleResultContainer" class="space-y-3">
+                                    <!-- populated by js -->
+                                </div>
+                            </div>
+
+                            <!-- Data Quality -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-database mr-2 text-yellow-500"></i> Data Quality</span>
+                                    <span id="dataQualityBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">Checks for duplicates, stale complaints, and
+                                    deadline
+                                    violations.</p>
+                                <div id="dataQualityResultContainer" class="space-y-3">
+                                    <!-- populated by js -->
+                                </div>
+                            </div>
+
+                            <!-- User Access Integrity -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-user-shield mr-2 text-indigo-500"></i> User Access</span>
+                                    <span id="userAccessBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">Validates user-to-office/buyer mappings.</p>
+                                <div id="userAccessResultContainer" class="space-y-3">
+                                    <!-- populated by js -->
+                                </div>
+                            </div>
+
+                            <!-- Employee Data -->
+                            <div class="bg-gray-50 rounded-xl border border-gray-200 p-5">
+                                <h4 class="text-base font-bold text-gray-800 mb-4 flex items-center justify-between">
+                                    <span><i class="fas fa-user-tie mr-2 text-teal-500"></i> Employee Data</span>
+                                    <span id="employeeDataBadge" class="px-2 py-0.5 rounded text-xs font-bold"></span>
+                                </h4>
+                                <p class="text-xs text-gray-500 mb-3">Checks for left employees with complaints and
+                                    missing
+                                    data.</p>
+                                <div id="employeeDataResultContainer" class="space-y-3">
+                                    <!-- populated by js -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION: MOBILE API PARITY -->
+                    <div class="mt-10">
+                        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800">Mobile API Parity</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                            <!-- Filter Parity -->
+                            <div
+                                class="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
+                                </div>
+                                <h4
+                                    class="relative text-sm font-bold text-gray-800 mb-4 flex items-center justify-between z-10">
+                                    <span><i class="fas fa-exchange-alt mr-2 text-purple-500"></i> Filter Parity</span>
+                                    <span id="filterParityBadge"
+                                        class="px-2 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-500"></span>
+                                </h4>
+                                <p class="relative text-xs text-gray-500 mb-3 z-10">Compares PHP vs Python filter
+                                    configs used by IOs.</p>
+                                <div id="filterParityResultContainer" class="relative z-10 space-y-2"></div>
+                            </div>
+
+                            <!-- Complaint Fetch -->
+                            <div
+                                class="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
+                                </div>
+                                <h4
+                                    class="relative text-sm font-bold text-gray-800 mb-4 flex items-center justify-between z-10">
+                                    <span><i class="fas fa-clipboard-list mr-2 text-orange-500"></i> Complaint
+                                        Fetch</span>
+                                    <span id="complaintFetchBadge"
+                                        class="px-2 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-500"></span>
+                                </h4>
+                                <p class="relative text-xs text-gray-500 mb-3 z-10">Verifies complaint data joins and
+                                    required fields.</p>
+                                <div id="complaintFetchResultContainer" class="relative z-10 space-y-2"></div>
+                            </div>
+
+                            <!-- Employee Verification -->
+                            <div
+                                class="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
+                                </div>
+                                <h4
+                                    class="relative text-sm font-bold text-gray-800 mb-4 flex items-center justify-between z-10">
+                                    <span><i class="fas fa-id-card mr-2 text-teal-500"></i> Employee Verification</span>
+                                    <span id="employeeVerifyBadge"
+                                        class="px-2 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-500"></span>
+                                </h4>
+                                <p class="relative text-xs text-gray-500 mb-3 z-10">Tests CNIC/ID lookups and format
+                                    consistency.</p>
+                                <div id="employeeVerifyResultContainer" class="relative z-10 space-y-2"></div>
+                            </div>
+
+                            <!-- Survey Visibility -->
+                            <div
+                                class="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
+                                </div>
+                                <h4
+                                    class="relative text-sm font-bold text-gray-800 mb-4 flex items-center justify-between z-10">
+                                    <span><i class="fas fa-poll mr-2 text-green-500"></i> Survey Visibility</span>
+                                    <span id="surveyVisibilityBadge"
+                                        class="px-2 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-500"></span>
+                                </h4>
+                                <p class="relative text-xs text-gray-500 mb-3 z-10">Verifies survey assignment by
+                                    employee attributes.</p>
+                                <div id="surveyVisibilityResultContainer" class="relative z-10 space-y-2"></div>
+                            </div>
+
+                            <!-- File Retrieval -->
+                            <div
+                                class="group bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all duration-300 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-24 h-24 bg-pink-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110">
+                                </div>
+                                <h4
+                                    class="relative text-sm font-bold text-gray-800 mb-4 flex items-center justify-between z-10">
+                                    <span><i class="fas fa-file-image mr-2 text-pink-500"></i> File Retrieval</span>
+                                    <span id="fileRetrievalBadge"
+                                        class="px-2 py-0.5 rounded text-xs font-bold bg-gray-100 text-gray-500"></span>
+                                </h4>
+                                <p class="relative text-xs text-gray-500 mb-3 z-10">Checks CAPA image files for
+                                    complaints.</p>
+                                <div id="fileRetrievalResultContainer" class="relative z-10 space-y-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Initial Empty State -->
+            <div id="diagnosticsPlaceholder" class="text-center py-12 text-gray-400">
+                <i class="fas fa-user-md text-4xl mb-4 text-gray-300"></i>
+                <p>Click 'Run Diagnostics' to verify reference integrity and filter configs</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Integrations Section -->
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-borderGray p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                        <i class="fas fa-network-wired text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-charcoal">External Integrations</h2>
+                        <p class="text-sm text-grayMedium">Connectivity and API status for external services</p>
+                    </div>
+                </div>
+                <!-- Action Button -->
+                <button onclick="runExternalIntegrations()" id="btnRunIntegrations"
+                    class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg shadow-lg shadow-purple-200 transition-all font-medium">
+                    <i class="fas fa-plug"></i>
+                    Test Integrations
+                </button>
+            </div>
+
+            <!-- Integrations Loader -->
+            <div id="integrationsLoader" class="hidden py-12 text-center">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-purple-500 mb-4"></i>
+                <p class="text-gray-500">Testing external API connections...</p>
+            </div>
+
+            <!-- Integrations Results -->
+            <div id="integrationsResults" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="externalApiContainer">
+                    <!-- Cards injected by JS -->
+                </div>
+            </div>
+
+            <!-- Initial Empty State -->
+            <div id="integrationsPlaceholder" class="text-center py-12 text-gray-400">
+                <i class="fas fa-link text-4xl mb-4 text-gray-300"></i>
+                <p>Execute integration tests to verify connectivity with SMS, Email, and HRMS services</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Quality Report Section -->
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-borderGray p-6 animate-fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-charcoal">Weekly Quality Report</h2>
+                        <p class="text-sm text-grayMedium">Grievance handling performance (Monday to Date)</p>
+                    </div>
+                </div>
+
+                <!-- Date Picker and Generate Button -->
+                <div class="flex items-center gap-3">
+                    <div class="relative">
+                        <input type="date" id="reportDateFilter"
+                            class="bg-gray-50 border border-borderGray text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Select Date">
+                    </div>
+                    <!-- Action Button -->
+                    <button onclick="generateWeeklyReport()" id="btnGenerateReport"
+                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-lg shadow-blue-200 transition-all font-medium">
+                        <i class="fas fa-file-invoice"></i>
+                        Generate Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Report Loader -->
+            <div id="reportLoader" class="hidden py-12 text-center">
+                <div class="flex flex-col items-center">
+                    <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
+                    <p class="text-gray-800 font-medium">Generating Weekly Quality Report...</p>
+                    <p class="text-sm text-gray-500 mt-1">Fetching data for all active users. This may take a moment.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Report Content -->
+            <div id="reportContent" class="hidden fade-in space-y-8">
+                <!-- Header Info -->
+                <div class="report-header-modern">
+                    <h3 class="text-3xl font-extrabold text-teal mb-3">Weekly Quality Report</h3>
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green animate-pulse"></span>
+                        <p class="text-lg text-grayMedium font-medium" id="reportPeriod">-</p>
+                    </div>
+                </div>
+
+                <!-- Row 1: Core Grievance Metrics -->
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
+                    <!-- Total Complaints -->
+                    <div class="report-card-premium">
+                        <div class="card-icon bg-teal-subtle text-teal">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <span class="block text-2xl font-bold text-teal" id="reportTotalComplaints">-</span>
+                        <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Total
+                            Complaints</span>
+                    </div>
+
+                    <!-- Email Card -->
+                    <div class="report-card-premium relative group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="card-icon bg-purple-50 text-purple-600">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <span class="block text-2xl font-bold text-purple-600">
+                                    <span id="reportEmailsSent">-</span>
+                                    <span class="text-sm text-grayMedium opacity-50">/ <span
+                                            class="reportTotalComplaintsRef">-</span></span>
+                                </span>
+                                <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Emails
+                                    Sent</span>
+                            </div>
+                            <button onclick="toggleDetails('emailDetails')"
+                                class="text-grayMedium hover:text-purple-600 p-1">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="emailDetails" class="hidden mt-3 pt-3 border-t border-gray-50 text-[10px]">
+                            <p class="font-bold text-gray-700 mb-1">Sent by IO:</p>
+                            <div id="emailBreakdownList" class="max-h-24 overflow-y-auto space-y-1"></div>
+                            <div id="emailFailedSection" class="hidden">
+                                <p class="font-bold text-red-600 mb-1 mt-2">Missing Email:</p>
+                                <div id="emailFailedList" class="max-h-20 overflow-y-auto space-y-1 text-red-500"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMS Card -->
+                    <div class="report-card-premium relative group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="card-icon bg-green-subtle text-green">
+                                    <i class="fas fa-sms"></i>
+                                </div>
+                                <span class="block text-2xl font-bold text-green">
+                                    <span id="reportSMSSent">-</span>
+                                    <span class="text-sm text-grayMedium opacity-50">/ <span
+                                            class="reportTotalComplaintsRef">-</span></span>
+                                </span>
+                                <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">SMS
+                                    Sent</span>
+                            </div>
+                            <button onclick="toggleDetails('smsDetails')"
+                                class="text-grayMedium hover:text-green-hover p-1">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="smsDetails" class="hidden mt-3 pt-3 border-t border-gray-50 text-[10px]">
+                            <p class="font-bold text-gray-700 mb-1">Sent by IO:</p>
+                            <div id="smsBreakdownList" class="max-h-24 overflow-y-auto space-y-1"></div>
+                            <div id="smsFailedSection" class="hidden">
+                                <p class="font-bold text-red-600 mb-1 mt-2">Missing Mobile:</p>
+                                <div id="smsFailedList" class="max-h-20 overflow-y-auto space-y-1 text-red-500"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Counseling Card -->
+                    <div class="report-card-premium">
+                        <div class="card-icon bg-orange-soft text-orange">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <span class="block text-2xl font-bold text-orange" id="reportTotalCounseling">-</span>
+                        <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Counseling</span>
+                    </div>
+
+                    <!-- Avg Closed Time Card -->
+                    <div class="report-card-premium">
+                        <div class="card-icon bg-blue-50 text-blue-600">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <span class="block text-2xl font-bold text-blue-600" id="reportAvgClosedTime">-</span>
+                        <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Avg
+                            Resolution</span>
+                    </div>
+                </div>
+
+                <!-- Row 2: Analytics & Sync -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                    <!-- Surveys Card -->
+                    <div class="report-card-premium">
+                        <div class="card-icon bg-cyan-50 text-cyan-500">
+                            <i class="fas fa-poll-h"></i>
+                        </div>
+                        <span class="block text-2xl font-bold text-cyan-500" id="reportTotalSurveys">-</span>
+                        <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Surveys</span>
+                    </div>
+
+                    <!-- Survey Responses Card -->
+                    <div class="report-card-premium relative group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="card-icon bg-indigo-50 text-indigo-600">
+                                    <i class="fas fa-comment-dots"></i>
+                                </div>
+                                <span class="block text-2xl font-bold text-indigo-600"
+                                    id="reportSurveyResponses">-</span>
+                                <span
+                                    class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Responses</span>
+                            </div>
+                            <button onclick="toggleDetails('surveyRespDetails')"
+                                class="text-grayMedium hover:text-indigo-600 p-1">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="surveyRespDetails" class="hidden mt-3 pt-3 border-t border-gray-50 text-[10px]">
+                            <p class="font-bold text-gray-700 mb-1">By Survey:</p>
+                            <div id="surveyRespBreakdownList" class="max-h-24 overflow-y-auto space-y-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Reconciliation Card -->
+                    <div class="report-card-premium relative group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="card-icon bg-slate-100 text-slate-700">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <span class="block text-2xl font-bold text-slate-700"
+                                    id="reportManualReconciled">-</span>
+                                <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">Manual
+                                    Recon</span>
+                            </div>
+                            <button onclick="toggleDetails('manualReconciledDetails')"
+                                class="text-grayMedium hover:text-slate-600 p-1">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="manualReconciledDetails" class="hidden mt-3 pt-3 border-t border-gray-50 text-[10px]">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-500 font-medium">Added:</span>
+                                <span class="font-bold text-slate-700" id="reportManualCreated">0</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-500 font-medium">Updated:</span>
+                                <span class="font-bold text-slate-700" id="reportManualModified">0</span>
+                            </div>
+                            <div class="pt-2 border-t border-gray-50">
+                                <p class="font-bold text-gray-700 mb-1">By Buyer:</p>
+                                <div id="manualSyncBreakdownList" class="max-h-24 overflow-y-auto space-y-1"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Sync Card -->
+                    <div class="report-card-premium relative group">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="card-icon bg-blue-50 text-blue-600">
+                                    <i class="fas fa-plug"></i>
+                                </div>
+                                <span class="block text-2xl font-bold text-blue-600" id="reportApiSynced">-</span>
+                                <span class="text-[10px] text-grayMedium font-bold uppercase tracking-wider">API
+                                    Sync</span>
+                            </div>
+                            <button onclick="toggleDetails('apiSyncedDetails')"
+                                class="text-grayMedium hover:text-blue-600 p-1">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                        </div>
+                        <div id="apiSyncedDetails" class="hidden mt-3 pt-3 border-t border-gray-50 text-[10px]">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-500 font-medium">Added:</span>
+                                <span class="font-bold text-blue-600" id="reportApiCreated">0</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-500 font-medium">Updated:</span>
+                                <span class="font-bold text-blue-600" id="reportApiModified">0</span>
+                            </div>
+                            <div class="pt-2 border-t border-gray-50">
+                                <p class="font-bold text-gray-700 mb-1">By Buyer:</p>
+                                <div id="apiSyncBreakdownList" class="max-h-24 overflow-y-auto space-y-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Report Table -->
+            <div class="report-table-modern mt-6">
+                <table class="w-full text-sm text-left">
+                    <thead>
+                        <tr>
+                            <th class="px-6 py-4">Administrative User</th>
+                            <th class="px-6 py-4 text-center">Grievance Count</th>
+                            <th class="px-6 py-4">Status Distribution</th>
+                            <th class="px-6 py-4">Critical Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody" class="divide-y divide-gray-50 bg-white">
+                        <!-- JS Populated Rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Survey Activity Analysis (New Section) -->
+            <div>
+                <h4 class="text-lg font-bold text-teal mb-4 px-1 flex items-center gap-2">
+                    <i class="fas fa-poll text-green/70"></i> Survey Activity Analysis
+                </h4>
+                <div class="report-table-modern">
+                    <table class="w-full text-sm text-left">
+                        <thead>
+                            <tr class="bg-cyan-50/50">
+                                <th class="px-6 py-4">Admin Portal User</th>
+                                <th class="px-6 py-4 text-center">Digital Forms</th>
+                                <th class="px-6 py-4 text-center">Directory Logs</th>
+                                <th class="px-6 py-4 text-center">Activity Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody id="surveyReportTableBody" class="divide-y divide-gray-50 bg-white">
+                            <!-- JS Populated Rows -->
+                            <tr>
+                                <td colspan="4" class="text-center py-6 text-grayMedium italic">
+                                    Loading survey analytics...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Detailed Survey Lists -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 border-t border-dashed border-gray-200 pt-6">
+
+                    <!-- Active Surveys -->
+                    <div>
+                        <h4 class="text-xs font-bold text-teal uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fas fa-play-circle text-green"></i> Active Surveys
+                            <span id="activeSurveysCount"
+                                class="bg-gray-100 text-grayMedium px-2 py-0.5 rounded text-[10px]">0</span>
+                        </h4>
+                        <div id="activeSurveysList"
+                            class="bg-white rounded-lg border border-gray-100 p-3 max-h-60 overflow-y-auto custom-scroll space-y-2 shadow-sm">
+                            <p class="text-xs text-center text-grayMedium py-2">No active surveys</p>
+                        </div>
+                    </div>
+
+                    <!-- Created This Week -->
+                    <div>
+                        <h4
+                            class="text-xs font-bold text-grayMedium uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fas fa-plus-circle text-blue-500"></i> New Creations
+                            <span id="createdSurveysCount"
+                                class="bg-gray-100 text-grayMedium px-2 py-0.5 rounded text-[10px]">0</span>
+                        </h4>
+                        <div id="createdSurveysList"
+                            class="bg-white rounded-lg border border-gray-100 p-3 max-h-60 overflow-y-auto custom-scroll space-y-2 shadow-sm">
+                            <p class="text-xs text-center text-grayMedium py-2">No new surveys</p>
+                        </div>
+                    </div>
+
+                    <!-- Directory Reports -->
+                    <div>
+                        <h4
+                            class="text-xs font-bold text-grayMedium uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fas fa-folder-open text-orange-500"></i> Analytics Reports
+                            <span id="directoryReportsCount"
+                                class="bg-gray-100 text-grayMedium px-2 py-0.5 rounded text-[10px]">0</span>
+                        </h4>
+                        <div id="directoryReportsList"
+                            class="bg-white rounded-lg border border-gray-100 p-3 max-h-60 overflow-y-auto custom-scroll space-y-2 shadow-sm">
+                            <p class="text-xs text-center text-grayMedium py-2">No reports found</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Initial Empty State -->
+        <div id="reportPlaceholder" class="text-center py-12 text-gray-400">
+            <i class="fas fa-file-invoice text-4xl mb-4 text-gray-300"></i>
+            <p>Click 'Generate Report' to view performance metrics for the current week</p>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Log Details Modal -->
+    <div id="logDetailsModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div
+            class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[85vh] flex flex-col animate-slide-up bg-white/90 backdrop-blur-sm">
+            <!-- Modal Header -->
+            <div
+                class="p-6 border-b border-borderGray flex justify-between items-center bg-grayLight rounded-t-xl sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <div id="modalLogIconBg"
+                        class="w-12 h-12 rounded-xl bg-teal-light/10 flex items-center justify-center text-teal text-xl shadow-sm">
+                        <i id="modalLogIcon" class="fas fa-list-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-charcoal flex items-center gap-2">
+                            <span id="modalLogTitle">System Logs</span>
+                        </h3>
+                        <p class="text-sm text-grayMedium mt-1" id="modalLogSubtitle">Detailed view of recent system
+                            events
+                        </p>
+                    </div>
+                    <button onclick="closeLogsModal()"
+                        class="w-8 h-8 rounded-full bg-white border border-borderGray flex items-center justify-center text-grayMedium hover:text-charcoal hover:shadow-sm transition-all">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-0 overflow-auto flex-1 custom-scroll bg-gray-50">
+                <table class="w-full text-sm text-left">
+                    <thead
+                        class="text-xs text-grayMedium uppercase bg-grayLight border-b border-borderGray sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 font-semibold">Timestamp</th>
+                            <th class="px-6 py-3 font-semibold">Level</th>
+                            <th class="px-6 py-3 font-semibold">Module</th>
+                            <th class="px-6 py-3 font-semibold">Message</th>
+                            <th class="px-6 py-3 font-semibold">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalLogTableBody" class="divide-y divide-borderGray bg-white">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-borderGray bg-white rounded-b-xl flex justify-end">
+                <button onclick="closeLogsModal()" class="btn-primary py-2 px-6">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Details Modal -->
+    <div id="moduleDetailsModal"
+        class="hidden fixed inset-0 bg-charcoal/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div
+            class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] flex flex-col animate-scale-in overflow-hidden">
+            <!-- Header -->
+            <div class="p-6 border-b border-borderGray flex justify-between items-center bg-gray-50">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-teal-light/10 flex items-center justify-center text-teal text-xl shadow-sm">
+                        <i id="modalIcon" class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-charcoal mb-1" id="modalTitle">Module Details</h3>
+                        <p class="text-sm text-grayMedium flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-green animate-pulse"></span>
+                            Live Data Overview
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="group p-2 rounded-lg hover:bg-gray-200 transition-colors">
+                    <i class="fas fa-times text-xl text-gray-400 group-hover:text-charcoal transition-colors"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="border-b border-borderGray px-6 bg-white sticky top-0 z-10">
+                <div class="flex gap-6 overflow-x-auto no-scrollbar">
+                    <button class="modal-tab-btn active" data-tab="overview">
+                        <i class="fas fa-chart-bar mr-2"></i>Overview
+                    </button>
+                    <button class="modal-tab-btn" data-tab="timeline">
+                        <i class="fas fa-stream mr-2"></i>Recent Activity
+                    </button>
+                    <button class="modal-tab-btn" data-tab="fulldata">
+                        <i class="fas fa-table mr-2"></i>Full Data
+                    </button>
+                    <!-- Tabs visible only for specific modules -->
+                    <button class="modal-tab-btn hidden" id="buyerBreakdownTab" data-tab="buyerbreakdown">
+                        <i class="fas fa-building mr-2"></i>Buyer Breakdown
+                    </button>
+                    <button class="modal-tab-btn hidden" id="portalBreakdownTab" data-tab="portalbreakdown">
+                        <i class="fas fa-user-tag mr-2"></i>Portal Breakdown
+                    </button>
+                    <button class="modal-tab-btn hidden" id="surveyBreakdownTab" data-tab="surveybreakdown">
+                        <i class="fas fa-poll mr-2"></i>Admin Breakdown
+                    </button>
+                    <button class="modal-tab-btn hidden" id="counsellingBreakdownTab" data-tab="counsellingbreakdown">
+                        <i class="fas fa-user-md mr-2"></i>Admin Breakdown
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div id="modalBody" class="flex-1 overflow-y-auto custom-scroll bg-grayLight p-6">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/tracking-dashboard.js') }}"></script>
+</body>
+
+</html>

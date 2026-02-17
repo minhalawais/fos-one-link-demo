@@ -751,7 +751,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className="mb-3"
+                      className="mb-3 relative z-20"
                     >
                       <motion.div
                         className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300 mx-auto max-w-[500px]"
@@ -805,7 +805,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                               className="px-3 py-2 flex items-center justify-between"
                               style={{ backgroundColor: COLORS.teal }}
                             >
-                              <span className="font-bold text-white text-xs">CAPA-Corrective & Preventive Actions</span>
+                              <span className="font-bold text-white text-xs">CAPA1-Corrective & Preventive Actions</span>
                               <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
                                 <List size={12} className="text-white" />
                               </div>
@@ -924,7 +924,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                               <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
                                 <AlertTriangle size={12} className="text-white" />
                               </div>
-                              <span className="font-bold text-white text-xs">RCA-Root Cause Analysis</span>
+                              <span className="font-bold text-white text-xs">RCA1-Root Cause Analysis</span>
                             </div>
 
                             {/* Card Body */}

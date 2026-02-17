@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <title>Account Temporarily Restricted</title>
+    <style>
+        :root {
+            --primary-color: #4285F4;
+            --accent-color: #0F9D58;
+            --text-color: #333333;
+            --light-gray: #f8f9fa;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', Oxygen, Ubuntu, sans-serif;
+            background-color: #f0f2f5;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .header {
+            background-color: white;
+            padding: 24px 0;
+            text-align: center;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .logo {
+            width: 110px;
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .content {
+            padding: 32px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--text-color);
+            font-size: 1.7rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        p {
+            font-size: 1.05rem;
+            margin-bottom: 18px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .status-icon {
+            display: flex;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background-color: #ffebee;
+            align-items: center;
+            justify-content: center;
+            color: #f44336;
+            font-size: 38px;
+            font-weight: 700;
+        }
+        
+        .contact-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+            font-size: 0.95rem;
+            color: #666;
+        }
+        
+        .contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .contact-info a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: var(--light-gray);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-method:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .contact-icon {
+            font-size: 18px;
+            color: var(--primary-color);
+        }
+
+        .pulse {
+            animation: pulse 2.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(244, 67, 54, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .content {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .contact-methods {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="Fruit of Sustainability Logo" class="logo">
+        </div>
+        
+        <div class="content">
+            <div class="status-icon pulse">!</div>
+            
+            <h1>Account Temporarily Restricted</h1>
+            
+            <p>
+                Your account has been temporarily restricted by the Fruit of Sustainability team. We've taken this step to ensure the security and integrity of our platform.
+            </p>
+            
+            <p>
+                Don't worry! This is often quickly resolved. Please contact our support team for assistance in restoring full access to your account.
+            </p>
+            
+            <div class="contact-info">
+                <p>Need help? Our friendly support team is just a message away.</p>
+                
+                <div class="contact-methods">
+                    <div class="contact-method">
+                        <span class="contact-icon">✉️</span>
+                        <a href="mailto:miqdam@fruitofsustainability.com">miqdam@fruitofsustainability.com</a>
+                    </div>
+                    
+                    <div class="contact-method">
+                        <span class="contact-icon">📞</span>
+                        <a href="tel:+923164015542">+92 316 4015542</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

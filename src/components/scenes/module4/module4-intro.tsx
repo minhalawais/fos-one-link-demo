@@ -78,7 +78,7 @@ export const SceneIntro = ({ isActive }: { isActive: boolean }) => {
                         transition={{ delay: 0.3, duration: 0.8, ease: IOS_EASE }}
                         className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#17161A]"
                     >
-                        Proactive Engagement
+                        Digital Surveys
                     </motion.h1>
 
                     <motion.div

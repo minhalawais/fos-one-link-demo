@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', filename='images/logo.png') }}" rel="icon" type="image/png" />
+    <title>FOS-Admin Account</title>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+        <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+        <link href="https://cdn.datatables.net/1.13.5/css/dataTables.jqueryui.min.css" rel="stylesheet" />
+        <!-- Updated jQuery UI and DataTables jQuery UI CSS links -->
+        <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" rel="stylesheet" />
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* General styles */
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            color: #284952;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background-color: #2D9480;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0px !important;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            display: contents;
+        }
+        .portal-heading {
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            background-color: #60BA81;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-btn:hover {
+            background-color: #f5a83c;
+        }
+
+        /* Main container styles */
+        .complaint-container {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2D9480;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 300;
+            font-size: 2.5em;
+        }
+        #searchBar {
+            width: calc(100% - 24px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #60BA81;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: box-shadow 0.3s ease;
+        }
+        #searchBar:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(96, 186, 129, 0.3);
+        }
+
+        /* Complaint list styles */
+        .complaint-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .complaint-item {
+            background-color: #ffffff;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 5px solid #60BA81;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .complaint-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        .complaint-item.disabled {
+            opacity: 0.7;
+            background-color: #f0f0f0;
+            border-left-color: #284952;
+        }
+        .complaint-item input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        .complaint-content {
+            flex-grow: 1;
+            padding-left: 15px;
+        }
+        .complaint-ticket {
+            font-size: 0.9em;
+            color: #2D9480;
+            font-weight: 600;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .complaint-text {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .toggle-btn {
+            background-color: #f5a83c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: auto;
+        }
+        .toggle-btn:hover {
+            background-color: #e09730;
+        }
+
+        /* Action buttons styles */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #60BA81;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px; /* Adjust border radius as desired */
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background-color: #2D9480;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(40, 73, 82, 0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 0% auto;
+            padding: 30px;
+            border: none;
+            width: 90%;
+            max-width: 90%;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .modal-buttons {
+            margin-top: 20px;
+        }
+        .modal-buttons .btn {
+            margin: 0 10px;
+        }
+        .fa-map-marker:before {
+                content: "\f041";
+                margin-right: 5px;
+            }
+            .section-container {
+                padding: 20px;
+            }
+
+            .graph-section,
+            .table-section {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .dataTables_wrapper {
+                margin-top: 20px;
+                margin-right: 10px;
+            }
+
+            .dataTables_filter label {
+                font-weight: bold;
+            }
+
+            .dataTables_filter input {
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 4px 8px;
+            }
+
+            .dataTables_paginate {
+                margin-top: 10px;
+            }
+
+            .hide-nbsp {
+                display: none;
+            }
+            .status-button {
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+
+                padding: 0.375rem 0.75rem;
+                font-size: 1rem;
+                line-height: 1.5;
+                border-radius: 0.25rem;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+                border: none;
+            }
+
+            /* Styles for each specific status */
+            .ui.button.initiated {
+                background-color: #284952; /* Change to the desired color for the "Initiated" status */
+                color: var(--white);
+            }
+
+            .ui.button.bounced {
+                background-color: #f5a83c; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.in.process {
+                background-color: #2d9480; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.uapproved {
+                background-color: #702480; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.unprocessed {
+                background-color: #206e71; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.submitted {
+                background-color: #60ba81; /* Change to the desired color for the "Closed" status */
+                color: var(--white);
+            }
+
+            .ui.button.completed {
+                background-color: #a5dc78; /* Change to the desired color for the "Completed" status */
+                color: var(--white);
+            }
+            body {
+                background: #eee;
+            }
+            .timeline {
+                position: relative;
+                padding: 10px;
+                margin: 0 auto;
+                overflow: hidden;
+                color: #ffffff;
+            }
+
+            .timeline:after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 50%;
+                margin-left: -1px;
+                border-right: 2px dashed #c4d2e2;
+                height: 100%;
+                display: block;
+            }
+
+            .timeline-row {
+                padding-left: 50%;
+                position: relative;
+                margin-bottom: 30px;
+            }
+
+            .timeline-row .timeline-time {
+                position: absolute;
+                right: 50%;
+                top: 16px;
+                text-align: right;
+                margin-right: 20px;
+                color: #000000;
+                font-size: 1.5rem;
+            }
+
+            .timeline-row .timeline-time small {
+                display: block;
+                font-size: 0.8rem;
+                color: #8796af;
+            }
+
+            .timeline-row .timeline-content {
+                position: relative;
+                padding: 20px 30px;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+            }
+
+            .timeline-row .timeline-content:after {
+                content: "";
+                position: absolute;
+                top: 20px;
+                height: 3px;
+                width: 40px;
+            }
+
+            .timeline-row .timeline-content:before {
+                content: "";
+                position: absolute;
+                top: 20px;
+                right: -50px;
+                width: 20px;
+                height: 20px;
+                -webkit-border-radius: 100px;
+                -moz-border-radius: 100px;
+                border-radius: 100px;
+                z-index: 100;
+                background: #ffffff;
+                border: 2px dashed #c4d2e2;
+            }
+
+            .timeline-row .timeline-content h4 {
+                margin: 0 0 1px 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                line-height: 150%;
+            }
+
+            .timeline-row .timeline-content p {
+                margin-bottom: 1px;
+                line-height: 150%;
+            }
+
+            .timeline-row .timeline-content i {
+                font-size: 2rem;
+                color: #ffffff;
+                line-height: 100%;
+                padding: 10px;
+                border: 2px solid #ffffff;
+                -webkit-border-radius: 100px;
+                -moz-border-radius: 100px;
+                border-radius: 100px;
+                margin-bottom: 10px;
+                display: inline-block;
+            }
+
+            .timeline-row .timeline-content .thumbs {
+                margin-bottom: 20px;
+            }
+
+            .timeline-row .timeline-content .thumbs img {
+                margin-bottom: 10px;
+            }
+
+            .timeline-row:nth-child(even) .timeline-content {
+                background-color: #ff5000;
+                /* Fallback Color */
+                background-image: -webkit-gradient(linear, left top, left bottom, from(#fc6d4c), to(#ff5000));
+                /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(top, #fc6d4c, #ff5000);
+                /* Chrome 10+, Saf5.1+, iOS 5+ */
+                background-image: -moz-linear-gradient(top, #fc6d4c, #ff5000);
+                /* FF3.6 */
+                background-image: -ms-linear-gradient(top, #fc6d4c, #ff5000);
+                /* IE10 */
+                background-image: -o-linear-gradient(top, #fc6d4c, #ff5000);
+                /* Opera 11.10+ */
+                background-image: linear-gradient(top, #fc6d4c, #ff5000);
+                margin-left: 40px;
+                text-align: left;
+            }
+
+            .timeline-row:nth-child(even) .timeline-content:after {
+                left: -39px;
+                border-right: 18px solid #ff5000;
+                border-top: 10px solid transparent;
+                border-bottom: 10px solid transparent;
+            }
+
+            .timeline-row:nth-child(even) .timeline-content:before {
+                left: -50px;
+                right: initial;
+            }
+
+            .timeline-row:nth-child(odd) {
+                padding-left: 0;
+                padding-right: 50%;
+            }
+
+            .timeline-row:nth-child(odd) .timeline-time {
+                right: auto;
+                left: 50%;
+                text-align: left;
+                margin-right: 0;
+                margin-left: 20px;
+            }
+
+            .timeline-row:nth-child(odd) .timeline-content {
+                background-color: #5a99ee;
+                /* Fallback Color */
+                background-image: -webkit-gradient(linear, left top, left bottom, from(#1379bb), to(#5a99ee));
+                /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(top, #1379bb, #5a99ee);
+                /* Chrome 10+, Saf5.1+, iOS 5+ */
+                background-image: -moz-linear-gradient(top, #1379bb, #5a99ee);
+                /* FF3.6 */
+                background-image: -ms-linear-gradient(top, #1379bb, #5a99ee);
+                /* IE10 */
+                background-image: -o-linear-gradient(top, #1379bb, #5a99ee);
+                /* Opera 11.10+ */
+                background-image: linear-gradient(top, #1379bb, #5a99ee);
+                margin-right: 40px;
+                margin-left: 0;
+                text-align: right;
+            }
+
+            .timeline-row:nth-child(odd) .timeline-content:after {
+                right: -39px;
+                border-left: 18px solid #1379bb;
+                border-top: 10px solid transparent;
+                border-bottom: 10px solid transparent;
+            }
+            .badge-light {
+                color: #212529;
+            }
+            @media (max-width: 767px) {
+                .timeline {
+                    padding: 15px 10px;
+                }
+                .timeline:after {
+                    left: 28px;
+                }
+                .timeline .timeline-row {
+                    padding-left: 0;
+                    margin-bottom: 16px;
+                }
+                .timeline .timeline-row .timeline-time {
+                    position: relative;
+                    right: auto;
+                    top: 0;
+                    text-align: left;
+                    margin: 0 0 6px 56px;
+                }
+                .timeline .timeline-row .timeline-time strong {
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                .timeline .timeline-row .timeline-icon {
+                    top: 52px;
+                    left: -2px;
+                    margin-left: 0;
+                }
+                .timeline .timeline-row .timeline-content {
+                    padding: 15px;
+                    margin-left: 56px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                    position: relative;
+                }
+                .timeline .timeline-row .timeline-content:after {
+                    right: auto;
+                    left: -39px;
+                    top: 32px;
+                }
+                .timeline .timeline-row:nth-child(odd) {
+                    padding-right: 0;
+                }
+                .timeline .timeline-row:nth-child(odd) .timeline-time {
+                    position: relative;
+                    right: auto;
+                    left: auto;
+                    top: 0;
+                    text-align: left;
+                    margin: 0 0 6px 56px;
+                }
+                .timeline .timeline-row:nth-child(odd) .timeline-content {
+                    margin-right: 0;
+                    margin-left: 55px;
+                }
+                .timeline .timeline-row:nth-child(odd) .timeline-content:after {
+                    right: auto;
+                    left: -39px;
+                    top: 32px;
+                    border-right: 18px solid #5a99ee;
+                    border-left: inherit;
+                }
+                .timeline.animated .timeline-row:nth-child(odd) .timeline-content {
+                    left: 20px;
+                }
+                .timeline.animated .timeline-row.active:nth-child(odd) .timeline-content {
+                    left: 0;
+                }
+                .fa1 {
+                    display: inline-block;
+                    font: normal normal normal 14px/1 FontAwesome;
+                    font-size: inherit;
+                    text-rendering: auto;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                    transform: translate(0, 0);
+                    width: 50px;
+                }
+            }
+            .timeline {
+                position: relative;
+            }
+            /* Add this custom CSS to change the color of the centered line */
+            .timeline:before {
+                content: "";
+                position: absolute;
+                width: 2px;
+                background-color: #f5a83c; /* Replace with the desired color */
+                top: 0;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: -1;
+            }
+
+            .dataTables_wrapper .dataTables_filter {
+                margin-bottom: 10px;
+            }
+            .modal-dialog {
+                max-width: 1200px !important;
+                margin: 1.75rem auto;
+            }
+            .urgent-ticket {
+                color: #be0000; /* Set the text color to red */
+                font-weight: bold; /* Optionally make the text bold */
+            }
+            .loading-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+
+            .loading-circle {
+                width: 100px; /* Adjust the size as needed */
+                height: 100px;
+                border-radius: 50%;
+                border: 3px solid #ccc;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: blink 1s ease infinite;
+            }
+
+            .loading-logo {
+                width: 100%; /* Adjust the size as needed */
+                height: auto;
+            }
+
+            @keyframes blink {
+                0%,
+                100% {
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+            }
+            .custom-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+            }
+
+            .custom-modal-content {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+                margin-left: 66px;
+                overflow-y: auto;
+                max-height: 100vh;
+            }
+
+            .custom-modal-title1 {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                cursor: pointer;
+                font-size: 24px;
+                color: #888;
+            }
+
+            /* Add hover effect */
+            .custom-modal-dialog {
+                max-width: 1500px;
+                margin-right: 0px;
+                margin-left: 16px;
+            }
+            .fa-map-marker:before {
+                content: "\f041";
+                margin-right: 5px;
+            }
+            .custom-modal-footer {
+                display: flex;
+                justify-content: flex-end; /* Align buttons to the right */
+                padding: 10px; /* Add some padding to the footer */
+            }
+            .cusotm-modal-header {
+                /* ... existing styles ... */
+                border-bottom: 1px solid #ccc; /* Add a border below the header */
+                margin-bottom: 10px;
+            }
+            .custom-modal-footer {
+                /* ... existing styles ... */
+                border-top: 1px solid #ccc; /* Add a border above the footer */
+                display: flex;
+                justify-content: flex-end;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .fa-upload:before {
+                content: "\f093";
+                margin-right: 15px;
+            }
+            .capa-image-container {
+                width: 150px; /* Adjust this value as needed */
+                height: 90px; /* Adjust this value as needed */
+                overflow: hidden;
+            }
+
+            .capa-image {
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+                margin: auto;
+            }
+            /* Add this to your CSS */
+            .icon-text-row {
+                display: flex;
+                justify-content: flex-end; /* Align items to the right end of the container */
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .icon-text-row1 {
+                display: flex; /* Align items to the right end of the container */
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .icon-text {
+                margin-left: 10px;
+            }
+            .timeline-row .timeline-content h4 {
+                margin: 0 0 1px 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                margin-left: 8px;
+                margin-bottom: 13px;
+                line-height: 150%;
+                margin-right: 9px;
+            }
+
+            .capa-image-container {
+                width: 134px;
+                height: 82px;
+                overflow: hidden;
+                margin-left: 500px;
+                margin-top: -29px;
+                position: absolute;
+            }
+            .input-group > :not(:first-child):not(.dropdown-menu) {
+                margin-left: -1px;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                width: 1px;
+                margin-left: 550px;
+                border: 6px;
+            }
+            .timeline-row:nth-child(odd) .timeline-content {
+                background-image: -webkit-linear-gradient(top, #206e71, #2d9480);
+            }
+            .timeline-row:nth-child(odd) .timeline-content:after {
+                border-left: 18px solid #206e71;
+            }
+            .timeline-row:nth-child(even) .timeline-content {
+                background-image: -webkit-linear-gradient(top, #60ba81, #a5dc71);
+            }
+            .timeline-row:nth-child(even) .timeline-content:after {
+                border-right: 18px solid #a5dc71;
+            }
+            .timeline-row .timeline-content:before {
+                border: 2px dashed #f5a83c;
+            }
+
+            .timeline:before {
+                border: 2px dashed #f5a83c;
+                background-color: #f5a83c; /* Replace with the desired color */
+            }
+            .timeline:after {
+                border: 1px dashed #f5a83c;
+            }
+            .section-container {
+                transform: scale(0.9); /* Adjust the value as needed */
+                transform-origin: top center; /* Keep content aligned to top left */
+            }
+
+            html body .font-weight-bold {
+                font-weight: 800;
+            }
+
+            .background-rectangle {
+                display: inline-block;
+                background-color: #f5a83c; /* Set the background color */
+                padding: 0px 10px; /* Adjust padding as needed */
+                border-radius: 5px; /* Add rounded corners if desired */
+                --bs-bg-opacity: 1;
+                font-family: "Inter", sans-serif;
+                font-weight: 700px;
+            }
+            .col-7 {
+                flex: 0 0 auto;
+                width: 58.33333333%;
+            }
+            .navbar {
+                margin-bottom: 0px; /* Adjust the margin if needed */
+            }
+            .logo-img {
+                height: 15%; /* Adjust the height as per your requirement */
+                width: 15%; /* Auto adjust the width based on the height to maintain aspect ratio */
+                margin-right: 10px; /* Optional margin to separate the logo from "FOS" */
+            }
+
+            .navbar-brand {
+                display: flex;
+                align-items: center;
+                margin-right: 10px; /* Adjust the margin to move the entire brand (logo + text) to the right */
+            }
+
+            .navbar-toggler {
+                border: none; /* Remove the border from the toggler button */
+            }
+
+            .navbar-toggler:focus {
+                outline: none; /* Remove the focus outline */
+            }
+
+            .navbar-center {
+                flex-wrap: wrap;
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center; /* Add this line to vertically center the buttons */
+            }
+
+            .navbar-nav {
+                flex-direction: row; /* Adjust the direction to align the logout button horizontally */
+            }
+
+            .nav-item {
+                padding: 0 10px; /* Adjust the horizontal spacing between navbar items */
+            }
+
+            .nav-item.disabled {
+                cursor: default; /* Prevent the "Reports" link from being clickable */
+            }
+
+            .nav-link,
+            .dropdown-menu a,
+            .search-button {
+                color: #284952;
+            }
+
+            .nav-link:hover,
+            .dropdown-menu a:hover {
+                color: #6e9954;
+            }
+
+            .dropdown-menu {
+                background-color: #284952;
+            }
+
+            .dropdown-menu a {
+                color: #fff;
+            }
+
+            .dropdown-menu a:hover {
+                background-color: #6e9954;
+            }
+            .page-wrapper > .page-breadcrumb {
+                max-width: 1361px;
+            }
+            .right-align {
+                float: right;
+                margin-right: 20px;
+            }
+            /* Updated logo and heading styling */
+            /* Updated .navbar-center styling */
+            /* Updated .navbar-center styling */
+            .navbar-center {
+                display: flex;
+                align-items: center;
+                margin-right: 178px;
+            }
+
+            .navbar-center .col-7 {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start; /* Align the heading to the left */
+                justify-content: center; /* Center vertically */
+            }
+
+            .container-fluid {
+                margin-top: -30px;
+                margin-bottom: -30px;
+            }
+            /* Additional styling for the heading */
+            .navbar-center h1 {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin: 0;
+                align-self: flex-start; /* Align the heading to the left */
+            }
+            #doughnutChart .google-visualization-table-td {
+                white-space: normal !important;
+                display: block !important;
+                text-align: left !important;
+            }
+            .ui.button {
+                width: 100%;
+            }
+            .table-container {
+                width: 100%; /* Set the desired width */
+                overflow-x: scroll; /* Add horizontal scroll */
+                white-space: nowrap; /* Prevent text wrapping in cells */
+            }
+            .badge {
+                border-radius: 0;
+                outline: none;
+            }
+            .badge:focus,
+            .badge:active {
+                outline: none;
+                border: none;
+            }
+            .notification-button {
+                background-color: #4caf50;
+                border: none;
+                color: white;
+                padding: 6px 22px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                transition-duration: 0.4s;
+                cursor: pointer;
+                border-radius: 9px;
+            }
+
+            .notification-button:hover {
+                background-color: #45a049; /* Darker green when hovering */
+            }
+
+            /* Custom CSS styles for the notification dropdown */
+            .notification-dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            .notification-dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                min-width: 400px;
+                box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+                padding: 12px;
+                z-index: 1;
+                border-radius: 8px;
+                right: 0;
+                overflow: auto;
+            }
+
+            .notification-dropdown-content .notification-message {
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .notification-dropdown-content .notification-message p {
+                color: #333;
+                margin: 0;
+            }
+
+            .notification-dropdown:hover .notification-dropdown-content {
+                display: block;
+            }
+            .notification-message:hover {
+                background-color: lightgray; /* Adjust the background color for the hover effect */
+                cursor: pointer; /* Set the cursor to indicate interactivity */
+            }
+            .table-section table tbody tr {
+                height: 150px; /* Adjust the value to your desired row height */
+            }
+            .table-section table tbody td {
+                overflow: hidden;
+                text-overflow: ellipsis; /* Ellipsis will truncate long text */
+                white-space: nowrap; /* Prevent text wrapping */
+            }
+            .table-section table {
+                width: 100%; /* Adjust the value to your desired table width */
+                table-layout: fixed; /* Ensure fixed table width */
+            }
+            .table-section table tbody tr td {
+                width: auto; /* Initial width to auto */
+            }
+            .table-section table tbody td:hover {
+                overflow: visible;
+                white-space: normal;
+            }
+            .ui.button,
+            .ui.buttons .button,
+            .ui.buttons .or {
+                font-size: 9px;
+            }
+            /* Add this CSS to your document or include it in your existing styles */
+            .custom-input-file {
+                /* Set the color property to black */
+                color: black;
+                margin-left: 125%;
+            }
+            .loader {
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #3498db;
+                border-radius: 50%;
+                margin-left: 41%;
+                width: 12px;
+                height: 12px;
+                animation: spin 2s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            #complaintsTable thead th:first-child {
+                width: 13.6px !important; /* Replace with your desired width */
+            }
+            #toast-container .toast {
+                background-color: #343a40;
+                color: #ffffff;
+            }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+        </div>
+        <div class="portal-heading">{{ buyer_name }} Admin Account</div>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="location.href='{{ url_for('survey_report_dashboard') }}'">Survey Reports</button>
+            <button class="nav-btn" onclick="location.href='{{ url_for('survey_dashboard') }}'">Manage Surveys</button>
+            <button class="nav-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+        </div>
+    </nav>
+
+    <div class="complaint-container">
+        <div class="actions">
+            <button id="selectAllBtn" class="btn">Select All</button>
+            <div>
+                <button id="enableSelectedBtn" class="btn">Enable Selected</button>
+                <button id="disableSelectedBtn" class="btn">Disable Selected</button>
+            </div>
+        </div>
+        <input type="text" id="searchBar" placeholder="Search complaints...">
+        <ul class="complaint-list" id="complaintList">
+            <!-- Complaints will be dynamically added here -->
+        </ul>
+    </div>
+
+    <div id="confirmModal" class="modal" >
+        <div class="modal-content" style="top: 39%;">
+            <p id="modalMessage"></p>
+            <div class="modal-buttons">
+                <button id="confirmYes" class="btn">Yes</button>
+                <button id="confirmNo" class="btn">No</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="exampleModal" style="width:100%; height:100%; max-width: 100%;     scrollbar-width: none;" >
+        <div class="modal-dialog" style="width:100%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title1" style="width: 100%;">Modal title</h5>
+                    <button type="button" class="close" id="closeButton1" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container bootdey">
+                        <div class="row gutters">
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <!-- Timeline start -->
+                                        <div class="timeline" id="timelineContent">
+                                            <!-- Dynamic content will be injected here -->
+                                        </div>
+                                        <!-- Timeline end -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="closeButton">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var data = {{ data | tojson }};
+        const complaintList = document.getElementById('complaintList');
+        const searchBar = document.getElementById('searchBar');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const enableSelectedBtn = document.getElementById('enableSelectedBtn');
+        const disableSelectedBtn = document.getElementById('disableSelectedBtn');
+        const modal = document.getElementById('confirmModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+    
+        function createComplaintItem(complaint) {
+            const li = document.createElement('li');
+            li.className = 'complaint-item';
+            li.innerHTML = `
+                <input type="checkbox" class="complaint-checkbox">
+                <div class="complaint-content">
+                    <div class="complaint-ticket" onclick="openSubModal('${complaint.ticket_number}')">${complaint.ticket_number}</div>
+                    <div class="complaint-text">${complaint.complaint_categories}</div>
+                </div>
+                <button class="btn toggle-btn">${complaint.enabled ? 'Disable' : 'Enable'}</button>
+            `;
+            if (!complaint.enabled) {
+                li.classList.add('disabled');
+            }
+            return li;
+        }
+    
+        function renderComplaints(complaintsToRender) {
+            complaintList.innerHTML = '';
+            complaintsToRender.forEach(complaint => {
+                complaintList.appendChild(createComplaintItem(complaint));
+            });
+        }
+    
+        renderComplaints(data);
+    
+        searchBar.addEventListener('input', (e) => {
+            const searchString = e.target.value.trim().toLowerCase();
+            const filteredComplaints = data.filter(complaint =>
+                (complaint.complaint_categories && complaint.complaint_categories.toLowerCase().includes(searchString)) ||
+                (complaint.ticket_number && complaint.ticket_number.toLowerCase().includes(searchString))
+            );
+            renderComplaints(filteredComplaints);
+        });
+        function showConfirmation(message, callback) {
+            modalMessage.textContent = message;
+            modal.style.display = "block";
+            confirmYes.onclick = () => {
+                modal.style.display = "none";
+                callback(true);
+            };
+            confirmNo.onclick = () => {
+                modal.style.display = "none";
+                callback(false);
+            };
+        }
+    
+        function toggleComplaint(complaint, action) {
+            return fetch("{{ url_for('toggle_complaint') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ticket_number: complaint.ticket_number,
+                    action: action
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    complaint.enabled = (action === 'enable');
+                    return true;
+                } else {
+                    alert('Failed to ' + action + ' complaint: ' + data.message);
+                    return false;
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('An error occurred while trying to ' + action + ' the complaint');
+                return false;
+            });
+        }
+    
+        complaintList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('toggle-btn')) {
+                const listItem = e.target.closest('.complaint-item');
+                const index = Array.from(complaintList.children).indexOf(listItem);
+                const complaint = data[index];
+                const action = complaint.enabled ? 'disable' : 'enable';
+                showConfirmation(`Are you sure you want to ${action} this complaint?`, (confirmed) => {
+                    if (confirmed) {
+                        toggleComplaint(complaint, action).then(success => {
+                            if (success) {
+                                listItem.classList.toggle('disabled');
+                                e.target.textContent = complaint.enabled ? 'Disable' : 'Enable';
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    
+        selectAllBtn.addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.complaint-checkbox');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+            selectAllBtn.textContent = allChecked ? 'Select All' : 'Deselect All';
+        });
+    
+        function handleBulkAction(action) {
+            const selectedItems = document.querySelectorAll('.complaint-checkbox:checked');
+            if (selectedItems.length === 0) {
+                alert('Please select at least one complaint.');
+                return;
+            }
+            showConfirmation(`Are you sure you want to ${action} ${selectedItems.length} complaint(s)?`, (confirmed) => {
+                if (confirmed) {
+                    const promises = Array.from(selectedItems).map(item => {
+                        const listItem = item.closest('.complaint-item');
+                        const index = Array.from(complaintList.children).indexOf(listItem);
+                        const complaint = data[index];
+                        return toggleComplaint(complaint, action).then(success => {
+                            if (success) {
+                                const toggleBtn = listItem.querySelector('.toggle-btn');
+                                if (action === 'enable') {
+                                    listItem.classList.remove('disabled');
+                                    toggleBtn.textContent = 'Disable';
+                                } else {
+                                    listItem.classList.add('disabled');
+                                    toggleBtn.textContent = 'Enable';
+                                }
+                            }
+                            return success;
+                        });
+                    });
+    
+                    Promise.all(promises).then(results => {
+                        const successCount = results.filter(Boolean).length;
+                        alert(`Successfully ${action}d ${successCount} out of ${selectedItems.length} complaints.`);
+                        selectedItems.forEach(item => item.checked = false);
+                    });
+                }
+            });
+        }
+    
+        enableSelectedBtn.addEventListener('click', () => handleBulkAction('enable'));
+        disableSelectedBtn.addEventListener('click', () => handleBulkAction('disable'));
+    </script>
+    <script>
+        function fileExists(url) {
+    const http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.send();
+    return http.status !== 404;
+}
+    function openSubModal(specificComplaint) {
+
+            specificComplaint = data.find(function (complaint) {
+                                        return complaint.ticket_number === specificComplaint;
+            });
+            console.log('specificComplaint', specificComplaint);
+                var modalTitle = document.querySelector(".modal-title1");
+                var modalBody = document.querySelector(".modal-body");
+                var ticketNumber = specificComplaint.ticket_number;
+
+                modalTitle.innerHTML = specificComplaint.ticket_number + " | " + specificComplaint.date_entry +
+                      '<span class="right-align">' + specificComplaint.company_name + " | " + specificComplaint.office_name + '</span>';
+
+
+                // Construct the modal body content dynamically
+    // ... Your previous code ...
+
+    // Construct the modal body content dynamically
+var modalContent = `
+  <div class="container bootdey">
+    <div class="row gutters"  style=" width:100%;">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="card-body" style="padding:0;">
+            <!-- Timeline start -->
+            <div class="timeline">
+              <div class="timeline-row">
+                <div class="timeline-time">
+                  ${specificComplaint.in_process_date}<small>  </small>
+                </div>
+                <div class="timeline-dot fb-bg"></div>
+                <div class="timeline-content">
+                  <div class="icon-text-row"> <!-- Added a container for icon and text -->
+                    <div class="left-align" style="width: 60%; flex-grow: 1; padding-left: 5px; text-align: left; font-size: 15px; margin-bottom: 10px;">
+                      <span class="badge ">${specificComplaint.employee_name}</span>
+                      <span class="badge ">|</span>
+                      <span class="badge ">${specificComplaint.designation}</span> <br>
+                      <span class="badge">${specificComplaint.complaint_categories}</span>
+                    </div>
+                    <h4 class="icon-text" style="margin-right: -1px;">In Process</h4>
+                    <i class="fa fa-list" aria-hidden="true" style="width: 50px; margin-left: 10px;"></i>
+                  </div>
+                  ${
+                    (() => {
+                      const imagePath = `static/images/capa_images/${ticketNumber}_proof.png`;
+                      const pdfPath = `static/images/capa_images/${ticketNumber}_proof.pdf`;
+                      const videoPath = `static/images/capa_images/${ticketNumber}_proof.mp4`;
+
+                      if (fileExists(imagePath)) {
+                        return `
+                          <div class="capa-image-container">
+                            <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                          </div>`;
+                      } else if (fileExists(pdfPath)) {
+                        // Display PDF viewer or link as per your requirements
+                        return `<p style="text-align: left;     font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>`;
+                      }else if (fileExists(videoPath)) {
+                            // Display video player or link as per your requirements
+                            return `
+                            <p style="text-align: left;     font-size: 75%;">Video Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                              <div class="capa-image-container">
+                                <video width="320" height="240" controls>
+                                  <source src="${videoPath}" type="video/mp4">
+                                  Your browser does not support the video tag.
+                                </video>
+                              </div>`;
+                          }else{
+                          return ``;
+                          }
+                    })()
+                  }
+                                    <p class="left-align" style="padding-left: 5px; text-align: left;">
+                    <br>
+                    ${
+                      specificComplaint.additional_comments
+                        ? `<span class="badge badge-light"></span>${specificComplaint.additional_comments}<br>`
+                        : ''
+                    }
+                    ${
+                      specificComplaint.date_of_issue
+                        ? `<span class="badge">Date of Issue:</span>${specificComplaint.date_of_issue}<br>`
+                        : ''
+                    }
+                    ${
+                      specificComplaint.person_issue
+                        ? `<span class="badge">Relevant Person:</span>${specificComplaint.person_issue}<br>`
+                        : ''
+                    }
+                    ${
+                      specificComplaint.concerned_department
+                        ? `<span class="badge">Concerned Department:</span>${specificComplaint.concerned_department}<br>`
+                        : ''
+                    }
+                    ${
+                      specificComplaint.previous_history
+                        ? `<span class="badge">Previous History:</span>${specificComplaint.previous_history}<br>`
+                        : ''
+                    }
+                    ${
+                      specificComplaint.proposed_solution
+                        ? `<span class="badge">Proposed Solution:</span>${specificComplaint.proposed_solution}<br>`
+                        : ''
+                    }
+`;
+if (specificComplaint.lodged_by_agent && specificComplaint.lodged_from_web) {
+      modalContent += `
+            <span class="badge"> Lodged By:</span>
+             Agent from Web<br>
+            `;
+            }
+else if (specificComplaint.lodged_by_agent && !specificComplaint.lodged_from_web) {
+      modalContent += `
+            <span class="badge"> Lodged By:</span>
+             Agent from Mobile App<br>
+            `;
+            }
+else if (!specificComplaint.lodged_by_agent && !specificComplaint.lodged_from_web) {
+      modalContent += `
+            <span class="badge"> Lodged By:</span>
+             Employee from Mobile App<br>
+            `;
+            }
+else{
+    modalContent += `
+            <span class="badge"> Lodged By:</span>
+            Employee from Web<br>
+            `;
+}
+  modalContent += `
+                      </p>
+
+                    </div>
+                  </div>
+                  <div class="timeline-row">
+                    <div class="timeline-time">
+                      ${specificComplaint.rca_date}<small></small>
+                    </div>
+                    <div class="timeline-dot green-one-bg"></div>
+                    <div class="timeline-content green-one">
+                    <div class="icon-text-row1">
+                      <i class="fa fa-warning"></i>
+                      <h4>RCA-Root Cause Analysis</h4>
+                    </div>
+                      ${
+                        specificComplaint.rca === null
+                          ? `<p>Detail <input type="text" id="rcaInput" class="form-control" readonly/></p>`
+            : `<p> ${specificComplaint.rca}</p><p><span class="badge">Capa Deadline:</span> ${specificComplaint.capa_deadline}</p>`
+                      }
+                      <div class="">
+                      </div>
+                    </div>
+                  </div>
+    <div class="timeline-row">
+        <div class="timeline-time">
+            ${specificComplaint.capa_date}<small></small>
+        </div>
+        <div class="timeline-dot green-two-bg"></div>
+        <div class="timeline-content green-two">
+        <div class="icon-text-row">
+            <h4>CAPA-Corrective & Preventive Actions</h4>
+            <i class="fa fa-list"></i>
+        </div>
+             ${
+                  specificComplaint.capa === null
+                    ? `<div class="input-group">
+                        <input type="file" id="capaImageInput" class="custom-file-input d-none" accept="image/*" data-capa="capa">
+                        <label for="capaImageInput" class="custom-file-label custom-upload-button">
+                            <i class="fas fa-upload" style="width: 52px; border-radius: 10px; height: 50px; margin-left: 7px; color: #f6f6f6; display: none;"></i>
+                        </label>
+                      </div>
+                      <p style= "margin-top: -10px;">Detail: <input type="text" id="capaInput" class="form-control" /></p>`
+                    : (() => {
+                        const imagePath = `static/images/capa_images/${ticketNumber}_capa.png`;
+                        const pdfPath = `static/images/capa_images/${ticketNumber}_capa.pdf`;
+                        const videoPath = `static/images/capa_images/${ticketNumber}_capa.mp4`;
+
+                        if (fileExists(imagePath)) {
+                          return `
+                            <div class="capa-image-container">
+                              <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                            </div>
+                            <br><p style="padding-left: 5px; text-align: left; margin-top: 0px;">${specificComplaint.capa}</p><br>`;
+                        } else if (fileExists(pdfPath)) {
+                          // Display PDF viewer or link as per your requirements
+                          return `<br><p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                          <p style="padding-left: 5px; text-align: left; margin-top: 0px;">${specificComplaint.capa}</p><br>`;
+                        } else if (fileExists(videoPath)) {
+                          // Display video player or link as per your requirements
+                          return `
+                          <p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                            <div class="capa-image-container">
+                              <video width="320" height="240" controls>
+                                <source src="${videoPath}" type="video/mp4">
+                                Your browser does not support the video tag.
+                              </video>
+                            </div>
+                            <br><p style="padding-left: 5px; text-align: left; margin-top: 0px;">${specificComplaint.capa}</p><br>`;
+                        }
+                        else{
+                        return `<br><p style="padding-left: 5px; text-align: left; margin-top: 0px;">${specificComplaint.capa}</p><br>`
+                        }
+                      })()
+
+                }
+              </div>
+            </div>
+`;
+
+    // Check for "RCA" status
+    if (specificComplaint.status === "Bounced" || specificComplaint.capa1!= null) {
+
+      modalContent += `
+    <div style="    text-align: center;">
+    <span class="background-rectangle font-weight-bold" style="font-size: 20px; text-align: center; margin-bottom: 3%; color:white;">
+        The Complainant Was Not Satisfied<br>
+        <span style="font-size: 16px; text-align: center;">Feedback: ${specificComplaint.feedback}</span>
+    </span>
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.rca1_date}<small></small>
+          </div>
+          <div class="timeline-dot green-three-bg"></div>
+          <div class="timeline-content green-three">
+          <div class="icon-text-row1">
+            <i class="fa fa-warning"></i>
+            <h4>RCA1-Root Cause Analysis</h4>
+          </div>
+            ${
+              specificComplaint.rca1 === null
+                ? `<p>Comments <input type="text" id="rca1Input" class="form-control" readonly/></p>`
+            : `<p> ${specificComplaint.rca1}</p><p><span class="badge">Capa1 Deadline:</span> ${specificComplaint.capa_deadline1}</p>`
+            }
+
+          </div>
+        </div>
+        </div>
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.capa1_date}<small></small>
+          </div>
+          <div class="timeline-dot green-four-bg"></div>
+          <div class="timeline-content green-four">
+          <div class="icon-text-row">
+            <h4>CAPA1-Corrective & Preventive Actions</h4>
+            <i class="fa fa-list"></i>
+          </div>
+            ${
+          specificComplaint.capa1 === null
+            ? `<div class="input-group">
+                    <input type="file" id="capa1ImageInput" class="custom-file-input d-none" accept="image/*" data-capa="capa1">
+                    <label for="capa1ImageInput" class="custom-file-label custom-upload-button">
+                        <i class="fas fa-upload" style="width: 52px; border-radius: 10px; height: 50px; margin-left: 7px; color: #f6f6f6; display: none;"></i>
+                    </label>
+                </div>
+                   <p style = "margin-top: -10px;">Detail: <input type="text" id="capa1Input" class="form-control" /></p>`
+            : (() => {
+                        const imagePath = `static/images/capa_images/${ticketNumber}_capa1.png`;
+                        const pdfPath = `static/images/capa_images/${ticketNumber}_capa1.pdf`;
+                        const videoPath = `static/images/capa_images/${ticketNumber}_capa1.mp4`;
+
+                        if (fileExists(imagePath)) {
+                          return `
+                            <div class="capa-image-container">
+                              <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                            </div>
+                            <br><p style=" padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa1}</p><br>`;
+                        } else if (fileExists(pdfPath)) {
+                          // Display PDF viewer or link as per your requirements
+                          return `<br><p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                          <p style=" padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa1}</p><br>`;
+                        } else if (fileExists(videoPath)) {
+                          // Display video player or link as per your requirements
+                          return `
+                          <p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                            <div class="capa-image-container">
+                              <video width="320" height="240" controls>
+                                <source src="${videoPath}" type="video/mp4">
+                                Your browser does not support the video tag.
+                              </video>
+                            </div>
+                            <br><p style=" padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa1}</p><br>`;
+                        }
+                        else{
+                        return `<br><p style=" padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa1}</p><br>`
+                        }
+                      })()
+
+        }
+      </div>
+    </div>
+  `;
+    }
+
+    // Check for "Bounced1" status
+    if (specificComplaint.status === "Bounced1" || specificComplaint.capa2!= null) {
+
+      modalContent += `
+    <div style="    text-align: center;">
+    <span class="background-rectangle font-weight-bold" style="font-size: 20px; text-align: center; margin-bottom: 3%; color:white;">
+        The Complainant Was Not Satisfied<br>
+        <span style="font-size: 16px; text-align: center;">Feedback: ${specificComplaint.feedback1}</span>
+    </span>
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.rca2_date}<small></small>
+          </div>
+          <div class="timeline-dot green-five-bg"></div>
+          <div class="timeline-content green-five">
+           <div class="icon-text-row1">
+            <h4>RCA2-Root Cause Analysis</h4>
+            <i class="fa fa-warning"></i>
+           </div>
+            ${
+              specificComplaint.rca2 === null
+                ? `<p>Detail <input type="text" id="rca2Input" class="form-control" readonly/></p>`
+            : `<p> ${specificComplaint.rca2}</p><p><span class="badge">Capa2 Deadline:</span> ${specificComplaint.capa_deadline2}</p>`
+            }
+
+          </div>
+        </div>
+        </div>
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.capa2_date}<small></small>
+          </div>
+          <div class="timeline-dot green-six-bg"></div>
+          <div class="timeline-content green-six">
+            <div class="icon-text-row">
+            <h4>CAPA2-Corrective & Preventive Actions</h4>
+            <i class="fa fa-list"></i>
+
+            </div>
+            ${
+          specificComplaint.capa2 === null
+            ? `<div class="input-group">
+                        <input type="file" id="capa2ImageInput" class="custom-file-input d-none" data-type="input-file" accept="image/*,application/pdf,video/*" data-component="fileupload" data-capa="capa2">
+                       <label for="capa2ImageInput" class="custom-file-label custom-upload-button">
+                            <i class="fas fa-upload" style="width: 52px; border-radius: 10px; height: 50px; margin-left: 7px; color: #f6f6f6;"></i>
+                       </label>
+                   </div>
+                   <p style="margin-top: -10px;">Comments: <input type="text" id="capa2Input" class="form-control" /></p>`
+            : (() => {
+                        const imagePath = `static/images/capa_images/${ticketNumber}_capa2.png`;
+                        const pdfPath = `static/images/capa_images/${ticketNumber}_capa2.pdf`;
+                        const videoPath = `static/images/capa_images/${ticketNumber}_capa2.mp4`;
+
+                        if (fileExists(imagePath)) {
+                          return `
+                            <div class="capa-image-container">
+                              <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                            </div>
+                            <br><p style = "padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa2}</p><br>`;
+                        } else if (fileExists(pdfPath)) {
+                          // Display PDF viewer or link as per your requirements
+                          return `<br><p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                          <p style = "padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa2}</p><br>`;
+                        } else if (fileExists(videoPath)) {
+                          // Display video player or link as per your requirements
+                          return `
+                          <p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                            <div class="capa-image-container">
+                              <video width="320" height="240" controls>
+                                <source src="${videoPath}" type="video/mp4">
+                                Your browser does not support the video tag.
+                              </video>
+                            </div>
+                            <br><p style = "padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa2}</p><br>`;
+                        }
+                        else{
+                        return `<br><p style = "padding-left: 5px; text-align: left; margin-top: 0px;"> ${specificComplaint.capa2}</p><br>`
+                        }
+                      })()
+
+        }
+      </div>
+    </div>
+  `;
+    }
+
+    if (specificComplaint.status === "Unclosed") {
+    modalContent += `
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.closed_date}<small> </small>
+          </div>
+          <div class="timeline-dot green-seven-bg"></div>
+          <div class="timeline-content green-seven">
+          <div class="icon-text-row">
+            <i class="fa fa-warning"></i>
+            <h4>UNCLOSED</h4>
+          </div>
+            <div class="">
+            </div>
+          </div>
+        </div>
+        `;
+        }
+
+    if (specificComplaint.status === "Closed") {
+    modalContent += `
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.closed_date}<small> </small>
+          </div>
+          <div class="timeline-dot green-seven-bg"></div>
+          <div class="timeline-content green-seven">
+          <div class="icon-text-row1">
+            <i class="fa fa-warning"></i>
+            <h4>SUBMITTED</h4>
+          </div>
+            <div class="">
+            </div>
+          </div>
+        </div>
+        `;
+        }
+        if (specificComplaint.status === "Completed") {
+        modalContent += `
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.closed_date}<small> </small>
+          </div>
+          <div class="timeline-dot green-seven-bg"></div>
+          <div class="timeline-content green-seven">
+          <div class="icon-text-row1">
+            <i class="fa fa-warning"></i>
+            <h4>SUBMITTED</h4>
+          </div>
+            <div class="">
+            </div>
+          </div>
+        </div>
+        `;
+    modalContent += `
+        <div class="timeline-row">
+          <div class="timeline-time">
+            ${specificComplaint.completed_date}<small> </small>
+          </div>
+          <div class="timeline-dot green-eight-bg"></div>
+          <div class="timeline-content green-eight">
+          <div class="icon-text-row">
+            <h4>COMPLETED</h4>
+            <i class="fa fa-list"></i>
+          </div>
+            <div class="">
+            </div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-bottom: 4%;">
+    <span class="background-rectangle font-weight-bold" style="font-size: 20px; text-align: center; margin-bottom: 3%; color:white;">
+        The Complainant Was Satisfied<br>
+        <span style="font-size: 16px; text-align: center;">Feedback: ${specificComplaint.closed_feedback}</span>
+    </span>
+    </div>
+        `;
+        }
+    modalContent += `
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ... Your previous code ...
+
+
+                $('#printButton').on('click', function() {
+            printModalContent(modalContent);
+        });
+                // Set the modal content
+                modalBody.innerHTML = modalContent;
+
+                // Show the modal
+                showModal();
+                }
+
+
+
+    function showModal() {
+
+            document.getElementById('exampleModal').style.display = 'block';
+        }
+        function hideModal() {
+            document.getElementById('exampleModal').style.display = 'none';
+        }
+        document.getElementById('closeButton').addEventListener('click', function() {
+
+            hideModal(); // Hide the modal when the close button is clicked
+        });
+        document.getElementById('closeButton1').addEventListener('click', function() {
+            hideModal(); // Hide the modal when the close button is clicked
+        });
+
+    </script>
+</body>
+</html>

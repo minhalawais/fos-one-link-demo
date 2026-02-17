@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library Management</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#60BA81',
+                        primary1: '#284952',
+                        secondary: '#f5a83c',
+                        'primary-50': '#f0f9f4',
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #60BA81;
+            --primary-dark: #4da56d;
+            --primary-light: #7dd49d;
+            --primary-bg: #f0f9f4;
+            --secondary: #284952;
+            --secondary-dark: #1f3840;
+            --accent: #f5a83c;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf0 100%);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #284952 0%, #1f3840 100%) !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem !important;
+            margin: 0 0.25rem;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #60BA81 0%, #4da56d 100%);
+            color: white !important;
+            box-shadow: 0 2px 4px rgba(96, 186, 129, 0.3);
+        }
+
+        /* Sidebar Enhancements */
+        .sidebar-container {
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sidebar-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-item:hover {
+            background: linear-gradient(90deg, #f0f9f4 0%, #ffffff 100%);
+            transform: translateX(2px);
+        }
+
+        .sidebar-item:hover::before,
+        .sidebar-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar-item.active {
+            background: linear-gradient(90deg, #f0f9f4 0%, #f8fcfa 100%);
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        /* Enhanced Search Input */
+        #buyerSearch {
+            transition: all 0.3s ease;
+        }
+
+        #buyerSearch:focus {
+            box-shadow: 0 0 0 3px rgba(96, 186, 129, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* Content Area */
+        .content-area {
+            background: linear-gradient(135deg, #fafbfc 0%, #f4f6f8 100%);
+        }
+
+        /* Toolbar Enhancement */
+        .toolbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced Card Styling */
+        .folder-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .folder-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .folder-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15),
+                0 8px 12px -6px rgba(96, 186, 129, 0.1);
+            border-color: rgba(96, 186, 129, 0.3);
+        }
+
+        .folder-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        /* Badge Styling */
+        .item-count-badge {
+            background: linear-gradient(135deg, #60BA81 0%, #4da56d 100%);
+            box-shadow: 0 2px 4px rgba(96, 186, 129, 0.3);
+        }
+
+        /* Context Menu Enhancement */
+        #contextMenu {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            min-width: 180px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15),
+                0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            animation: contextMenuSlide 0.2s ease;
+        }
+
+        @keyframes contextMenuSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .context-menu-item {
+            padding: 10px 14px;
+            font-size: 0.875rem;
+            color: #374151;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin: 2px 0;
+        }
+
+        .context-menu-item:hover {
+            background: linear-gradient(90deg, #f0f9f4 0%, #f8fcfa 100%);
+            color: var(--secondary);
+            transform: translateX(4px);
+        }
+
+        .context-menu-item i {
+            width: 20px;
+        }
+
+        /* Enhanced Buttons */
+        .action-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal Enhancements */
+        .modal-content {
+            border: none;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Upload Progress */
+        #uploadProgress {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Breadcrumbs */
+        .breadcrumb-item {
+            transition: all 0.2s ease;
+        }
+
+        .breadcrumb-item:hover {
+            color: var(--primary) !important;
+            transform: scale(1.05);
+        }
+
+        /* Drag Over Effect */
+        .drag-over {
+            border-color: var(--primary) !important;
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 100%) !important;
+            box-shadow: inset 0 0 0 2px rgba(96, 186, 129, 0.2);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Icon Animations */
+        .icon-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .folder-card:hover .icon-hover {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="font-inter bg-slate-50 h-screen flex flex-col overflow-hidden">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark flex-shrink-0">
+        <div class="container-fluid">
+            <a class="navbar-brand flex items-center" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo"
+                    style="height: 35px; margin-right: 10px;">
+                <span class="font-bold tracking-tight">Digital Library</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_portal') }}">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="#">Digital Library</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- Sidebar: Buyers List -->
+        <div class="w-64 sidebar-container flex flex-col flex-shrink-0 z-10">
+            <div class="p-4 sidebar-header">
+                <h6 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Buyers</h6>
+                <div class="relative">
+                    <input type="text" id="buyerSearch" placeholder="Search buyers..."
+                        class="w-full pl-8 pr-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                    <i class="bi bi-search absolute left-2.5 top-3 text-gray-400 text-xs"></i>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto flex-1 p-2 space-y-1" id="buyerList">
+                <!-- Buyers loaded dynamically -->
+                <div class="text-center py-8 text-gray-400 text-sm loading">Loading buyers...</div>
+            </div>
+
+            <div class="p-4 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <!-- Auto-listed buyers only -->
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 flex flex-col content-area overflow-hidden relative" id="dropZone">
+
+            <!-- Toolbar & Breadcrumbs -->
+            <div
+                class="toolbar bg-white border-b border-gray-200 p-4 flex-shrink-0 z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+                <!-- Left: Breadcrumbs -->
+                <div class="flex-1 min-w-0">
+                    <nav class="flex" aria-label="Breadcrumb">
+                        <ol class="flex items-center space-x-2 text-sm" id="breadcrumbs">
+                            <li class="breadcrumb-item">
+                                <span class="flex items-center text-gray-400">
+                                    <i class="bi bi-house-door"></i>
+                                </span>
+                            </li>
+                            <!-- Breadcrumbs injected here -->
+                            <li><span class="text-gray-300 mx-2">/</span></li>
+                            <li class="font-medium text-gray-800 truncate">Select a Buyer</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center space-x-3 opacity-50 pointer-events-none" id="actionToolbar">
+                    <div class="relative">
+                        <input type="text" id="fileSearch" placeholder="Filter files..."
+                            class="w-48 pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                        <i class="bi bi-filter absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
+                    </div>
+                    <button id="btnNewFolder" onclick="openCreateFolderModal()"
+                        class="action-button p-2.5 text-gray-600 hover:text-primary hover:bg-primary-50 rounded-lg transition-colors"
+                        title="New Folder">
+                        <i class="bi bi-folder-plus text-lg"></i>
+                    </button>
+                    <button id="btnUploadFile" onclick="document.getElementById('fileUploadInput').click()"
+                        class="action-button p-2.5 text-gray-600 hover:text-primary hover:bg-primary-50 rounded-lg transition-colors"
+                        title="Upload File">
+                        <i class="bi bi-cloud-upload text-lg"></i>
+                    </button>
+                    <input type="file" id="fileUploadInput" multiple class="hidden"
+                        onchange="handleFileUpload(this.files)">
+                </div>
+            </div>
+
+            <!-- File Grid -->
+            <div class="flex-1 overflow-y-auto p-6" id="fileGridContainer">
+                <div id="fileGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                    <!-- Files injected here -->
+                    <div class="col-span-full flex flex-col items-center justify-center h-64 text-gray-400">
+                        <i class="bi bi-arrow-left text-4xl mb-4"></i>
+                        <p class="text-lg">Select a buyer from the sidebar to view files</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Progress Overlay -->
+            <div id="uploadProgress"
+                class="absolute bottom-6 right-6 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 p-5 transform translate-y-full transition-transform duration-300 z-50">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center">
+                        <div
+                            class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center mr-3">
+                            <i class="bi bi-cloud-upload text-white text-sm"></i>
+                        </div>
+                        <h6 class="text-sm font-semibold text-gray-800">Uploading <span id="uploadCount">0</span> items
+                        </h6>
+                    </div>
+                    <button onclick="closeUploadProgress()"
+                        class="text-gray-400 hover:text-gray-600 transition-colors"><i
+                            class="bi bi-x-lg text-sm"></i></button>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3 overflow-hidden">
+                    <div id="uploadBar"
+                        class="h-full rounded-full transition-all duration-300 bg-gradient-to-r from-primary to-primary-light"
+                        style="width: 0%"></div>
+                </div>
+                <p class="text-xs text-gray-500 truncate" id="uploadStatus">Preparing...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu">
+        <div class="context-menu-item text-red-600" id="ctxDelete" onclick="deleteItem()">
+            <i class="bi bi-trash mr-2"></i> Delete
+        </div>
+        <div class="context-menu-item" id="ctxDownload" onclick="downloadItem()">
+            <i class="bi bi-download mr-2"></i> Download
+        </div>
+        <div class="context-menu-item" id="ctxRename" onclick="promptRename()">
+            <i class="bi bi-pencil mr-2"></i> Rename
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Create Folder Modal -->
+    <div class="modal fade" id="createFolderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content rounded-xl shadow-lg border-0">
+                <div class="p-4">
+                    <h5 class="text-lg font-bold text-gray-800 mb-3">New Folder</h5>
+                    <input type="text" id="newFolderName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                        placeholder="Folder Name" autofocus>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" onclick="createFolder()"
+                            class="px-3 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-600">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div class="modal fade" id="renameModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content rounded-xl shadow-lg border-0">
+                <div class="p-4">
+                    <h5 class="text-lg font-bold text-gray-800 mb-3">Rename Item</h5>
+                    <input type="text" id="renameInput"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                        autofocus>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" onclick="submitRename()"
+                            class="px-3 py-2 text-sm bg-primary text-white rounded-lg hover:bg-primary-600">Rename</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // State
+        let currentBuyerId = null;
+        let currentBuyerName = null; // Added to track buyer name
+        let currentPath = ''; // Relative to buyer root
+        let currentItems = [];
+        let contextItem = null;
+        let allBuyers = [];
+
+        // Formatting Helpers
+        const formatSize = (bytes) => {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        const formatDate = (timestamp) => {
+            return new Date(timestamp * 1000).toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        }
+
+        // --- API Calls ---
+
+        async function loadStructure(buyerId = null, path = '') {
+            try {
+                // Determine API URL
+                let url = `{{ url_for('digital_library.get_structure') }}`;
+                const params = new URLSearchParams();
+                if (buyerId) params.append('buyer_id', buyerId);
+                if (path) params.append('path', path);
+
+                if ([...params].length > 0) url += `?${params.toString()}`;
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                if (data.is_root) {
+                    renderSidebar(data.items);
+                } else {
+                    currentItems = data.items;
+                    renderFiles(data.items);
+                    updateBreadcrumbs(data.buyer_folder, path);
+                    currentPath = path; // Update current path state
+                    updateUIState(path);
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Failed to load library content");
+            }
+        }
+
+        // --- Rendering ---
+
+        function renderSidebar(buyers) {
+            allBuyers = buyers; // Cache for searching
+            const container = document.getElementById('buyerList');
+            container.innerHTML = buyers.length ? '' : '<div class="text-center py-4 text-gray-400 text-sm">No buyers found</div>';
+
+            buyers.sort((a, b) => a.buyer_name.localeCompare(b.buyer_name)).forEach(buyer => {
+                const div = document.createElement('div');
+                div.className = `sidebar-item px-3 py-2 rounded-lg text-sm text-gray-600 font-medium flex items-center justify-between group ${String(currentBuyerId) === String(buyer.buyer_id) ? 'active' : ''}`;
+                div.innerHTML = `
+                    <div class="flex items-center min-w-0">
+                        <i class="bi bi-folder2-open text-yellow-500 mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+                        <span class="truncate">${buyer.buyer_name}</span>
+                    </div>
+                `;
+                div.onclick = () => selectBuyer(buyer.buyer_id, buyer.buyer_name);
+                container.appendChild(div);
+            });
+
+            // Search Filter Listener
+            document.getElementById('buyerSearch').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = allBuyers.filter(b => b.buyer_name.toLowerCase().includes(term));
+                const container = document.getElementById('buyerList');
+                container.innerHTML = filtered.length ? '' : '<div class="text-center py-4 text-gray-400 text-sm">No matches</div>';
+
+                filtered.forEach(buyer => {
+                    const div = document.createElement('div');
+                    div.className = `sidebar-item px-3 py-2 rounded-lg text-sm text-gray-600 font-medium flex items-center justify-between group ${currentBuyerId == buyer.buyer_id ? 'active' : ''}`;
+                    div.innerHTML = `
+                        <div class="flex items-center min-w-0">
+                            <i class="bi bi-folder2-open text-yellow-500 mr-3 text-lg group-hover:scale-110 transition-transform"></i>
+                            <span class="truncate">${buyer.buyer_name}</span>
+                        </div>
+                    `;
+                    div.onclick = () => selectBuyer(buyer.buyer_id, buyer.buyer_name);
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Fetch Buyers List separately to populate sidebar
+        async function loadBuyersList() {
+            try {
+                const res = await fetch(`{{ url_for('digital_library.get_buyers_list') }}`);
+                const data = await res.json();
+                if (data.success) {
+                    renderSidebar(data.buyers);
+                } else {
+                    document.getElementById('buyerList').innerHTML = '<div class="text-center py-4 text-red-500 text-sm">Error loading buyers</div>';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function selectBuyer(id, folderName) {
+            currentBuyerId = id;
+            currentBuyerName = folderName; // Store buyer name
+            currentPath = '';
+
+            // Update UI State
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            // Note: In a real app we'd re-render sidebar to apply active class, relying on click for now
+
+            // Enable Toolbar
+            document.getElementById('actionToolbar').classList.remove('opacity-50', 'pointer-events-none');
+
+            // Load Root of Buyer
+            loadStructure(id, '');
+        }
+
+        function renderFiles(items) {
+            const container = document.getElementById('fileGrid');
+            container.innerHTML = items.length ? '' : `
+                <div class="col-span-full flex flex-col items-center justify-center h-64 text-gray-400">
+                    <i class="bi bi-folder2-open text-4xl mb-3 opacity-50"></i>
+                    <p class="text-sm">This folder is empty</p>
+                </div>`;
+
+            // Sort: Folders first, then Files
+            items.sort((a, b) => {
+                if (a.type === b.type) return a.name.localeCompare(b.name);
+                return a.type === 'folder' ? -1 : 1;
+            });
+
+            // Local Search Filter
+            const searchTerm = document.getElementById('fileSearch').value.toLowerCase();
+            const filteredItems = items.filter(i => i.name.toLowerCase().includes(searchTerm));
+
+            filteredItems.forEach(item => {
+                const isFolder = item.type === 'folder';
+                const iconClass = isFolder ? 'bi-folder-fill text-yellow-400' : getFileIcon(item.name);
+
+                const card = document.createElement('div');
+                card.className = 'folder-card bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center cursor-pointer relative group h-40';
+                card.oncontextmenu = (e) => showContextMenu(e, item);
+                card.onclick = () => {
+                    if (isFolder) {
+                        loadStructure(currentBuyerId, item.path); // path is relative to buyer root
+                    } else {
+                        // Single click does nothing or selection
+                    }
+                };
+
+                // Double click to view
+                if (!isFolder) {
+                    card.ondblclick = () => viewItem(item);
+                }
+
+                card.innerHTML = `
+                    <div class="mb-3 text-4xl drop-shadow-sm transition-transform group-hover:scale-110 relative">
+                        <i class="bi ${iconClass}"></i>
+                        ${isFolder ? `<span class="absolute -top-2 -right-2 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-gray-200 shadow-sm">${item.item_count || 0}</span>` : ''}
+                    </div>
+                    <div class="w-full">
+                        <p class="text-sm font-medium text-gray-700 truncate w-full px-2" title="${item.name}">${item.name}</p>
+                        <p class="text-xs text-gray-400 mt-1 flex justify-center gap-2">
+                             ${isFolder ? '<span>Folder</span>' : `<span>${item.name.split('.').pop().toUpperCase()}</span> <span>•</span> <span>${formatSize(item.size)}</span>`}
+                        </p>
+                    </div>
+                    <!-- Hover Actions -->
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                        <button onclick="event.stopPropagation(); contextItem = {path:'${item.path}', type:'${item.type}'}; deleteItem()" class="p-1 rounded bg-white shadow text-red-500 hover:bg-red-50" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                         <button onclick="event.stopPropagation(); contextItem = {path:'${item.path}', name:'${item.name}'}; promptRename()" class="p-1 rounded bg-white shadow text-gray-600 hover:bg-gray-50" title="Rename">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        ${!isFolder ? `
+                        <button onclick="event.stopPropagation(); window.location.href='{{ url_for('digital_library.download_file') }}?buyer_id=${currentBuyerId}&path=${item.path}'" class="p-1 rounded bg-white shadow text-blue-500 hover:bg-blue-50" title="Download">
+                            <i class="bi bi-download"></i>
+                        </button>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const map = {
+                'pdf': 'bi-file-earmark-pdf text-red-500',
+                'doc': 'bi-file-earmark-word text-blue-500', 'docx': 'bi-file-earmark-word text-blue-500',
+                'xls': 'bi-file-earmark-excel text-green-500', 'xlsx': 'bi-file-earmark-excel text-green-500',
+                'jpg': 'bi-file-earmark-image text-purple-500', 'png': 'bi-file-earmark-image text-purple-500', 'jpeg': 'bi-file-earmark-image text-purple-500',
+                'txt': 'bi-file-earmark-text text-gray-500',
+                'zip': 'bi-file-earmark-zip text-yellow-600',
+                'mp4': 'bi-file-play text-pink-500', 'mov': 'bi-file-play text-pink-500'
+            };
+            return map[ext] || 'bi-file-earmark text-gray-400';
+        }
+
+        function updateBreadcrumbs(buyerFolder, path) {
+            const bc = document.getElementById('breadcrumbs');
+            // Root Item
+            let html = `
+                <li class="cursor-pointer hover:text-primary transition-colors">
+                    <span class="flex items-center text-gray-500"><i class="bi bi-house-door"></i></span>
+                </li>
+                <li><span class="text-gray-400 mx-2">/</span></li>
+                <li onclick="loadStructure('${currentBuyerId}', '')" class="cursor-pointer hover:text-primary transition-colors hover:underline font-medium text-gray-700">
+                    ${buyerFolder}
+                </li>
+            `;
+
+            if (path) {
+                const parts = path.split('/');
+                let cumulativePath = '';
+                parts.forEach((part, index) => {
+                    cumulativePath += (index > 0 ? '/' : '') + part;
+                    html += `
+                        <li><span class="text-gray-400 mx-2">/</span></li>
+                        <li onclick="loadStructure('${currentBuyerId}', '${cumulativePath}')" class="cursor-pointer hover:text-primary transition-colors ${index === parts.length - 1 ? 'font-semibold text-primary' : 'text-gray-600'}">
+                            ${part}
+                        </li>
+                    `;
+                });
+            }
+            bc.innerHTML = html;
+        }
+
+        function updateUIState(path) {
+            const btnNewFolder = document.getElementById('btnNewFolder');
+            const btnUploadFile = document.getElementById('btnUploadFile');
+
+            if (!btnNewFolder || !btnUploadFile) {
+                console.warn("UI buttons for new folder or upload file not found.");
+                return;
+            }
+
+            if (!path) {
+                // Root Level: Allow New Folder, Block Upload
+                btnNewFolder.style.display = 'inline-block';
+                btnUploadFile.style.display = 'none';
+            } else {
+                // Subfolder Level: Block New Folder (Max depth 1), Allow Upload
+                btnNewFolder.style.display = 'none';
+                btnUploadFile.style.display = 'inline-block';
+            }
+        }
+
+        // --- Actions ---
+
+        function openCreateFolderModal() {
+            new bootstrap.Modal(document.getElementById('createFolderModal')).show();
+            setTimeout(() => document.getElementById('newFolderName').focus(), 500);
+        }
+
+        // Fetch and Render Dashboard Stats
+        async function loadDashboard() {
+            const container = document.getElementById('fileGrid');
+            container.innerHTML = `<div class="col-span-full flex justify-center py-12"><div class="spinner-border text-primary" role="status"></div></div>`;
+
+            try {
+                const res = await fetch(`{{ url_for('digital_library.get_library_stats') }}`);
+                const data = await res.json();
+
+                if (data.success) {
+                    renderDashboard(data.stats);
+                } else {
+                    container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Failed to load dashboard data</div>`;
+                }
+            } catch (e) {
+                console.error("Dashboard error:", e);
+                container.innerHTML = `<div class="col-span-full text-center text-red-500 py-12">Error loading dashboard</div>`;
+            }
+        }
+
+        function renderDashboard(stats) {
+            const container = document.getElementById('fileGrid');
+
+            // Format file types for display (take top 4 + others)
+            const sortedTypes = Object.entries(stats.file_types).sort((a, b) => b[1] - a[1]);
+            const topTypes = sortedTypes.slice(0, 4);
+            const otherCount = sortedTypes.slice(4).reduce((sum, item) => sum + item[1], 0);
+            if (otherCount > 0) topTypes.push(['others', otherCount]);
+
+            // Calculate percentages for bars
+            const totalFiles = stats.total_files || 1;
+
+            const html = `
+            <div class="col-span-full animate-fade-in">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 tracking-tight">Library Overview</h2>
+                            <p class="text-gray-500 text-sm mt-1">Live statistics and recent activity</p>
+                        </div>
+                        <div class="text-sm text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100 shadow-sm">
+                            <i class="bi bi-clock mr-1"></i> Updated just now
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mr-5 shadow-sm">
+                                <i class="bi bi-buildings-fill"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Buyers</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-0.5">${stats.total_buyers}</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mr-5 shadow-sm">
+                                <i class="bi bi-file-earmark-check-fill"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Files</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-0.5">${stats.total_files}</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mr-5 shadow-sm">
+                                <i class="bi bi-folder-fill"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Total Folders</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-0.5">${stats.total_folders}</h3>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex items-center hover:shadow-md transition-shadow">
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl mr-5 shadow-sm">
+                                <i class="bi bi-hdd-fill"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Storage Used</p>
+                                <h3 class="text-2xl font-bold text-gray-800 mt-0.5">${formatSize(stats.total_size)}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Left Column: Recent Uploads -->
+                        <div class="lg:col-span-2 space-y-8">
+                             <!-- Recent Activity -->
+                            <div class="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] border border-gray-100 p-6">
+                                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                                    <i class="bi bi-clock-history mr-2 text-primary"></i> Recently Uploaded Files
+                                </h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm text-left">
+                                        <thead class="text-xs text-gray-500 uppercase bg-gray-50/50 border-b border-gray-100">
+                                            <tr>
+                                                <th class="px-4 py-3 font-semibold rounded-tl-lg">File Name</th>
+                                                <th class="px-4 py-3 font-semibold">Buyer Location</th>
+                                                <th class="px-4 py-3 font-semibold">Size</th>
+                                                <th class="px-4 py-3 font-semibold rounded-tr-lg text-right">Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-50">
+                                            ${stats.recent_uploads.length ? stats.recent_uploads.map(file => `
+                                            <tr class="hover:bg-gray-50/80 transition-colors group">
+                                                <td class="px-4 py-3.5">
+                                                    <div class="flex items-center">
+                                                        <i class="bi ${getFileIcon(file.name)} text-lg mr-3 shadow-sm rounded p-0.5 bg-white"></i>
+                                                        <span class="font-medium text-gray-700 group-hover:text-primary transition-colors truncate max-w-[200px]" title="${file.name}">${file.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-3.5 text-gray-500">
+                                                    <div class="flex items-center">
+                                                         <i class="bi bi-building text-gray-400 mr-2 text-xs"></i>
+                                                         ${file.buyer}
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-3.5 text-gray-500 font-mono text-xs">${formatSize(file.size)}</td>
+                                                <td class="px-4 py-3.5 text-right text-gray-500 text-xs">${formatDate(file.modified)}</td>
+                                            </tr>
+                                            `).join('') : `<tr><td colspan="4" class="text-center py-6 text-gray-400 italic">No files uploaded yet</td></tr>`}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Analytics -->
+                        <div class="space-y-6">
+                            <!-- File Types -->
+                            <div class="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] border border-gray-100 p-6">
+                                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                                    <i class="bi bi-pie-chart-fill mr-2 text-amber-500"></i> File Types
+                                </h3>
+                                <div class="space-y-5">
+                                    ${topTypes.map(item => {
+                const percent = Math.round((item[1] / totalFiles) * 100);
+                const typeName = item[0].toUpperCase();
+                // Specific colors based on type
+                let barColor = 'bg-gray-400';
+                if (['PDF'].includes(typeName)) barColor = 'bg-red-500';
+                else if (['JPG', 'PNG', 'JPEG'].includes(typeName)) barColor = 'bg-purple-500';
+                else if (['DOC', 'DOCX'].includes(typeName)) barColor = 'bg-blue-500';
+                else if (['XLS', 'XLSX'].includes(typeName)) barColor = 'bg-green-500';
+                else if (['ZIP'].includes(typeName)) barColor = 'bg-yellow-500';
+
+                return `
+                                        <div>
+                                            <div class="flex justify-between items-center mb-1.5 text-xs font-semibold text-gray-600">
+                                                <span>${typeName}</span>
+                                                <span>${item[1]} files (${percent}%)</span>
+                                            </div>
+                                            <div class="w-full bg-gray-100 rounded-full h-2">
+                                                <div class="${barColor} h-2 rounded-full transition-all duration-1000 ease-out" style="width: ${percent}%"></div>
+                                            </div>
+                                        </div>
+                                    `}).join('')}
+                                     ${topTypes.length === 0 ? '<div class="text-center text-gray-400 text-sm italic">No data available</div>' : ''}
+                                </div>
+                            </div>
+                            
+                            <!-- Largest Libraries -->
+                            <div class="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] border border-gray-100 p-6">
+                                <h3 class="text-lg font-bold text-gray-800 mb-6 flex items-center">
+                                    <i class="bi bi-graph-up-arrow mr-2 text-emerald-500"></i> Largest Data Sets
+                                </h3>
+                                <div class="space-y-4">
+                                     ${stats.largest_libraries.map((lib, idx) => `
+                                        <div class="flex items-center justify-between group cursor-default">
+                                            <div class="flex items-center min-w-0">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-xs font-bold flex items-center justify-center mr-3 group-hover:bg-primary group-hover:text-white transition-colors">
+                                                    ${idx + 1}
+                                                </span>
+                                                <span class="text-sm font-medium text-gray-700 truncate">${lib.name}</span>
+                                            </div>
+                                            <span class="text-xs font-semibold text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100 ml-2 whitespace-nowrap">
+                                                ${formatSize(lib.size)}
+                                            </span>
+                                        </div>
+                                     `).join('')}
+                                      ${stats.largest_libraries.length === 0 ? '<div class="text-center text-gray-400 text-sm italic">No data available</div>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+            container.innerHTML = html;
+        }
+
+        async function createFolder() {
+            const name = document.getElementById('newFolderName').value;
+            if (!name) return;
+
+            try {
+                const res = await fetch(`{{ url_for('digital_library.create_folder') }}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        buyer_id: currentBuyerId,
+                        buyer_name: currentBuyerName, // Pass buyer name for initialization
+                        parent_path: currentPath,
+                        folder_name: name
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('createFolderModal')).hide();
+                    document.getElementById('newFolderName').value = '';
+                    loadStructure(currentBuyerId, currentPath);
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { alert('Error creating folder'); }
+        }
+
+        async function openCreateBuyerModal() {
+            // Removed as requested
+        }
+
+        async function initBuyerFolder() {
+            // Removed as requested
+        }
+
+        async function deleteItem() {
+            if (!contextItem || !confirm(`Delete ${contextItem.path.split('/').pop()}? This cannot be undone.`)) return;
+
+            try {
+                const res = await fetch(`{{ url_for('digital_library.delete_item') }}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        buyer_id: currentBuyerId,
+                        path: contextItem.path
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    loadStructure(currentBuyerId, currentPath);
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { alert('Delete failed'); }
+        }
+
+        // --- Rename & View ---
+
+        function promptRename() {
+            // contextItem should be set by trigger
+            if (!contextItem) return;
+            const name = contextItem.name || contextItem.path.split('/').pop();
+            document.getElementById('renameInput').value = name;
+            new bootstrap.Modal(document.getElementById('renameModal')).show();
+            setTimeout(() => document.getElementById('renameInput').focus(), 500);
+        }
+
+        async function submitRename() {
+            const newName = document.getElementById('renameInput').value;
+            if (!newName) return;
+
+            try {
+                const res = await fetch(`{{ url_for('digital_library.rename_item') }}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        buyer_id: currentBuyerId,
+                        path: contextItem.path,
+                        new_name: newName
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('renameModal')).hide();
+                    loadStructure(currentBuyerId, currentPath);
+                } else {
+                    alert(data.error);
+                }
+            } catch (e) { alert('Rename failed'); }
+        }
+
+        function viewItem(item) {
+            const ext = item.name.split('.').pop().toLowerCase();
+            const url = `{{ url_for('digital_library.download_file') }}?buyer_id=${currentBuyerId}&path=${item.path}&disposition=inline`;
+            if (ext === 'pdf' || ['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                window.open(url, '_blank');
+            } else {
+                window.location.href = url.replace('disposition=inline', 'disposition=attachment');
+            }
+        }
+
+        function downloadItem() {
+            // Uses contextItem
+            if (!contextItem) return;
+            window.location.href = `{{ url_for('digital_library.download_file') }}?buyer_id=${currentBuyerId}&path=${contextItem.path}&disposition=attachment`;
+        }
+
+        // --- Upload Handling ---
+
+        function handleFileUpload(files) {
+            if (files.length === 0) return;
+
+            const progressPanel = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('uploadBar');
+            const statusText = document.getElementById('uploadStatus');
+            const countText = document.getElementById('uploadCount');
+
+            progressPanel.classList.remove('translate-y-full');
+            countText.innerText = files.length;
+
+            let completed = 0;
+
+            Array.from(files).forEach(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('buyer_id', currentBuyerId);
+                formData.append('path', currentPath);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `{{ url_for('digital_library.upload_file') }}`, true);
+
+                xhr.onload = function () {
+                    completed++;
+                    const percent = (completed / files.length) * 100;
+                    progressBar.style.width = percent + '%';
+
+                    if (completed === files.length) {
+                        statusText.innerText = 'Upload Complete!';
+                        setTimeout(() => {
+                            progressPanel.classList.add('translate-y-full');
+                            loadStructure(currentBuyerId, currentPath);
+                            // Reset input
+                            document.getElementById('fileUploadInput').value = '';
+                        }, 1500);
+                    } else {
+                        statusText.innerText = `Uploading ${completed}/${files.length}...`;
+                    }
+                };
+
+                xhr.send(formData);
+            });
+        }
+
+        // Drag & Drop
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+
+            if (!currentBuyerId) {
+                alert("Please select a buyer folder first.");
+                return;
+            }
+
+            if (!currentPath) {
+                alert("Files cannot be uploaded to the root folder. Please enter a subfolder first.");
+                return;
+            }
+
+            handleFileUpload(e.dataTransfer.files);
+        });
+
+        // Context Menu Logic
+        document.addEventListener('click', () => document.getElementById('contextMenu').style.display = 'none');
+
+        function showContextMenu(e, item) {
+            e.preventDefault();
+            contextItem = item;
+            const menu = document.getElementById('contextMenu');
+            menu.style.display = 'block';
+            menu.style.left = e.pageX + 'px';
+            menu.style.top = e.pageY + 'px';
+
+            document.getElementById('ctxDownload').style.display = item.type === 'folder' ? 'none' : 'flex';
+        }
+
+        // Search Filter
+        document.getElementById('fileSearch').addEventListener('input', () => {
+            // Re-render only
+            renderFiles(currentItems);
+        });
+
+        // Initialize
+        loadBuyersList();
+        loadDashboard();
+
+    </script>
+</body>
+
+</html>

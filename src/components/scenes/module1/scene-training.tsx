@@ -209,17 +209,8 @@ export default function SceneTraining({ isActive, progress }: { isActive: boolea
 
   const phase = PHASES[phaseIndex]
 
-  // Image cycling logic: Fixed boundary overshoots to prevent "sticking"
-  const imageIndex = useMemo(() => {
-    if (phaseIndex === 0) return Math.min(2, Math.floor(localTime / 2))
-    if (phaseIndex === 1) return Math.min(2, Math.floor((localTime - 6) / 2))
-    // Uses 2.33s for Mgmt phase to ensure all 3 images fit comfortably in the final 7s (12-19s)
-    return Math.min(2, Math.floor((localTime - 12) / 2.33))
-  }, [localTime, phaseIndex])
-
+  const imageIndex = 0 // Default to 0 for overlays if needed, though grid uses all 3.
   const currentImages = PHASE_IMAGES[phase.key]
-  const currentImage = currentImages[imageIndex]
-  const currentCaption = phase.captions[imageIndex]
   const PhaseIcon = phase.icon
 
   return (
@@ -253,116 +244,15 @@ export default function SceneTraining({ isActive, progress }: { isActive: boolea
             transition={{ duration: 0.4 }}
             className="flex flex-col items-center gap-1"
           >
-            <div
-              className="flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.15em]"
-              style={{ backgroundColor: phase.colorLight, color: phase.color }}
-            >
-              <PhaseIcon size={11} />
-              Phase {phaseIndex + 1} of 3
-            </div>
-
             <h2 className="text-2xl font-black text-[#0F172A] tracking-tight leading-tight">
               {phase.label}
             </h2>
-            <p className="text-xs font-medium text-slate-400">{phase.subtitle}</p>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* ── MAIN CONTENT AREA ── */}
-      <div className="flex-1 min-h-0 relative z-10 flex items-center justify-center px-8 py-2">
-        <div className="w-full h-full max-w-[90%] max-h-full flex gap-4 items-stretch">
-
-          {/* ── HERO IMAGE ── */}
-          <div className="flex-1 min-w-0 relative rounded-2xl overflow-hidden shadow-[0_25px_80px_-15px_rgba(0,0,0,0.15)] bg-white p-1.5">
-            <div className="w-full h-full relative rounded-xl overflow-hidden bg-slate-100">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${phase.key}-${imageIndex}`}
-                  className="absolute inset-0"
-                  initial={{ scale: 1.08, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <motion.img
-                    src={currentImage}
-                    alt={currentCaption}
-                    className="w-full h-full object-cover"
-                    animate={{ scale: [1, 1.06] }}
-                    transition={{ duration: 6, ease: "easeOut" }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
-
-                  {phaseIndex === 0 && <SiteOverlay caption={currentCaption} />}
-                  {phaseIndex === 1 && <WorkerOverlay caption={currentCaption} />}
-                  {phaseIndex === 2 && <MgmtOverlay caption={currentCaption} />}
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="absolute bottom-4 left-4 z-30 flex items-center gap-1.5">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    className="h-1 rounded-full"
-                    animate={{
-                      width: i === imageIndex ? 24 : 8,
-                      backgroundColor: i === imageIndex ? phase.color : 'rgba(255,255,255,0.4)',
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ── THUMBNAIL STRIP ── */}
-          <div className="w-24 flex flex-col gap-2 shrink-0">
-            {currentImages.map((thumb, i) => (
-              <motion.div
-                key={`${phase.key}-thumb-${i}`}
-                className="flex-1 relative rounded-xl overflow-hidden cursor-pointer"
-                initial={{ x: 30, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 + i * 0.1 }}
-                style={{
-                  border: i === imageIndex ? `2px solid ${phase.color}` : '2px solid transparent',
-                  boxShadow: i === imageIndex ? `0 0 15px ${phase.color}30` : '0 4px 12px rgba(0,0,0,0.06)',
-                }}
-              >
-                <img
-                  src={thumb}
-                  alt={phase.captions[i]}
-                  className="w-full h-full object-cover"
-                  style={{
-                    filter: i === imageIndex ? 'none' : 'brightness(0.6)',
-                    transition: 'filter 0.3s ease',
-                  }}
-                />
-                {i === imageIndex && (
-                  <motion.div
-                    layoutId="activeThumb"
-                    className="absolute inset-0 border-2 rounded-xl"
-                    style={{ borderColor: phase.color }}
-                  />
-                )}
-                <div
-                  className="absolute top-1.5 left-1.5 w-5 h-5 rounded-md flex items-center justify-center text-[9px] font-black"
-                  style={{
-                    backgroundColor: i === imageIndex ? phase.color : 'rgba(0,0,0,0.5)',
-                    color: C.white,
-                  }}
-                >
-                  {i + 1}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── BOTTOM PHASE PROGRESS ── */}
-      <div className="relative z-20 py-3 px-12 shrink-0">
+      {/* ── TOP PHASE PROGRESS ── */}
+      <div className="relative z-20 py-0 px-12 shrink-0">
         <div className="flex items-center gap-3">
           {PHASES.map((p, i) => {
             const isPhaseActive = i === phaseIndex
@@ -417,6 +307,79 @@ export default function SceneTraining({ isActive, progress }: { isActive: boolea
               </React.Fragment>
             )
           })}
+        </div>
+      </div>
+
+      {/* ── MAIN CONTENT AREA ── */}
+      <div className="flex-1 min-h-0 relative z-10 flex items-center justify-center px-8 py-2">
+        <div className="w-full h-full max-w-[90%] max-h-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={phase.key}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="w-full h-full grid grid-cols-12 grid-rows-2 gap-4"
+            >
+              {/* ── PRIMARY IMAGE (Large, Left) ── */}
+              <div className="col-span-8 row-span-2 relative rounded-2xl overflow-hidden shadow-2xl bg-white p-1">
+                <div className="w-full h-full relative rounded-xl overflow-hidden bg-slate-100 group">
+                  <img
+                    src={currentImages[0]}
+                    alt={phase.captions[0]}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10" />
+
+                  {/* Phase-Specific Overlays (Only on Main Image) */}
+                  {phaseIndex === 0 && <SiteOverlay caption={phase.captions[0]} />}
+                  {phaseIndex === 1 && <WorkerOverlay caption={phase.captions[0]} />}
+                  {phaseIndex === 2 && <MgmtOverlay caption={phase.captions[0]} />}
+
+                  <div className="absolute bottom-4 left-4 z-30">
+                    <span className="bg-white/90 backdrop-blur text-black text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                      Primary View
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── SECONDARY IMAGES (Right Column) ── */}
+              <div className="col-span-4 row-span-1 relative rounded-2xl overflow-hidden shadow-lg bg-white p-1">
+                <div className="w-full h-full relative rounded-xl overflow-hidden bg-slate-100 group">
+                  <img
+                    src={currentImages[1]}
+                    alt={phase.captions[1]}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-3 left-3">
+                    <p className="text-white text-[9px] font-bold leading-tight drop-shadow-md bg-black/40 backdrop-blur-sm px-2 py-1 rounded inline-block">
+                      {phase.captions[1]}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-4 row-span-1 relative rounded-2xl overflow-hidden shadow-lg bg-white p-1">
+                <div className="w-full h-full relative rounded-xl overflow-hidden bg-slate-100 group">
+                  <img
+                    src={currentImages[2]}
+                    alt={phase.captions[2]}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-3 left-3">
+                    <p className="text-white text-[9px] font-bold leading-tight drop-shadow-md bg-black/40 backdrop-blur-sm px-2 py-1 rounded inline-block">
+                      {phase.captions[2]}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Questions</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #60BA81;
+            --secondary-color: #284952;
+            --accent-color: #f5a83c;
+            --background-color: #f4f7f6;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .survey-header {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            padding: 40px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .survey-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .survey-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .survey-description {
+            font-size: 18px;
+            position: relative;
+        }
+
+        .question-container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(96, 186, 129, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .question-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .required {
+            color: var(--accent-color);
+            margin-left: 5px;
+        }
+
+        .help-text {
+            font-size: 14px;
+            color: #2D9480;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .input-text, .input-textarea, .input-select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            background-color: #E9F3EB;
+            color: var(--secondary-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-text:focus, .input-textarea:focus, .input-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(245, 168, 60, 0.2);
+        }
+
+        .input-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .radio-button, .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            margin-right: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .checkbox {
+            border-radius: 6px;
+        }
+
+        .radio-button.selected, .checkbox.selected {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .radio-button.selected::after, .checkbox.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        .option-text {
+            font-size: 16px;
+            color: var(--secondary-color);
+        }
+
+        .file-upload-button {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block;
+            margin-bottom: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-upload-button:hover {
+            background-color: #4fa36e;
+        }
+
+        .selected-file-name {
+            font-size: 14px;
+            color: var(--secondary-color);
+            margin-top: 8px;
+        }
+
+        .submit-button {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .submit-button:hover:not(:disabled) {
+            background-color: #4fa36e;
+            transform: translateY(-2px);
+        }
+
+        .submit-button:disabled {
+            background-color: #A5D6A7;
+            cursor: not-allowed;
+        }
+
+        .media-container {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .media-image, .media-video {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .media-image:hover, .media-video:hover {
+            transform: scale(1.05);
+        }
+
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .fullscreen-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            .survey-header {
+                padding: 30px 20px;
+            }
+
+            .survey-title {
+                font-size: 28px;
+            }
+
+            .question-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="survey-header">
+            <h1 class="survey-title" id="surveyTitle"></h1>
+            <p class="survey-description" id="surveyDescription"></p>
+        </div>
+        <form id="surveyForm">
+            <!-- Questions will be dynamically inserted here -->
+        </form>
+        <button class="submit-button" id="submitButton" disabled>Submit Survey</button>
+    </div>
+
+    <div class="fullscreen-overlay" id="fullscreenOverlay">
+        <img src="" alt="Fullscreen image" class="fullscreen-image" id="fullscreenImage">
+    </div>
+
+    <script>
+        const surveyId = {{ survey_id }};
+        const employeeId = {{ employee_id }};
+        const surveyForm = document.getElementById('surveyForm');
+        const submitButton = document.getElementById('submitButton');
+        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+        const fullscreenImage = document.getElementById('fullscreenImage');
+        let questions = [];
+        let responses = {};
+
+        async function fetchSurveyData() {
+            try {
+                const response = await fetch(`https://fruitofsustainability.com/app_api/getSurveyData.php?surveyId=${surveyId}`);
+                const data = await response.json();
+                document.getElementById('surveyTitle').textContent = data.survey.title;
+                document.getElementById('surveyDescription').textContent = data.survey.description;
+                questions = data.questions;
+                renderQuestions();
+            } catch (error) {
+                console.error('Error fetching survey data:', error);
+            }
+        }
+
+        function renderQuestions() {
+            questions.forEach(question => {
+                const questionContainer = document.createElement('div');
+                questionContainer.className = 'question-container';
+                questionContainer.innerHTML = `
+                    <h2 class="question-text">
+                        ${question.question_text}
+                        ${question.is_required === 1 ? '<span class="required">*</span>' : ''}
+                    </h2>
+                    ${question.help_text ? `<p class="help-text">${question.help_text}</p>` : ''}
+                    ${renderQuestionMedia(question)}
+                    ${renderQuestionInput(question)}
+                `;
+                surveyForm.appendChild(questionContainer);
+            });
+            addInputEventListeners();
+        }
+
+        function renderQuestionMedia(question) {
+            if (!question.image_name) return '';
+            const mediaType = getMediaType(question.image_name);
+            const uri = `https://fruitofsustainability.com/app_api/getImage.php?file=${question.image_name}`;
+            if (mediaType === 'image') {
+                return `
+                    <div class="media-container">
+                        <img src="${uri}" alt="Question media" class="media-image" onclick="showFullscreenImage('${uri}')">
+                    </div>
+                `;
+            } else if (mediaType === 'video') {
+                return `
+                    <div class="media-container">
+                        <video src="${uri}" class="media-video" controls></video>
+                    </div>
+                `;
+            }
+            return '';
+        }
+
+        function renderQuestionInput(question) {
+            switch (question.question_type) {
+                case 'text':
+                    return `<input type="text" class="input-text" id="question_${question.question_id}" ${question.is_required === 1 ? 'required' : ''}>`;
+                case 'textarea':
+                    return `<textarea class="input-textarea" id="question_${question.question_id}" ${question.is_required === 1 ? 'required' : ''}></textarea>`;
+                case 'radio':
+                    return question.options.map((option, index) => `
+                        <div class="radio-option">
+                            <span class="radio-button" data-question-id="${question.question_id}" data-option="${option}" onclick="handleRadioClick(this)"></span>
+                            <span class="option-text">${option}</span>
+                        </div>
+                    `).join('');
+                case 'checkbox':
+                    return question.options.map((option, index) => `
+                        <div class="checkbox-option">
+                            <span class="checkbox" data-question-id="${question.question_id}" data-option="${option}" onclick="handleCheckboxClick(this)"></span>
+                            <span class="option-text">${option}</span>
+                        </div>
+                    `).join('');
+                case 'select':
+                    return `
+                        <select class="input-select" id="question_${question.question_id}" ${question.is_required === 1 ? 'required' : ''}>
+                            <option value="">Select an option</option>
+                            ${question.options.map(option => `<option value="${option}">${option}</option>`).join('')}
+                        </select>
+                    `;
+                case 'file':
+                    return `
+                        <input type="file" id="question_${question.question_id}" style="display: none;" onchange="handleFileChange(this)" ${question.is_required === 1 ? 'required' : ''}>
+                        <label for="question_${question.question_id}" class="file-upload-button">Select File</label>
+                        <div class="selected-file-name" id="file_name_${question.question_id}"></div>
+                    `;
+                default:
+                    return '';
+            }
+        }
+
+        function handleRadioClick(element) {
+            const questionId = element.dataset.questionId;
+            const option = element.dataset.option;
+            document.querySelectorAll(`.radio-button[data-question-id="${questionId}"]`).forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            responses[questionId] = option;
+            checkFormValidity();
+        }
+
+        function handleCheckboxClick(element) {
+            const questionId = element.dataset.questionId;
+            const option = element.dataset.option;
+            element.classList.toggle('selected');
+            responses[questionId] = responses[questionId] || [];
+            if (element.classList.contains('selected')) {
+                responses[questionId].push(option);
+            } else {
+                responses[questionId] = responses[questionId].filter(item => item !== option);
+            }
+            checkFormValidity();
+        }
+
+        function handleFileChange(input) {
+            const file = input.files[0];
+            const questionId = input.id.replace('question_', '');
+            if (file) {
+                responses[questionId] = file;
+                document.getElementById(`file_name_${questionId}`).textContent = file.name;
+            } else {
+                delete responses[questionId];
+                document.getElementById(`file_name_${questionId}`).textContent = '';
+            }
+            checkFormValidity();
+        }
+
+        function addInputEventListeners() {
+            document.querySelectorAll('.input-text, .input-textarea, .input-select').forEach(input => {
+                input.addEventListener('input', function() {
+                    const questionId = this.id.replace('question_', '');
+                    responses[questionId] = this.value;
+                    checkFormValidity();
+                });
+            });
+        }
+
+        function checkFormValidity() {
+            const isValid = questions.every(question => {
+                if (question.is_required !== 1) return true;
+                const response = responses[question.question_id];
+                if (question.question_type === 'file') {
+                    return response && response.name;
+                } else if (question.question_type === 'text' || question.question_type === 'textarea' || question.question_type === 'select') {
+                    const input = document.getElementById(`question_${question.question_id}`);
+                    return input && input.value.trim() !== '';
+                } else if (question.question_type === 'radio' || question.question_type === 'checkbox') {
+                    return response !== undefined && response !== '' && response.length !== 0;
+                }
+                return false;
+            });
+            submitButton.disabled = !isValid;
+        }
+
+        async function handleSubmit() {
+            const formData = new FormData();
+            formData.append('surveyId', surveyId);
+            formData.append('employeeId', employeeId);
+
+            for (const [questionId, response] of Object.entries(responses)) {
+                if (response instanceof File) {
+                    formData.append(`file_${questionId}`, response);
+                } else {
+                    formData.append(`response_${questionId}`, JSON.stringify(response));
+                }
+            }
+
+            try {
+                const response = await fetch('https://fruitofsustainability.com/app_api/saveSurveyResponse.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Survey responses submitted successfully');
+                    window.location.href = `/login/survey_list?employee_id=${employeeId}`;
+                } else {
+                    throw new Error('Failed to submit survey responses');
+                }
+            } catch (error) {
+                console.error('Error submitting survey responses:', error);
+                alert('An error occurred while submitting survey responses');
+            }
+        }
+
+        function getMediaType(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+            const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
+            
+            if (imageExtensions.includes(extension)) {
+                return 'image';
+            } else if (videoExtensions.includes(extension)) {
+                return 'video';
+            } else {
+                return 'unknown';
+            }
+        }
+
+        function showFullscreenImage(src) {
+            fullscreenImage.src = src;
+            fullscreenOverlay.style.display = 'flex';
+        }
+
+        fullscreenOverlay.addEventListener('click', () => {
+            fullscreenOverlay.style.display = 'none';
+        });
+
+        submitButton.addEventListener('click', handleSubmit);
+
+        fetchSurveyData();
+    </script>
+</body>
+</html>

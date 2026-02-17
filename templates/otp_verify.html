@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="FOS">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <title>FOS - Verify OTP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='my-login.css') }}">
+    <style>
+        .my-login-page .brand {
+            width: 125px;
+            height: 125px;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+        }
+
+        .otp-input {
+            font-size: 24px;
+            letter-spacing: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .email-display {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .email-display i {
+            color: #28a745;
+            margin-right: 8px;
+        }
+
+        .resend-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .back-link a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            color: #007bff;
+        }
+
+        .expires-info {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body class="my-login-page">
+    <section class="h-100">
+        <div class="container h-100">
+            <div class="row justify-content-md-center h-100">
+                <div class="card-wrapper">
+                    <div class="brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo">
+                    </div>
+                    <div class="card fat">
+                        <div class="card-body">
+                            <h4 class="card-title">Verify OTP</h4>
+
+                            <div class="email-display">
+                                <i class="fas fa-check-circle"></i>
+                                OTP sent to your registered contact for: <strong>{{ email }}</strong>
+                            </div>
+
+                            <!-- Error Alert -->
+                            {% if error %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Error!</strong> {{ error }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% endif %}
+
+                            <form method="POST" action="{{ url_for('verify_otp_login') }}" novalidate>
+                                <div class="form-group">
+                                    <label for="otp">Enter 6-digit OTP</label>
+                                    <input id="otp" type="text" class="form-control otp-input" name="otp" maxlength="6"
+                                        pattern="[0-9]{6}" required autofocus placeholder="------" inputmode="numeric"
+                                        autocomplete="one-time-code">
+                                    <div class="invalid-feedback">
+                                        Please enter the 6-digit OTP
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-0">
+                                    <button type="submit" class="btn btn-success btn-block">
+                                        <i class="fas fa-sign-in-alt mr-2"></i>Verify & Login
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="expires-info">
+                                <i class="fas fa-clock"></i> OTP expires in 5 minutes
+                            </div>
+
+                            <div class="resend-link">
+                                Didn't receive OTP?
+                                <br>
+                                <button id="resendOtpBtn" class="btn btn-link p-0"
+                                    style="font-size: 14px; text-decoration: none;" disabled>
+                                    Resend OTP <span id="timerSpan">in <span id="timer">30</span>s</span>
+                                </button>
+                            </div>
+
+                            <div class="back-link">
+                                <a href="{{ url_for('login') }}">
+                                    <i class="fas fa-arrow-left mr-2"></i>Back to Password Login
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        Copyright &copy; 2023 &mdash; Fruit of Sustainability
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='my-login.js') }}"></script>
+    <script>
+        // Auto-format OTP input
+        document.getElementById('otp').addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+        });
+
+        // OTP Resend Timer Logic
+        let timeLeft = 30;
+        const timerElement = document.getElementById('timer');
+        const timerSpan = document.getElementById('timerSpan');
+        const resendBtn = document.getElementById('resendOtpBtn');
+        let timerId;
+
+        function startTimer() {
+            timeLeft = 30;
+            resendBtn.disabled = true;
+            timerSpan.style.display = 'inline';
+            timerElement.innerText = timeLeft;
+
+            clearInterval(timerId);
+            timerId = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    resendBtn.disabled = false;
+                    timerSpan.style.display = 'none';
+                    resendBtn.innerText = "Resend OTP";
+                } else {
+                    timerElement.innerText = timeLeft;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        // Initialize timer on load
+        startTimer();
+
+        // Handle Resend Click
+        resendBtn.addEventListener('click', function () {
+            if (resendBtn.disabled) return;
+
+            // Show loading state
+            resendBtn.disabled = true;
+            const originalText = resendBtn.innerText;
+            resendBtn.innerText = "Sending...";
+
+            $.ajax({
+                url: "{{ url_for('resend_otp_login') }}",
+                type: "POST",
+                success: function (response) {
+                    // Success toast or alert
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                    alertDiv.innerHTML = `<strong>Success!</strong> ${response.message}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>`;
+
+                    const cardBody = document.querySelector('.card-body');
+                    const title = document.querySelector('.card-title');
+                    cardBody.insertBefore(alertDiv, title.nextSibling);
+
+                    // Reset button logic
+                    resendBtn.innerHTML = 'Resend OTP <span id="timerSpan">in <span id="timer">30</span>s</span>';
+                    // Re-grab elements as innerHTML replacement might lose references
+                    const newTimerSpan = document.getElementById('timerSpan');
+                    const newTimer = document.getElementById('timer');
+
+                    // Restart timer visually
+                    timeLeft = 30;
+                    newTimerSpan.style.display = 'inline';
+                    newTimer.innerText = timeLeft;
+
+                    // Restart interval
+                    clearInterval(timerId);
+                    timerId = setInterval(() => {
+                        if (timeLeft <= 0) {
+                            clearInterval(timerId);
+                            resendBtn.disabled = false;
+                            newTimerSpan.style.display = 'none';
+                            resendBtn.innerText = "Resend OTP";
+                        } else {
+                            newTimer.innerText = timeLeft;
+                            timeLeft--;
+                        }
+                    }, 1000);
+                },
+                error: function (xhr) {
+                    // Error alert
+                    const msg = xhr.responseJSON ? xhr.responseJSON.message : "Failed to resend OTP.";
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                    alertDiv.innerHTML = `<strong>Error!</strong> ${msg}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>`;
+
+                    const cardBody = document.querySelector('.card-body');
+                    const title = document.querySelector('.card-title');
+                    cardBody.insertBefore(alertDiv, title.nextSibling);
+
+                    // Re-enable button if it wasn't a rate limit error
+                    if (xhr.status !== 429) {
+                        resendBtn.disabled = false;
+                        resendBtn.innerText = "Resend OTP";
+                    } else {
+                        // Start timer for remaining time if provided
+                        resendBtn.innerText = "Resend OTP";
+                        startTimer();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

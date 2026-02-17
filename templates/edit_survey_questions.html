@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Questions - {{ survey.title }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#60BA81',
+                        primary1: '#284952',
+                        secondary: '#f5a83c',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'pulse-gentle': 'pulseGentle 2s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        pulseGentle: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.8' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .question-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(96, 186, 129, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        .question-card:hover::before {
+            left: 100%;
+        }
+        .question-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+        .drag-handle:hover {
+            color: #60BA81;
+            transform: scale(1.2);
+        }
+        .form-input {
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(96, 186, 129, 0.1);
+        }
+        .status-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+        }
+        .floating-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 min-h-screen">
+    <nav class="bg-primary1 shadow-lg sticky top-0 z-40">
+        <div class="max-w-full mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="h-10 w-auto mr-3">
+                    <div class="text-white">
+                        <h1 class="text-lg font-semibold">Edit Questions</h1>
+                        <p class="text-sm opacity-75">{{ survey.title }}</p>
+                    </div>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{{ url_for('survey') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 shadow-md">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to List
+                    </a>
+                    <button onclick="updateQuestions()" class="bg-gradient-to-r from-secondary to-orange-500 hover:from-orange-500 hover:to-secondary text-white px-6 py-2 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-save mr-2"></i>Update Questions
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="glass-morphism rounded-2xl p-8 mb-8 animate-fade-in">
+            <div class="flex items-start space-x-6">
+                <div class="bg-gradient-to-br from-secondary to-orange-500 p-4 rounded-xl text-white">
+                    <i class="fas fa-edit text-2xl"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <h2 class="text-2xl font-bold text-gray-900">{{ survey.title }}</h2>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <i class="fas fa-edit mr-1"></i>Edit Mode
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mb-4 text-lg">{{ survey.description or 'No description available' }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                        <div class="flex items-center text-gray-500">
+                            <i class="fas fa-calendar-alt mr-2 text-primary"></i>
+                            <span>Created: {{ survey.created_at.strftime('%b %d, %Y') if survey.created_at else 'N/A' }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <i class="fas fa-clock mr-2 text-secondary"></i>
+                            <span>Est. Time: {{ survey.estimated_time or 'N/A' }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <i class="fas fa-question-circle mr-2 text-blue-500"></i>
+                            <span id="questionCount">Questions: {{ questions|length }}</span>
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <i class="fas fa-trash mr-2 text-red-500"></i>
+                            <span id="deletedCount">Deleted: 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white rounded-xl p-4 shadow-md border-l-4 border-green-500">
+                <div class="flex items-center">
+                    <i class="fas fa-plus-circle text-green-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="text-sm text-gray-600">New Questions</p>
+                        <p class="text-xl font-bold text-gray-900" id="newQuestionsCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-md border-l-4 border-blue-500">
+                <div class="flex items-center">
+                    <i class="fas fa-edit text-blue-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="text-sm text-gray-600">Modified Questions</p>
+                        <p class="text-xl font-bold text-gray-900" id="modifiedQuestionsCount">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-md border-l-4 border-red-500">
+                <div class="flex items-center">
+                    <i class="fas fa-trash text-red-500 text-xl mr-3"></i>
+                    <div>
+                        <p class="text-sm text-gray-600">Deleted Questions</p>
+                        <p class="text-xl font-bold text-gray-900" id="deletedQuestionsCount">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="questionsContainer" class="space-y-6 mb-8">
+             Questions will be loaded here 
+        </div>
+
+        <div class="text-center">
+            <button onclick="addNewQuestion()" class="group bg-white hover:bg-gray-50 border-2 border-dashed border-gray-300 hover:border-secondary rounded-2xl p-8 text-center transition-all duration-300 transform hover:scale-105 w-full max-w-md mx-auto block">
+                <div class="bg-gradient-to-br from-secondary to-orange-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-200">
+                    <i class="fas fa-plus text-2xl text-white"></i>
+                </div>
+                <p class="text-gray-600 font-semibold text-lg group-hover:text-secondary transition-colors">Add a new question</p>
+                <p class="text-gray-400 text-sm mt-2">Expand your survey with additional questions</p>
+            </button>
+        </div>
+    </div>
+
+    <div class="floating-actions">
+        <button onclick="updateQuestions()" class="bg-gradient-to-r from-secondary to-orange-500 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-200 transform hover:scale-110 animate-pulse-gentle">
+            <i class="fas fa-save text-xl"></i>
+        </button>
+        <button onclick="addNewQuestion()" class="bg-gradient-to-r from-primary to-green-600 text-white p-3 rounded-full shadow-xl hover:shadow-2xl transition-all duration-200 transform hover:scale-110">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <script>
+        let questions = [];
+        let deletedQuestions = [];
+        let originalQuestions = [];
+
+        // Load existing questions
+        {% for question in questions %}
+        const question{{ loop.index0 }} = {
+            question_id: {{ question.question_id }},
+            question_text: `{{ question.question_text|safe }}`,
+            question_type: '{{ question.question_type }}',
+            is_required: {{ question.is_required|lower }},
+            order: {{ question.order }},
+            help_text: `{{ question.help_text or '' }}`,
+            options: {{ question.options|tojson if question.options else '[]' }}
+        };
+        questions.push(question{{ loop.index0 }});
+        originalQuestions.push(JSON.parse(JSON.stringify(question{{ loop.index0 }})));
+        {% endfor %}
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderQuestions();
+            initializeSortable();
+            updateCounts();
+        });
+
+        function updateCounts() {
+            const newQuestions = questions.filter(q => !q.question_id).length;
+            const modifiedQuestions = questions.filter(q => {
+                if (!q.question_id) return false;
+                const original = originalQuestions.find(oq => oq.question_id === q.question_id);
+                return original && JSON.stringify(original) !== JSON.stringify(q);
+            }).length;
+            
+            document.getElementById('questionCount').textContent = `Questions: ${questions.length}`;
+            document.getElementById('deletedCount').textContent = `Deleted: ${deletedQuestions.length}`;
+            document.getElementById('newQuestionsCount').textContent = newQuestions;
+            document.getElementById('modifiedQuestionsCount').textContent = modifiedQuestions;
+            document.getElementById('deletedQuestionsCount').textContent = deletedQuestions.length;
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+
+            questions.forEach((question, index) => {
+                const questionElement = createQuestionElement(question, index);
+                container.appendChild(questionElement);
+            });
+            updateCounts();
+        }
+
+        function createQuestionElement(question, index) {
+            const div = document.createElement('div');
+            div.className = 'question-card rounded-2xl border border-gray-200 shadow-lg question-item animate-slide-in relative';
+            div.dataset.index = index;
+            div.style.animationDelay = `${index * 0.1}s`;
+
+            const questionTypeIcons = {
+                'text': 'fas fa-font',
+                'textarea': 'fas fa-align-left',
+                'radio': 'fas fa-dot-circle',
+                'checkbox': 'fas fa-check-square',
+                'select': 'fas fa-list',
+                'file': 'fas fa-file-upload'
+            };
+
+            const questionTypeColors = {
+                'text': 'from-blue-500 to-blue-600',
+                'textarea': 'from-green-500 to-green-600',
+                'radio': 'from-purple-500 to-purple-600',
+                'checkbox': 'from-pink-500 to-pink-600',
+                'select': 'from-indigo-500 to-indigo-600',
+                'file': 'from-yellow-500 to-yellow-600'
+            };
+
+            // Determine status
+            const isNew = !question.question_id;
+            const original = originalQuestions.find(oq => oq.question_id === question.question_id);
+            const isModified = original && JSON.stringify(original) !== JSON.stringify(question);
+
+            const statusBadge = isNew ? 
+                '<span class="status-badge inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-plus mr-1"></i>New</span>' :
+                isModified ? 
+                '<span class="status-badge inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><i class="fas fa-edit mr-1"></i>Modified</span>' :
+                '<span class="status-badge inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><i class="fas fa-check mr-1"></i>Existing</span>';
+
+            const optionsHtml = question.question_type === 'radio' || question.question_type === 'checkbox' || question.question_type === 'select' 
+                ? `<div class="mt-6">
+                     <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                       <i class="fas fa-list-ul mr-2 text-primary"></i>Options:
+                     </label>
+                     <div id="options-${index}" class="space-y-3">
+                       ${(question.options || []).map((option, optIndex) => `
+                         <div class="flex items-center space-x-3 bg-gray-50 rounded-lg p-3">
+                           <div class="w-8 h-8 bg-gradient-to-r ${questionTypeColors[question.question_type]} text-white rounded-full flex items-center justify-center text-sm font-bold">
+                             ${optIndex + 1}
+                           </div>
+                           <input type="text" value="${option}" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm form-input focus:ring-2 focus:ring-primary focus:border-primary" onchange="updateQuestionOption(${index}, ${optIndex}, this.value)">
+                           <button onclick="removeOption(${index}, ${optIndex})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                             <i class="fas fa-trash"></i>
+                           </button>
+                         </div>
+                       `).join('')}
+                     </div>
+                     <button onclick="addOption(${index})" class="mt-4 text-primary hover:text-green-600 text-sm font-medium flex items-center hover:bg-primary hover:bg-opacity-10 px-3 py-2 rounded-lg transition-colors">
+                       <i class="fas fa-plus mr-2"></i>Add Option
+                     </button>
+                   </div>` 
+                : '';
+
+            div.innerHTML = `
+                ${statusBadge}
+                <div class="p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <i class="fas fa-grip-vertical text-gray-400 cursor-move drag-handle text-xl hover:text-primary transition-all duration-200"></i>
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-gradient-to-r ${questionTypeColors[question.question_type]} text-white rounded-full flex items-center justify-center shadow-lg">
+                                    ${index + 1}
+                                </div>
+                                <div>
+                                    <span class="text-xl font-bold text-gray-900">Question ${index + 1}</span>
+                                    <div class="flex items-center mt-1">
+                                        <i class="${questionTypeIcons[question.question_type]} mr-2 text-primary"></i>
+                                        <span class="text-sm text-gray-600 capitalize">${question.question_type.replace('_', ' ')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="duplicateQuestion(${index})" class="text-gray-500 hover:text-blue-600 hover:bg-blue-50 p-3 rounded-lg transition-colors transform hover:scale-110" title="Duplicate">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button onclick="removeQuestion(${index})" class="text-gray-500 hover:text-red-600 hover:bg-red-50 p-3 rounded-lg transition-colors transform hover:scale-110" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-question mr-2 text-primary"></i>Question Text:
+                            </label>
+                            <textarea class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary form-input text-lg" 
+                                      rows="3" placeholder="Enter your question here..."
+                                      onchange="updateQuestion(${index}, 'question_text', this.value)">${question.question_text}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                    <i class="fas fa-cog mr-2 text-primary"></i>Question Type:
+                                </label>
+                                <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary form-input"
+                                        onchange="updateQuestionType(${index}, this.value)">
+                                    <option value="text" ${question.question_type === 'text' ? 'selected' : ''}>Short Text</option>
+                                    <option value="textarea" ${question.question_type === 'textarea' ? 'selected' : ''}>Long Text</option>
+                                    <option value="radio" ${question.question_type === 'radio' ? 'selected' : ''}>Multiple Choice</option>
+                                    <option value="checkbox" ${question.question_type === 'checkbox' ? 'selected' : ''}>Checkboxes</option>
+                                    <option value="select" ${question.question_type === 'select' ? 'selected' : ''}>Dropdown</option>
+                                    <option value="file" ${question.question_type === 'file' ? 'selected' : ''}>File Upload</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-center">
+                                <label class="flex items-center bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-xl transition-colors cursor-pointer">
+                                    <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary w-5 h-5"
+                                           ${question.is_required ? 'checked' : ''}
+                                           onchange="updateQuestion(${index}, 'is_required', this.checked)">
+                                    <span class="ml-3 text-sm font-medium text-gray-700 flex items-center">
+                                        <i class="fas fa-asterisk mr-2 text-red-500"></i>Required Question
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>Help Text (Optional):
+                            </label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary form-input"
+                                   placeholder="Add helpful instructions for this question..."
+                                   value="${question.help_text || ''}"
+                                   onchange="updateQuestion(${index}, 'help_text', this.value)">
+                        </div>
+
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+
+            return div;
+        }
+
+        function addNewQuestion() {
+            const newQuestion = {
+                question_text: '',
+                question_type: 'text',
+                is_required: false,
+                order: questions.length + 1,
+                help_text: '',
+                options: []
+            };
+            
+            questions.push(newQuestion);
+            renderQuestions();
+            initializeSortable();
+            
+            // Scroll to the new question
+            setTimeout(() => {
+                const newQuestionElement = document.querySelector(`[data-index="${questions.length - 1}"]`);
+                if (newQuestionElement) {
+                    newQuestionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+
+        function removeQuestion(index) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                const question = questions[index];
+                if (question.question_id) {
+                    deletedQuestions.push(question.question_id);
+                }
+                questions.splice(index, 1);
+                renderQuestions();
+                initializeSortable();
+            }
+        }
+
+function duplicateQuestion(index) {
+    const originalQuestion = questions[index];
+    
+    // Create a deep copy of the entire object
+    const duplicatedQuestion = structuredClone(originalQuestion);
+    
+    // Reset specific properties for the new copy
+    duplicatedQuestion.question_id = undefined;
+    duplicatedQuestion.order = questions.length + 1;
+    duplicatedQuestion.question_text = originalQuestion.question_text + ' (Copy)';
+    
+    questions.push(duplicatedQuestion);
+    renderQuestions();
+    initializeSortable();
+}
+        function updateQuestion(index, field, value) {
+            questions[index][field] = value;
+            updateCounts();
+        }
+
+        function updateQuestionType(index, type) {
+            questions[index].question_type = type;
+            if (type === 'radio' || type === 'checkbox' || type === 'select') {
+                if (!questions[index].options || questions[index].options.length === 0) {
+                    questions[index].options = ['Option 1'];
+                }
+            }
+            renderQuestions();
+            initializeSortable();
+        }
+
+        function addOption(questionIndex) {
+            if (!questions[questionIndex].options) {
+                questions[questionIndex].options = [];
+            }
+            questions[questionIndex].options.push(`Option ${questions[questionIndex].options.length + 1}`);
+            renderQuestions();
+            initializeSortable();
+        }
+
+        function removeOption(questionIndex, optionIndex) {
+            questions[questionIndex].options.splice(optionIndex, 1);
+            renderQuestions();
+            initializeSortable();
+        }
+
+        function updateQuestionOption(questionIndex, optionIndex, value) {
+            questions[questionIndex].options[optionIndex] = value;
+            updateCounts();
+        }
+
+        function initializeSortable() {
+    const container = document.getElementById('questionsContainer');
+    
+    // Destroy existing sortable to avoid duplicates
+    if (container._sortable) {
+        container._sortable.destroy();
+    }
+
+    container._sortable = Sortable.create(container, {
+        handle: '.drag-handle',
+        animation: 200,
+        ghostClass: 'opacity-50',
+        chosenClass: 'scale-105',
+        forceFallback: true, // Ensures native scrolling is possible
+        scroll: true,        // Enable scrolling while dragging
+        scrollSensitivity: 60, // Trigger scroll earlier
+        scrollSpeed: 15,     // Scroll speed while dragging
+        bubbleScroll: true,  // Scroll parent elements too
+        onEnd: function(evt) {
+            const oldIndex = evt.oldIndex;
+            const newIndex = evt.newIndex;
+            
+            const movedQuestion = questions.splice(oldIndex, 1)[0];
+            questions.splice(newIndex, 0, movedQuestion);
+            
+            questions.forEach((question, index) => {
+                question.order = index + 1;
+            });
+            
+            renderQuestions();
+            initializeSortable();
+        }
+    });
+}
+
+        function updateQuestions() {
+            // Show loading state
+            const updateButtons = document.querySelectorAll('button[onclick="updateQuestions()"]');
+            updateButtons.forEach(btn => {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
+                btn.disabled = true;
+            });
+
+            // Validate questions
+            for (let i = 0; i < questions.length; i++) {
+                if (!questions[i].question_text.trim()) {
+                    alert(`Please enter text for question ${i + 1}`);
+                    // Reset buttons
+                    updateButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Questions';
+                        btn.disabled = false;
+                    });
+                    return;
+                }
+            }
+
+            questions.forEach((question, index) => {
+                question.order = index + 1;
+            });
+
+            const data = {
+                survey_id: {{ survey.id }},
+                questions: questions,
+                deleted_questions: deletedQuestions
+            };
+
+            fetch('/update_survey_questions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Success animation
+                    updateButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-check mr-2"></i>Updated!';
+                        btn.classList.remove('from-secondary', 'to-orange-500');
+                        btn.classList.add('from-green-500', 'to-green-600');
+                    });
+                    
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('survey') }}";
+                    }, 1000);
+                } else {
+                    alert('Error: ' + data.error);
+                    // Reset buttons
+                    updateButtons.forEach(btn => {
+                        btn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Questions';
+                        btn.disabled = false;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating questions');
+                // Reset buttons
+                updateButtons.forEach(btn => {
+                    btn.innerHTML = '<i class="fas fa-save mr-2"></i>Update Questions';
+                    btn.disabled = false;
+                });
+            });
+        }
+    </script>
+</body>
+</html>

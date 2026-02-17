@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Management | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Shared Personal Dashboard Styles -->
+    <link href="{{ url_for('static', filename='css/personal-dashboard.css') }}" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--primary1-color) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin: 2rem auto;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary1-color) 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .stats-section .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .buyer-summary-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            max-width: 300px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .buyer-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .buyer-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .buyer-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .buyer-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #047857);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #047857, var(--success-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+            box-shadow: 0 4px 12px rgba(96, 186, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4da570, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(96, 186, 129, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info-color), #0e7490);
+            color: white;
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #0e7490, var(--info-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(8, 145, 178, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #b91c1c);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #b91c1c, var(--danger-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 1.25rem 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(96, 186, 129, 0.05), rgba(96, 186, 129, 0.02));
+            transform: scale(1.001);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .actions-column {
+            width: 120px;
+        }
+
+        .table .btn {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            margin: 0 0.25rem;
+        }
+
+        .badge {
+            padding: 0.35em 0.65em;
+            font-weight: 600;
+            border-radius: 0.375rem;
+        }
+
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+
+        .bg-info {
+            background-color: var(--info-color) !important;
+        }
+
+        .bg-warning {
+            background-color: var(--warning-color) !important;
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary1-color));
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border-color);
+            background: #f8fafc;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(96, 186, 129, 0.15);
+            outline: none;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Custom Select2 styling */
+        .select2-container--default .select2-selection--single,
+        .select2-container--default .select2-selection--multiple {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem;
+            min-height: 2.75rem;
+        }
+
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default .select2-selection--multiple:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 1.75rem;
+            padding-left: 0;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            color: white;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white;
+            margin-right: 0.25rem;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: var(--primary-color);
+        }
+
+        .select2-dropdown {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 1rem 0;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            padding: 0.5rem 1rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                margin: 1rem;
+                border-radius: 12px;
+            }
+
+            .stats-section,
+            .content-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_employee') }}">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_complaints') }}">Complaints</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link"
+                            href="{{ url_for('manage_counseling_sessions') }}">Counseling</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('survey') }}">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user_management') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_backups') }}">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="stats-section">
+                <div class="content">
+                    <h1 class="page-title">
+                        <i class="fas fa-handshake me-3"></i>Buyer Management
+                    </h1>
+                    <p class="page-subtitle">Manage buyer information and company associations</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card" id="totalBuyersCard">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <span class="stat-number" id="totalBuyers">0</span>
+                            <div class="stat-label">Total Buyers</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-building"></i></div>
+                            <span class="stat-number" id="totalCompanies">0</span>
+                            <div class="stat-label">Companies</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-link"></i></div>
+                            <span class="stat-number" id="activeAssociations">0</span>
+                            <div class="stat-label">Active Associations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="action-buttons">
+                    <button id="addCompanyButton" class="btn btn-info">
+                        <i class="fas fa-building me-2"></i>Add Company Association
+                    </button>
+                    <button id="addBuyerButton" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Add New Buyer
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Buyer ID</th>
+                                    <th>Buyer Name</th>
+                                    <th>Emp ID Prefix</th>
+                                    <th>Associated Companies</th>
+                                    <th>Employees</th>
+                                    <th>Username</th>
+                                    <th class="actions-column">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for buyer in data %}
+                                <tr data-prefix="{{ buyer.employee_id_prefix }}">
+                                    <td><strong>{{ buyer.buyer_id }}</strong></td>
+                                    <td>{{ buyer.buyer_name }}</td>
+                                    <td>
+                                        {% if buyer.employee_id_prefix %}
+                                        <code class="text-primary">{{ buyer.employee_id_prefix }}</code>
+                                        {% else %}
+                                        <span class="text-muted fst-italic">Not set</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if buyer.company_names %}
+                                        {% for company in buyer.company_names.split(', ') %}
+                                        <span class="badge bg-primary me-1">{{ company }}</span>
+                                        {% endfor %}
+                                        {% else %}
+                                        <span class="text-muted fst-italic">No companies</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge bg-primary">{{ buyer.employee_count }}</span></td>
+                                    <td><code>{{ buyer.username }}</code></td>
+                                    <td>
+                                        <button class="edit-btn btn btn-sm btn-primary" data-id="{{ buyer.buyer_id }}"
+                                            title="Edit Buyer">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="buyer-summary-tooltip" id="buyerTooltip">
+        <strong>Buyer Names:</strong>
+        <div class="buyer-list" id="buyerList"></div>
+    </div>
+
+    <!-- Add Company Modal -->
+    <div class="modal fade" id="addCompanyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-building me-2"></i>Add Company Association</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="selectBuyer" class="form-label">Select Buyer:</label>
+                        <select id="selectBuyer" class="form-select">
+                            <option value="">Choose a buyer...</option>
+                            {% for buyer in buyer_names %}
+                            <option value="{{ buyer.buyer_id }}">{{ buyer.buyer_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="selectCompany" class="form-label">Select Companies (Multiple):</label>
+                        <select id="selectCompany" class="form-select" multiple="multiple">
+                            {% for company in company_names %}
+                            <option value="{{ company.company_id }}">{{ company.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>You can select multiple companies at once. Hold Ctrl
+                        (Windows) or Cmd (Mac) to select multiple items.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-info" id="addCompanyBtn">
+                        <i class="fas fa-plus me-2"></i>Add Associations
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Buyer Modal -->
+    <div class="modal fade" id="addBuyerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Buyer</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="newBuyerName" class="form-label">Buyer Name:</label>
+                        <input type="text" id="newBuyerName" class="form-control" placeholder="Enter buyer name...">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="newEmployeeIdPrefix" class="form-label">Employee ID Prefix:</label>
+                        <input type="text" id="newEmployeeIdPrefix" class="form-control" placeholder="e.g., 15, 110"
+                            maxlength="10">
+                        <small class="text-muted">2-3 digit prefix for auto-generating employee IDs (optional)</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="newBuyerLogo" class="form-label">Buyer Logo:</label>
+                        <input type="file" id="newBuyerLogo" class="form-control" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="addBuyerBtn">
+                        <i class="fas fa-save me-2"></i>Add Buyer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Buyer Information</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="editBuyerName" class="form-label">Buyer Name:</label>
+                        <input type="text" id="editBuyerName" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="editEmployeeIdPrefix" class="form-label">Employee ID Prefix:</label>
+                        <input type="text" id="editEmployeeIdPrefix" class="form-control" placeholder="e.g., 15, 110"
+                            maxlength="10">
+                        <small class="text-muted">2-3 digit prefix for auto-generating employee IDs</small>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="editBuyerUsername" class="form-label">Username:</label>
+                        <input type="text" id="editBuyerUsername" class="form-control">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="editBuyerPassword" class="form-label">Password:</label>
+                        <input type="password" id="editBuyerPassword" class="form-control"
+                            placeholder="Enter new password (optional)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                // Initialize Select2 for searchable dropdowns
+                $('#selectBuyer').select2({
+                    placeholder: 'Search and select a buyer...',
+                    allowClear: true,
+                    dropdownParent: $('#addCompanyModal'),
+                    width: '100%'
+                });
+
+                $('#selectCompany').select2({
+                    placeholder: 'Search and select companies...',
+                    allowClear: true,
+                    dropdownParent: $('#addCompanyModal'),
+                    width: '100%'
+                });
+
+                // Initialize DataTable
+                var dataTable = $('#datatable').DataTable({
+                    "order": [[0, "desc"]],
+                    responsive: true,
+                    pageLength: 25,
+                    language: {
+                        search: "Search buyers:",
+                        lengthMenu: "Show _MENU_ buyers per page",
+                        info: "Showing _START_ to _END_ of _TOTAL_ buyers",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        }
+                    }
+                });
+
+                // Update stats
+                function updateStats() {
+                    var totalBuyers = dataTable.rows().count();
+                    var uniqueCompanies = new Set();
+                    var totalAssociations = 0;
+                    var buyerNames = [];
+
+                    $('#datatable tbody tr').each(function () {
+                        var cells = $(this).find('td');
+
+                        buyerNames.push($(cells[1]).text());
+
+                        var companyBadges = $(cells[2]).find('.badge');
+                        companyBadges.each(function () {
+                            var companyName = $(this).text();
+                            if (companyName && companyName !== 'No companies') {
+                                uniqueCompanies.add(companyName);
+                                totalAssociations++;
+                            }
+                        });
+                    });
+
+                    $('#totalBuyers').text(totalBuyers);
+                    $('#totalCompanies').text(uniqueCompanies.size);
+                    $('#activeAssociations').text(totalAssociations);
+
+                    window.buyerNames = Array.from(new Set(buyerNames)).sort();
+                }
+
+                // Buyer summary tooltip
+                var tooltipTimeout;
+                $('#totalBuyersCard').hover(
+                    function (e) {
+                        if (window.buyerNames && window.buyerNames.length > 0) {
+                            clearTimeout(tooltipTimeout);
+                            var tooltip = $('#buyerTooltip');
+                            var buyerList = $('#buyerList');
+
+                            buyerList.empty();
+                            window.buyerNames.forEach(function (name) {
+                                buyerList.append('<div style="padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">' + name + '</div>');
+                            });
+
+                            tooltip.css({
+                                'left': e.pageX + 10 + 'px',
+                                'top': e.pageY - 10 + 'px'
+                            }).fadeIn(200);
+                        }
+                    },
+                    function () {
+                        tooltipTimeout = setTimeout(function () {
+                            $('#buyerTooltip').fadeOut(200);
+                        }, 300);
+                    }
+                );
+
+                $('#buyerTooltip').hover(
+                    function () {
+                        clearTimeout(tooltipTimeout);
+                    },
+                    function () {
+                        $(this).fadeOut(200);
+                    }
+                );
+
+                $('#totalBuyersCard').mousemove(function (e) {
+                    $('#buyerTooltip').css({
+                        'left': e.pageX + 10 + 'px',
+                        'top': e.pageY - 10 + 'px'
+                    });
+                });
+
+                updateStats();
+
+                // Modal handlers
+                $('#addBuyerButton').click(function () {
+                    $('#addBuyerModal').modal('show');
+                });
+
+                $('#addCompanyButton').click(function () {
+                    $('#addCompanyModal').modal('show');
+                });
+
+
+                // Add company associations (multiple)
+                $('#addCompanyBtn').click(function () {
+                    var selectedBuyer = $('#selectBuyer').val();
+                    var selectedCompanies = $('#selectCompany').val();
+
+                    if (!selectedBuyer || !selectedCompanies || selectedCompanies.length === 0) {
+                        alert('Please select both a buyer and at least one company.');
+                        return;
+                    }
+
+                    // Show loading state
+                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Adding...');
+
+                    // Send single AJAX request with all company IDs
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ url_for('update_buyer_company') }}",
+                        data: JSON.stringify({
+                            'buyer_id': selectedBuyer,
+                            'company_ids': selectedCompanies
+                        }),
+                        contentType: 'application/json',
+                        success: function (response) {
+                            console.log('Companies linked successfully:', response);
+                            $('#addCompanyModal').modal('hide');
+
+                            // Show success message
+                            alert(response.message || 'Companies linked successfully!');
+                            location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error adding company associations:', error);
+
+                            // Try to parse error response
+                            var errorMessage = 'Error adding company associations. Please try again.';
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                errorMessage = response.message || errorMessage;
+                            } catch (e) {
+                                // Use default error message
+                            }
+
+                            alert(errorMessage);
+                            $('#addCompanyBtn').prop('disabled', false).html('<i class="fas fa-plus me-2"></i>Add Associations');
+                        }
+                    });
+                });
+
+                // Delete buyer
+
+                // Add buyer
+                $('#addBuyerBtn').click(function () {
+                    var newBuyerName = $('#newBuyerName').val().trim();
+                    var newBuyerLogo = $('#newBuyerLogo')[0].files[0];
+                    var newEmployeeIdPrefix = $('#newEmployeeIdPrefix').val().trim();
+
+                    if (!newBuyerName) {
+                        alert('Please enter a buyer name.');
+                        return;
+                    }
+
+                    var formData = new FormData();
+                    formData.append('buyer_name', newBuyerName);
+                    formData.append('employee_id_prefix', newEmployeeIdPrefix);
+                    if (newBuyerLogo) {
+                        formData.append('buyer_logo', newBuyerLogo);
+                    }
+
+                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Adding...');
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ url_for('add_buyer') }}",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (response) {
+                            console.log('Buyer added successfully');
+                            location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error adding buyer:', error);
+                            alert('Error adding buyer. Please try again.');
+                            $('#addBuyerBtn').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Add Buyer');
+                        }
+                    });
+                });
+
+                // Edit buyer
+                $('#datatable').on('click', '.edit-btn', function () {
+                    var row = $(this).closest('tr');
+                    var rowData = dataTable.row(row).data();
+
+                    var buyerId = $(this).data('id');
+                    var buyerName = getTextContent(rowData[1]);
+                    var employeeIdPrefix = row.attr('data-prefix') || '';
+                    var buyerUsername = getTextContent(rowData[5]);
+
+                    $('#editBuyerUsername').val(buyerUsername);
+                    $('#editBuyerName').val(buyerName);
+                    $('#editEmployeeIdPrefix').val(employeeIdPrefix);
+                    $('#editBuyerPassword').val('');
+                    $('#saveChangesBtn').attr('data-id', buyerId);
+                    $('#editModal').modal('show');
+                });
+
+                function getTextContent(data) {
+                    if (typeof data === 'string' && data.includes('<')) {
+                        var tmp = document.createElement("div");
+                        tmp.innerHTML = data;
+                        return tmp.textContent || tmp.innerText || "";
+                    }
+                    return data;
+                }
+
+                // Save changes
+                $('#saveChangesBtn').click(function () {
+                    var editedBuyerName = $('#editBuyerName').val().trim();
+                    var editedBuyerPassword = $('#editBuyerPassword').val();
+                    var editBuyerUsername = $('#editBuyerUsername').val().trim();
+                    var editEmployeeIdPrefix = $('#editEmployeeIdPrefix').val().trim();
+                    var buyerId = $(this).attr('data-id');
+
+                    if (!editedBuyerName || !editBuyerUsername) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+
+                    var editedData = {
+                        'buyer_id': buyerId,
+                        'buyer_name': editedBuyerName,
+                        'username': editBuyerUsername,
+                        'employee_id_prefix': editEmployeeIdPrefix
+                    };
+
+                    if (editedBuyerPassword) {
+                        editedData.password = editedBuyerPassword;
+                    }
+
+                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ url_for('update_buyer') }}",
+                        data: JSON.stringify(editedData),
+                        contentType: 'application/json',
+                        success: function (response) {
+                            console.log('Buyer data successfully updated');
+                            location.reload();
+                        },
+                        error: function (error) {
+                            console.error('Error updating buyer data:', error);
+                            alert('Error updating buyer information. Please try again.');
+                            $('#saveChangesBtn').prop('disabled', false).html('<i class="fas fa-save me-2"></i>Save Changes');
+                        }
+                    });
+                });
+
+                // Clear form when modals close
+                $('#addCompanyModal').on('hidden.bs.modal', function () {
+                    $('#selectBuyer').val(null).trigger('change');
+                    $('#selectCompany').val(null).trigger('change');
+                });
+
+                $('#addBuyerModal').on('hidden.bs.modal', function () {
+                    $('#newBuyerName').val('');
+                    $('#newEmployeeIdPrefix').val('');
+                    $('#newBuyerLogo').val('');
+                });
+
+                // Add hover effect to table rows
+                $('#datatable tbody').on('mouseenter', 'tr', function () {
+                    $(this).addClass('table-row-hover');
+                }).on('mouseleave', 'tr', function () {
+                    $(this).removeClass('table-row-hover');
+                });
+            });
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../static/images/logo.png" type="image/png" />
+  <title>FOS-Complaint Form</title>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<!-- Remove the old DataTables and Semantic UI JS files -->
+<!-- <script src="https://code.jquery.com/jquery-3.7.0.js"></script> -->
+<!-- <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script> -->
+<!-- <script src="https://cdn.datatables.net/1.13.5/js/dataTables.semanticui.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.js"></script> -->
+<!-- Remove the old DataTables and Semantic UI JS files -->
+
+<!-- Add the new DataTables and Semantic UI JS files -->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/dataTables.jqueryui.min.js"></script>
+<!-- Add the new DataTables and Semantic UI JS files -->
+
+<!-- Add the new Fomantic UI JS file -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.js"></script>
+<!-- Add the new Fomantic UI JS file -->
+
+<!-- Add the new JSZip and PDFMake JS files -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
+<!-- Add the new JSZip and PDFMake JS files -->
+
+<!-- Add the new Buttons extension JS files -->
+
+<!-- Add the new Buttons extension JS files -->
+
+</head>
+
+<body>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.css">
+
+<!-- Updated jQuery UI and DataTables jQuery UI CSS links -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.jqueryui.min.css">
+<!-- Updated jQuery UI and DataTables jQuery UI CSS links -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"  integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+
+
+<style>
+      .navbar {
+            margin-bottom: 20px; /* Adjust the margin if needed */
+        }
+
+        .logo-img {
+            height: 45px; /* Adjust the height as per your requirement */
+            width: auto; /* Auto adjust the width based on the height to maintain aspect ratio */
+            margin-right: 10px; /* Optional margin to separate the logo from "FOS" */
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            margin-right: 10px; /* Adjust the margin to move the entire brand (logo + text) to the right */
+        }
+
+        .navbar-toggler {
+            border: none; /* Remove the border from the toggler button */
+        }
+
+        .navbar-toggler:focus {
+            outline: none; /* Remove the focus outline */
+        }
+
+        .navbar-center {
+            flex-wrap: wrap;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Add this line to vertically center the buttons */
+        }
+
+        .navbar-nav {
+            flex-direction: row; /* Adjust the direction to align the logout button horizontally */
+        }
+
+        .nav-item {
+            padding: 0 10px; /* Adjust the horizontal spacing between navbar items */
+        }
+
+        .nav-item.disabled {
+            cursor: default; /* Prevent the "Reports" link from being clickable */
+        }
+
+        .nav-link,
+        .dropdown-menu a,
+        .search-button {
+            color: #284952;
+        }
+
+        .nav-link:hover,
+        .dropdown-menu a:hover {
+            color: #6e9954;
+        }
+    .dropdown-menu {
+            background-color: #284952;
+        }
+
+        .dropdown-menu a {
+            color: #fff;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: #6e9954;
+        }
+       .table-section {
+            background-color: #f5f5f5;
+            margin-top: 20px;
+        }
+
+
+    #complaintsTable {
+      margin: 0px;
+    }
+        .dataTables_wrapper {
+            margin-top: 20px;
+            margin-right: 10px
+        }
+
+        .dataTables_filter label {
+            font-weight: bold;
+        }
+
+        .dataTables_filter input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+
+        .dataTables_paginate {
+            margin-top: 10px;
+        }
+      .status-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+    border: none;
+  }
+
+  /* Styles for each specific status */
+  .ui.button.initiated {
+    background-color: #284952; /* Change to the desired color for the "Initiated" status */
+    color: var(--white);
+  }
+
+.ui.button.bounced {
+    background-color: #A5DC78; /* Change to the desired color for the "In Process" status */
+    color: var(--white);
+  }
+  .ui.button.in.process {
+    background-color: #60BA81; /* Change to the desired color for the "In Process" status */
+    color: var(--white);
+  }
+      .ui.button.unprocessed {
+    background-color: #284952; /* Change to the desired color for the "In Process" status */
+    color: var(--white);
+  }
+  .ui.button.closed {
+    background-color: #f5a83c; /* Change to the desired color for the "Closed" status */
+    color: var(--white);
+  }
+
+  .ui.button.completed {
+    background-color: #A5DC78; /* Change to the desired color for the "Completed" status */
+    color: var(--white);
+  }
+    body{margin-top:20px;
+background:#eee;
+}
+.timeline {
+    position: relative;
+    padding: 10px;
+    margin: 0 auto;
+    overflow: hidden;
+    color: #ffffff;
+}
+
+.timeline:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    margin-left: -1px;
+    border-right: 2px dashed #c4d2e2;
+    height: 100%;
+    display: block;
+}
+
+.timeline-row {
+    padding-left: 50%;
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-row .timeline-time {
+    position: absolute;
+    right: 50%;
+    top: 16px;
+    text-align: right;
+    margin-right: 20px;
+    color: #000000;
+    font-size: 1.5rem;
+}
+
+.timeline-row .timeline-time small {
+    display: block;
+    font-size: .8rem;
+    color: #8796af;
+}
+
+.timeline-row .timeline-content {
+    position: relative;
+    padding: 20px 30px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.timeline-row .timeline-content:after {
+    content: "";
+    position: absolute;
+    top: 20px;
+    height: 3px;
+    width: 40px;
+}
+
+.timeline-row .timeline-content:before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    right: -50px;
+    width: 20px;
+    height: 20px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    border-radius: 100px;
+    z-index: 100;
+    background: #ffffff;
+    border: 2px dashed #c4d2e2;
+}
+
+.timeline-row .timeline-content h4 {
+    margin: 0 0 1px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 150%;
+}
+
+.timeline-row .timeline-content p {
+    margin-bottom: 1px;
+    line-height: 150%;
+}
+
+.timeline-row .timeline-content i {
+    font-size: 2rem;
+    color: #ffffff;
+    line-height: 100%;
+    padding: 10px;
+    border: 2px solid #ffffff;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    border-radius: 100px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+.timeline-row .timeline-content .thumbs {
+    margin-bottom: 20px;
+}
+
+.timeline-row .timeline-content .thumbs img {
+    margin-bottom: 10px;
+}
+
+.timeline-row:nth-child(even) .timeline-content {
+    background-color: #ff5000;
+    /* Fallback Color */
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#fc6d4c), to(#ff5000));
+    /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(top, #fc6d4c, #ff5000);
+    /* Chrome 10+, Saf5.1+, iOS 5+ */
+    background-image: -moz-linear-gradient(top, #fc6d4c, #ff5000);
+    /* FF3.6 */
+    background-image: -ms-linear-gradient(top, #fc6d4c, #ff5000);
+    /* IE10 */
+    background-image: -o-linear-gradient(top, #fc6d4c, #ff5000);
+    /* Opera 11.10+ */
+    background-image: linear-gradient(top, #fc6d4c, #ff5000);
+    margin-left: 40px;
+    text-align: left;
+}
+
+.timeline-row:nth-child(even) .timeline-content:after {
+    left: -39px;
+    border-right: 18px solid #ff5000;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+}
+
+.timeline-row:nth-child(even) .timeline-content:before {
+    left: -50px;
+    right: initial;
+}
+
+.timeline-row:nth-child(odd) {
+    padding-left: 0;
+    padding-right: 50%;
+}
+
+.timeline-row:nth-child(odd) .timeline-time {
+    right: auto;
+    left: 50%;
+    text-align: left;
+    margin-right: 0;
+    margin-left: 20px;
+}
+
+.timeline-row:nth-child(odd) .timeline-content {
+    background-color: #5a99ee;
+    /* Fallback Color */
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#1379bb), to(#5a99ee));
+    /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(top, #1379bb, #5a99ee);
+    /* Chrome 10+, Saf5.1+, iOS 5+ */
+    background-image: -moz-linear-gradient(top, #1379bb, #5a99ee);
+    /* FF3.6 */
+    background-image: -ms-linear-gradient(top, #1379bb, #5a99ee);
+    /* IE10 */
+    background-image: -o-linear-gradient(top, #1379bb, #5a99ee);
+    /* Opera 11.10+ */
+    background-image: linear-gradient(top, #1379bb, #5a99ee);
+    margin-right: 40px;
+    margin-left: 0;
+    text-align: right;
+}
+
+.timeline-row:nth-child(odd) .timeline-content:after {
+    right: -39px;
+    border-left: 18px solid #1379bb;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+}
+.badge-light {
+    color: #212529;
+    background-color: #f8f9fa;
+}
+@media (max-width: 767px) {
+    .timeline {
+        padding: 15px 10px;
+    }
+    .timeline:after {
+        left: 28px;
+    }
+    .timeline .timeline-row {
+        padding-left: 0;
+        margin-bottom: 16px;
+    }
+    .timeline .timeline-row .timeline-time {
+        position: relative;
+        right: auto;
+        top: 0;
+        text-align: left;
+        margin: 0 0 6px 56px;
+    }
+    .timeline .timeline-row .timeline-time strong {
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .timeline .timeline-row .timeline-icon {
+        top: 52px;
+        left: -2px;
+        margin-left: 0;
+    }
+    .timeline .timeline-row .timeline-content {
+        padding: 15px;
+        margin-left: 56px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    .timeline .timeline-row .timeline-content:after {
+        right: auto;
+        left: -39px;
+        top: 32px;
+    }
+    .timeline .timeline-row:nth-child(odd) {
+        padding-right: 0;
+    }
+    .timeline .timeline-row:nth-child(odd) .timeline-time {
+        position: relative;
+        right: auto;
+        left: auto;
+        top: 0;
+        text-align: left;
+        margin: 0 0 6px 56px;
+    }
+    .timeline .timeline-row:nth-child(odd) .timeline-content {
+        margin-right: 0;
+        margin-left: 55px;
+    }
+    .timeline .timeline-row:nth-child(odd) .timeline-content:after {
+        right: auto;
+        left: -39px;
+        top: 32px;
+        border-right: 18px solid #5a99ee;
+        border-left: inherit;
+    }
+    .timeline.animated .timeline-row:nth-child(odd) .timeline-content {
+        left: 20px;
+    }
+    .timeline.animated .timeline-row.active:nth-child(odd) .timeline-content {
+        left: 0;
+    }
+    .fa1 {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+    width: 50px;
+    }
+}
+.dataTables_wrapper .dataTables_filter{
+    margin-bottom: 10px;
+}
+.modal-dialog {
+    max-width: 1200px !important;
+    margin: 1.75rem auto;
+}
+.urgent-ticket {
+    color: #be0000; /* Set the text color to red */
+    font-weight: bold; /* Optionally make the text bold */
+}
+     </style>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <!-- Logo with adjusted size -->
+      <a href="#" class="navbar-brand">
+        <img src="../static/images/vertical_logo.png" alt="FOS Logo" class="logo-img">
+      </a>
+
+      <!-- Toggler button for mobile -->
+      <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Centered buttons -->
+      <div class="navbar-center">
+        <a href="#" class="nav-item nav-link active">Home</a>
+        <a href="#" class="nav-item nav-link">Profile</a>
+        <div class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Messages</a>
+          <div class="dropdown-menu">
+            <a href="#" class="dropdown-item">Inbox</a>
+            <a href="#" class="dropdown-item">Sent</a>
+            <a href="#" class="dropdown-item">Drafts</a>
+          </div>
+        </div>
+        <a href="#" class="nav-item nav-link disabled" tabindex="-1">Reports</a>
+      </div>
+
+      <!-- Logout button -->
+      <div class="navbar-nav">
+        <a href="#" class="nav-item nav-link">Logout</a>
+      </div>
+    </div>
+  </nav>
+   <div class="table-section">
+
+    <table id="complaintsTable" class="ui celled table" style="width:100%">
+        <thead>
+            <tr>
+                <th>Ticket Number</th>
+                <th>NAME</th>
+                <th>STATUS</th>
+                <th>COMPLAINT DATE</th>
+                <th>Mobile Number</th>
+                <th>Date of Issue</th>
+                <th>Complaint Categories</th>
+                <th>Additional Comments</th>
+                <th>RELEVANT Complaint</th>
+                <th>Concerned Department</th>
+                <th>Previous History</th>
+                <th>Proposed Solution</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for complaint in data %}
+            <tr>
+
+                <td class="{% if complaint.is_urgent %}urgent-ticket{% endif %}">{{ complaint.ticket_number }}</td>
+                <td>{{complaint.employee_name}}</td>
+                <td>
+                  <button class="ui {{complaint.status|lower}} button status-button" data-toggle="modal" data-target="#exampleModal">
+                    {{complaint.status}}
+                  </button>
+                </td>
+                <td>{{complaint.date_entry}}</td>
+                <td>{{ complaint.mobile_number }}</td>
+                <td>{{ complaint.date_of_issue }}</td>
+                <td>{{ complaint.complaint_categories }}</td>
+                <td>{{ complaint.additional_comments }}</td>
+                <td>{{ complaint.person_issue }}</td>
+                <td>{{ complaint.concerned_department }}</td>
+                <td>{{ complaint.previous_history }}</td>
+                <td>{{ complaint.proposed_solution }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Ticket Number</th>
+                <th>NAME</th>
+                <th>STATUS</th>
+                <th>COMPLAINT DATE</th>
+                <th>Mobile Number</th>
+                <th>Date of Issue</th>
+                <th>Complaint Categories</th>
+                <th>Additional Comments</th>
+                <th>RELEVANT Complaint</th>
+                <th>Concerned Department</th>
+                <th>Previous History</th>
+                <th>Proposed Solution</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+</div>
+<div class="modal fade" id="exampleModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Modal title
+                </h5>
+                <button type="button" class="close"
+                    data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">
+                        ×
+                    </span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container bootdey">
+<div class="row gutters">
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+<div class="card">
+<div class="card-body">
+<!-- Timeline start -->
+<div class="timeline">
+	<div class="timeline-row">
+		<div class="timeline-time">
+			7:45PM<small>May 21</small>
+		</div>
+		<div class="timeline-dot fb-bg"></div>
+		<div class="timeline-content">
+			<i class="fa fa-map-marker"></i>
+			<h4>Admin theme!</h4>
+			<p>Milestone Admin Dashboard contains C3 graphs, flot graphs, data tables, calendar, drag &amp; drop and ion slider.</p>
+			<div class="">
+				<span class="badge badge-light">Design</span>
+				<span class="badge badge-light">Admin</span>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-row">
+		<div class="timeline-time">
+			8:00 AM<small>May 18</small>
+		</div>
+		<div class="timeline-dot green-one-bg"></div>
+		<div class="timeline-content green-one">
+			<i class="fa fa-warning"></i>
+			<h4>Admin theme!</h4>
+			<p>
+				Milestone Admin Dashboard contains C3 graphs, flot graphs, data tables, calendar.
+			</p>
+			<div class="">
+				<span class="badge badge-light">Design</span>
+				<span class="badge badge-light">Admin</span>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-row">
+		<div class="timeline-time">
+			7:25 PM<small>May 6</small>
+		</div>
+		<div class="timeline-dot green-two-bg"></div>
+		<div class="timeline-content green-two">
+			<i class="fa fa-list"></i>
+			<h4>Best Admin Template!</h4>
+			<p>Custom C3 graphs, Custom flot graphs, flot graphs, small graphs, Sass, profile and timeline.</p>
+			<div>
+				<span class="badge badge-light">Invoice</span>
+				<span class="badge badge-light">Graphs</span>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-row">
+		<div class="timeline-time">
+			3:55 PM<small>Apr 26</small>
+		</div>
+		<div class="timeline-dot green-three-bg"></div>
+		<div class="timeline-content green-three">
+			<i class="icon-directions"></i>
+			<h4>Milestone Admin</h4>
+			<p>
+				Admin theme includes graphs, invoice, timeline, widgets, projects, calendar, components, layouts, todo's.
+			</p>
+			<div>
+				<span class="badge badge-light">Profile</span>
+				<span class="badge badge-light">Dashboard</span>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-row">
+		<div class="timeline-time">
+			5:24 PM<small>Apr 12</small>
+		</div>
+		<div class="timeline-dot green-four-bg"></div>
+		<div class="timeline-content green-four">
+			<i class="fa fa-user"></i>
+			<h4>Milestone Dashboard</h4>
+			<p class="no-margin">Milestone Admin Dashboard includes invoice, profile, tasks, gallery, projects, maintanence.</p>
+			<div>
+				<span class="badge badge-light">Analytics</span>
+				<span class="badge badge-light">Graphs</span>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-row">
+		<div class="timeline-time">
+			11:25 AM<small>Apr 19</small>
+		</div>
+		<div class="timeline-dot teal-bg"></div>
+		<div class="timeline-content teal">
+			<i class="fa fa-coffee"></i>
+			<h4>Milestone Template</h4>
+			<p class="no-margin">Panels, alerts, notifications, new input styles, pricing plans, project plan, signup, login and register.</p>
+			<div>
+				<span class="badge badge-light">Labels</span>
+				<span class="badge badge-light">Filters</span>
+			</div>
+		</div>
+	</div>
+	<div class="timeline-row">
+		<div class="timeline-time">
+			12:30 PM<small>May 25</small>
+		</div>
+		<div class="timeline-dot sea-green-bg"></div>
+		<div class="timeline-content sea-green">
+			<i class="fa fa-image"></i>
+			<h4>Milestone dashboard</h4>
+			<p>Milestone Admin Dashboard contains Ion slider, heatmap, alerts, breadcrumbs, alerts, pricing, signup, login and register.</p>
+			<div>
+				<span class="badge badge-light">BS 4</span>
+				<span class="badge badge-light">Sass</span>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Timeline end -->
+</div>
+</div>
+</div>
+</div>
+</div>
+            </div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" id="saveChangesButton">Save changes</button>
+    <button type="button" class="btn btn-success" id="printButton">Print</button>
+</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/dataTables.jqueryui.min.js"></script>
+
+<script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"  integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.7.4/js/uikit.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.7.4/js/uikit-icons.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+    // Add event listeners for each chart tab
+    $('.tab').click(function () {
+        // Get the data attribute value to find the corresponding table content
+        var tableContentID = $(this).data('table');
+
+        // Hide all table contents and show the corresponding one
+        $('.table-section').hide();
+        $(tableContentID).show();
+
+        // Redraw the DataTable
+        $('#complaintsTable').DataTable().draw();
+    });
+});
+$(document).ready(function() {
+    var dataTable = $('#complaintsTable').DataTable({
+        // DataTable initialization options
+        // ... (your existing initialization options)
+    });
+
+    // Handle search
+    $('#searchInput').on('keyup', function() {
+        dataTable.search(this.value).draw();
+    });
+
+    // Handle show entries
+    $('#entriesSelect').on('change', function() {
+        dataTable.page.len(this.value).draw();
+    });
+
+    // Handle CSV export
+    $('#csvExportBtn').on('click', function() {
+        dataTable.button('.buttons-csv').trigger();
+    });
+});
+let ticketNumber;
+let specificComplaint;
+document.addEventListener("DOMContentLoaded", function () {
+    var statusButtons = document.getElementsByClassName("status-button");
+
+    Array.prototype.forEach.call(statusButtons, function (button) {
+        button.addEventListener("click", function () {
+            // Get the corresponding ticket number from the row
+            const row = this.closest('tr');
+            ticketNumber = row.querySelector('td:nth-child(1)').textContent;
+            var data = {{ data | tojson }}; // Convert Flask data to a JavaScript variable
+
+            // Find the specific complaint from the data using the ticket number
+            specificComplaint = data.find(function (complaint) {
+                return complaint.ticket_number === ticketNumber;
+            });
+
+            if (specificComplaint.status === "Unprocessed") {
+                // Show a different modal for 'Unprocessed' status with a simple message
+                var modalTitle = document.querySelector(".modal-title");
+                var modalBody = document.querySelector(".modal-body");
+
+                modalTitle.textContent = "Receive Complain";
+                modalBody.textContent = "Are you sure, to process this complain?";
+              }else {
+            // Update the modal content with the specific complaint details
+            var modalTitle = document.querySelector(".modal-title");
+            var modalBody = document.querySelector(".modal-body");
+
+            modalTitle.textContent = specificComplaint.ticket_number +" | "+specificComplaint.date_entry;
+            // Construct the modal body content dynamically
+// ... Your previous code ...
+
+// Construct the modal body content dynamically
+var modalContent = `
+  <div class="container bootdey">
+    <div class="row gutters">
+      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- Timeline start -->
+            <div class="timeline">
+              <div class="timeline-row">
+                <div class="timeline-time">
+                  ${specificComplaint.in_process_date}<small>  </small>
+                </div>
+                <div class="timeline-dot fb-bg"></div>
+                <div class="timeline-content">
+                  <i class="fa fa-map-marker" style = "width:50px; margin-left:10px;"></i>
+                  <h4>In Process</h4>
+                  <p class="left-align" style="padding-left: 5px; text-align: left;">
+                   <span class="badge badge-light">${specificComplaint.employee_name}</span>
+                   <span class="badge badge-light">${specificComplaint.mobile_number}</span>
+                   <span class="badge badge-light">${specificComplaint.complaint_categories}</span>
+                    <span class="badge badge-light">${specificComplaint.status}</span><br>
+<br>
+                    <span class="badge badge-light">Additional Comments:</span>
+                     ${specificComplaint.additional_comments}<br>
+                     <span class="badge badge-light">Date of Issue:</span>
+                     ${specificComplaint.date_of_issue}<br>
+                     <span class="badge badge-light">Relevant Person:</span>
+                     ${specificComplaint.person_issue}<br>
+                     <span class="badge badge-light">Concerned Department:</span>
+                     ${specificComplaint.concerned_department}<br>
+                     <span class="badge badge-light">Previous History:</span>
+                     ${specificComplaint.previous_history}<br>
+                     <span class="badge badge-light"> Proposed Solution:</span>
+                    ${specificComplaint.proposed_solution}<br>
+                  </p>
+                  <div class="">
+
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="timeline-time">
+                  ${specificComplaint.rca_date}<small></small>
+                </div>
+                <div class="timeline-dot green-one-bg"></div>
+                <div class="timeline-content green-one">
+                  <i class="fa fa-warning"></i>
+                  <h4>RCA</h4>
+                  ${
+                    specificComplaint.rca === null
+                      ? `<p>Comments <input type="text" id="rcaInput" class="form-control" /></p>`
+                      : `<p>Comments: ${specificComplaint.rca}</p>`
+                  }
+                  <div class="">
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-row">
+                <div class="timeline-time">
+                  ${specificComplaint.capa_date}<small></small>
+                </div>
+                <div class="timeline-dot green-two-bg"></div>
+                <div class="timeline-content green-two">
+                  <i class="fa fa-list"></i>
+                  <h4>CAPA</h4>
+                  ${
+                    specificComplaint.capa === null
+                      ? `<p>Comments: <input type="text" id="capaInput" class="form-control" /></p>`
+                      : `<p>Comments: ${specificComplaint.capa}</p>`
+                  }
+
+                </div>
+              </div>
+`;
+
+// Check for "RCA" status
+if (specificComplaint.status === "Bounced") {
+  modalContent += `
+    <div class="timeline-row">
+      <div class="timeline-time">
+        ${specificComplaint.rca_date}<small></small>
+      </div>
+      <div class="timeline-dot green-three-bg"></div>
+      <div class="timeline-content green-three">
+        <i class="fa fa-warning"></i>
+        <h4>RCA 1</h4>
+        ${
+          specificComplaint.rca1 === null
+            ? `<p>Comments <input type="text" id="rca1Input" class="form-control" /></p>`
+            : `<p>Comments: ${specificComplaint.rca1}</p>`
+        }
+
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-time">
+        ${specificComplaint.capa_date}<small></small>
+      </div>
+      <div class="timeline-dot green-four-bg"></div>
+      <div class="timeline-content green-four">
+        <i class="fa fa-list"></i>
+        <h4>CAPA 1</h4>
+        ${
+          specificComplaint.capa1 === null
+            ? `<p>Comments: <input type="text" id="capa1Input" class="form-control" /></p>`
+            : `<p>Comments: ${specificComplaint.capa1}</p>`
+        }
+
+      </div>
+    </div>
+  `;
+}
+
+// Check for "Bounced1" status
+if (specificComplaint.status === "bounced1") {
+  modalContent += `
+    <div class="timeline-row">
+      <div class="timeline-time">
+        ${specificComplaint.rca_date}<small></small>
+      </div>
+      <div class="timeline-dot green-five-bg"></div>
+      <div class="timeline-content green-five">
+        <i class="fa fa-warning"></i>
+        <h4>RCA 2</h4>
+        ${
+          specificComplaint.rca2 === null
+            ? `<p>Comments <input type="text" id="rca2Input" class="form-control" /></p>`
+            : `<p>Comments: ${specificComplaint.rca2}</p>`
+        }
+
+      </div>
+    </div>
+    <div class="timeline-row">
+      <div class="timeline-time">
+        ${specificComplaint.capa_date}<small></small>
+      </div>
+      <div class="timeline-dot green-six-bg"></div>
+      <div class="timeline-content green-six">
+        <i class="fa fa-list"></i>
+        <h4>CAPA 2</h4>
+        ${
+          specificComplaint.capa2 === null
+            ? `<p>Comments: <input type="text" id="capa2Input" class="form-control" /></p>`
+            : `<p>Comments: ${specificComplaint.capa2}</p>`
+        }
+
+      </div>
+    </div>
+  `;
+}
+if (specificComplaint.status === "Closed") {
+modalContent += `
+    <div class="timeline-row">
+      <div class="timeline-time">
+        ${specificComplaint.closed_date}<small> </small>
+      </div>
+      <div class="timeline-dot green-seven-bg"></div>
+      <div class="timeline-content green-seven">
+        <i class="fa fa-warning"></i>
+        <h4>CLOSED</h4>
+        <div class="">
+        </div>
+      </div>
+    </div>
+    `;
+    }
+modalContent += `
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
+// ... Your previous code ...
+
+
+            $('#printButton').on('click', function() {
+        printModalContent(modalContent);
+    });
+            // Set the modal content
+            modalBody.innerHTML = modalContent;
+
+            // Show the modal
+            $("#exampleModal").modal("show");
+            }
+        });
+    });
+});
+    document.addEventListener("DOMContentLoaded", function () {
+  // Handle "Save changes" button click
+  var saveChangesButton = document.getElementById('saveChangesButton');
+  saveChangesButton.addEventListener('click', function () {
+    // Get the values from the input elements directly
+    var unprocessed = null;
+    if (specificComplaint.status === "Unprocessed") {
+    unprocessed = true;
+    }
+    var rcaInputValue = document.getElementById("rcaInput")?.value || null;
+    var capaInputValue = document.getElementById("capaInput")?.value || null;
+    var rca1InputValue = document.getElementById("rca1Input")?.value || null;
+    var capa1InputValue = document.getElementById("capa1Input")?.value || null;
+    var rca2InputValue = document.getElementById("rca2Input")?.value || null;
+    var capa2InputValue = document.getElementById("capa2Input")?.value || null;
+
+    // Create a data object to send to Flask
+    var dataToSend = {
+        ticket :ticketNumber,
+      rca: rcaInputValue,
+      capa: capaInputValue,
+      rca1: rca1InputValue,
+      capa1: capa1InputValue,
+      rca2: rca2InputValue,
+      capa2: capa2InputValue,
+      unprocessed: unprocessed,
+    };
+
+    // Send the data to Flask using an AJAX request (Assuming you have the correct Flask route to handle this request)
+    // You can use libraries like Axios or fetch API for AJAX requests.
+    // For simplicity, I'll use the fetch API here:
+
+    fetch("/submit_form", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataToSend),
+    })
+      .then(function (response) {
+        // Handle the response from Flask if needed
+
+      })
+        .then(data => {
+        // Handle the data returned from the backend if needed
+
+
+        // Redirect to the root URL after successful submission
+        window.location.href = '/'; // Replace '/' with the appropriate URL if needed
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the fetch
+        console.error('Error:', error);
+      });
+  });
+});
+
+  </script>
+</body>
+
+</html>

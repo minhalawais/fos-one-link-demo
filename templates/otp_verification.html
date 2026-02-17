@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="FOS">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <title>FOS - Verify Google Authenticator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='my-login.css') }}">
+    <style>
+        .my-login-page .brand {
+            width: 110px;
+            height: 110px;
+        }
+        .alert-danger {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="my-login-page">
+    <section class="h-100">
+        <div class="container h-100">
+            <div class="row justify-content-md-center h-100">
+                <div class="card-wrapper">
+                    <div class="brand">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo">
+                    </div>
+                    <div class="card fat">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                {% if is_setup %}
+                                    Verify Google Authenticator Setup
+                                {% else %}
+                                    Verify Google Authenticator Code
+                                {% endif %}
+                            </h4>
+                            
+                            {% if error %}
+                                <div class="alert alert-danger">
+                                    Invalid verification code. Please try again.
+                                </div>
+                            {% endif %}
+                            
+                            <form method="POST" class="my-login-validation">
+                                <div class="form-group">
+                                    <label for="otp">Verification Code</label>
+                                    <input id="otp" type="text" class="form-control" name="otp" required autofocus>
+                                    <div class="invalid-feedback">
+                                        Verification code is required
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-0">
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        Verify
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        Copyright &copy; 2023 &mdash; Fruit of Sustainability
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

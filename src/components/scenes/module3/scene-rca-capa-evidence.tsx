@@ -215,22 +215,38 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
     }
   }, [stage, evidenceItems.length])
 
-  // RCA Typing Effect - Complete within stage 7 (3 seconds: 48-51s)
-  // RCA text is ~320 chars, faster typing to complete in time
-  // Pre-fill if we're past stage 7
+  // Reset typing state before each typing section begins
+  // This ensures typing animations replay correctly even after hot-reloads
   useEffect(() => {
-    if (stage > 7 && rcaText.length < rcaFullText.length) {
+    // Clear ALL text during overview/early stages
+    if (stage <= 5) {
+      setRcaText("")
+      setDeadlineText("")
+      setCapaText("")
+    }
+    // Keep CAPA text cleared during RCA/deadline phases (stages 6-8)
+    // So it's guaranteed empty when CAPA focus starts at stage 9
+    else if (stage >= 6 && stage <= 8) {
+      setCapaText("")
+    }
+  }, [stage])
+
+  // RCA Typing Effect - Starts when RCA is focused (stage 21) and types across stages 21→6→7
+  // ~320 chars over ~7 seconds = visible, human-readable typing speed
+  // Pre-fill if we're past the typing window (stage 8+, but NOT stage 21 which is a focus stage)
+  useEffect(() => {
+    if (stage >= 8 && stage !== 21 && rcaText.length < rcaFullText.length) {
       setRcaText(rcaFullText)
-    } else if (stage === 7 && rcaText.length < rcaFullText.length) {
+    } else if ((stage === 21 || stage === 6 || stage === 7) && rcaText.length < rcaFullText.length) {
       const interval = setInterval(() => {
         setRcaText((prev) => {
           if (prev.length < rcaFullText.length) {
-            // Type 3 chars at once for faster completion
-            return rcaFullText.slice(0, prev.length + 3)
+            // Type 2 chars at a time — visible typing across the 7-second window
+            return rcaFullText.slice(0, prev.length + 2)
           }
           return prev
         })
-      }, 10) // Very fast typing: 10ms per 3 chars = ~1.1 seconds for full text
+      }, 40) // 40ms per 2 chars ≈ 6.4 seconds for full text
       return () => clearInterval(interval)
     }
   }, [stage, rcaText.length])
@@ -253,22 +269,22 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
     }
   }, [stage, deadlineText.length])
 
-  // CAPA Typing Effect - Complete within stages 10-11 (8 seconds: 61-69s)
-  // CAPA text is ~310 chars, faster typing to complete in time
+  // CAPA Typing Effect - Starts when CAPA is focused (stage 9) and types across stages 9→10→11
+  // ~310 chars over ~12 seconds = visible, human-readable typing speed
   // Pre-fill if we're past stage 11
   useEffect(() => {
     if (stage > 11 && capaText.length < capaFullText.length) {
       setCapaText(capaFullText)
-    } else if (stage >= 10 && stage <= 11 && capaText.length < capaFullText.length) {
+    } else if (stage >= 9 && stage <= 11 && capaText.length < capaFullText.length) {
       const interval = setInterval(() => {
         setCapaText((prev) => {
           if (prev.length < capaFullText.length) {
-            // Type 3 chars at once for faster completion
-            return capaFullText.slice(0, prev.length + 3)
+            // Type 2 chars at a time — visible typing
+            return capaFullText.slice(0, prev.length + 2)
           }
           return prev
         })
-      }, 30) // Fast typing: 30ms per 3 chars = ~3.4 seconds for full text
+      }, 40) // 40ms per 2 chars ≈ 6.2 seconds for full text
       return () => clearInterval(interval)
     }
   }, [stage, capaText.length])
@@ -799,7 +815,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                         </div>
 
                         {/* Text Content */}
-                        <div className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50">
+                        <div className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50 relative">
                           <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
                             {capaText ? (
                               <>
@@ -818,13 +834,6 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                     {line}
                                   </motion.div>
                                 ))}
-                                {stage >= 9 && stage < 11 && (
-                                  <motion.span
-                                    animate={{ opacity: [1, 0] }}
-                                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6 }}
-                                    className="inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle"
-                                  />
-                                )}
                               </>
                             ) : (
                               <span className="text-gray-400 italic text-[10px]">
@@ -836,6 +845,14 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                 implemented to avoid repetition?
                                 <br />• How will effectiveness be measured (e.g., audits, follow-ups)?
                               </span>
+                            )}
+                            {/* Persistent Cursor for CAPA focus/typing */}
+                            {(stage >= 9 && stage <= 11) && (
+                              <motion.span
+                                animate={{ opacity: [1, 0] }}
+                                transition={{ repeat: Infinity, duration: 0.6 }}
+                                className={`inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle ${!capaText ? "absolute top-2 left-2" : ""}`}
+                              />
                             )}
                           </div>
                         </div>
@@ -936,18 +953,23 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                         </div>
 
                         {/* Text Content */}
-                        <div className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50">
+                        <div className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50 relative">
                           <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
                             {rcaText ? (
                               <>
-                                {rcaText}
-                                {stage >= 6 && stage < 8 && (
-                                  <motion.span
-                                    animate={{ opacity: [1, 0] }}
-                                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6 }}
-                                    className="inline-block w-0.5 h-3 bg-[#60BA81] ml-0.5 align-middle"
-                                  />
-                                )}
+                                {rcaText.split("\n").map((line, idx) => (
+                                  <motion.div
+                                    key={idx}
+                                    animate={{
+                                      backgroundColor: stage === 6 && (line.includes("VALID") || line.includes("findings"))
+                                        ? COLORS.softGreen
+                                        : "transparent",
+                                    }}
+                                    className="px-1 -mx-1 rounded transition-colors duration-300"
+                                  >
+                                    {line}
+                                  </motion.div>
+                                ))}
                               </>
                             ) : (
                               <span className="text-gray-400 italic text-[10px]">
@@ -959,6 +981,14 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                 <br />• Was it a process issue, lack of training, or a mistake?
                                 <br />• Has this happened before? If yes, why?
                               </span>
+                            )}
+                            {/* Persistent Cursor for RCA focus/typing (Stages 21, 6, 7) */}
+                            {(stage === 21 || stage === 6 || stage === 7) && (
+                              <motion.span
+                                animate={{ opacity: [1, 0] }}
+                                transition={{ repeat: Infinity, duration: 0.6 }}
+                                className={`inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle ${!rcaText ? 'absolute top-2 left-2' : ''}`}
+                              />
                             )}
                           </div>
                         </div>
@@ -1074,21 +1104,62 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                 Print Timeline
               </motion.button>
               <button className="px-3 py-1.5 rounded text-[10px] font-medium text-white bg-gray-500">Close</button>
-              <motion.button
-                className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
-                style={{ backgroundColor: "#0095da" }}
-                animate={{
-                  scale: stage === 19 ? [1, 1.08, 1] : 1,
-                  boxShadow: stage === 19 ? `0 0 20px ${COLORS.teal}` : "none",
-                }}
-                transition={{
-                  duration: 0.4,
-                  repeat: stage === 19 ? Number.POSITIVE_INFINITY : 0,
-                  repeatDelay: 0.3,
-                }}
-              >
-                Route Complaint
-              </motion.button>
+              <div className="relative">
+                <motion.button
+                  className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
+                  style={{ backgroundColor: stage === 19 ? "#0095da" : "#0095da" }}
+                  animate={{
+                    boxShadow: stage === 19 ? `0 0 12px ${COLORS.teal}40` : "none",
+                  }}
+                >
+                  Route Complaint
+                </motion.button>
+
+                {/* Animated Cursor - clicks the Route Complaint button */}
+                {stage === 19 && (
+                  <motion.div
+                    className="absolute z-50 pointer-events-none"
+                    initial={{ x: 80, y: 20, opacity: 0 }}
+                    animate={{
+                      x: [80, 20, 20, 20],
+                      y: [20, -5, -5, -5],
+                      opacity: [0, 1, 1, 1],
+                      scale: [1, 1, 0.85, 1],
+                    }}
+                    transition={{
+                      duration: 1.6,
+                      times: [0, 0.5, 0.7, 0.85],
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {/* Cursor pointer SVG */}
+                    <svg width="20" height="24" viewBox="0 0 24 28" fill="none">
+                      <path
+                        d="M5 2L5 20L9.5 16L13.5 24L16.5 22.5L12.5 14.5L18 13L5 2Z"
+                        fill="white"
+                        stroke="#333"
+                        strokeWidth="1.5"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {/* Click ripple */}
+                    <motion.div
+                      className="absolute top-0 left-0 w-4 h-4 rounded-full border-2"
+                      style={{ borderColor: COLORS.teal }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{
+                        scale: [0, 0, 2.5],
+                        opacity: [0, 0, 0.6, 0],
+                      }}
+                      transition={{
+                        duration: 1.6,
+                        times: [0, 0.65, 0.85, 1],
+                        ease: "easeOut",
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </div>
               <motion.button
                 className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
                 style={{ backgroundColor: "#0095da" }}
@@ -1375,67 +1446,184 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                 <button className="px-5 py-2 rounded text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors">
                   Cancel
                 </button>
-                <motion.button
-                  className="flex items-center gap-2 px-5 py-2 rounded text-sm font-medium text-white"
-                  style={{ backgroundColor: COLORS.teal }}
-                  animate={{
-                    scale: routeMessage.length >= routeMessageFull.length ? [1, 1.05, 1] : 1,
-                    boxShadow: routeMessage.length >= routeMessageFull.length ? `0 0 15px ${COLORS.teal}60` : "none",
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    repeat: routeMessage.length >= routeMessageFull.length ? Infinity : 0,
-                    repeatDelay: 0.3,
-                  }}
-                >
-                  <Send size={14} />
-                  Route Complaint
-                </motion.button>
+                <div className="relative">
+                  <motion.button
+                    className="flex items-center gap-2 px-5 py-2 rounded text-sm font-medium text-white"
+                    style={{ backgroundColor: COLORS.teal }}
+                    animate={{
+                      boxShadow: routeMessage.length >= routeMessageFull.length ? `0 0 12px ${COLORS.teal}40` : "none",
+                    }}
+                  >
+                    <Send size={14} />
+                    Route Complaint
+                  </motion.button>
+
+                  {/* Animated Cursor - clicks the Route Complaint submit button */}
+                  {stage === 22 && routeMessage.length >= routeMessageFull.length && (
+                    <motion.div
+                      className="absolute z-50 pointer-events-none"
+                      initial={{ x: 60, y: 30, opacity: 0 }}
+                      animate={{
+                        x: [60, 15, 15, 15],
+                        y: [30, -2, -2, -2],
+                        opacity: [0, 1, 1, 1],
+                        scale: [1, 1, 0.85, 1],
+                      }}
+                      transition={{
+                        duration: 1.4,
+                        times: [0, 0.5, 0.7, 0.85],
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <svg width="20" height="24" viewBox="0 0 24 28" fill="none">
+                        <path
+                          d="M5 2L5 20L9.5 16L13.5 24L16.5 22.5L12.5 14.5L18 13L5 2Z"
+                          fill="white"
+                          stroke="#333"
+                          strokeWidth="1.5"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <motion.div
+                        className="absolute top-0 left-0 w-4 h-4 rounded-full border-2"
+                        style={{ borderColor: COLORS.teal }}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{
+                          scale: [0, 0, 2.5],
+                          opacity: [0, 0, 0.6, 0],
+                        }}
+                        transition={{
+                          duration: 1.4,
+                          times: [0, 0.65, 0.85, 1],
+                          ease: "easeOut",
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </div>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Success Overlay - Stage 20 */}
+      {/* Success Overlay - Stage 20: Complaint Routed Successfully */}
       <AnimatePresence>
         {stage === 20 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
           >
             <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center gap-4 max-w-md"
+              initial={{ scale: 0.8, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 22 }}
+              className="bg-white rounded-2xl shadow-2xl w-[480px] max-w-[90%] overflow-hidden"
             >
-              <motion.div
-                className="w-20 h-20 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: COLORS.green }}
-                animate={{
-                  boxShadow: [
-                    `0 0 0 0 ${COLORS.green}40`,
-                    `0 0 0 20px ${COLORS.green}00`,
-                    `0 0 0 0 ${COLORS.green}40`,
-                  ],
-                }}
-                transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-              >
-                <CheckCircle2 size={48} className="text-white" strokeWidth={2.5} />
-              </motion.div>
-              <h3 className="text-2xl font-bold text-gray-800">Investigation Complete!</h3>
-              <p className="text-sm text-gray-600 text-center">
-                Case has been documented and prepared for submission to FOS team.
-              </p>
-              <div className="flex gap-2 text-xs text-gray-500">
-                <span>✓ RCA Documented</span>
-                <span>•</span>
-                <span>✓ CAPA Created</span>
-                <span>•</span>
-                <span>✓ Evidence Attached</span>
+              {/* Success Banner */}
+              <div className="px-6 py-4 flex items-center gap-3" style={{ backgroundColor: COLORS.darkTeal }}>
+                <motion.div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: COLORS.green }}
+                  animate={{
+                    boxShadow: [
+                      `0 0 0 0 ${COLORS.green}40`,
+                      `0 0 0 12px ${COLORS.green}00`,
+                      `0 0 0 0 ${COLORS.green}40`,
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  <CheckCircle2 size={22} className="text-white" strokeWidth={2.5} />
+                </motion.div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Complaint Routed Successfully</h3>
+                  <p className="text-[11px] text-white/70">via Email</p>
+                </div>
+                <motion.div
+                  className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold text-white"
+                  style={{ backgroundColor: COLORS.green }}
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+                >
+                  <Mail size={12} />
+                  Sent
+                </motion.div>
+              </div>
+
+              {/* Email Preview */}
+              <div className="px-5 py-4 space-y-3">
+                {/* FOS Header */}
+                <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: COLORS.darkTeal }}>
+                    <span className="text-[8px] font-bold text-white">FOS</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold" style={{ color: COLORS.darkTeal }}>Complaint Routed to You</p>
+                    <p className="text-[10px] text-gray-400">from FOS HRDD Team</p>
+                  </div>
+                </div>
+
+                {/* Email Body */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="space-y-2.5"
+                >
+                  <p className="text-[11px] text-gray-600">
+                    Dear Investigation Officer,
+                  </p>
+                  <p className="text-[11px] text-gray-600 leading-relaxed">
+                    Investigation Officer has reviewed a <span className="font-bold" style={{ color: COLORS.teal }}>complaint</span> and determined it falls under your department's responsibility. This complaint has been officially routed to you for resolution.
+                  </p>
+
+                  {/* Message from IO */}
+                  <div className="px-3 py-2.5 rounded border-l-3 bg-amber-50 border-l-4" style={{ borderLeftColor: COLORS.orange }}>
+                    <p className="text-[10px] font-bold" style={{ color: COLORS.orange }}>Message from Investigation Officer:</p>
+                    <p className="text-[10px] text-gray-600 mt-1">Please close the complaint</p>
+                  </div>
+
+                  {/* Complaint Info */}
+                  <div className="px-3 py-2.5 rounded border-l-4 bg-gray-50" style={{ borderLeftColor: COLORS.teal }}>
+                    <p className="text-[10px] font-bold mb-1.5" style={{ color: COLORS.darkTeal }}>Complaint Information</p>
+                    <div className="space-y-1">
+                      <div className="flex gap-4 text-[10px]">
+                        <span className="text-gray-500 w-20">Ticket Number:</span>
+                        <span className="font-medium text-gray-700">#XX061105-883532</span>
+                      </div>
+                      <div className="flex gap-4 text-[10px]">
+                        <span className="text-gray-500 w-20">Company:</span>
+                        <span className="font-medium text-gray-700">ARF</span>
+                      </div>
+                      <div className="flex gap-4 text-[10px]">
+                        <span className="text-gray-500 w-20">Category:</span>
+                        <span className="font-medium text-gray-700">Workplace Discipline</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="flex justify-center pt-1">
+                    <motion.div
+                      className="px-5 py-1.5 rounded text-[10px] font-bold text-white"
+                      style={{ backgroundColor: COLORS.green }}
+                      animate={{ scale: [1, 1.03, 1] }}
+                      transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+                    >
+                      Submit CAPA & RCA
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                {/* Footer */}
+                <div className="pt-2 border-t border-gray-200 text-center">
+                  <p className="text-[9px] text-gray-400">Best regards,</p>
+                  <p className="text-[9px] font-bold text-gray-500">FOS HRDD Team</p>
+                  <p className="text-[8px] text-gray-400 mt-1">This is an automated email. Please do not reply.</p>
+                </div>
               </div>
             </motion.div>
           </motion.div>

@@ -42,6 +42,12 @@ const COLORS = {
   softGreen: "rgba(96, 186, 129, 0.42)",
 }
 
+// Assets
+const ASSETS = {
+  officer_pc: "/assets/avatars/officer_pc.png",
+}
+
+
 // Apple-style easing
 const EASE = [0.32, 0.72, 0, 1]
 
@@ -714,19 +720,19 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
   const getTransform = () => {
     if (stage >= 7 && stage < 10) {
       // Zoom to RCA
-      return { scale: 2.2, x: -180, y: 80 }
+      return { scale: 1.4, x: -140, y: 50 }
     }
     if (stage >= 10 && stage < 13) {
       // Zoom to CAPA
-      return { scale: 2.2, x: 180, y: -60 }
+      return { scale: 1.4, x: 140, y: -40 }
     }
     if (stage >= 13 && stage < 15) {
       // Zoom to Evidence
-      return { scale: 2.2, x: -180, y: -80 }
+      return { scale: 1.4, x: -100, y: -50 }
     }
     if (stage >= 15 && stage < 17) {
       // Zoom to Submit button
-      return { scale: 1.8, x: 0, y: -120 }
+      return { scale: 1.2, x: 0, y: -80 }
     }
     return { scale: 1, x: 0, y: 0 }
   }
@@ -740,7 +746,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       initial="initial"
       animate="animate"
       exit="exit"
-      className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex items-center justify-center font-sans relative"
+      className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex items-center justify-center font-sans"
     >
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-[0.02]">
@@ -758,7 +764,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
         {draggingFile && (
           <motion.div
             initial={{ x: 200, y: -100, opacity: 0, scale: 0.5 }}
-            animate={{ x: 80, y: 60, opacity: 1, scale: 1 }}
+            animate={{ x: 60, y: 40, opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className="absolute z-[100] flex flex-col items-center gap-2 p-3 bg-white rounded-xl shadow-2xl border-2 border-dashed"
@@ -782,7 +788,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
         }}
         transition={{ type: "spring", stiffness: 80, damping: 25 }}
       >
-        <div className="w-[95%] h-[95%] max-w-[900px] max-h-[600px]">
+        <div className="w-full h-full p-12 lg:p-16">
           {/* Apple-style Card Container - Removed border-gray-200 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -1254,6 +1260,50 @@ export function ScenePortal({ isActive, progress }: { isActive: boolean; progres
         {currentScreen === "dashboard" && <PortalDashboard key="dashboard" stage={stage} />}
         {currentScreen === "timeline" && <TimelineFormScreen key="timeline" stage={stage} />}
       </AnimatePresence>
+
+      {/* IO Avatar Card - Persistent Overlay */}
+      <motion.div
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: stage >= 1 ? 24 : -100, opacity: stage >= 1 ? 1 : 0 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+        className="absolute bottom-6 left-6 z-[100]"
+      >
+        <motion.div
+          className="bg-white rounded-2xl shadow-2xl p-4 flex flex-col items-center border border-gray-100"
+          style={{
+            boxShadow: "0 20px 50px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1)"
+          }}
+          animate={{ y: [0, -4, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="w-16 h-16 rounded-xl overflow-hidden border-2 shadow-sm mb-2" style={{ borderColor: COLORS.teal }}>
+            <img src={ASSETS.officer_pc} alt="Investigation Officer" className="w-full h-full object-cover" />
+          </div>
+          <span className="text-[#284952] font-black text-xs">Investigation Officer</span>
+          <span className="text-teal-600 text-[9px] font-mono mb-2">IO-MULTAN47</span>
+
+          {/* Status Badge */}
+          <div
+            className="px-3 py-1.5 rounded-full flex items-center gap-2"
+            style={{ backgroundColor: `${COLORS.teal}08`, border: `1px solid ${COLORS.teal}15` }}
+          >
+            <motion.div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: stage >= 17 ? "#60BA81" : COLORS.teal }}
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+            />
+            <span className="text-teal-700 text-[9px] font-bold uppercase tracking-wider">
+              {stage < 4 && "Authenticating..."}
+              {stage >= 4 && stage < 6 && "Syncing Portal..."}
+              {stage >= 6 && stage <= 9 && "Examining Complaint..."}
+              {stage >= 10 && stage <= 12 && "Conducting Interviews"}
+              {stage >= 13 && stage <= 15 && "Cross-Checking Records"}
+              {stage >= 16 && "Analysis Complete"}
+            </span>
+          </div>
+        </motion.div>
+      </motion.div>
     </div>
   )
 }

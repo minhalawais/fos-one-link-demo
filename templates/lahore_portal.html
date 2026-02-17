@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <link href="{{ url_for('static', filename='images/logo.png') }}" rel="icon" type="image/png" />
+        <title>FOS-IO Portal</title>
+        <!-- Updated script section -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+        <!-- Remove the old DataTables and Semantic UI JS files -->
+        <!-- <script src="https://code.jquery.com/jquery-3.7.0.js"></script> -->
+        <!-- <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script> -->
+        <!-- <script src="https://cdn.datatables.net/1.13.5/js/dataTables.semanticui.min.js"></script> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.js"></script> -->
+        <!-- Remove the old DataTables and Semantic UI JS files -->
+        <!-- Add the new DataTables and Semantic UI JS files -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/dataTables.jqueryui.min.js"></script>
+        <!-- Add the new DataTables and Semantic UI JS files -->
+        <!-- Add the new Fomantic UI JS file -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.js"></script>
+        <!-- Add the new Fomantic UI JS file -->
+        <!-- Add the new JSZip and PDFMake JS files -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/vfs_fonts.js"></script>
+        <!-- Add the new JSZip and PDFMake JS files -->
+        <!-- Add the new Buttons extension JS files -->
+        <!-- Add the new Buttons extension JS files -->
+    </head>
+    <body>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.css" rel="stylesheet" />
+        <!-- Updated jQuery UI and DataTables jQuery UI CSS links -->
+        <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+        <link href="https://cdn.datatables.net/1.13.5/css/dataTables.jqueryui.min.css" rel="stylesheet" />
+        <!-- Updated jQuery UI and DataTables jQuery UI CSS links -->
+        <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" rel="stylesheet" />
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+        <style>
+            .graph-section {
+                background-color: #f0f0f0;
+                margin-top: 20px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .graph-chart {
+                width: 48%;
+                margin-bottom: 20px;
+                height: auto;
+                max-width: 48%; /* Add some margin at the bottom */
+            }
+
+            /* Add margin between graph sections */
+            .graph-section > div {
+                margin-right: 0px;
+                margin-top: -26px;
+            }
+
+            .table-section {
+                background-color: #f5f5f5;
+                margin-top: 20px;
+                max-width: 100%; /* Set a maximum width */
+            }
+
+            #complaintsTable {
+                margin: 0px;
+
+                min-width: 100%;
+                box-sizing: border-box;
+            }
+            .fa-map-marker:before {
+                content: "\f041";
+                margin-right: 5px;
+            }
+            .section-container {
+                padding: 20px;
+            }
+
+            .graph-section,
+            .table-section {
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .dataTables_wrapper {
+                margin-top: 20px;
+                margin-right: 10px;
+            }
+
+            .dataTables_filter label {
+                font-weight: bold;
+            }
+
+            .dataTables_filter input {
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 4px 8px;
+            }
+
+            .dataTables_paginate {
+                margin-top: 10px;
+            }
+
+            .hide-nbsp {
+                display: none;
+            }
+            .status-button {
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+
+                padding: 0.375rem 0.75rem;
+                font-size: 1rem;
+                line-height: 1.5;
+                border-radius: 0.25rem;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+                border: none;
+            }
+
+            /* Styles for each specific status */
+            .ui.button.initiated {
+                background-color: #284952; /* Change to the desired color for the "Initiated" status */
+                color: var(--white);
+            }
+
+            .ui.button.bounced {
+                background-color: #f5a83c; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.in.process {
+                background-color: #2d9480; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.uapproved {
+                background-color: #702480; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.unprocessed {
+                background-color: #206e71; /* Change to the desired color for the "In Process" status */
+                color: var(--white);
+            }
+            .ui.button.submitted {
+                background-color: #60ba81; /* Change to the desired color for the "Closed" status */
+                color: var(--white);
+            }
+
+            .ui.button.completed {
+                background-color: #a5dc78; /* Change to the desired color for the "Completed" status */
+                color: var(--white);
+            }
+            body {
+                margin-top: 20px;
+                background: #eee;
+            }
+            .timeline {
+                position: relative;
+                padding: 10px;
+                margin: 0 auto;
+                overflow: hidden;
+                color: #ffffff;
+            }
+
+            .timeline:after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 50%;
+                margin-left: -1px;
+                border-right: 2px dashed #c4d2e2;
+                height: 100%;
+                display: block;
+            }
+
+            .timeline-row {
+                padding-left: 50%;
+                position: relative;
+                margin-bottom: 30px;
+            }
+
+            .timeline-row .timeline-time {
+                position: absolute;
+                right: 50%;
+                top: 16px;
+                text-align: right;
+                margin-right: 20px;
+                color: #000000;
+                font-size: 1.5rem;
+            }
+
+            .timeline-row .timeline-time small {
+                display: block;
+                font-size: 0.8rem;
+                color: #8796af;
+            }
+
+            .timeline-row .timeline-content {
+                position: relative;
+                padding: 20px 30px;
+                -webkit-border-radius: 10px;
+                -moz-border-radius: 10px;
+                border-radius: 10px;
+            }
+
+            .timeline-row .timeline-content:after {
+                content: "";
+                position: absolute;
+                top: 20px;
+                height: 3px;
+                width: 40px;
+            }
+
+            .timeline-row .timeline-content:before {
+                content: "";
+                position: absolute;
+                top: 20px;
+                right: -50px;
+                width: 20px;
+                height: 20px;
+                -webkit-border-radius: 100px;
+                -moz-border-radius: 100px;
+                border-radius: 100px;
+                z-index: 100;
+                background: #ffffff;
+                border: 2px dashed #c4d2e2;
+            }
+
+            .timeline-row .timeline-content h4 {
+                margin: 0 0 1px 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                line-height: 150%;
+            }
+
+            .timeline-row .timeline-content p {
+                margin-bottom: 1px;
+                line-height: 150%;
+            }
+
+            .timeline-row .timeline-content i {
+                font-size: 2rem;
+                color: #ffffff;
+                line-height: 100%;
+                padding: 10px;
+                border: 2px solid #ffffff;
+                -webkit-border-radius: 100px;
+                -moz-border-radius: 100px;
+                border-radius: 100px;
+                margin-bottom: 10px;
+                display: inline-block;
+            }
+
+            .timeline-row .timeline-content .thumbs {
+                margin-bottom: 20px;
+            }
+
+            .timeline-row .timeline-content .thumbs img {
+                margin-bottom: 10px;
+            }
+
+            .timeline-row:nth-child(even) .timeline-content {
+                background-color: #ff5000;
+                /* Fallback Color */
+                background-image: -webkit-gradient(linear, left top, left bottom, from(#fc6d4c), to(#ff5000));
+                /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(top, #fc6d4c, #ff5000);
+                /* Chrome 10+, Saf5.1+, iOS 5+ */
+                background-image: -moz-linear-gradient(top, #fc6d4c, #ff5000);
+                /* FF3.6 */
+                background-image: -ms-linear-gradient(top, #fc6d4c, #ff5000);
+                /* IE10 */
+                background-image: -o-linear-gradient(top, #fc6d4c, #ff5000);
+                /* Opera 11.10+ */
+                background-image: linear-gradient(top, #fc6d4c, #ff5000);
+                margin-left: 40px;
+                text-align: left;
+            }
+
+            .timeline-row:nth-child(even) .timeline-content:after {
+                left: -39px;
+                border-right: 18px solid #ff5000;
+                border-top: 10px solid transparent;
+                border-bottom: 10px solid transparent;
+            }
+
+            .timeline-row:nth-child(even) .timeline-content:before {
+                left: -50px;
+                right: initial;
+            }
+
+            .timeline-row:nth-child(odd) {
+                padding-left: 0;
+                padding-right: 50%;
+            }
+
+            .timeline-row:nth-child(odd) .timeline-time {
+                right: auto;
+                left: 50%;
+                text-align: left;
+                margin-right: 0;
+                margin-left: 20px;
+            }
+
+            .timeline-row:nth-child(odd) .timeline-content {
+                background-color: #5a99ee;
+                /* Fallback Color */
+                background-image: -webkit-gradient(linear, left top, left bottom, from(#1379bb), to(#5a99ee));
+                /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(top, #1379bb, #5a99ee);
+                /* Chrome 10+, Saf5.1+, iOS 5+ */
+                background-image: -moz-linear-gradient(top, #1379bb, #5a99ee);
+                /* FF3.6 */
+                background-image: -ms-linear-gradient(top, #1379bb, #5a99ee);
+                /* IE10 */
+                background-image: -o-linear-gradient(top, #1379bb, #5a99ee);
+                /* Opera 11.10+ */
+                background-image: linear-gradient(top, #1379bb, #5a99ee);
+                margin-right: 40px;
+                margin-left: 0;
+                text-align: right;
+            }
+
+            .timeline-row:nth-child(odd) .timeline-content:after {
+                right: -39px;
+                border-left: 18px solid #1379bb;
+                border-top: 10px solid transparent;
+                border-bottom: 10px solid transparent;
+            }
+            .badge-light {
+                color: #212529;
+            }
+            @media (max-width: 767px) {
+                .timeline {
+                    padding: 15px 10px;
+                }
+                .timeline:after {
+                    left: 28px;
+                }
+                .timeline .timeline-row {
+                    padding-left: 0;
+                    margin-bottom: 16px;
+                }
+                .timeline .timeline-row .timeline-time {
+                    position: relative;
+                    right: auto;
+                    top: 0;
+                    text-align: left;
+                    margin: 0 0 6px 56px;
+                }
+                .timeline .timeline-row .timeline-time strong {
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                .timeline .timeline-row .timeline-icon {
+                    top: 52px;
+                    left: -2px;
+                    margin-left: 0;
+                }
+                .timeline .timeline-row .timeline-content {
+                    padding: 15px;
+                    margin-left: 56px;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                    position: relative;
+                }
+                .timeline .timeline-row .timeline-content:after {
+                    right: auto;
+                    left: -39px;
+                    top: 32px;
+                }
+                .timeline .timeline-row:nth-child(odd) {
+                    padding-right: 0;
+                }
+                .timeline .timeline-row:nth-child(odd) .timeline-time {
+                    position: relative;
+                    right: auto;
+                    left: auto;
+                    top: 0;
+                    text-align: left;
+                    margin: 0 0 6px 56px;
+                }
+                .timeline .timeline-row:nth-child(odd) .timeline-content {
+                    margin-right: 0;
+                    margin-left: 55px;
+                }
+                .timeline .timeline-row:nth-child(odd) .timeline-content:after {
+                    right: auto;
+                    left: -39px;
+                    top: 32px;
+                    border-right: 18px solid #5a99ee;
+                    border-left: inherit;
+                }
+                .timeline.animated .timeline-row:nth-child(odd) .timeline-content {
+                    left: 20px;
+                }
+                .timeline.animated .timeline-row.active:nth-child(odd) .timeline-content {
+                    left: 0;
+                }
+                .fa1 {
+                    display: inline-block;
+                    font: normal normal normal 14px/1 FontAwesome;
+                    font-size: inherit;
+                    text-rendering: auto;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                    transform: translate(0, 0);
+                    width: 50px;
+                }
+            }
+            .timeline {
+                position: relative;
+            }
+            /* Add this custom CSS to change the color of the centered line */
+            .timeline:before {
+                content: "";
+                position: absolute;
+                width: 2px;
+                background-color: #f5a83c; /* Replace with the desired color */
+                top: 0;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: -1;
+            }
+
+            .dataTables_wrapper .dataTables_filter {
+                margin-bottom: 10px;
+            }
+            .modal-dialog {
+                max-width: 1200px !important;
+                margin: 1.75rem auto;
+            }
+            .urgent-ticket {
+                color: #be0000; /* Set the text color to red */
+                font-weight: bold; /* Optionally make the text bold */
+            }
+            .loading-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+
+            .loading-circle {
+                width: 100px; /* Adjust the size as needed */
+                height: 100px;
+                border-radius: 50%;
+                border: 3px solid #ccc;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: blink 1s ease infinite;
+            }
+
+            .loading-logo {
+                width: 100%; /* Adjust the size as needed */
+                height: auto;
+            }
+
+            @keyframes blink {
+                0%,
+                100% {
+                    opacity: 0;
+                }
+                50% {
+                    opacity: 1;
+                }
+            }
+            .custom-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                align-items: center;
+                overflow: hidden;
+            }
+
+            .custom-modal-content {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 90%;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                position: relative;
+                margin-left: 66px;
+                overflow-y: auto;
+                max-height: 100vh;
+            }
+
+            .custom-modal-title1 {
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                cursor: pointer;
+                font-size: 24px;
+                color: #888;
+            }
+
+            /* Add hover effect */
+            .custom-modal-dialog {
+                max-width: 1500px;
+                margin-right: 0px;
+                margin-left: 16px;
+            }
+            .fa-map-marker:before {
+                content: "\f041";
+                margin-right: 5px;
+            }
+            .custom-modal-footer {
+                display: flex;
+                justify-content: flex-end; /* Align buttons to the right */
+                padding: 10px; /* Add some padding to the footer */
+            }
+            .cusotm-modal-header {
+                /* ... existing styles ... */
+                border-bottom: 1px solid #ccc; /* Add a border below the header */
+                margin-bottom: 10px;
+            }
+            .custom-modal-footer {
+                /* ... existing styles ... */
+                border-top: 1px solid #ccc; /* Add a border above the footer */
+                display: flex;
+                justify-content: flex-end;
+                padding: 10px;
+                margin-top: 10px;
+            }
+            .fa-upload:before {
+                content: "\f093";
+                margin-right: 15px;
+            }
+            .capa-image-container {
+                width: 150px; /* Adjust this value as needed */
+                height: 90px; /* Adjust this value as needed */
+                overflow: hidden;
+            }
+
+            .capa-image {
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+                margin: auto;
+            }
+            /* Add this to your CSS */
+            .icon-text-row {
+                display: flex;
+                justify-content: flex-end; /* Align items to the right end of the container */
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .icon-text-row1 {
+                display: flex; /* Align items to the right end of the container */
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .icon-text {
+                margin-left: 10px;
+            }
+            .timeline-row .timeline-content h4 {
+                margin: 0 0 1px 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                margin-left: 8px;
+                margin-bottom: 13px;
+                line-height: 150%;
+                margin-right: 9px;
+            }
+
+            .capa-image-container {
+                width: 134px;
+                height: 82px;
+                overflow: hidden;
+                margin-left: 500px;
+                margin-top: -29px;
+                position: absolute;
+            }
+            .input-group > :not(:first-child):not(.dropdown-menu) {
+                margin-left: -1px;
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+                width: 1px;
+                margin-left: 550px;
+                border: 6px;
+            }
+            .timeline-row:nth-child(odd) .timeline-content {
+                background-image: -webkit-linear-gradient(top, #206e71, #2d9480);
+            }
+            .timeline-row:nth-child(odd) .timeline-content:after {
+                border-left: 18px solid #206e71;
+            }
+            .timeline-row:nth-child(even) .timeline-content {
+                background-image: -webkit-linear-gradient(top, #60ba81, #a5dc71);
+            }
+            .timeline-row:nth-child(even) .timeline-content:after {
+                border-right: 18px solid #a5dc71;
+            }
+            .timeline-row .timeline-content:before {
+                border: 2px dashed #f5a83c;
+            }
+
+            .timeline:before {
+                border: 2px dashed #f5a83c;
+                background-color: #f5a83c; /* Replace with the desired color */
+            }
+            .timeline:after {
+                border: 1px dashed #f5a83c;
+            }
+            .navbar {
+                margin-bottom: -18px;
+                margin-top: -20px;
+                padding: 1rem 1rem !important;
+            }
+            .section-container {
+                transform: scale(0.9); /* Adjust the value as needed */
+                transform-origin: top center; /* Keep content aligned to top left */
+            }
+
+            html body .font-weight-bold {
+                font-weight: 800;
+            }
+
+            .background-rectangle {
+                display: inline-block;
+                background-color: #f5a83c; /* Set the background color */
+                padding: 0px 10px; /* Adjust padding as needed */
+                border-radius: 5px; /* Add rounded corners if desired */
+                --bs-bg-opacity: 1;
+                font-family: "Inter", sans-serif;
+                font-weight: 700px;
+            }
+            .col-7 {
+                flex: 0 0 auto;
+                width: 58.33333333%;
+            }
+            .navbar {
+                margin-bottom: 0px; /* Adjust the margin if needed */
+            }
+            .logo-img {
+                height: 45px; /* Adjust the height as per your requirement */
+                width: auto; /* Auto adjust the width based on the height to maintain aspect ratio */
+                margin-right: 10px; /* Optional margin to separate the logo from "FOS" */
+            }
+
+            .navbar-brand {
+                display: flex;
+                align-items: center;
+                margin-right: 10px; /* Adjust the margin to move the entire brand (logo + text) to the right */
+            }
+
+            .navbar-toggler {
+                border: none; /* Remove the border from the toggler button */
+            }
+
+            .navbar-toggler:focus {
+                outline: none; /* Remove the focus outline */
+            }
+
+            .navbar-center {
+                flex-wrap: wrap;
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center; /* Add this line to vertically center the buttons */
+            }
+
+            .navbar-nav {
+                flex-direction: row; /* Adjust the direction to align the logout button horizontally */
+            }
+
+            .nav-item {
+                padding: 0 10px; /* Adjust the horizontal spacing between navbar items */
+            }
+
+            .nav-item.disabled {
+                cursor: default; /* Prevent the "Reports" link from being clickable */
+            }
+
+            .nav-link,
+            .dropdown-menu a,
+            .search-button {
+                color: #284952;
+            }
+
+            .nav-link:hover,
+            .dropdown-menu a:hover {
+                color: #6e9954;
+            }
+
+            .dropdown-menu {
+                background-color: #284952;
+            }
+
+            .dropdown-menu a {
+                color: #fff;
+            }
+
+            .dropdown-menu a:hover {
+                background-color: #6e9954;
+            }
+            .page-wrapper > .page-breadcrumb {
+                max-width: 1361px;
+            }
+            .logo-img {
+                height: 55px;
+                width: auto;
+                margin-right: 0px;
+            }
+            .right-align {
+                float: right;
+                margin-right: 20px;
+            }
+            /* Updated logo and heading styling */
+            /* Updated .navbar-center styling */
+            /* Updated .navbar-center styling */
+            .navbar-center {
+                display: flex;
+                align-items: center;
+                margin-right: 178px;
+            }
+
+            .navbar-center .col-7 {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start; /* Align the heading to the left */
+                justify-content: center; /* Center vertically */
+            }
+
+            .logo-img {
+                height: 23%;
+                width: 23%;
+                margin-right: 0px; /* Maintain a small margin for separation */
+            }
+            .container-fluid {
+                margin-top: -30px;
+                margin-bottom: -30px;
+            }
+            /* Additional styling for the heading */
+            .navbar-center h1 {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin: 0;
+                align-self: flex-start; /* Align the heading to the left */
+            }
+            #doughnutChart .google-visualization-table-td {
+                white-space: normal !important;
+                display: block !important;
+                text-align: left !important;
+            }
+            .ui.button {
+                width: 100%;
+            }
+            .table-container {
+                width: 100%; /* Set the desired width */
+                overflow-x: scroll; /* Add horizontal scroll */
+                white-space: nowrap; /* Prevent text wrapping in cells */
+            }
+            .badge {
+                border-radius: 0;
+                outline: none;
+            }
+            .badge:focus,
+            .badge:active {
+                outline: none;
+                border: none;
+            }
+            .notification-button {
+                background-color: #4caf50;
+                border: none;
+                color: white;
+                padding: 6px 22px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                transition-duration: 0.4s;
+                cursor: pointer;
+                border-radius: 9px;
+            }
+
+            .notification-button:hover {
+                background-color: #45a049; /* Darker green when hovering */
+            }
+
+            /* Custom CSS styles for the notification dropdown */
+            .notification-dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            .notification-dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                min-width: 400px;
+                box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+                padding: 12px;
+                z-index: 1;
+                border-radius: 8px;
+                right: 0;
+                overflow: auto;
+            }
+
+            .notification-dropdown-content .notification-message {
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .notification-dropdown-content .notification-message p {
+                color: #333;
+                margin: 0;
+            }
+
+            .notification-dropdown:hover .notification-dropdown-content {
+                display: block;
+            }
+            .notification-message:hover {
+                background-color: lightgray; /* Adjust the background color for the hover effect */
+                cursor: pointer; /* Set the cursor to indicate interactivity */
+            }
+            .table-section table tbody tr {
+                height: 150px; /* Adjust the value to your desired row height */
+            }
+            .table-section table tbody td {
+                overflow: hidden;
+                text-overflow: ellipsis; /* Ellipsis will truncate long text */
+                white-space: nowrap; /* Prevent text wrapping */
+            }
+            .table-section table {
+                width: 100%; /* Adjust the value to your desired table width */
+                table-layout: fixed; /* Ensure fixed table width */
+            }
+            .table-section table tbody tr td {
+                width: auto; /* Initial width to auto */
+            }
+            .table-section table tbody td:hover {
+                overflow: visible;
+                white-space: normal;
+            }
+            .ui.button,
+            .ui.buttons .button,
+            .ui.buttons .or {
+                font-size: 9px;
+            }
+            /* Add this CSS to your document or include it in your existing styles */
+            .custom-input-file {
+                /* Set the color property to black */
+                color: black;
+                margin-left: 125%;
+            }
+            .loader {
+                border: 2px solid #f3f3f3;
+                border-top: 2px solid #3498db;
+                border-radius: 50%;
+                margin-left: 41%;
+                width: 12px;
+                height: 12px;
+                animation: spin 2s linear infinite;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+
+            #complaintsTable thead th:first-child {
+                width: 13.6px !important; /* Replace with your desired width */
+            }
+            #toast-container .toast {
+                background-color: #343a40;
+                color: #ffffff;
+            }
+
+            #toast-container .toast-success .toast-progress {
+                background-color: #28a745;
+            }
+        </style>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <!-- Logo with adjusted size -->
+                <a class="navbar-brand">
+                    <img alt="FOS Logo" class="logo-img" src="{{ url_for('static', filename='images/vertical_logo.png') }}" />
+                    <img alt="FOS Logo" class="logo-img" src="{{ url_for('static', filename='images/buyer_logos/giz.png') }}" />
+
+                    <div class="navbar-center">
+                        <div class="col-7 align-self-center">
+                            <h1 class="font-weight-bold" style="font-size: 20px; color:black font-weight: 700px; font-family: Inter, sans-serif; margin-left: -45px;">
+                                <span class="background-rectangle font-weight-bold" style="font-size: 25px; color: white;">CMT</span> Investigation/Remediation Portal 
+                            </h1>
+                            <div class="d-flex align-items-center">
+                                <!-- Any additional content here -->
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <div class="notification-dropdown" style="display: none;">
+                    <button class="notification-button" style="position: relative;">
+                        <i class="fas fa-bell"></i><span id="unreadCounter" style="position: absolute; top: 0; right: 0; background-color: red; color: white; border-radius: 50%; padding: 0px 6px; font-size: 11px;"></span>
+                    </button>
+                    <div class="notification-dropdown-content" id="notification-dropdown-content" >
+                        <!-- Notification messages will be dynamically added here -->
+                    </div>
+                </div>
+                <img alt="FOS Logo" class="logo-img" src="{{ url_for('static', filename='images/company_logos/Lahore_Fashions.png') }}" />
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </div>
+            </div>
+        </nav>
+        <div class="section-container">
+            <!-- New container for both graph sections -->
+            <div class="graph-container" style="display: flex; justify-content: space-between; margin-left: 2%; flex-wrap: wrap;">
+                <!-- Graph Section 1 -->
+                <div class="graph-section" id="graphSection1" style="width: 30%; height: 340px;">
+                    <div class="graph-chart" style="margin-top: -8px;">
+                        <div id="doughnutChart" style="width: 200%; height: 300px;"></div>
+                        <div id="selectedValue" style="text-align: center; font-size: 16px; font-weight: bold;"></div>
+                        <!-- New div for the center label -->
+                    </div>
+                </div>
+                <div class="graph-section" id="graphSection2" style="width: 68%; height: 341px;">
+                    <div class="graph-chart">
+                        <div id="barChart" style="width: 200%; height: 350px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-section" style="position: fixed;">
+                <table class="ui celled table" id="complaintsTable">
+                    <thead>
+                        <tr>
+                            <th>Sr.</th>
+                            <!-- Index column -->
+                            <th>Ticket Number</th>
+                            <th>NAME</th>
+                            <th>STATUS</th>
+                            <th>COMPLAINT DATE</th>
+                            <th>Mobile Number</th>
+                            <th>Date of Issue</th>
+                            <th>Complaint Categories</th>
+                            <th>Additional Comments</th>
+                            <th>RELEVANT Complaint</th>
+                            <th>Concerned Department</th>
+                            <th>Previous History</th>
+                            <th>Proposed Solution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in data %}
+                        <tr style="height: 150px;">
+                            <td>{{ loop.index }}</td>
+                            <!-- Index column content -->
+                            <td class="{% if complaint.is_urgent %}urgent-ticket{% endif %}" style="white-space: normal;">{{ complaint.ticket_number }}</td>
+                            <td style="white-space: normal;">{{ complaint.employee_name }}</td>
+                            <td style="width:100% white-space: nowrap;">
+                                <button class="ui {{ complaint.status|lower }} button status-button" data-target="#exampleModal" data-toggle="custom-modal">
+                                    {{ complaint.status }}
+                                </button>
+                            </td>
+                            <td style="white-space: normal;">{{ complaint.date_entry }}</td>
+                            <td style="white-space: normal;">{{ complaint.mobile_number }}</td>
+                            <td style="white-space: normal;">{{ complaint.date_of_issue }}</td>
+                            <td style="white-space: normal;">{{ complaint.complaint_categories }}</td>
+                            <td>{{ complaint.additional_comments }}</td>
+                            <td style="white-space: normal;">{{ complaint.person_issue }}</td>
+                            <td style="white-space: normal;">{{ complaint.concerned_department }}</td>
+                            <td>{{ complaint.previous_history }}</td>
+                            <td>{{ complaint.proposed_solution }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>#</th>
+                            <!-- Index column footer -->
+                            <th>Ticket Number</th>
+                            <th>NAME</th>
+                            <th>STATUS</th>
+                            <th>COMPLAINT DATE</th>
+                            <th>Mobile Number</th>
+                            <th>Date of Issue</th>
+                            <th>Complaint Categories</th>
+                            <th>Additional Comments</th>
+                            <th>RELEVANT Complaint</th>
+                            <th>Concerned Department</th>
+                            <th>Previous History</th>
+                            <th>Proposed Solution</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div aria-hidden="true" aria-labelledby="capaModalLabel" class="modal fade" id="capaModal" role="dialog" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img alt="" class="img-fluid" id="capaEnlargedImage" src="" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="custom-modal" id="exampleModal" style="top: 0%; width: 100%; height: 100%; bottom: 50%; max-width: 100%;">
+            <div class="custom-modal-dialog" style="width: 100%; margin-bottom: 54px;">
+                <div class="custom-modal-content">
+                    <div class="cusotm-modal-header">
+                        <h5 class="custom-modal-title1">
+                            Modal title
+                        </h5>
+                        <button aria-label="Close" class="close" id="closeButton1" type="button">
+                            <span aria-hidden="true">
+                                ×
+                            </span>
+                        </button>
+                    </div>
+                    <div class="custom-modal-body">
+                        <div class="container bootdey">
+                            <div class="row gutters">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <!-- Timeline start -->
+                                            <div class="timeline">
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">7:45PM<small>May 21</small></div>
+                                                    <div class="timeline-dot fb-bg"></div>
+                                                    <div class="timeline-content">
+                                                        <i class="fa fa-map-marker"></i>
+                                                        <h4>Admin theme!</h4>
+                                                        <p>Milestone Admin Dashboard contains C3 graphs, flot graphs, data tables, calendar, drag &amp; drop and ion slider.</p>
+                                                        <div class="">
+                                                            <span class="badge badge-light">Design</span>
+                                                            <span class="badge badge-light">Admin</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">8:00 AM<small>May 18</small></div>
+                                                    <div class="timeline-dot green-one-bg"></div>
+                                                    <div class="timeline-content green-one">
+                                                        <i class="fa fa-warning"></i>
+                                                        <h4>Admin theme!</h4>
+                                                        <p>
+                                                            Milestone Admin Dashboard contains C3 graphs, flot graphs, data tables, calendar.
+                                                        </p>
+                                                        <div class="">
+                                                            <span class="badge badge-light">Design</span>
+                                                            <span class="badge badge-light">Admin</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">7:25 PM<small>May 6</small></div>
+                                                    <div class="timeline-dot green-two-bg"></div>
+                                                    <div class="timeline-content green-two">
+                                                        <i class="fa fa-list"></i>
+                                                        <h4>Best Admin Template!</h4>
+                                                        <p>Custom C3 graphs, Custom flot graphs, flot graphs, small graphs, Sass, profile and timeline.</p>
+                                                        <div>
+                                                            <span class="badge badge-light">Invoice</span>
+                                                            <span class="badge badge-light">Graphs</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">3:55 PM<small>Apr 26</small></div>
+                                                    <div class="timeline-dot green-three-bg"></div>
+                                                    <div class="timeline-content green-three">
+                                                        <i class="icon-directions"></i>
+                                                        <h4>Milestone Admin</h4>
+                                                        <p>
+                                                            Admin theme includes graphs, invoice, timeline, widgets, projects, calendar, components, layouts, todo's.
+                                                        </p>
+                                                        <div>
+                                                            <span class="badge badge-light">Profile</span>
+                                                            <span class="badge badge-light">Dashboard</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">5:24 PM<small>Apr 12</small></div>
+                                                    <div class="timeline-dot green-four-bg"></div>
+                                                    <div class="timeline-content green-four">
+                                                        <i class="fa fa-user"></i>
+                                                        <h4>Milestone Dashboard</h4>
+                                                        <p class="no-margin">Milestone Admin Dashboard includes invoice, profile, tasks, gallery, projects, maintanence.</p>
+                                                        <div>
+                                                            <span class="badge badge-light">Analytics</span>
+                                                            <span class="badge badge-light">Graphs</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">11:25 AM<small>Apr 19</small></div>
+                                                    <div class="timeline-dot teal-bg"></div>
+                                                    <div class="timeline-content teal">
+                                                        <i class="fa fa-coffee"></i>
+                                                        <h4>Milestone Template</h4>
+                                                        <p class="no-margin">Panels, alerts, notifications, new input styles, pricing plans, project plan, signup, login and register.</p>
+                                                        <div>
+                                                            <span class="badge badge-light">Labels</span>
+                                                            <span class="badge badge-light">Filters</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-time">12:30 PM<small>May 25</small></div>
+                                                    <div class="timeline-dot sea-green-bg"></div>
+                                                    <div class="timeline-content sea-green">
+                                                        <i class="fa fa-image"></i>
+                                                        <h4>Milestone dashboard</h4>
+                                                        <p>Milestone Admin Dashboard contains Ion slider, heatmap, alerts, breadcrumbs, alerts, pricing, signup, login and register.</p>
+                                                        <div>
+                                                            <span class="badge badge-light">BS 4</span>
+                                                            <span class="badge badge-light">Sass</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Timeline end -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-modal-footer">
+                        <button class="btn btn-secondary" data-dismiss="modal" id="closeButton" type="button">Close</button>
+                        <button class="btn btn-primary" id="saveChangesButton" type="button">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="loading-screen">
+            <div class="loading-circle">
+                <img alt="Loading..." class="loading-logo" src="{{ url_for('static', filename='images/FOS-Original.png') }}" />
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.5/js/dataTables.jqueryui.min.js"></script>
+        <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+        <script src="https://www.gstatic.com/charts/loader.js"></script>
+        <script crossorigin="anonymous" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.7.4/js/uikit.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.7.4/js/uikit-icons.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <script>
+                          var customData;
+                          toastr.options = {
+              "closeButton": true,
+              "debug": false,
+              "newestOnTop": false,
+              "progressBar": true,
+              "positionClass": "toast-bottom-full-width",
+              "preventDuplicates": false,
+              "onclick": null,
+              "showDuration": "300",
+              "hideDuration": "1000",
+              "timeOut": "10000",
+              "extendedTimeOut": "1000",
+              "showEasing": "swing",
+              "hideEasing": "linear",
+              "showMethod": "fadeIn",
+              "hideMethod": "fadeOut",
+              "progressBarColor": "#28a745",
+              "backgroundColor": "#343a40",
+              "textColor": "#ffffff"
+            }
+                        $(document).ready(function () {
+                          var data = {{ data | tojson }};
+                          customData = data;
+                            var dataTable = $('#complaintsTable').DataTable({
+                                columnDefs: [
+                                    {
+                                        targets: 4, // Index of the "COMPLAINT DATE" column (zero-based index)
+                                        type: 'datetime', // Specify the data type as "datetime"
+                                        render: function(data, type, full, meta) {
+                                            if (type === 'sort') {
+                                                // Parse the datetime using moment.js for sorting
+                                                return moment(data, 'ddd, DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss');
+                                            }
+                                            return data; // Display the original datetime format
+                                        }
+                                    }
+                                ],
+                                lengthMenu: [
+                                [100, 50, 25,10, -1],
+                                [100, 50, 25,10, 'All']
+                            ],
+                                order: [[4, 'desc']] // Set the default sorting by "COMPLAINT DATE" column in descending order
+                            });
+
+                            // Add event listeners for each chart tab
+                            $('.tab').click(function () {
+                                var tableContentID = $(this).data('table');
+                                $('.table-section').hide();
+                                $(tableContentID).show();
+
+                                if ($.fn.DataTable.isDataTable('#complaintsTable')) {
+                                    dataTable.destroy();
+                                }
+
+                                dataTable = $(tableContentID + ' table').DataTable({
+                                    columnDefs: [
+                                        {
+                                            targets: 4, // Index of the "COMPLAINT DATE" column (zero-based index)
+                                            type: 'datetime', // Specify the data type as "datetime"
+                                            render: function(data, type, full, meta) {
+                                                if (type === 'sort') {
+                                                    // Parse the datetime using moment.js for sorting
+                                                    return moment(data, 'ddd, DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss');
+                                                }
+                                                return data; // Display the original datetime format
+                                            }
+                                        }
+                                    ],
+                                     lengthMenu: [
+                                [100, 50, 25,10, -1],
+                                [100, 50, 25,10, 'All']
+                            ],
+                                    order: [[4, 'desc']] // Set the default sorting by "COMPLAINT DATE" column in descending order
+                                });
+                            });
+                        });
+                        var centerDiv;
+                              var selectedValueDiv;
+                          // Callback function to draw the charts after Google Charts API is loaded
+                            var selectedDoughnutItem = null;
+                            function drawDoughnutChart() {
+                              // Sample data for the doughnut chart
+                                var result = calculateInitializedRows();
+                              var data = google.visualization.arrayToDataTable([
+                                ['Label', 'Value'],
+                                ['Unprocessed', result[0]],
+                                ['In Process', result[1]],
+                                ['Submitted', result[2]],
+                                ['Bounced', result[3]],
+                              ]);
+                              var options = {
+                               title: 'Complaints By Status',
+                               titleTextStyle: {
+                                    fontSize: 15,
+                                  fontName: 'Arial, sans-serif',// Adjust the font size as needed
+                                  },
+                                pieHole: 0.6, // Decrease the width of the circle (0 to 1)
+                                colors: ['#206E71' ,'#2D9480' ,'#60BA81','#F5A83C'],
+                                pieSliceText: 'none',
+                                chartArea: {
+
+                                  width: '90%',
+                                  height: '80%',
+                                },
+                                legend: {
+                                    position: 'bottom',
+                                  },
+                                   interactivity: false,
+                                   tooltip: {
+                                    trigger: 'none' // Disable tooltips specifically
+                                  },
+                                 backgroundColor: 'transparent',
+                              animation: {
+                                startup: true, // Enable animation on startup
+                                duration: 1000, // Animation duration in milliseconds
+                                easing: 'out', // Animation easing function
+                              },
+
+                            };
+                            updateSelectedValue('Total', result[4]);
+
+                          var doughnutChart = new google.visualization.PieChart(document.getElementById('doughnutChart'));
+
+                                // Add a select event listener to the chart
+                                google.visualization.events.addListener(doughnutChart, 'select', selectHandler);
+
+                                function selectHandler() {
+
+                                  // Get the selected data label and value
+                                  var selection = doughnutChart.getSelection();
+                                  if (selection.length > 0) {
+
+                                    var selectedItem = data.getValue(selection[0].row, 0); // Column 0 contains the labels
+                                    var selectedValue = data.getValue(selection[0].row, 1); // Column 1 contains the values
+
+                                        if (selectedDoughnutItem === selectedItem) {
+                                  doughnutChart.setSelection([]); // Deselect the item
+                                  filterTableByStatus(''); // Clear the search filter
+                                  updateSelectedValue('', 0); // Update the center text with empty values
+                                  selectedDoughnutItem = null; // Reset the selectedDoughnutItem variable
+                                    drawBarChart('')
+                                } else {
+                                  filterTableByStatus(selectedItem); // Apply the search filter
+                                  updateSelectedValue(selectedItem, selectedValue); // Update the center text with selected values
+                                  selectedDoughnutItem = selectedItem; // Store the selected item in the variable
+                                    drawBarChart(selectedDoughnutItem)
+                                }
+                              } else {
+                                // No item selected (deselected)
+                                doughnutChart.setSelection([]); // Deselect the item (in case it was previously selected)
+                                filterTableByStatus(''); // Clear the search filter
+                                updateSelectedValue('Total', result[4]); // Update the center text with empty values
+                                selectedDoughnutItem = null; // Reset the selectedDoughnutItem variable
+                                 drawBarChart('')
+                              }
+                            }
+
+                                // Function to update the center text
+                                function updateCenterText(text) {
+                                  if (centerDiv) {
+                                    centerDiv.remove(); // Remove the previous center text element
+                                  }
+
+
+                                }
+
+                                // Function to update the selected value text below the chart
+                                function updateSelectedValue(text, value) {
+                                if (selectedValueDiv) {
+                                    selectedValueDiv.remove(); // Remove the previous selected value element
+                                  }
+                                if (value>0){
+
+                                  selectedValueDiv = document.createElement('div');
+                                  if (text.includes('Submitted')) {
+                                        selectedValueDiv.innerHTML = text + '&nbsp;'  +'('+value + ')' ;
+                                        selectedValueDiv.style.right = '22%'; // Center the text horizontally
+                                        selectedValueDiv.style.top = '103%';
+                                        selectedValueDiv.style.pointerEvents = 'none';// Center the text vertically
+                                      }
+                                  if (text.includes('Bounced')) {
+                                        selectedValueDiv.innerHTML = text + '&nbsp;'  +'('+value + ')' ;
+                                        selectedValueDiv.style.right = '23%'; // Center the text horizontally
+                                        selectedValueDiv.style.top = '103%';
+                                        selectedValueDiv.style.pointerEvents = 'none';// Center the text vertically
+
+                                      }
+
+                                  if (text.includes('In Process')) {
+                                        selectedValueDiv.innerHTML = text + '&nbsp;'  +'('+value + ')'; // Add the "hide-nbsp" class to hide the &nbsp;
+                                      selectedValueDiv.style.right = '22%'; // Center the text horizontally
+                                        selectedValueDiv.style.top = '103%';
+                                        selectedValueDiv.style.pointerEvents = 'none';// Center the text vertically
+                                      }
+                                  if (text.includes('Unprocessed')) {
+                                        selectedValueDiv.innerHTML = text + '&nbsp;'  +'('+value + ')'; // Add the "hide-nbsp" class to hide the &nbsp;
+                                      selectedValueDiv.style.right = '16%'; // Center the text horizontally
+                                        selectedValueDiv.style.top = '103%'; // Center the text vertically
+                                        selectedValueDiv.style.pointerEvents = 'none';
+                                      }
+                                  if (text.includes('Total')) {
+                                        selectedValueDiv.innerHTML = text + '&nbsp;'  +'('+value + ')'; // Add the "hide-nbsp" class to hide the &nbsp;
+                                      selectedValueDiv.style.right = '31%'; // Center the text horizontally
+                                        selectedValueDiv.style.top = '103%'; // Center the text vertically
+                                        selectedValueDiv.style.pointerEvents = 'none';
+                                      }
+                                    selectedValueDiv.classList.add('selected-value'); // Add the "selected-value" class
+
+                                  selectedValueDiv.style.textAlign = 'center';
+                                  selectedValueDiv.style.fontSize = '16px';
+                                  selectedValueDiv.style.fontWeight = 'bold';
+                                  selectedValueDiv.style.position = 'relative';
+                                   selectedValueDiv.style.transform = 'translateX(-50%)';
+
+                                  selectedValueDiv.style.transform = 'translate(-50%, -50%)';
+                                  document.getElementById('graphSection1').appendChild(selectedValueDiv);
+                                }
+                                }
+                                doughnutChart.draw(data, options);
+
+                              }
+                              function drawBarChart(status) {
+                          var initiatedCategoriesCount = InitiatedCategory();
+                          var inProcessCategoriesCount = InProcessCategory();
+                          var closedCategoryCount = ClosedCategory();
+                          var BouncedCategoryCount = BouncedCategory();
+                            var access_id = "{{access_id}}"
+                          // List of all categories
+                          var categories = [
+                            'Workplace Health, Safety and Environment',
+                            'Freedom of Association',
+                            'Child Labor',
+                            'Wages & Benefits',
+                            'Working Hours',
+                            'Forced Labor',
+                            'Discrimination',
+                            'Unfair Employment',
+                            'Ethical Business',
+                            'Harassment',
+                            'Discipline',
+                            'Feedback'
+                          ];
+
+                          // Ensure that each category exists in the count objects, set count to 0 if missing
+                            categories.forEach(function (category) {
+                            if (!initiatedCategoriesCount[category]) {
+                              initiatedCategoriesCount[category] = 0;
+                            }
+                            if (!inProcessCategoriesCount[category]) {
+                              inProcessCategoriesCount[category] = 0;
+                            }
+                            if (!closedCategoryCount[category]) {
+                              closedCategoryCount[category] = 0;
+                            }
+                            if (!BouncedCategoryCount[category]) {
+                              BouncedCategoryCount[category] = 0;
+                            }
+                          });
+                         if(status==='') {
+                          var data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Unprocessed', 'In Process', 'Submitted','Bounced'],
+                            ['Workplace Health, Safety and Environment', initiatedCategoriesCount['Workplace Health, Safety and Environment'], inProcessCategoriesCount['Workplace Health, Safety and Environment'], closedCategoryCount['Workplace Health, Safety and Environment'],BouncedCategoryCount['Workplace Health, Safety and Environment']],
+                            ['Freedom of Association', initiatedCategoriesCount['Freedom of Association'], inProcessCategoriesCount['Freedom of Association'], closedCategoryCount['Freedom of Association'],BouncedCategoryCount['Freedom of Association']],
+                            ['Child Labor', initiatedCategoriesCount['Child Labor'], inProcessCategoriesCount['Child Labor'], closedCategoryCount['Child Labor'],BouncedCategoryCount['Child Labor']],
+                            ['Wages & Benefits', initiatedCategoriesCount['Wages & Benefits'], inProcessCategoriesCount['Wages & Benefits'], closedCategoryCount['Wages & Benefits'],BouncedCategoryCount['Wages & Benefits']],
+                            ['Working Hours', initiatedCategoriesCount['Working Hours'], inProcessCategoriesCount['Working Hours'], closedCategoryCount['Working Hours'],BouncedCategoryCount['Working Hours']],
+                            ['Forced Labor', initiatedCategoriesCount['Forced Labor'], inProcessCategoriesCount['Forced Labor'], closedCategoryCount['Forced Labor'],BouncedCategoryCount['Forced Labor']],
+                            ['Discrimination', initiatedCategoriesCount['Discrimination'], inProcessCategoriesCount['Discrimination'], closedCategoryCount['Discrimination'],BouncedCategoryCount['Discrimination']],
+                            ['Unfair Employment', initiatedCategoriesCount['Unfair Employment'], inProcessCategoriesCount['Unfair Employment'], closedCategoryCount['Unfair Employment'],BouncedCategoryCount['Unfair Employment']],
+                            ['Ethical Business', initiatedCategoriesCount['Ethical Business'], inProcessCategoriesCount['Ethical Business'], closedCategoryCount['Ethical Business'],BouncedCategoryCount['Ethical Business']],
+                            ['Harassment', initiatedCategoriesCount['Harassment'], inProcessCategoriesCount['Harassment'], closedCategoryCount['Harassment'],BouncedCategoryCount['Harassment']],
+                            ['Discipline', initiatedCategoriesCount['Discipline'], inProcessCategoriesCount['Discipline'], closedCategoryCount['Discipline'],BouncedCategoryCount['Discipline']],
+                            ['Feedback', initiatedCategoriesCount['Feedback'], inProcessCategoriesCount['Feedback'], closedCategoryCount['Feedback'],BouncedCategoryCount['Feedback']],
+                          ]);
+                          if(access_id == '73'){
+                             data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Unprocessed', 'In Process', 'Submitted','Bounced'],
+                            ['Workplace Health, Safety and Environment', initiatedCategoriesCount['Workplace Health, Safety and Environment'], inProcessCategoriesCount['Workplace Health, Safety and Environment'], closedCategoryCount['Workplace Health, Safety and Environment'],BouncedCategoryCount['Workplace Health, Safety and Environment']],
+
+                            ['Child Labor', initiatedCategoriesCount['Child Labor'], inProcessCategoriesCount['Child Labor'], closedCategoryCount['Child Labor'],BouncedCategoryCount['Child Labor']],
+                            ['Wages & Benefits', initiatedCategoriesCount['Wages & Benefits'], inProcessCategoriesCount['Wages & Benefits'], closedCategoryCount['Wages & Benefits'],BouncedCategoryCount['Wages & Benefits']],
+                            ['Working Hours', initiatedCategoriesCount['Working Hours'], inProcessCategoriesCount['Working Hours'], closedCategoryCount['Working Hours'],BouncedCategoryCount['Working Hours']],
+                            ['Forced Labor', initiatedCategoriesCount['Forced Labor'], inProcessCategoriesCount['Forced Labor'], closedCategoryCount['Forced Labor'],BouncedCategoryCount['Forced Labor']],
+                            ['Discrimination', initiatedCategoriesCount['Discrimination'], inProcessCategoriesCount['Discrimination'], closedCategoryCount['Discrimination'],BouncedCategoryCount['Discrimination']],
+                            ['Unfair Employment', initiatedCategoriesCount['Unfair Employment'], inProcessCategoriesCount['Unfair Employment'], closedCategoryCount['Unfair Employment'],BouncedCategoryCount['Unfair Employment']],
+                            ['Ethical Business', initiatedCategoriesCount['Ethical Business'], inProcessCategoriesCount['Ethical Business'], closedCategoryCount['Ethical Business'],BouncedCategoryCount['Ethical Business']],
+                            ['Harassment', initiatedCategoriesCount['Harassment'], inProcessCategoriesCount['Harassment'], closedCategoryCount['Harassment'],BouncedCategoryCount['Harassment']],
+                            ['Discipline', initiatedCategoriesCount['Discipline'], inProcessCategoriesCount['Discipline'], closedCategoryCount['Discipline'],BouncedCategoryCount['Discipline']],
+                            ['Feedback', initiatedCategoriesCount['Feedback'], inProcessCategoriesCount['Feedback'], closedCategoryCount['Feedback'],BouncedCategoryCount['Feedback']],
+                          ]);
+                             }
+                            var options = {
+                            title: 'Complaints By Categories',
+                            titleTextStyle: {
+                                    fontSize: 15,
+                                  fontName: 'Arial, sans-serif',// Adjust the font size as needed
+                                  },
+                            isStacked: true,
+                            hAxis: {
+                              title: '',
+                            },
+                            vAxis: {
+                              title: 'No. of Complaints',
+                            },
+                            backgroundColor: 'transparent',
+                            animation: {
+                              startup: true,
+                              duration: 1000,
+                              easing: 'out',
+                            },
+                            // Set the colors for each bar category
+                            colors:  ['#206E71' ,'#2D9480' ,'#60BA81','#F5A83C'],
+                          };
+                          }
+                            if(status==='Unprocessed') {
+                            var data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Unprocessed'],
+                            ['Workplace Health, Safety and Environment', initiatedCategoriesCount['Workplace Health, Safety and Environment']],
+                            ['Freedom of Association', initiatedCategoriesCount['Freedom of Association']],
+                            ['Child Labor', initiatedCategoriesCount['Child Labor']],
+                            ['Wages & Benefits', initiatedCategoriesCount['Wages & Benefits']],
+                            ['Working Hours', initiatedCategoriesCount['Working Hours']],
+                            ['Forced Labor', initiatedCategoriesCount['Forced Labor']],
+                            ['Discrimination', initiatedCategoriesCount['Discrimination']],
+                            ['Unfair Employment', initiatedCategoriesCount['Unfair Employment']],
+                            ['Ethical Business', initiatedCategoriesCount['Ethical Business']],
+                            ['Harassment', initiatedCategoriesCount['Harassment']],
+                            ['Discipline', initiatedCategoriesCount['Discipline']],
+                            ['Feedback', initiatedCategoriesCount['Feedback']],
+                          ]);
+                          if(access_id == '73'){
+                             data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Unprocessed'],
+                            ['Workplace Health, Safety and Environment', initiatedCategoriesCount['Workplace Health, Safety and Environment']],
+                                ['Child Labor', initiatedCategoriesCount['Child Labor']],
+                            ['Wages & Benefits', initiatedCategoriesCount['Wages & Benefits']],
+                            ['Working Hours', initiatedCategoriesCount['Working Hours']],
+                            ['Forced Labor', initiatedCategoriesCount['Forced Labor']],
+                            ['Discrimination', initiatedCategoriesCount['Discrimination']],
+                            ['Unfair Employment', initiatedCategoriesCount['Unfair Employment']],
+                            ['Ethical Business', initiatedCategoriesCount['Ethical Business']],
+                            ['Harassment', initiatedCategoriesCount['Harassment']],
+                            ['Discipline', initiatedCategoriesCount['Discipline']],
+                            ['Feedback', initiatedCategoriesCount['Feedback']],
+                          ]);
+                          }
+                            var options = {
+                            title: 'Complaints By Categories',
+                            titleTextStyle: {
+                                    fontSize: 15,
+                                  fontName: 'Arial, sans-serif',// Adjust the font size as needed
+                                  },
+                            isStacked: true,
+                            hAxis: {
+                              title: '',
+                            },
+                            vAxis: {
+                              title: 'No. of Complaints',
+                            },
+                            backgroundColor: 'transparent',
+                            animation: {
+                              startup: true,
+                              duration: 1000,
+                              easing: 'out',
+                            },
+                            // Set the colors for each bar category
+                            colors: ['#206E71'],
+                          };
+                          }
+                          if(status==='In Process') {
+                            var data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'In Process'],
+                            ['Workplace Health, Safety and Environment', inProcessCategoriesCount['Workplace Health, Safety and Environment']],
+                            ['Freedom of Association', inProcessCategoriesCount['Freedom of Association']],
+                            ['Child Labor', inProcessCategoriesCount['Child Labor']],
+                            ['Wages & Benefits', inProcessCategoriesCount['Wages & Benefits']],
+                            ['Working Hours', inProcessCategoriesCount['Working Hours']],
+                            ['Forced Labor', inProcessCategoriesCount['Forced Labor']],
+                            ['Discrimination', inProcessCategoriesCount['Discrimination']],
+                            ['Unfair Employment', inProcessCategoriesCount['Unfair Employment']],
+                            ['Ethical Busines', inProcessCategoriesCount['Ethical Business']],
+                            ['Harassment', inProcessCategoriesCount['Harassment']],
+                            ['Discipline', inProcessCategoriesCount['Discipline']],
+                            ['Feedback', inProcessCategoriesCount['Feedback']],
+                          ]);
+                          if(access_id=='73'){
+                              data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'In Process'],
+                            ['Workplace Health, Safety and Environment', inProcessCategoriesCount['Workplace Health, Safety and Environment']],
+                            ['Child Labor', inProcessCategoriesCount['Child Labor']],
+                            ['Wages & Benefits', inProcessCategoriesCount['Wages & Benefits']],
+                            ['Working Hours', inProcessCategoriesCount['Working Hours']],
+                            ['Forced Labor', inProcessCategoriesCount['Forced Labor']],
+                            ['Discrimination', inProcessCategoriesCount['Discrimination']],
+                            ['Unfair Employment', inProcessCategoriesCount['Unfair Employment']],
+                            ['Ethical Busines', inProcessCategoriesCount['Ethical Business']],
+                            ['Harassment', inProcessCategoriesCount['Harassment']],
+                            ['Discipline', inProcessCategoriesCount['Discipline']],
+                            ['Feedback', inProcessCategoriesCount['Feedback']]
+                          ]);
+                          }
+                            var options = {
+                            title: 'Complaints By Categories',
+                            titleTextStyle: {
+                                    fontSize: 15,
+                                  fontName: 'Arial, sans-serif',// Adjust the font size as needed
+                                  },
+                            isStacked: true,
+                            hAxis: {
+                              title: '',
+                            },
+                            vAxis: {
+                              title: 'No. of Complaints',
+                            },
+                            backgroundColor: 'transparent',
+                            animation: {
+                              startup: true,
+                              duration: 1000,
+                              easing: 'out',
+                            },
+                            // Set the colors for each bar category
+                            colors: ['#2D9480'],
+                          };
+                          }
+                            if(status==='Submitted') {
+                            var data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Submitted'],
+                            ['Workplace Health, Safety and Environment', closedCategoryCount['Workplace Health, Safety and Environment']],
+                            ['Freedom of Association', closedCategoryCount['Freedom of Association']],
+                            ['Child Labor', closedCategoryCount['Child Labor']],
+                            ['Wages & Benefits', closedCategoryCount['Wages & Benefits']],
+                            ['Working Hours', closedCategoryCount['Working Hours']],
+                            ['Forced Labor', closedCategoryCount['Forced Labor']],
+                            ['Discrimination', closedCategoryCount['Discrimination']],
+                            ['Unfair Employment', closedCategoryCount['Unfair Employment']],
+                            ['Ethical Business', closedCategoryCount['Ethical Business']],
+                            ['Harassment', closedCategoryCount['Harassment']],
+                            ['Discipline', closedCategoryCount['Discipline']],
+                            ['Feedback', closedCategoryCount['Feedback']],
+                          ]);
+                          if(access_id=='73'){
+                          data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Submitted'],
+                            ['Workplace Health, Safety and Environment', closedCategoryCount['Workplace Health, Safety and Environment']],
+                                ['Child Labor', closedCategoryCount['Child Labor']],
+                            ['Wages & Benefits', closedCategoryCount['Wages & Benefits']],
+                            ['Working Hours', closedCategoryCount['Working Hours']],
+                            ['Forced Labor', closedCategoryCount['Forced Labor']],
+                            ['Discrimination', closedCategoryCount['Discrimination']],
+                            ['Unfair Employment', closedCategoryCount['Unfair Employment']],
+                            ['Ethical Business', closedCategoryCount['Ethical Business']],
+                            ['Harassment', closedCategoryCount['Harassment']],
+                            ['Discipline', closedCategoryCount['Discipline']],
+                            ['Feedback', closedCategoryCount['Feedback']],
+                          ]);
+                          }
+                            var options = {
+                            title: 'Complaints By Categories',
+                            titleTextStyle: {
+                                    fontSize: 15,
+                                  fontName: 'Arial, sans-serif',// Adjust the font size as needed
+                                  },
+                            isStacked: true,
+                            hAxis: {
+                              title: '',
+                            },
+                            vAxis: {
+                              title: 'No. of Complaints',
+                            },
+                            backgroundColor: 'transparent',
+                            animation: {
+                              startup: true,
+                              duration: 1000,
+                              easing: 'out',
+                            },
+                            // Set the colors for each bar category
+                            colors: ['#60BA81'],
+                          };
+                          }
+
+                            if(status==='Bounced') {
+                            var data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Bounced'],
+                            ['Workplace Health, Safety and Environment', BouncedCategoryCount['Workplace Health, Safety and Environment']],
+                            ['Freedom of Association', BouncedCategoryCount['Freedom of Association']],
+                            ['Child Labor', BouncedCategoryCount['Child Labor']],
+                            ['Wages & Benefits', BouncedCategoryCount['Wages & Benefits']],
+                            ['Working Hours', BouncedCategoryCount['Working Hours']],
+                            ['Forced Labor', BouncedCategoryCount['Forced Labor']],
+                            ['Discrimination', BouncedCategoryCount['Discrimination']],
+                            ['Unfair Employment', BouncedCategoryCount['Unfair Employment']],
+                            ['Ethical Business', BouncedCategoryCount['Ethical Business']],
+                            ['Harassment', BouncedCategoryCount['Harassment']],
+                            ['Discipline', BouncedCategoryCount['Discipline']],
+                            ['Feedback', BouncedCategoryCount['Feedback']],
+                          ]);
+                          if(access_id=='73'){
+                              data = google.visualization.arrayToDataTable([
+                            ['Complaint Category', 'Bounced'],
+                            ['Workplace Health, Safety and Environment', BouncedCategoryCount['Workplace Health, Safety and Environment']],
+                            ['Child Labor', BouncedCategoryCount['Child Labor']],
+                            ['Wages & Benefits', BouncedCategoryCount['Wages & Benefits']],
+                            ['Working Hours', BouncedCategoryCount['Working Hours']],
+                            ['Forced Labor', BouncedCategoryCount['Forced Labor']],
+                            ['Discrimination', BouncedCategoryCount['Discrimination']],
+                            ['Unfair Employment', BouncedCategoryCount['Unfair Employment']],
+                            ['Ethical Business', BouncedCategoryCount['Ethical Business']],
+                            ['Harassment', BouncedCategoryCount['Harassment']],
+                            ['Discipline', BouncedCategoryCount['Discipline']],
+                            ['Feedback', BouncedCategoryCount['Feedback']],
+                          ]);
+                          }
+                            var options = {
+                            title: 'Complaints By Categories',
+                            titleTextStyle: {
+                                    fontSize: 15,
+                                  fontName: 'Arial, sans-serif',// Adjust the font size as needed
+                                  },
+                            isStacked: true,
+                            hAxis: {
+                              title: '',
+                            },
+                            vAxis: {
+                              title: 'No. of Complaints',
+                            },
+                            backgroundColor: 'transparent',
+                            animation: {
+                              startup: true,
+                              duration: 1000,
+                              easing: 'out',
+                            },
+                            // Set the colors for each bar category
+                            colors: ['#F5A83C']
+                          };
+                          }
+
+
+                          var chart = new google.visualization.ColumnChart(document.getElementById('barChart'));
+
+                          // Add an event listener to the chart
+                          google.visualization.events.addListener(chart, 'select', selectHandler1);
+
+                          function selectHandler1() {
+                            // Get the selected data from the chart
+                            var selection = chart.getSelection();
+
+                            if (selection.length > 0) {
+                              var selectedItem = selection[0];
+                              var categoryIndex = selectedItem.row;
+                              var categoryName = categories[categoryIndex];
+                              var selectedBar = data.getColumnLabel(selectedItem.column);
+
+                              // Call the filterTableByCategory function if defined
+                              filterTableByCategory(categoryName, selectedBar);
+
+                              // You can perform any additional actions here based on the selection
+                            }else {
+                              // No bar selected (deselected)
+                              // Clear the search filter and redraw the data table
+                              filterTableByCategory('', '');
+                            }
+                          }
+
+                          chart.draw(data, options);
+                        }
+                        function getIoPortalData() {
+                          fetch("{{ url_for('io_portal_json') }}")
+                            .then(response => response.json())
+                            .then(data => {
+                              let originalData = [...data.data]; // Create a copy of the original data
+                              customData = [...data.data];
+                              customData.sort((a, b) => {
+                                  const dateA = new Date(a.date_entry);
+                                  const dateB = new Date(b.date_entry);
+                                  return dateB.getTime() - dateA.getTime();
+                                });
+                              var dataTable = $('#complaintsTable').DataTable();
+
+                              // Destroy the existing DataTable instance
+                              dataTable.clear();
+                              dataTable.destroy();
+                              $('#complaintsTable tbody').empty();
+
+                              // Recreate the DataTable with the same configuration
+                              var newDataTable = $('#complaintsTable').DataTable({
+                                columnDefs: [
+                                  {
+                                    targets: 4, // Index of the "COMPLAINT DATE" column (zero-based index)
+                                    type: 'datetime', // Specify the data type as "datetime"
+                                    render: function(data, type, full, meta) {
+                                      if (type === 'sort') {
+                                        // Parse the datetime using moment.js for sorting
+                                        return moment(data, 'ddd, DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss');
+                                      }
+                                      return data; // Display the original datetime format
+                                    }
+                                  }
+                                ],
+                                lengthMenu: [
+                                  [100, 50, 25, 10, -1],
+                                  [100, 50, 25, 10, 'All']
+                                ],
+                                order: [[4, 'desc']] // Set the default sorting by "COMPLAINT DATE" column in descending order
+                              });
+
+                              // Populate the DataTable with the fetched data
+                              customData.forEach(function(complaint) {
+                                console.log('Complaint:', complaint);
+                                let originalIndex = originalData.indexOf(complaint) + 1;
+                                console.log(originalIndex); // Get the original index of the complaint
+                                newDataTable.row.add([
+                                  originalIndex, // Original index
+                                  `<span class="${complaint.is_urgent ? 'urgent-ticket' : ''}" style='white-space: normal;'>${complaint.ticket_number}</span>`, // Ticket Number
+                                  `<span style='white-space: normal;'>${complaint.employee_name}</span>`, // NAME
+                                  `<div style="width:100%; white-space: nowrap;">
+                                    <button class="ui ${complaint.status.toLowerCase()} button status-button" data-target="#exampleModal" data-toggle="custom-modal">
+                                      ${complaint.status}
+                                    </button>
+                                  </div>`, // STATUS
+                                  `<span style='white-space: normal;' class="sorting_1">${complaint.date_entry}</span>`, // COMPLAINT DATE
+                                  `<span style='white-space: normal;'>${complaint.mobile_number}</span>`, // Mobile Number
+                                  `<span style='white-space: normal;'>${complaint.date_of_issue}</span>`, // Date of Issue
+                                  `<span style='white-space: normal;'>${complaint.complaint_categories}</span>`, // Complaint Categories
+                                  `<span>${complaint.additional_comments}</span>`, // Additional Comments
+                                  `<span style='white-space: normal;'>${complaint.person_issue}</span>`, // RELEVANT Complaint
+                                  `<span style='white-space: normal;'>${complaint.concerned_department}</span>`, // Concerned Department
+                                  `<span>${complaint.previous_history}</span>`, // Previous History
+                                  `<span>${complaint.proposed_solution}</span>` // Proposed Solution
+                                ]);
+                              });
+
+                              // Redraw the DataTable
+
+                              newDataTable.draw();
+
+
+                              drawDoughnutChart();
+                              drawBarChart('');
+                              toastr.success('Data has been updated Successfully');
+
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }
+
+
+                            document.addEventListener("DOMContentLoaded", function () {
+                                const user_id = "{{ access_id }}";  // Replace with the actual user_id passed from Flask
+                                const url = "{{ url_for('get_user_notifications', user_id=access_id) }}";
+                                const notificationButton = document.querySelector('.notification-button');
+                                let isFirstTime = true;
+                                let unreadCount = 0; // Initialize the unread count
+
+                                fetch(url)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const notificationDropdown = document.getElementById('notification-dropdown-content');
+                                        if (data.length === 0) {
+                                            const noNotificationElement = document.createElement('p');
+                                            noNotificationElement.textContent = 'There is no notification to display';
+                                            notificationDropdown.appendChild(noNotificationElement);
+                                        } else {
+                                            data.forEach(notification => {
+                                                const notificationElement = document.createElement('div');
+                                                const notificationMessage = document.createElement('p');
+                                                notificationMessage.textContent = notification.message;
+                                                const notificationDate = document.createElement('p');
+                                                notificationDate.textContent = notification.created_at;
+                                                notificationElement.classList.add('notification-message');
+
+                                                // Check if the notification is read or not and change the background color accordingly
+                                                if (!notification.is_read) {
+                                                    notificationElement.style.backgroundColor = 'lightblue';
+                                                    unreadCount++; // Increment the unread count
+                                                }
+
+                                                // Add click event to each notification element
+                                                notificationElement.addEventListener('click', () => {
+                                                    var dataTable = $('#complaintsTable').DataTable();
+                                                    const complaintNumber = extractComplaintNumber(notification.message);
+                                                    dataTable.columns(1).search(complaintNumber).draw();
+                                                    setTimeout(() => {
+                                                        dataTable.columns(1).search('').draw();
+                                                    }, 7000);
+                                                    updateUnreadCounter(); // Update the unread counter
+                                                });
+
+                                                notificationElement.appendChild(notificationMessage);
+                                                notificationElement.appendChild(notificationDate);
+                                                notificationDropdown.appendChild(notificationElement);
+                                            });
+
+                                            // If it's the first time, send a request to update notifications
+                                            if (isFirstTime) {
+                                                const updateNotificationURL = "{{ url_for('update_user_notifications') }}"; // Replace with the actual URL for updating notifications
+                                                  if (user_id) {
+                                                    fetch(updateNotificationURL, {
+                                                        method: "POST",
+                                                        headers: {
+                                                            "Content-Type": "application/json"
+                                                        },
+                                                        body: JSON.stringify({ user_id: user_id })
+                                                    })
+                                                    .then(response => response.json())
+                                                    .then(data => {
+                                                        console.log(data);
+                                                        isFirstTime = false;
+                                                    })
+                                                    .catch(error => console.error('Error:', error));
+                                                } else {
+                                                    console.error('User ID is empty');
+                                                }
+                                            }
+
+                                            updateUnreadCounter(); // Call the function to initially update the unread counter
+                                        }
+                                    })
+                                    .catch(error => console.error('Error:', error));
+
+                                function extractComplaintNumber(message) {
+                                    const regex = /#([A-Z0-9]+)-\d+/;
+                                    const match = message.match(regex);
+                                    if (match) {
+                                        return match[0].replace('#', '');
+                                    }
+                                    return 'No complaint number found';
+                                }
+
+                                function updateUnreadCounter() {
+                                    const unreadCounter = document.getElementById('unreadCounter');
+                                    unreadCounter.textContent = unreadCount > 0 ? unreadCount : ''; // Set the text content of the counter
+                                }
+                            });
+
+                         window.addEventListener("load", function () {
+                            document.querySelector(".loading-screen").style.display = "none";
+                          });
+                        $(document).ready(function() {
+
+                            // Handle search
+                            $('#searchInput').on('keyup', function() {
+                                dataTable.search(this.value).draw();
+                            });
+
+                            // Handle show entries
+                            $('#entriesSelect').on('change', function() {
+                                dataTable.page.len(this.value).draw();
+                            });
+
+                            // Handle CSV export
+                            $('#csvExportBtn').on('click', function() {
+                                dataTable.button('.buttons-csv').trigger();
+                            });
+                        });
+                        function filterTableByStatus(statusValue) {
+                          var dataTable = $('#complaintsTable').DataTable();
+
+                          if (statusValue === 'Bounced') {
+                            dataTable.columns(3).search('Bounced|Bounced1', true, false).draw();
+                          }
+                              else {
+                            dataTable.columns(3).search(statusValue).draw();
+                          }
+                        }
+
+                         function InitiatedCategory() {
+                          var dataTable = $('#complaintsTable').DataTable();
+                            var categories = [
+                            'Workplace Health, Safety and Environment',
+                            'Freedom of Association',
+                            'Child Labor',
+                            'Wages & Benefits',
+                            'Working Hours',
+                            'Forced Labor',
+                            'Discrimination',
+                            'Unfair Employment',
+                            'Ethical Business',
+                            'Harassment',
+                            'Discipline',
+                            'Feedback'
+                          ];
+                          var rowCountsByCategory = {};
+
+                          categories.forEach(function (category) {
+                            rowCountsByCategory[category] = 0;
+                          });
+
+                          dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            var rowData = this.data();
+                            var statusCell = rowData[3]; // Assuming the "STATUS" column is the third column (index 2)
+                            status = extractTextFromHTML(statusCell)
+                            var categoryValueCell = rowData[7]; // Assuming the "Complaint Categories" column is the seventh column (index 6)
+                            var categoryValue = extractTextFromHTML(categoryValueCell)
+                            if (status === 'Unprocessed' && categories.includes(categoryValue)) {
+                              rowCountsByCategory[categoryValue]++;
+                            }
+                          });
+
+                          return rowCountsByCategory;
+                        }
+                        function printModalContent(modalContent) {
+
+                                // Create a new window for printing
+                                var printWindow = window.open('', '_blank');
+
+                                // Write the modal content and the print CSS link to the new window
+                                printWindow.document.write('<html><head><title>Print</title>');
+
+                                var modal_css = '<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"><style>body{margin-top:20px;background:#eee;}.timeline{position:relative;padding:10px;margin:0 auto;overflow:hidden;color:#fff;}.timeline:after{content:"";position:absolute;top:0;left:50%;margin-left:-1px;border-right:2px dashed #c4d2e2;height:100%;display:block;}.timeline-row{padding-left:50%;position:relative;margin-bottom:30px;}.timeline-row .timeline-time{position:absolute;right:50%;top:31px;text-align:right;margin-right:20px;color:#000;font-size:1.5rem;}.timeline-row .timeline-time small{display:block;font-size:.8rem;color:#8796af;}.timeline-row .timeline-content{position:relative;padding:20px 30px;-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;}.timeline-row .timeline-content:after{content:"";position:absolute;top:20px;height:3px;width:40px;}.timeline-row .timeline-content:before{content:"";position:absolute;top:20px;right:-50px;width:20px;height:20px;-webkit-border-radius:100px;-moz-border-radius:100px;border-radius:100px;z-index:100;background:#fff;border:2px dashed #c4d2e2;}.timeline-row .timeline-content h4{margin:0 0 20px 0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;line-height:150%;}.timeline-row .timeline-content p{margin-bottom:30px;line-height:150%;}.timeline-row .timeline-content i{font-size:2rem;color:#fff;line-height:100%;padding:10px;border:2px solid #fff;-webkit-border-radius:100px;-moz-border-radius:100px;border-radius:100px;margin-bottom:10px;display:inline-block;}.timeline-row .timeline-content .thumbs{margin-bottom:20px;}.timeline-row .timeline-content .thumbs img{margin-bottom:10px;}.timeline-row:nth-child(even) .timeline-content{background-color:#ff5000;background-image:-webkit-gradient(linear,left top,left bottom,from(#fc6d4c),to(#ff5000));background-image:-webkit-linear-gradient(top,#fc6d4c,#ff5000);background-image:-moz-linear-gradient(top,#fc6d4c,#ff5000);background-image:-ms-linear-gradient(top,#fc6d4c,#ff5000);background-image:-o-linear-gradient(top,#fc6d4c,#ff5000);background-image:linear-gradient(top,#fc6d4c,#ff5000);margin-left:40px;text-align:left;}.timeline-row:nth-child(even) .timeline-content:after{left:-39px;border-right:18px solid #ff5000;border-top:10px solid transparent;border-bottom:10px solid transparent;}.timeline-row:nth-child(even) .timeline-content:before{left:-50px;right:initial;}.timeline-row:nth-child(odd){padding-left:0;padding-right:50%;}.timeline-row:nth-child(odd) .timeline-time{right:auto;left:50%;text-align:left;margin-right:0;margin-left:20px;}.timeline-row:nth-child(odd) .timeline-content{background-color:#5a99ee;background-image:-webkit-gradient(linear,left top,left bottom,from(#1379bb),to(#5a99ee));background-image:-webkit-linear-gradient(top,#1379bb,#5a99ee);background-image:-moz-linear-gradient(top,#1379bb,#5a99ee);background-image:-ms-linear-gradient(top,#1379bb,#5a99ee);background-image:-o-linear-gradient(top,#1379bb,#5a99ee);background-image:linear-gradient(top,#1379bb,#5a99ee);margin-right:40px;margin-left:0;text-align:right;}.timeline-row:nth-child(odd) .timeline-content:after{right:-39px;border-left:18px solid #1379bb;border-top:10px solid transparent;border-bottom:10px solid transparent;}.media(max-width:767px){.timeline{padding:15px 10px;}.timeline:after{left:28px;}.timeline .timeline-row{padding-left:0;margin-bottom:16px;}.timeline .timeline-row .timeline-time{position:relative;right:auto;top:0;text-align:left;margin:0 0 6px 56px;}.timeline .timeline-row .timeline-time strong{display:inline-block;margin-right:10px;}.timeline .timeline-row .timeline-icon{top:52px;left:-2px;margin-left:0;}.timeline .timeline-row .timeline-content{padding:15px;margin-left:56px;box-shadow:0 1px 2px rgba(0,0,0,.1);position:relative;}.timeline .timeline-row .timeline-content:after{right:auto;left:-39px;top:32px;}.timeline .timeline-row:nth-child(odd){padding-right:0;}.timeline .timeline-row:nth-child(odd) .timeline-time{position:relative;right:auto;left:auto;top:0;text-align:left;margin:0 0 6px 56px;}.timeline .timeline-row:nth-child(odd) .timeline-content{margin-right:0;margin-left:55px;}.timeline .timeline-row:nth-child(odd) .timeline-content:after{right:auto;left:-39px;top:32px;border-right:18px solid #5a99ee;border-left:inherit;}.timeline.animated .timeline-row:nth-child(odd) .timeline-content{left:20px;}.timeline.animated .timeline-row.active:nth-child(odd) .timeline-content{left:0;}}</style>';
+
+                                printWindow.document.write(modal_css);
+                                printWindow.document.write('</head><body>');
+                                printWindow.document.write('modalContent');
+                                printWindow.document.write('</body></html>');
+
+                                // Print and close the new window
+                                printWindow.document.close();
+                                printWindow.print();
+                                printWindow.close();
+                            }
+                        function InProcessCategory() {
+                          var dataTable = $('#complaintsTable').DataTable();
+                            var categories = [
+                            'Workplace Health, Safety and Environment',
+                            'Freedom of Association',
+                            'Child Labor',
+                            'Wages & Benefits',
+                            'Working Hours',
+                            'Forced Labor',
+                            'Discrimination',
+                            'Unfair Employment',
+                            'Ethical Business',
+                            'Harassment',
+                            'Discipline',
+                            'Feedback'
+                          ];
+                          var rowCountsByCategory = {};
+
+                          categories.forEach(function (category) {
+                            rowCountsByCategory[category] = 0;
+                          });
+
+                          dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            var rowData = this.data();
+                            var statusCell = rowData[3]; // Assuming the "STATUS" column is the third column (index 2)
+                            status = extractTextFromHTML(statusCell)
+                            var categoryValueCell = rowData[7]; // Assuming the "Complaint Categories" column is the seventh column (index 6)
+                            var categoryValue = extractTextFromHTML(categoryValueCell)
+                            if (status === 'In Process' && categories.includes(categoryValue)) {
+                              rowCountsByCategory[categoryValue]++;
+                            }
+                          });
+
+                          return rowCountsByCategory;
+                        }
+
+                        function ClosedCategory() {
+                          var dataTable = $('#complaintsTable').DataTable();
+                            var categories = [
+                            'Workplace Health, Safety and Environment',
+                            'Freedom of Association',
+                            'Child Labor',
+                            'Wages & Benefits',
+                            'Working Hours',
+                            'Forced Labor',
+                            'Discrimination',
+                            'Unfair Employment',
+                            'Ethical Business',
+                            'Harassment',
+                            'Discipline',
+                            'Feedback'
+                          ];
+                          var rowCountsByCategory = {};
+
+                          categories.forEach(function (category) {
+                            rowCountsByCategory[category] = 0;
+                          });
+
+                          dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            var rowData = this.data();
+                            var statusCell = rowData[3]; // Assuming the "STATUS" column is the third column (index 2)
+                            status = extractTextFromHTML(statusCell)
+                            var categoryValueCell = rowData[7]; // Assuming the "Complaint Categories" column is the seventh column (index 6)
+                            var categoryValue = extractTextFromHTML(categoryValueCell)
+                            if (status === 'Submitted' && categories.includes(categoryValue)) {
+                              rowCountsByCategory[categoryValue]++;
+                            }
+                          });
+
+                          return rowCountsByCategory;
+                        }
+                        function BouncedCategory() {
+                          var dataTable = $('#complaintsTable').DataTable();
+                            var categories = [
+                            'Workplace Health, Safety and Environment',
+                            'Freedom of Association',
+                            'Child Labor',
+                            'Wages & Benefits',
+                            'Working Hours',
+                            'Forced Labor',
+                            'Discrimination',
+                            'Unfair Employment',
+                            'Ethical Business',
+                            'Harassment',
+                            'Discipline',
+                            'Feedback'
+                          ];
+                          var rowCountsByCategory = {};
+
+                          categories.forEach(function (category) {
+                            rowCountsByCategory[category] = 0;
+                          });
+
+                          dataTable.rows().every(function (rowIdx, tableLoop, rowLoop) {
+                            var rowData = this.data();
+                            var statusCell = rowData[3]; // Assuming the "STATUS" column is the third column (index 2)
+                            status = extractTextFromHTML(statusCell)
+                            var categoryValueCell = rowData[7]; // Assuming the "Complaint Categories" column is the seventh column (index 6)
+                            var categoryValue = extractTextFromHTML(categoryValueCell)
+                            if ((status === 'Bounced' || status === 'Bounced1' ) && categories.includes(categoryValue)) {
+                              rowCountsByCategory[categoryValue]++;
+                            }
+                          });
+
+                          return rowCountsByCategory;
+                        }
+
+
+                        function calculateInitializedRows() {
+                          var initializedRows = 0;
+                          var processRows = 0;
+                          var closedRows = 0;
+                          var completedRows = 0;
+                          var totalRows = 0;
+
+                          // Get the DataTable instance
+                          var dataTable = $('#complaintsTable').DataTable();
+
+                          // Loop through each row in the DataTable
+                          dataTable.rows().every(function () {
+                            var rowData = this.data();
+                            var statusCell = rowData[3]; // Assuming the "STATUS" column is the third column (index 2)
+                            status = extractTextFromHTML(statusCell)
+                            // Count only if the row status matches 'Initiated', 'In Process', 'Closed', or 'Completed'
+                            if (status === 'Unprocessed') {
+                              initializedRows++;
+                              totalRows++;
+                            } else if (status === 'In Process') {
+                              processRows++;
+                              totalRows++;
+                            } else if (status === 'Submitted') {
+                              closedRows++;
+                              totalRows++;
+                            } else if (status === 'Bounced' || status === 'Bounced1' || status === 'Unclosed') {
+                              completedRows++;
+                              totalRows++;
+                            }
+                          });
+                          console.log('Sum of rows:', initializedRows, processRows, closedRows, completedRows,totalRows);
+
+                          return [initializedRows, processRows, closedRows, completedRows,totalRows];
+                        }
+
+                        function extractTextFromHTML(htmlString) {
+                          // Create a temporary element to parse the HTML string
+                          const tempElement = document.createElement('div');
+                          tempElement.innerHTML = htmlString;
+
+                          // Get the text content from the element
+                          const textContent = tempElement.textContent.trim();
+
+                          // Return the extracted text
+                          return textContent;
+                        }
+
+
+
+                            window.onload = function () {
+                              // Load the Google Charts API
+                              google.charts.load('current', { packages: ['corechart'] });
+                                google.charts.setOnLoadCallback(function () {
+                                drawDoughnutChart();
+                                drawBarChart('');
+                              });
+
+
+                            }
+
+
+                        function filterTableByCategory(statusValue, categoryValue) {
+                          var dataTable = $('#complaintsTable').DataTable();
+
+                          // Clear any previous search filters
+                          dataTable.search('').draw();
+                          dataTable.search(statusValue);
+
+                          // Draw the updated table with the combined search results
+                          dataTable.draw();
+                        }
+
+                        function fileExists(url) {
+                            const http = new XMLHttpRequest();
+                            http.open('HEAD', url, false);
+                            http.send();
+                            return http.status !== 404;
+                        }
+                        let ticketNumber;
+                        let specificComplaint;
+                        document.addEventListener("DOMContentLoaded", function () {
+                            var table = document.getElementById("complaintsTable"); // replace with the id of your table
+
+                            table.addEventListener("click", function (event) {
+                                var target = event.target;
+
+                                // Check if the clicked element is a status button
+                                if (target.classList.contains("status-button")) {
+                                    // Get the corresponding ticket number from the row
+                                    var button = event.target;
+                                    let originalContent = button.innerHTML;
+
+                                    // Change the button's content to a loader
+                                    button.innerHTML = '<div class="loader"></div>';
+                                    const row = button.closest('tr');
+                                    requestAnimationFrame(() => {
+                                    // Simulate an asynchronous operation (e.g., data fetching)
+                                    setTimeout(() => {
+                                    console.log('this.innerHTML', button.innerHTML);
+
+                                    ticketNumber = row.querySelector('td:nth-child(2)').textContent;
+                                    sessionStorage.setItem('selectedTicketNumber', ticketNumber);
+
+                                    var data = customData;
+
+                                    // Find the specific complaint from the data using the ticket number
+                                    specificComplaint = data.find(function (complaint) {
+                                        return complaint.ticket_number === ticketNumber;
+                                    });
+
+
+                                    // Update the modal content with the specific complaint details
+                                    var modalTitle = document.querySelector(".custom-modal-title1");
+                                    var modalBody = document.querySelector(".custom-modal-body");
+
+                        modalTitle.innerHTML = specificComplaint.ticket_number + " | " + specificComplaint.date_entry +
+                                              '<span class="right-align">' + specificComplaint.company_name + " | " + specificComplaint.office_name + '</span>';
+
+                        if(specificComplaint.status === 'Unprocessed'){
+                                            var modalContent = `Are you sure, you want to process this complaint?`;
+                                            }
+                                            else{
+                        var modalContent = `
+                          <div class="container bootdey">
+                            <div class="row gutters">
+                              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div class="card">
+                                  <div class="card-body">
+                                    <!-- Timeline start -->
+                                    <div class="timeline">
+                                      <div class="timeline-row">
+                                        <div class="timeline-time">
+                                          ${specificComplaint.in_process_date}<small>  </small>
+                                        </div>
+                                        <div class="timeline-dot fb-bg"></div>
+                                        <div class="timeline-content">
+                                          <div class="icon-text-row"> <!-- Added a container for icon and text -->
+                                            <div class="left-align" style="width: 60%; flex-grow: 1; padding-left: 5px; text-align: left; font-size: 15px; margin-bottom: 10px;">
+                                              <span class="badge ">${specificComplaint.employee_name}</span>
+                                              <span class="badge ">|</span>
+                                              <span class="badge ">${specificComplaint.designation}</span> <br>
+                                              <span class="badge">${specificComplaint.complaint_categories}</span>
+                                            </div>
+                                            <h4 class="icon-text" style="margin-right: -1px;">In Process</h4>
+                                            <i class="fa fa-list" aria-hidden="true" style="width: 50px; margin-left: 10px;"></i>
+                                          </div>
+                                          ${
+                                            (() => {
+                                              const imagePath = `static/images/capa_images/${ticketNumber}_proof.png`;
+                                              const pdfPath = `static/images/capa_images/${ticketNumber}_proof.pdf`;
+                                              const videoPath = `static/images/capa_images/${ticketNumber}_proof.mp4`;
+
+                                              if (fileExists(imagePath)) {
+                                                return `
+                                                  <div class="capa-image-container">
+                                                    <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                                                  </div>`;
+                                              } else if (fileExists(pdfPath)) {
+                                                // Display PDF viewer or link as per your requirements
+                                                return `<p style="text-align: left;     font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>`;
+                                              }else if (fileExists(videoPath)) {
+                                                    // Display video player or link as per your requirements
+                                                    return `
+                                                  <p style="text-align: left; font-size: 75%;">Video Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                                                      <div class="capa-image-container">
+                                                        <video class="myVideo" width="320" height="240" controls>
+                                                          <source src="${videoPath}" type="video/mp4">
+                                                          Your browser does not support the video tag.
+                                                        </video>
+                                                      </div>`;
+                                                  }
+                                                  else{
+                                                  return ``;
+                                                  }
+                                            })()
+                                          }
+                                                            <p class="left-align" style="padding-left: 5px; text-align: left;">
+                                            <br>
+                                            ${
+                                              specificComplaint.additional_comments
+                                                ? `<span class="badge badge-light"></span>${specificComplaint.additional_comments}<br>`
+                                                : ''
+                                            }
+                                            ${
+                                              specificComplaint.date_of_issue
+                                                ? `<span class="badge">Date of Issue:</span>${specificComplaint.date_of_issue}<br>`
+                                                : ''
+                                            }
+                                            ${
+                                              specificComplaint.person_issue
+                                                ? `<span class="badge">Relevant Person:</span>${specificComplaint.person_issue}<br>`
+                                                : ''
+                                            }
+                                            ${
+                                              specificComplaint.concerned_department
+                                                ? `<span class="badge">Concerned Department:</span>${specificComplaint.concerned_department}<br>`
+                                                : ''
+                                            }
+                                            ${
+                                              specificComplaint.previous_history
+                                                ? `<span class="badge">Previous History:</span>${specificComplaint.previous_history}<br>`
+                                                : ''
+                                            }
+                                            ${
+                                              specificComplaint.proposed_solution
+                                                ? `<span class="badge">Proposed Solution:</span>${specificComplaint.proposed_solution}<br>`
+                                                : ''
+                                            }
+                        `;
+                        if (specificComplaint.lodged_by_agent && specificComplaint.lodged_from_web) {
+                              modalContent += `
+                                    <span class="badge"> Lodged By:</span>
+                                     Agent from Web<br>
+                                    `;
+                                    }
+                        else if (specificComplaint.lodged_by_agent && !specificComplaint.lodged_from_web) {
+                              modalContent += `
+                                    <span class="badge"> Lodged By:</span>
+                                     Agent from Mobile App<br>
+                                    `;
+                                    }
+                        else if (!specificComplaint.lodged_by_agent && !specificComplaint.lodged_from_web) {
+                              modalContent += `
+                                    <span class="badge"> Lodged By:</span>
+                                     Employee from Mobile App<br>
+                                    `;
+                                    }
+                        else{
+                            modalContent += `
+                                    <span class="badge"> Lodged By:</span>
+                                    Employee from Web<br>
+                                    `;
+                        }
+                        if(specificComplaint.complaint_categories != 'Feedback'){
+                            modalContent += `
+                                    <span class="badge"> Feedback:</span>
+                                    ${specificComplaint.feedback}<br>
+                                    `;
+                          modalContent += `
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div class="timeline-row">
+                                      <div class="timeline-time">
+                                        ${specificComplaint.rca_date}<small></small>
+                                      </div>
+                                      <div class="timeline-dot green-one-bg"></div>
+                                      <div class="timeline-content green-one">
+                                        <div class="icon-text-row1">
+                                          <i class="fa fa-warning"></i>
+                                          <h4>RCA-Root Cause Analysis</h4>
+                                        </div>
+                                        ${
+                                          specificComplaint.rca === null
+                                            ? `<p>Detail <input type="text" id="rcaInput" class="form-control" /></p>
+                                              <p>Capa Deadline <input type="datetime-local" id="rcaDatetime" class="form-control" /></p>`
+                                            : `<p>${specificComplaint.rca}</p><p><span class="badge">Capa Deadline:</span> ${specificComplaint.capa_deadline}</p>`
+                                        }
+                                        <div class="">
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="timeline-row">
+                                      <div class="timeline-time">
+                                        ${specificComplaint.capa_date}<small></small>
+                                      </div>
+                                      <div class="timeline-dot green-two-bg"></div>
+                                      <div class="timeline-content green-two">
+                                        <div class="icon-text-row">
+                                          <h4>CAPA-Corrective & Preventive Actions</h4>
+                                          <i class="fa fa-list"></i>
+                                        </div>
+                                        ${
+                                          specificComplaint.capa === null
+                                            ? `
+                                            <input type="file" class="custom-input-file" id="capaImageInput" accept="image/*,application/pdf,video/*" data-component="fileupload" data-capa="capa">
+
+                                              <p style= "margin-top: -10px;">Detail: <input type="text" id="capaInput" class="form-control" /></p>`
+                                            : (() => {
+                                                const imagePath = `static/images/capa_images/${ticketNumber}_capa.png`;
+                                                const pdfPath = `static/images/capa_images/${ticketNumber}_capa.pdf`;
+                                                const videoPath = `static/images/capa_images/${ticketNumber}_capa.mp4`;
+
+                                                if (fileExists(imagePath)) {
+                                                  return `
+                                                    <div class="capa-image-container">
+                                                      <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                                                    </div>
+                                                    <br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`;
+                                                } else if (fileExists(pdfPath)) {
+                                                  // Display PDF viewer or link as per your requirements
+                                                  return `<br><p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                                                  <br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`;
+                                                } else if (fileExists(videoPath)) {
+                                                  // Display video player or link as per your requirements
+                                                  return `
+                                                    <p style="text-align: left; font-size: 75%;">Video Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                                                    <div class="capa-image-container">
+                                                      <video class="myVideo" width="320" height="240" controls>
+                                                        <source src="${videoPath}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                      </video>
+                                                    </div>
+                                                    <br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`;
+                                                }
+                                                else{
+                                                return `<br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`
+                                                }
+                                              })()
+
+                                        }
+                                      </div>
+                                    </div>
+                        `;
+                                  }else{
+                          modalContent += `
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div class="timeline-row">
+                                      <div class="timeline-time">
+                                        ${specificComplaint.capa_date}<small></small>
+                                      </div>
+                                      <div class="timeline-dot green-two-bg"></div>
+                                      <div class="timeline-content green-two">
+                                        <div class="icon-text-row">
+                                          <h4>Investigation Officer - IO Feedback</h4>
+                                          <i class="fa fa-list"></i>
+                                        </div>
+                                        ${
+                                          specificComplaint.capa === null
+                                            ? `
+                                            <input type="file" class="custom-input-file" id="capaImageInput" accept="image/*,application/pdf,video/*" data-component="fileupload" data-capa="capa">
+
+                                              <p style= "margin-top: -10px;">Detail: <input type="text" id="capaInput" class="form-control" /></p>`
+                                            : (() => {
+                                                const imagePath = `static/images/capa_images/${ticketNumber}_capa.png`;
+                                                const pdfPath = `static/images/capa_images/${ticketNumber}_capa.pdf`;
+                                                const videoPath = `static/images/capa_images/${ticketNumber}_capa.mp4`;
+
+                                                if (fileExists(imagePath)) {
+                                                  return `
+                                                    <div class="capa-image-container">
+                                                      <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                                                    </div>
+                                                    <br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`;
+                                                } else if (fileExists(pdfPath)) {
+                                                  // Display PDF viewer or link as per your requirements
+                                                  return `<br><p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                                                  <br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`;
+                                                } else if (fileExists(videoPath)) {
+                                                  // Display video player or link as per your requirements
+                                                  return `
+                                                    <p style="text-align: left; font-size: 75%;">Video Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                                                    <div class="capa-image-container">
+                                                      <video class="myVideo" width="320" height="240" controls>
+                                                        <source src="${videoPath}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                      </video>
+                                                    </div>
+                                                    <br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`;
+                                                }
+                                                else{
+                                                return `<br><br><p style="padding-left: 5px; text-align: left; margin-top: -36px;">${specificComplaint.capa}</p><br>`
+                                                }
+                                              })()
+
+                                        }
+                                      </div>
+                                    </div>
+                        `;
+                                  }
+
+                        // Check for "RCA" status
+                        if (specificComplaint.status === "Bounced" || specificComplaint.capa1!= null) {
+
+                          modalContent += `
+                            <div style="    text-align: center;">
+                            <span class="background-rectangle font-weight-bold" style="font-size: 20px; text-align: center; margin-bottom: 3%; color:white; position: relative; z-index: 1">
+                                The Complainant Was Not Satisfied<br>
+                                <span style="font-size: 16px; text-align: center;">Feedback: ${specificComplaint.feedback}</span>
+                            </span>
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.rca1_date}<small></small>
+                              </div>
+                              <div class="timeline-dot green-three-bg"></div>
+                              <div class="timeline-content green-three">
+                              <div class="icon-text-row1">
+                                <i class="fa fa-warning"></i>
+                                <h4>RCA1-Root Cause Analysis</h4>
+                              </div>
+                                ${
+                                  specificComplaint.rca1 === null
+                                    ? `<p>Detail <input type="text" id="rca1Input" class="form-control" /></p>
+                                    <p> Capa1 Deadline <input type="datetime-local" id="rca1Datetime" class="form-control" /></p>`
+                                    : `<p> ${specificComplaint.rca1}</p><p><span class="badge">Capa1 Deadline:</span> ${specificComplaint.capa_deadline1}</p>`
+                                }
+
+                              </div>
+                            </div>
+                            </div>
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.capa1_date}<small></small>
+                              </div>
+                              <div class="timeline-dot green-four-bg"></div>
+                              <div class="timeline-content green-four">
+                              <div class="icon-text-row">
+                                <h4>CAPA1-Corrective & Preventive Actions</h4>
+                                <i class="fa fa-list"></i>
+                              </div>
+                                ${
+                                  specificComplaint.capa1 === null
+                                    ? `
+                                    <input type="file" class="custom-input-file" id="capa1ImageInput" accept="image/*,application/pdf,video/*" data-component="fileupload" data-capa="capa1">
+
+                                           <p style = "margin-top: -10px;">Detail: <input type="text" id="capa1Input" class="form-control" /></p>`
+                                    : (() => {
+                                                const imagePath = `static/images/capa_images/${ticketNumber}_capa1.png`;
+                                                const pdfPath = `static/images/capa_images/${ticketNumber}_capa1.pdf`;
+                                                const videoPath = `static/images/capa_images/${ticketNumber}_capa1.mp4`;
+
+                                                if (fileExists(imagePath)) {
+                                                  return `
+                                                    <div class="capa-image-container">
+                                                      <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                                                    </div>
+                                                    <br><p style=" padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa1}</p><br>`;
+                                                } else if (fileExists(pdfPath)) {
+                                                  // Display PDF viewer or link as per your requirements
+                                                  return `<p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                                                  <br><p style=" padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa1}</p><br>`;
+                                                } else if (fileExists(videoPath)) {
+                                                  // Display video player or link as per your requirements
+                                                  return `
+                                                    <p style="text-align: left; font-size: 75%;">Video Proof: <a href="${videoPath}" target="_blank">Click Here to Download</a></p>
+                                                    <div class="capa-image-container">
+                                                      <video class="myVideo" width="320" height="240" controls>
+                                                        <source src="${videoPath}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                      </video>
+                                                    </div>
+                                                    <br><p style=" padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa1}</p><br>`;
+                                                }
+                                                else{
+                                                return `<br><p style=" padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa1}</p><br>`
+                                                }
+                                              })()
+
+
+                                }
+                              </div>
+                            </div>
+                          `;
+                        }
+
+                        // Check for "Bounced1" status
+                        if (specificComplaint.status === "Bounced1" || specificComplaint.capa2!= null) {
+                          modalContent += `
+                            <div style="    text-align: center;">
+                            <span class="background-rectangle font-weight-bold" style="font-size: 20px; text-align: center; margin-bottom: 3%; color:white; position: relative; z-index: 1">
+                                The Complainant Was Not Satisfied<br>
+                                <span style="font-size: 16px; text-align: center;">Feedback: ${specificComplaint.feedback1}</span>
+                            </span>
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.rca2_date}<small></small>
+                              </div>
+                              <div class="timeline-dot green-five-bg"></div>
+                              <div class="timeline-content green-five">
+                               <div class="icon-text-row1">
+                                <h4>RCA2-Root Cause Analysis</h4>
+                                <i class="fa fa-warning"></i>
+                               </div>
+                                ${
+                                  specificComplaint.rca2 === null
+                                    ? `<p>Detail <input type="text" id="rca2Input" class="form-control" /></p>
+                                    <p>Capa2 Deadline<input type="datetime-local" id="rca2Datetime" class="form-control" /></p>`
+                                    : `<p> ${specificComplaint.rca2}</p><p><span class="badge">Capa2 Deadline:</span> ${specificComplaint.capa_deadline2}</p>`
+                                }
+
+                              </div>
+                            </div>
+                            </div>
+                             <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.capa2_date}<small></small>
+                              </div>
+                              <div class="timeline-dot green-six-bg"></div>
+                              <div class="timeline-content green-six">
+                                <div class="icon-text-row">
+                                <h4>CAPA2-Corrective & Preventive Actions</h4>
+                                <i class="fa fa-list"></i>
+
+                                </div>
+                                ${
+                                  specificComplaint.capa2 === null
+                                    ? `
+                                    <input type="file" class="custom-input-file" id="capa2ImageInput" accept="image/*,application/pdf,video/*" data-component="fileupload" data-capa="capa2"><br><br>
+                                           <p style="margin-top: -10px;">Comments: <input type="text" id="capa2Input" class="form-control" /></p>`
+                                    : (() => {
+                                                const imagePath = `static/images/capa_images/${ticketNumber}_capa2.png`;
+                                                const pdfPath = `static/images/capa_images/${ticketNumber}_capa2.pdf`;
+                                                const videoPath = `static/images/capa_images/${ticketNumber}_capa2.mp4`;
+
+                                                if (fileExists(imagePath)) {
+                                                  return `
+                                                    <div class="capa-image-container">
+                                                      <img src="${imagePath}" alt="" class="capa-image" data-toggle="modal" data-target="#capaModal" data-enlarged-src="${imagePath}">
+                                                    </div>
+                                                    <br><p style = "padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa2}</p>`;
+                                                } else if (fileExists(pdfPath)) {
+                                                  // Display PDF viewer or link as per your requirements
+                                                  return `<p style="text-align: left; font-size: 75%;">PDF Proof: <a href="${pdfPath}" target="_blank">Click Here to Download</a></p>
+                                                  <br><p style = "padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa2}</p>`;
+                                                } else if (fileExists(videoPath)) {
+                                                  // Display video player or link as per your requirements
+                                                  return `
+                                                    <div class="capa-image-container">
+                                                      <video class="myVideo" width="320" height="240" controls>
+                                                        <source src="${videoPath}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                      </video>
+                                                    </div>
+                                                    <br><p style = "padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa2}</p>`;
+                                                }
+                                                else{
+                                                return ` <br><p style = "padding-left: 5px; text-align: left; margin-top: -36px;"> ${specificComplaint.capa2}</p>`
+                                                }
+                                              })()
+
+                                }
+
+                              </div>
+                            </div>
+                          `;
+                        }
+
+                        if (specificComplaint.status === "Unclosed") {
+                        modalContent += `
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.unclosed_date}<small> </small>
+                              </div>
+                              <div class="timeline-dot green-seven-bg"></div>
+                              <div class="timeline-content green-seven">
+                              <div class="icon-text-row">
+                                <i class="fa fa-warning"></i>
+                                <h4>UNCLOSED</h4>
+                              </div>
+                                <div class="">
+                                </div>
+                              </div>
+                            </div>
+                            `;
+                            }
+
+                        if (specificComplaint.status === "Submitted") {
+                        modalContent += `
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.closed_date}<small> </small>
+                              </div>
+                              <div class="timeline-dot green-seven-bg"></div>
+                              <div class="timeline-content green-seven">
+                              <div class="icon-text-row1">
+                                <i class="fa fa-warning"></i>
+                                <h4>SUBMITTED</h4>
+                              </div>
+                                <div class="">
+                                </div>
+                              </div>
+                            </div>
+                            `;
+                            }
+                            if (specificComplaint.status === "Completed") {
+                            modalContent += `
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.closed_date}<small> </small>
+                              </div>
+                              <div class="timeline-dot green-seven-bg"></div>
+                              <div class="timeline-content green-seven">
+                              <div class="icon-text-row1">
+                                <i class="fa fa-warning"></i>
+                                <h4>SUBMITTED</h4>
+                              </div>
+                                <div class="">
+                                </div>
+                              </div>
+                            </div>
+                            `;
+                        modalContent += `
+                            <div class="timeline-row">
+                              <div class="timeline-time">
+                                ${specificComplaint.completed_date}<small> </small>
+                              </div>
+                              <div class="timeline-dot green-eight-bg"></div>
+                              <div class="timeline-content green-eight">
+                              <div class="icon-text-row">
+                                <h4>COMPLETED</h4>
+                                <i class="fa fa-list"></i>
+                              </div>
+                                <div class="">
+                                </div>
+                              </div>
+                            </div>
+                            <div style="text-align: center; margin-bottom: 4%;">
+                            <span class="background-rectangle font-weight-bold" style="font-size: 20px; text-align: center; margin-bottom: 3%; color:white; position: relative; z-index: 1">
+                                The Complainant Was Satisfied<br>
+                                <span style="font-size: 16px; text-align: center;">Feedback: ${specificComplaint.closed_feedback}</span>
+                            </span>
+                            </div>
+                            `;
+                            }
+                        modalContent += `
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        `;
+
+                        }
+                                    // Set the modal content
+                                    modalBody.innerHTML = modalContent;
+
+                                    showModal();
+                                    button.innerHTML = originalContent;
+                                  }, 500); // Simulate a delay for asynchronous operation
+                              });
+                          }
+                      });
+                  });
+
+                        document.addEventListener("DOMContentLoaded", function () {
+                          var saveChangesButton = document.getElementById('saveChangesButton');
+
+                          saveChangesButton.addEventListener('click', function (event) {
+                          event.preventDefault();
+                          let button = this;
+                          let originalContent = button.innerHTML;
+
+                          // Change the button's content to a loader
+                          button.innerHTML = '<div class="loader"></div>';
+                          button.disabled = true;
+
+                          // Use requestAnimationFrame to ensure the loader is displayed before continuing
+                          requestAnimationFrame(() => {
+                              // Your code to send data
+                              var unprocessed = null;
+                              if (specificComplaint.status === "Unprocessed") {
+                                  unprocessed = true;
+                              }
+                              var rcaInputValue = document.getElementById("rcaInput")?.value || null;
+                              var capaInputValue = document.getElementById("capaInput")?.value || null;
+                              var rca1InputValue = document.getElementById("rca1Input")?.value || null;
+                              var capa1InputValue = document.getElementById("capa1Input")?.value || null;
+                              var rca2InputValue = document.getElementById("rca2Input")?.value || null;
+                              var capa2InputValue = document.getElementById("capa2Input")?.value || null;
+                              var rcaDeadline = document.getElementById("rcaDatetime")?.value || null;
+                              var rca1Deadline = document.getElementById("rca1Datetime")?.value || null;
+                              var rca2Deadline = document.getElementById("rca2Datetime")?.value || null;
+
+                              var formData = new FormData();
+                              formData.append('ticket', ticketNumber);
+                              formData.append('rca', rcaInputValue);
+                              formData.append('capa', capaInputValue);
+                              formData.append('rca1', rca1InputValue);
+                              formData.append('capa1', capa1InputValue);
+                              formData.append('rca2', rca2InputValue);
+                              formData.append('capa2', capa2InputValue);
+                              formData.append('unprocessed', unprocessed);
+                              formData.append('rcaDeadline', rcaDeadline);
+                              formData.append('rca1Deadline', rca1Deadline);
+                              formData.append('rca2Deadline', rca2Deadline);
+
+                              // Append CAPA images
+                              appendImage(formData, 'capa', 'capaImageInput');
+                              appendImage(formData, 'capa1', 'capa1ImageInput');
+                              appendImage(formData, 'capa2', 'capa2ImageInput');
+
+                              const submitForm = "{{ url_for('submit_form') }}"; // Replace with the actual URL for updating notifications
+                              
+                              fetch(submitForm, {
+                                  method: "POST",
+                                  body: formData,
+                              })
+                              .then(function (response) {
+                                  if (response.ok) {
+                                      // Close the modal
+                                      console.log('Success:', response);
+                                      hideModal();
+                                      getIoPortalData();
+                                    document.getElementById("rcaInput").value = '';
+                                    document.getElementById("capaInput").value = '';
+                                    document.getElementById("rca1Input").value = '';
+                                    document.getElementById("capa1Input").value = '';
+                                    document.getElementById("rca2Input").value = '';
+                                    document.getElementById("capa2Input").value = '';
+                                    document.getElementById("rcaDatetime").value = '';
+                                    document.getElementById("rca1Datetime").value = '';
+                                    document.getElementById("rca2Datetime").value = '';
+                                    // Reset file inputs if necessary
+                                    document.getElementById("capaImageInput").value = '';
+                                    document.getElementById("capa1ImageInput").value = '';
+                                    document.getElementById("capa2ImageInput").value = '';
+                                  }
+                                  button.disabled = false;
+                                  button.innerHTML = originalContent;
+                              })
+                              .catch(error => {
+                                  button.disabled = false;
+                                  button.innerHTML = originalContent;
+                                  console.error('Error:', error);
+                              });
+                          });
+                      });
+
+                            function appendImage(formData, capaIdentifier, inputId) {
+                                var fileInput = document.querySelector(`[data-capa="${capaIdentifier}"]`);
+                                if (fileInput && fileInput.files.length > 0) {
+                                    formData.append(`${capaIdentifier}Image`, fileInput.files[0]);
+                                }
+                            }
+                        });
+
+
+                        function showModal() {
+
+                                document.getElementById('exampleModal').style.display = 'block';
+                            }
+                            function hideModal() {
+                                document.getElementById('exampleModal').style.display = 'none';
+                                var videos = document.getElementsByClassName('myVideo');
+                                    for (var i = 0; i < videos.length; i++) {
+                                  videos[i].pause();
+                                }
+
+                            }
+                            document.getElementById('closeButton').addEventListener('click', function() {
+                                hideModal(); // Hide the modal when the close button is clicked
+                            });
+                        document.getElementById('closeButton1').addEventListener('click', function() {
+                                hideModal(); // Hide the modal when the close button is clicked
+                            });
+                          $(document).ready(function() {
+                          $('#capaModal').on('show.bs.modal', function(event) {
+                            var button = $(event.relatedTarget);
+                            var enlargedSrc = button.data('enlarged-src');
+                            var modalImage = $(this).find('#capaEnlargedImage');
+                            modalImage.attr('src', enlargedSrc);
+                          });
+
+                          $('#capaModal').on('hide.bs.modal', function() {
+                            var modalImage = $(this).find('#capaEnlargedImage');
+                            modalImage.attr('src', '');
+                          });
+                        });
+        </script>
+    </body>
+</html>

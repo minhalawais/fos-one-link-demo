@@ -38,14 +38,28 @@ const COLORS = {
 }
 
 // --- DATA & POSITIONS ---
-// Arranged in a semi-circle/organic arc for better composition than a simple ring
+// Positions computed via polar coordinates: evenly spaced on a ring
+// Radius chosen to clear the central logo (224px diam) + node size (~160px) + gap
+const RING_RADIUS = 260
+// Angles in degrees, clockwise from top (0°=12 o'clock)
+// Arc from 240° (lower-left) to 480°/120° (lower-right) — open bottom
+const CHANNEL_ANGLES = [240, 288, 336, 24, 72, 120]
+
+const computePos = (angleDeg: number) => {
+  const rad = (angleDeg * Math.PI) / 180
+  return {
+    x: Math.round(RING_RADIUS * Math.sin(rad)),
+    y: Math.round(-RING_RADIUS * Math.cos(rad)),
+  }
+}
+
 const CHANNELS = [
-  { id: "phone", type: "hotline", label: "Hotline", sub: "0800 91299", color: COLORS.Orange, icon: Phone, delay: TIMING.HOTLINE, x: -220, y: 40, imageSrc: null },
-  { id: "sms", type: "bubble", label: "SMS", sub: "+92 329 9129999", color: COLORS.Green, icon: MessageSquare, delay: TIMING.SMS, x: -180, y: -120 },
-  { id: "whatsapp", type: "bubble", label: "WhatsApp", sub: "+92 329 9129999", color: COLORS.WhatsApp, icon: MessageCircle, delay: TIMING.WHATSAPP, x: -60, y: -200, imageSrc: "/assets/images/whatsapp.png" },
-  { id: "email", type: "card", label: "Email", sub: "hrdd@fruitofsustainability.com", color: COLORS.Teal, icon: Mail, delay: TIMING.EMAIL, x: 90, y: -200 },
-  { id: "web", type: "browser", label: "Web Portal", sub: "fruitofsustainability.com", color: COLORS.Teal, icon: Globe, delay: TIMING.WEB, x: 200, y: -100 },
-  { id: "app", type: "mobile", label: "Mobile App", sub: "FOS Hotline", color: COLORS.Green, icon: Smartphone, delay: TIMING.APP, x: 240, y: 60 },
+  { id: "phone", type: "hotline", label: "Hotline", sub: "0800 91299", color: COLORS.Orange, icon: Phone, delay: TIMING.HOTLINE, ...computePos(CHANNEL_ANGLES[0]), imageSrc: null },
+  { id: "sms", type: "bubble", label: "SMS", sub: "+92 329 9129999", color: COLORS.Green, icon: MessageSquare, delay: TIMING.SMS, ...computePos(CHANNEL_ANGLES[1]) },
+  { id: "whatsapp", type: "bubble", label: "WhatsApp", sub: "+92 329 9129999", color: COLORS.WhatsApp, icon: MessageCircle, delay: TIMING.WHATSAPP, ...computePos(CHANNEL_ANGLES[2]), imageSrc: "/assets/images/whatsapp.png" },
+  { id: "email", type: "card", label: "Email", sub: "hrdd@fruitofsustainability.com", color: COLORS.Teal, icon: Mail, delay: TIMING.EMAIL, ...computePos(CHANNEL_ANGLES[3]) },
+  { id: "web", type: "browser", label: "Web Portal", sub: "fruitofsustainability.com", color: COLORS.Teal, icon: Globe, delay: TIMING.WEB, ...computePos(CHANNEL_ANGLES[4]) },
+  { id: "app", type: "mobile", label: "Mobile App", sub: "FOS Hotline", color: COLORS.Green, icon: Smartphone, delay: TIMING.APP, ...computePos(CHANNEL_ANGLES[5]) },
 ]
 
 // --- COMPONENTS ---
@@ -124,53 +138,66 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
     switch (data.type) {
       case 'mobile':
         return (
-          <div className="w-16 h-28 bg-gray-900 rounded-[14px] border-[4px] border-gray-800 shadow-xl relative overflow-hidden flex flex-col items-center justify-center">
-            <div className="absolute top-0 w-8 h-3 bg-black rounded-b-md z-10" />
-            <div className="w-full h-full bg-white flex flex-col items-center pt-6 gap-1">
-              <div className="w-8 h-8 rounded-lg bg-[#60BA81] flex items-center justify-center shadow-sm">
-                <Smartphone size={14} className="text-white" />
+          <div className="w-20 h-36 bg-gray-900 rounded-[18px] border-[5px] border-gray-800 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center">
+            <div className="absolute top-0 w-10 h-4 bg-black rounded-b-md z-10" />
+            <div className="w-full h-full bg-white flex flex-col items-center pt-8 gap-1.5">
+              <div className="w-10 h-10 rounded-xl bg-[#60BA81] flex items-center justify-center shadow-sm">
+                <Smartphone size={18} className="text-white" />
               </div>
-              <div className="w-10 h-1 bg-gray-100 rounded-full mt-2" />
-              <div className="w-8 h-1 bg-gray-100 rounded-full" />
+              <div className="w-12 h-1.5 bg-gray-100 rounded-full mt-3" />
+              <div className="w-10 h-1.5 bg-gray-100 rounded-full" />
             </div>
           </div>
         )
       case 'browser':
         return (
-          <div className="w-24 h-16 bg-white rounded-lg border border-gray-200 shadow-xl relative overflow-hidden flex flex-col">
-            <div className="h-4 bg-gray-50 border-b flex items-center px-1.5 gap-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          <div className="w-32 h-20 bg-white rounded-xl border border-gray-200 shadow-2xl relative overflow-hidden flex flex-col">
+            <div className="h-5 bg-gray-50 border-b flex items-center px-2.5 gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-red-400" />
+              <div className="w-2 h-2 rounded-full bg-yellow-400" />
+              <div className="w-2 h-2 rounded-full bg-green-400" />
             </div>
             <div className="flex-1 flex items-center justify-center bg-gray-50/50">
-              <Globe size={24} className="text-[#284952] opacity-20" />
+              <Globe size={32} className="text-[#284952] opacity-20" />
             </div>
           </div>
         )
       case 'bubble':
         return (
           <div className="relative">
-            <div className="w-14 h-14 rounded-2xl rounded-bl-none flex items-center justify-center shadow-lg" style={{ backgroundColor: data.color }}>
-              {data.imageSrc ? (
-                <img src={data.imageSrc} alt={data.label} className="w-8 h-8" />
-              ) : (
-                <data.icon size={24} className="text-white" />
-              )}
+            {/* Outer glow */}
+            <div className="absolute -inset-2 rounded-full opacity-30 blur-xl" style={{ backgroundColor: data.color }} />
+            {/* Main bubble — circle */}
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center shadow-xl relative overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${data.color}, ${data.color}dd)` }}
+            >
+              {/* Glass shine overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-transparent rounded-full" />
+              {/* Icon */}
+              <div className="relative z-10">
+                {data.imageSrc ? (
+                  <img src={data.imageSrc} alt={data.label} className="w-12 h-12 drop-shadow-md" />
+                ) : (
+                  <data.icon size={36} className="text-white drop-shadow-md" />
+                )}
+              </div>
             </div>
-            <div className="absolute -bottom-1 -left-1 w-3 h-3" style={{ backgroundColor: data.color, clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }} />
           </div>
         )
       default: // card/hotline
         return (
-          <div className="w-14 h-14 rounded-full bg-white border-2 flex items-center justify-center shadow-lg" style={{ borderColor: data.color }}>
-            <data.icon size={24} style={{ color: data.color }} />
+          <div className="w-20 h-20 rounded-full bg-white border-2 flex items-center justify-center shadow-xl" style={{ borderColor: data.color }}>
+            <data.icon size={36} style={{ color: data.color }} />
           </div>
         )
     }
   }
 
   return (
+    /* Layer 1: ANCHOR — positioned at center of container, then moved to target x,y.
+       The connection beams share this same coordinate system (SVG at top:50% left:50%).
+       This guarantees the beam endpoint and the node anchor are the SAME point. */
     <motion.div
       className="absolute top-1/2 left-1/2 z-20 cursor-pointer"
       initial={{ x: 0, y: 0, scale: 0, opacity: 0 }}
@@ -183,36 +210,40 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
         mass: 1.2,
         delay: index * 0.1
       }}
-      style={{ marginLeft: -30, marginTop: -30 }}
     >
-      <motion.div
-        whileHover={{ scale: 1.1, y: -5 }}
-        animate={{ y: [0, -6, 0] }}
-        transition={{
-          repeat: Infinity,
-          duration: 4,
-          ease: "easeInOut",
-          delay: index * 0.7,
-          repeatType: "mirror"
-        }}
-        className="flex flex-col items-center gap-2"
-      >
-        {renderVisual()}
-
-        {/* Label Badge */}
-        {/* Label Badge */}
-        <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-xl shadow-md border border-gray-100 flex flex-col items-center max-w-[140px]">
-          <span className="text-[10px] font-bold text-gray-800 leading-none mb-0.5">{data.label}</span>
-          <span className="text-[9px] text-gray-500 leading-tight text-center break-all">{data.sub}</span>
-        </div>
-      </motion.div>
+      {/* Layer 2: CENTERING — plain div (NOT motion.div), so framer-motion
+          will never overwrite this transform. Shifts content so its center
+          sits exactly on the anchor point above. */}
+      <div style={{ transform: 'translate(-50%, -50%)' }}>
+        {/* Layer 3: FLOAT — handles hover and breathing animation only */}
+        <motion.div
+          whileHover={{ scale: 1.1, y: -5 }}
+          animate={{ y: [0, -6, 0] }}
+          transition={{
+            repeat: Infinity,
+            duration: 4,
+            ease: "easeInOut",
+            delay: index * 0.7,
+            repeatType: "mirror"
+          }}
+          className="flex flex-col items-center gap-2"
+        >
+          {renderVisual()}
+          <div className="bg-white/95 backdrop-blur px-4 py-2 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center max-w-[160px]">
+            <span className="text-xs font-bold text-gray-800 leading-none mb-1">{data.label}</span>
+            <span className="text-[10px] text-gray-500 leading-tight text-center break-all">{data.sub}</span>
+          </div>
+        </motion.div>
+      </div>
     </motion.div>
   )
 }
 
 // 3. Central "FOS Brain" -> Morphs into "Safety Shield"
 const CentralCore = ({ isMerged }: { isMerged: boolean }) => (
-  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center justify-center overflow-visible">
+  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center overflow-visible">
+
+    {/* Logo + Shield container */}
     <div className="relative flex items-center justify-center">
 
       {/* State 1: Pulse Rings (Active when NOT merged) */}
@@ -307,36 +338,34 @@ const CentralCore = ({ isMerged }: { isMerged: boolean }) => (
 
       {/* Persistent Logo */}
       <motion.div
-        className="w-40 h-40 bg-white rounded-full shadow-2xl flex items-center justify-center relative z-20 border-4 border-white"
+        className="w-56 h-56 bg-white rounded-full shadow-2xl flex items-center justify-center relative z-20 border-4 border-white"
         animate={{
           scale: isMerged ? 0.9 : 1,
-          boxShadow: isMerged ? "0 0 40px rgba(96,186,129,0.4)" : "0 25px 50px -12px rgba(0,0,0,0.25)"
+          boxShadow: isMerged ? "0 0 40px rgba(96,186,129,0.4)" : "0 30px 60px -12px rgba(0,0,0,0.3)"
         }}
         transition={{ duration: 0.8 }}
       >
-        <img src="/assets/images/FOS-01.png" alt="FOS" className="w-36 h-36 object-contain" />
+        <img src="/assets/images/FOS-01.png" alt="FOS" className="w-54 h-54 object-contain max-w-[130%]" />
       </motion.div>
 
     </div>
 
-    {/* Text Reveal - Fixed Position */}
+    {/* Text Reveal - flows below the logo in the flex column */}
     <AnimatePresence>
       {isMerged && (
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 110 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="absolute text-center z-50 w-full top-[10px]"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="flex flex-col items-center gap-2 mt-6"
         >
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-2 text-[#284952] bg-white/95 backdrop-blur-md px-6 py-2.5 rounded-full border border-green-100 shadow-xl">
-              <ShieldCheck size={20} className="text-[#60BA81]" />
-              <span className="text-sm font-black tracking-widest uppercase">100% Protected</span>
-            </div>
-            <p className="text-[#284952]/80 text-sm font-semibold max-w-sm leading-relaxed px-8 py-2 bg-white/20 backdrop-blur-sm rounded-2xl">
-              "A simple and safe way for every worker to speak up."
-            </p>
+          <div className="flex items-center gap-3 text-[#284952] bg-white/95 backdrop-blur-md px-8 py-3 rounded-full border border-green-100 shadow-2xl">
+            <ShieldCheck size={22} className="text-[#60BA81]" />
+            <span className="text-sm font-black tracking-widest uppercase">100% Protected</span>
           </div>
+          <p className="text-[#284952]/70 text-sm font-semibold max-w-sm leading-relaxed text-center">
+            "A simple and safe way for every worker to speak up."
+          </p>
         </motion.div>
       )}
     </AnimatePresence>
@@ -441,7 +470,7 @@ export default function SceneOmnichannel({ isActive, progress }: { isActive: boo
         variants={headerVariant}
         animate={isMerged ? "hidden" : "visible"}
       >
-        <h1 className="text-4xl font-extrabold text-[#284952] tracking-tight">FOS Ecosystem</h1>
+        <h1 className="text-4xl font-extrabold text-[#284952] tracking-tight">FOS Multichannel Grievance Ecosystem</h1>
       </motion.div>
 
       {/* --- INTERACTIVE GRAPH CONTAINER --- */}

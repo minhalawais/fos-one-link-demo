@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { MessageSquare, CheckCircle2, SignalHigh, Battery } from "lucide-react"
+import { MessageSquare, CheckCircle2, SignalHigh, Battery, Wifi } from "lucide-react"
 
 // --- TIMING (Total: 18s -> 95s to 113s) ---
 // Script: 101-113s: "This ticket number is shared with the worker through an SMS 
@@ -23,6 +23,141 @@ const TIMING = {
 }
 
 const EASE_IOS = [0.32, 0.72, 0, 1]
+
+const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolean, isBroadcasting: boolean, isCentered: boolean }) => {
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{
+        opacity: active ? 1 : 0,
+        scale: active ? (isCentered ? 1.1 : 0.8) : 0.8,
+        x: isCentered ? 0 : 0, // Simplified for this scene
+      }}
+      transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+      className="flex flex-col items-center justify-center relative z-40"
+    >
+      {/* --- PREMIUM VISUAL LAYERS --- */}
+
+      {/* 1. Orbiting Data Ring (Always visible when active) */}
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute w-64 h-64 border border-dashed border-green-200/20 rounded-full"
+      />
+
+      {/* 2. Signal Waves (Broadcasting Mode) */}
+      {isBroadcasting && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          {[...Array(4)].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ scale: 0.8, opacity: 0.8 }}
+              animate={{ scale: 4, opacity: 0 }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.6, ease: "easeOut" }}
+              className="absolute w-56 h-56 rounded-full border-2 border-green-400/10"
+            />
+          ))}
+          {/* Glowing Core Aura */}
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="absolute w-80 h-80 rounded-full bg-green-400/5 blur-3xl"
+          />
+        </div>
+      )}
+
+      <div className="relative group">
+        <div
+          className={`relative w-48 h-48 flex items-center justify-center transition-all duration-1000
+                        ${isBroadcasting ? "transform scale-110" : ""}
+                    `}
+        >
+          {/* --- HOLOGRAPHIC CONNECTION NEXUS --- */}
+
+          {/* A. Central Core (The "Brain") */}
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{
+              scale: isBroadcasting ? [1, 1.1, 1] : 1,
+              boxShadow: isBroadcasting
+                ? "0 0 30px rgba(96, 186, 129, 0.6), inset 0 0 20px rgba(96, 186, 129, 0.4)"
+                : "0 0 10px rgba(203, 213, 225, 0.3)"
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className={`w-28 h-28 rounded-full flex items-center justify-center relative z-20 backdrop-blur-sm border
+                            ${isBroadcasting ? "bg-green-500/10 border-green-400/50" : "bg-slate-200/10 border-slate-300/30"}
+                        `}
+          >
+            <div className={`relative w-20 h-20 transition-all duration-500 ${isBroadcasting ? "scale-110" : "scale-100"}`}>
+              <img
+                src="/assets/FOS-01.png"
+                alt="FOS Logo"
+                className={`w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(96,186,129,0.5)] ${isBroadcasting ? "opacity-100" : "opacity-60"}`}
+              />
+            </div>
+
+            {/* Core pulse ring */}
+            {isBroadcasting && (
+              <motion.div
+                animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="absolute inset-0 rounded-full border border-green-400/30"
+              />
+            )}
+          </motion.div>
+
+
+          {/* Outer Ring (Slow Reverse Spin) */}
+          <motion.div
+            animate={{ rotateY: 45, rotateZ: -360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            className={`absolute w-52 h-52 rounded-full border-2 box-border pointer-events-none z-10
+                            ${isBroadcasting ? "border-teal-400/20" : "border-slate-300/10"}
+                        `}
+            style={{ borderLeftColor: 'transparent', borderRightColor: 'transparent' }}
+          />
+
+          {/* C. Floating Data Nodes (Particles) */}
+          {isBroadcasting && (
+            <div className="absolute inset-0 pointer-events-none">
+              {[0, 60, 120, 180, 240, 300].map((deg, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: 0, y: 0 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    x: Math.cos(deg * Math.PI / 180) * 100,
+                    y: Math.sin(deg * Math.PI / 180) * 100,
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, delay: i * 0.2, ease: "easeOut" }}
+                  className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_5px_#4ade80]"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Labels */}
+      <div className="mt-4 text-center">
+        <h3 className="text-sm font-black text-[#284952] tracking-tight uppercase">
+          FOS SMS Gateway
+        </h3>
+        <div className="flex items-center justify-center gap-1.5 mt-1">
+          <motion.div
+            animate={{ opacity: [1, 0.5, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+            className={`w-2 h-2 rounded-full ${isBroadcasting ? "bg-green-500 shadow-[0_0_8px_#22c55e]" : "bg-slate-300"}`}
+          />
+          <span className="text-[10px] text-slate-500 font-mono font-bold tracking-[0.2em]">
+            {isBroadcasting ? "SYSTEM: ACTIVE" : "SYSTEM: STANDBY"}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 
 
 // --- REUSABLE TECH CALLOUT COMPONENT ---
@@ -335,93 +470,89 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
               transition={{ duration: 0.8 }}
               className="w-full flex items-center justify-between px-0 lg:px-4 relative"
             >
-              {/* Left: Robot Character */}
-              <motion.div className="flex-1 flex justify-center items-center -ml-20">
-                <motion.div
-                  initial={{ x: -100, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  className="relative flex flex-col items-center scale-[1.5] lg:scale-[1.8]"
-                >
-                  <motion.div
-                    animate={{ y: [0, -15, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative"
-                  >
-                    <img
-                      src="/assets/images/fos_sms.png"
-                      alt="FOS Robot"
-                      className="w-[700px] h-[700px] object-contain drop-shadow-2xl"
-                    />
-                    {/* Antenna Glow */}
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0.8, 0.5] }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                      className="absolute top-8 left-[25%] w-8 h-8 bg-[#60BA81] rounded-full blur-2xl"
-                    />
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0.8, 0.5] }}
-                      transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-                      className="absolute top-8 right-[25%] w-8 h-8 bg-[#60BA81] rounded-full blur-2xl"
-                    />
-                  </motion.div>
-                  {/* Shadow */}
-                  <motion.div
-                    animate={{ scale: [1, 0.8, 1], opacity: [0.3, 0.1, 0.3] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-48 h-5 bg-black/20 blur-2xl rounded-full mt-4"
-                  />
-                </motion.div>
-              </motion.div>
+              {/* Left: FOS SMS Gateway */}
+              <div className="flex-1 flex justify-center items-center scale-[1.1] lg:scale-[1.3]">
+                <UnifiedGateway active={showSMS} isBroadcasting={showSMS} isCentered={true} />
+              </div>
 
-              {/* Center: Signal Visualization */}
-              <div className="w-1/6 relative h-64 hidden lg:block">
+              {/* Center-Left: Signal from Gateway to Worker */}
+              <div className="w-24 relative h-64 hidden lg:block">
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="absolute inset-0"
                 >
-                  {/* Signal Particles */}
-                  {[0, 0.5, 1, 1.5, 2].map((d) => (
-                    <motion.div
-                      key={d}
-                      initial={{ x: 0, opacity: 0, scale: 0 }}
-                      animate={{
-                        x: [0, 150, 300],
-                        y: [0, -40, 0],
-                        opacity: [0, 1, 1, 0],
-                        scale: [0.5, 1, 1, 0.5],
-                        rotate: [0, 5, -5, 0]
-                      }}
-                      transition={{
-                        duration: 2.5,
-                        delay: d,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-lg shadow-lg flex items-center justify-center border border-[#60BA81]/30 z-20"
-                    >
-                      <MessageSquare size={12} className="text-[#60BA81]" />
-                    </motion.div>
-                  ))}
-
-                  {/* Data Beam Flow */}
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                  <svg className="absolute inset-0 w-full h-full border-none pointer-events-none">
                     <motion.path
-                      d="M 50,128 Q 150,88 300,128"
+                      d="M 0,128 Q 50,88 100,128"
                       fill="none"
-                      stroke="url(#beamGradientTicket)"
-                      strokeWidth="4"
-                      strokeDasharray="10 10"
+                      stroke="url(#beamGradientTicket1)"
+                      strokeWidth="3"
+                      strokeDasharray="8 8"
                       initial={{ strokeDashoffset: 100 }}
                       animate={{ strokeDashoffset: 0 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
                     />
                     <defs>
-                      <linearGradient id="beamGradientTicket" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <linearGradient id="beamGradientTicket1" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#60BA81" stopOpacity="0" />
-                        <stop offset="50%" stopColor="#60BA81" stopOpacity="0.5" />
+                        <stop offset="50%" stopColor="#60BA81" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#60BA81" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </motion.div>
+              </div>
+
+              {/* Middle: Worker Avatar */}
+              <motion.div
+                className="flex-none flex flex-col items-center justify-center relative px-4"
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
+              >
+                <div className="relative">
+                  <img
+                    src="/assets/avatars/worker_avatar.png"
+                    alt="Worker"
+                    className="w-32 h-32 lg:w-48 lg:h-48 object-contain drop-shadow-xl rounded-full border-4 border-white bg-white/20 backdrop-blur-sm"
+                  />
+                  {/* Receiving Glow */}
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1], opacity: [0, 0.3, 0] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 bg-[#60BA81] rounded-full blur-2xl -z-10"
+                  />
+                </div>
+                <div className="mt-4 text-center">
+                  <span className="text-[10px] font-bold text-[#284952] uppercase tracking-widest bg-white/80 px-3 py-1 rounded-full shadow-sm border border-[#284952]/10">
+                    Concerned Worker
+                  </span>
+                </div>
+              </motion.div>
+
+              {/* Center-Right: Signal from Worker to Phone */}
+              <div className="w-24 relative h-64 hidden lg:block">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0"
+                >
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                    <motion.path
+                      d="M 0,128 Q 50,88 100,128"
+                      fill="none"
+                      stroke="url(#beamGradientTicket2)"
+                      strokeWidth="3"
+                      strokeDasharray="8 8"
+                      initial={{ strokeDashoffset: 100 }}
+                      animate={{ strokeDashoffset: 0 }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.5 }}
+                    />
+                    <defs>
+                      <linearGradient id="beamGradientTicket2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#60BA81" stopOpacity="0" />
+                        <stop offset="50%" stopColor="#60BA81" stopOpacity="0.4" />
                         <stop offset="100%" stopColor="#60BA81" stopOpacity="0" />
                       </linearGradient>
                     </defs>

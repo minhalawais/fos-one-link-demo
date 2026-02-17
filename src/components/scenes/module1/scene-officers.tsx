@@ -43,8 +43,8 @@ const OFFICERS: OfficerData[] = [
   },
   {
     id: "IO-GENDER-02",
-    role: "Gender Officer",
-    category: "Gender",
+    role: "Harassment Officer",
+    category: "Harassment",
     color: "#F5A83C", // Orange
     icon: Users,
     avatar: "/assets/avatars/female_io.png",
@@ -176,7 +176,7 @@ const AppointmentPhase = () => {
       transition={{ duration: 0.5 }}
     >
       {/* CENTRAL CARD */}
-      <div className="w-64 h-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden relative flex flex-col items-center pt-8 perspective-card">
+      <div className="w-80 h-[530px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden relative flex flex-col items-center pt-8 perspective-card">
 
         {/* Holographic scanner effect */}
         <motion.div
@@ -193,7 +193,7 @@ const AppointmentPhase = () => {
         />
 
         {/* Avatar */}
-        <div className="w-32 h-32 rounded-full border-4 border-gray-100 shadow-inner overflow-hidden mb-6 relative z-10 bg-gray-50 flex items-center justify-center">
+        <div className="w-32 h-32 rounded-full border-4 border-gray-100 shadow-inner overflow-hidden mb-6 relative z-10 bg-gray-50 flex items-center justify-center shrink-0">
           <img src="/assets/avatars/male_io.png" className="w-full h-full object-cover opacity-80" alt="Candidate" />
         </div>
 
@@ -207,11 +207,58 @@ const AppointmentPhase = () => {
         </div>
 
         {/* Bottom Status */}
-        <div className="absolute bottom-0 w-full p-4 bg-gray-50 border-t border-gray-100">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-gray-400 font-mono">ID: PENDING</span>
-            <ScanLine size={14} className="text-gray-400 animate-pulse" />
+        <div className="flex-1 w-full px-6 py-4 flex flex-col justify-between">
+
+          {/* Operational Scope */}
+          <div className="space-y-2">
+            <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 border-b border-gray-100 pb-1">Operational Scope</h4>
+            <div className="flex flex-wrap gap-2">
+              <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-[9px] font-bold border border-blue-100">Unit: Production Floor</span>
+              <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded text-[9px] font-bold border border-purple-100">Cat: General</span>
+              <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded text-[9px] font-bold border border-amber-100">Clearance: L3</span>
+            </div>
           </div>
+
+          {/* Authorized Modules */}
+          <div className="space-y-2">
+            <h4 className="text-[10px] uppercase tracking-widest font-bold text-gray-400 border-b border-gray-100 pb-1">Authorized Modules</h4>
+            <div className="grid grid-cols-1 gap-1.5">
+              {["Root Cause Analysis", "Corrective Actions", "Evidence Upload"].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1 + (i * 0.2) }}
+                  className="flex items-center gap-2 text-[10px] text-gray-600 font-medium"
+                >
+                  <div className="w-3 h-3 rounded-full bg-[#60BA81]/20 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#60BA81]" />
+                  </div>
+                  {item}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* System Sync Visualization */}
+          <div className="mt-2 bg-gray-50 rounded-lg p-3 border border-gray-200/60">
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-[9px] font-bold text-gray-500">SYSTEM SYNC</span>
+              <span className="text-[9px] font-mono text-[#60BA81] animate-pulse">ACTIVE</span>
+            </div>
+            <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-[#60BA81] to-[#284952]"
+                animate={{ width: ["0%", "100%"] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-[7px] text-gray-400">CONNECTING TO FOS PLATFORM...</span>
+              <span className="text-[7px] text-gray-400 font-mono">ID: PENDING</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -268,7 +315,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
     <motion.div
       variants={cardVariants}
       whileHover="hover"
-      className="w-64 bg-white rounded-2xl shadow-xl border border-white/60 overflow-hidden relative flex flex-col items-center backdrop-blur-sm"
+      className="w-80 bg-white rounded-2xl shadow-xl border border-white/60 overflow-hidden relative flex flex-col items-center backdrop-blur-sm"
     >
       {/* Header Color Bar */}
       <div className="w-full h-2" style={{ backgroundColor: officer.color }} />
@@ -291,7 +338,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
         </div>
 
         {/* Avatar Box */}
-        <div className="relative mb-6 group-hover:scale-105 transition-transform duration-300">
+        <div className="relative mb-6 group-hover:scale-105 transition-transform duration-300 shrink-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/20 rounded-full blur-md" />
           <img src={officer.avatar} alt={officer.role} className="w-24 h-24 object-contain drop-shadow-lg" />
 
@@ -389,7 +436,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
                 <div className="h-1 bg-gray-100 rounded-full w-3/4 mx-auto" />
               </div>
 
-              <p className="mt-4 text-[8px] font-mono text-gray-400">ACCESS: portal.fos.com</p>
+              <p className="mt-4 text-[8px] font-mono text-gray-400">ACCESS: fruitofsustainability.com/login</p>
             </div>
           </motion.div>
         )}

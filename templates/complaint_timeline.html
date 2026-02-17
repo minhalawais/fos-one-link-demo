@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Check Complaint Status</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --gradient-start: #60BA81;
+            --gradient-end: #4fa371;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --bg-light: #fafbfc;
+            --white: #ffffff;
+            --border-light: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #f0f4f8 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background elements */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 25% 25%, rgba(96, 186, 129, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(245, 168, 60, 0.03) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .container {
+            max-width: 1450px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand img {
+            height: 45px;
+            transition: transform 0.2s ease;
+        }
+        
+        .navbar-brand:hover img {
+            transform: scale(1.05);
+        }
+        
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1rem;
+            position: relative;
+        }
+        
+        .search-wrapper {
+            width: 100%;
+            max-width: 650px;
+            position: relative;
+        }
+        
+        .search-card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        
+        .search-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary1-color));
+            border-radius: 24px 24px 0 0;
+        }
+        
+        .search-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 32px 60px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .search-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            box-shadow: var(--shadow-lg);
+            animation: pulse 2s infinite;
+        }
+        
+        .search-icon i {
+            font-size: 2rem;
+            color: var(--white);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: var(--shadow-lg); }
+            50% { box-shadow: 0 0 0 15px rgba(96, 186, 129, 0.1), var(--shadow-lg); }
+            100% { box-shadow: var(--shadow-lg); }
+        }
+        
+        .search-title {
+            color: var(--primary1-color);
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+            position: relative;
+        }
+        
+        .search-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+        
+        .search-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+            font-family: inherit;
+            color: var(--text-primary);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(96, 186, 129, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        
+        .search-button {
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: var(--white);
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .search-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px -5px rgba(96, 186, 129, 0.3);
+        }
+        
+        .search-button:hover::before {
+            left: 100%;
+        }
+        
+        .search-button:active {
+            transform: translateY(-1px);
+        }
+        
+        .search-button i {
+            font-size: 1.25rem;
+        }
+        
+        .search-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: none;
+            border: 1px solid #fca5a5;
+            position: relative;
+        }
+        
+        .error-message::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: #dc2626;
+            border-radius: 2px;
+        }
+        
+        .error-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 1rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .feature:hover {
+            transform: translateY(-2px);
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(96, 186, 129, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--primary-color);
+        }
+        
+        .feature-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        footer {
+            background: var(--primary1-color);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar .container {
+                padding: 0 1rem;
+            }
+            
+            .main-container {
+                padding: 2rem 1rem;
+            }
+            
+            .search-card {
+                padding: 2rem 1.5rem;
+                border-radius: 20px;
+            }
+            
+            .search-title {
+                font-size: 1.875rem;
+            }
+            
+            .search-subtitle {
+                font-size: 1rem;
+            }
+            
+            .search-icon {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .search-icon i {
+                font-size: 1.75rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-links {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-card {
+                padding: 1.5rem 1rem;
+            }
+            
+            .search-title {
+                font-size: 1.625rem;
+            }
+            
+            .search-input {
+                padding: 1rem 1.25rem;
+                font-size: 1rem;
+            }
+            
+            .search-button {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+        .search-logo {
+            width: 98px; /* Adjust width as needed */
+            height: auto; /* Maintain aspect ratio */
+            display: block;
+            margin: 0 auto; /* Center the logo */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="Logo">
+            </a>
+        </div>
+    </nav>
+    
+    <div class="main-container">
+        <div class="search-wrapper">
+            <div class="search-card">
+                <div class="search-icon">
+                  <img src="{{ url_for('static', filename='images/logo.png') }}" alt="logo" class="search-logo">
+              </div>
+                
+                <h1 class="search-title">Check Complaint Status</h1>
+                <p class="search-subtitle">
+                    Enter your complaint ticket number below to view the current status and detailed timeline of your complaint submission.
+                </p>
+                
+                <div class="search-form">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Enter your complaint ticket number..." required>
+                    </div>
+                    
+                    <button id="searchButton" class="search-button">
+                        <i class="fas fa-search"></i>
+                        <span>Search Complaint</span>
+                    </button>
+                    
+                    <div id="errorMessage" class="error-message">
+                        Complaint not found. Please check the ticket number and try again.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          document.body.style.zoom = "80%";
+      });
+  </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#searchButton').click(function() {
+                const ticketNumber = $('#searchInput').val().trim();
+                
+                if (!ticketNumber) {
+                    showError('Please enter a ticket number');
+                    return;
+                }
+                
+                // Show loading state
+                const $button = $('#searchButton');
+                const $buttonText = $button.find('span');
+                const originalText = $buttonText.text();
+                
+                $button.html('<i class="fas fa-spinner fa-spin"></i><span>Searching...</span>').prop('disabled', true);
+                $('#errorMessage').removeClass('show').hide();
+                
+                // Check if complaint exists
+                fetch("{{ url_for('search_complaint') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: ticketNumber })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        // Success animation before redirect
+                        $button.html('<i class="fas fa-check"></i><span>Found! Redirecting...</span>');
+                        setTimeout(() => {
+                            window.location.href = `/login/timeline/${ticketNumber}`;
+                        }, 1000);
+                    } else {
+                        showError('Complaint not found. Please check the ticket number and try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('An error occurred. Please try again.');
+                })
+                .finally(() => {
+                    if (!$button.find('.fa-check').length) {
+                        $button.html(`<i class="fas fa-search"></i><span>${originalText}</span>`).prop('disabled', false);
+                    }
+                });
+            });
+            
+            function showError(message) {
+                const $error = $('#errorMessage');
+                $error.text(message).addClass('show').show();
+                
+                // Remove focus from input and add shake animation
+                $('#searchInput').blur();
+                $('#searchInput').css('animation', 'shake 0.5s ease-in-out');
+                setTimeout(() => {
+                    $('#searchInput').css('animation', '');
+                }, 500);
+            }
+            
+            // Allow search on Enter key
+            $('#searchInput').keypress(function(e) {
+                if (e.which === 13) {
+                    $('#searchButton').click();
+                }
+            });
+            
+            // Clear error message when user starts typing
+            $('#searchInput').on('input', function() {
+                $('#errorMessage').removeClass('show').hide();
+            });
+        });
+        
+        // Add shake animation for error state
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

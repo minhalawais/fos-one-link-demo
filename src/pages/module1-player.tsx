@@ -34,7 +34,7 @@ export default function Module1Player({ progress }: Module1PlayerProps) {
   return (
     <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
       <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
         </AnimatePresence>
       </div>

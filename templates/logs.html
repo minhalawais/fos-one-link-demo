@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs Dashboard | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Shared Personal Dashboard Styles -->
+    <link href="{{ url_for('static', filename='css/personal-dashboard.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--primary1-color) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            margin: 2rem auto;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary1-color) 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .stats-section .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .content-section {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+            box-shadow: 0 4px 12px rgba(96, 186, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4da570, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(96, 186, 129, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #047857);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info-color), #0e7490);
+            color: white;
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #b91c1c);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 1.25rem 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(96, 186, 129, 0.05), rgba(96, 186, 129, 0.02));
+            transform: scale(1.001);
+        }
+
+        .log-type-info {
+            color: var(--info-color);
+            background-color: rgba(8, 145, 178, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .log-type-warning {
+            color: var(--warning-color);
+            background-color: rgba(217, 119, 6, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .log-type-error {
+            color: var(--danger-color);
+            background-color: rgba(220, 38, 38, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .log-type-success {
+            color: var(--success-color);
+            background-color: rgba(5, 150, 105, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .timestamp-cell {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                margin: 1rem;
+                border-radius: 12px;
+            }
+
+            .stats-section,
+            .content-section {
+                padding: 1.5rem;
+            }
+        }
+
+        .filter-section {
+            background: var(--light-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary1-color);
+            margin: 0;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            margin-bottom: 0;
+        }
+
+        .filter-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .filter-select,
+        .filter-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .filter-select:focus,
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(96, 186, 129, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-filter {
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+            padding: 0.5rem 1.5rem;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, var(--text-muted), #94a3b8);
+            color: white;
+            padding: 0.5rem 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                flex-direction: column;
+            }
+
+            .btn-filter,
+            .btn-clear {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('manage_logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_employee') }}">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_complaints') }}">Complaints</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link"
+                            href="{{ url_for('manage_counseling_sessions') }}">Counseling</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('survey') }}">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user_management') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_backups') }}">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="content">
+                    <h1 class="page-title">
+                        <i class="fas fa-scroll me-3"></i>System Logs
+                    </h1>
+                    <p class="page-subtitle">Monitor and analyze system activities and events</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card" id="totalLogsCard">
+                            <div class="stat-icon">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <span class="stat-number" id="totalLogs">0</span>
+                            <div class="stat-label">Total Logs</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <span class="stat-number" id="infoLogs">0</span>
+                            <div class="stat-label">Info Logs</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <span class="stat-number" id="warningLogs">0</span>
+                            <div class="stat-label">Warnings</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <span class="stat-number" id="errorLogs">0</span>
+                            <div class="stat-label">Errors</div>
+                        </div>
+
+                        <!-- Add these new stat cards for email and SMS -->
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <span class="stat-number" id="emailLogs">0</span>
+                            <div class="stat-label">Email Logs</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-sms"></i>
+                            </div>
+                            <span class="stat-number" id="smsLogs">0</span>
+                            <div class="stat-label">SMS Logs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Section -->
+            <div class="content-section">
+                <div class="filter-section">
+                    <div class="filter-header">
+                        <h3 class="filter-title"><i class="fas fa-filter me-2"></i>Filter Logs</h3>
+                    </div>
+
+                    <form id="filterForm" method="GET" action="{{ url_for('manage_logs') }}">
+                        {% if log_type %}
+                        <input type="hidden" name="type" value="{{ log_type }}">
+                        {% endif %}
+
+                        <div class="filter-grid">
+                            <div class="filter-group">
+                                <label class="filter-label">Date From</label>
+                                <input type="date" class="filter-input" name="date_from"
+                                    value="{{ current_filters.date_from if current_filters.date_from }}">
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Date To</label>
+                                <input type="date" class="filter-input" name="date_to"
+                                    value="{{ current_filters.date_to if current_filters.date_to }}">
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Portal</label>
+                                <select class="filter-select" name="portal">
+                                    <option value="all">All Portals</option>
+                                    {% for portal in filter_options.portals %}
+                                    <option value="{{ portal }}" {% if current_filters.portal==portal %}selected{% endif
+                                        %}>{{ portal }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Action</label>
+                                <select class="filter-select" name="action">
+                                    <option value="all">All Actions</option>
+                                    {% for action in filter_options.actions %}
+                                    <option value="{{ action }}" {% if current_filters.action==action %}selected{% endif
+                                        %}>{{ action }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Username</label>
+                                <select class="filter-select" name="username">
+                                    <option value="all">All Users</option>
+                                    {% for username in filter_options.usernames %}
+                                    <option value="{{ username }}" {% if current_filters.username==username %}selected{%
+                                        endif %}>{{ username }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label class="filter-label">Ticket Number</label>
+                                <input type="text" class="filter-input" name="ticket_number"
+                                    value="{{ current_filters.ticket_number if current_filters.ticket_number }}"
+                                    placeholder="XX123456-...">
+                            </div>
+                        </div>
+
+                        <div class="filter-actions">
+                            <button type="submit" class="btn btn-filter">
+                                <i class="fas fa-search me-2"></i>Apply Filters
+                            </button>
+                            <a href="{{ url_for('manage_logs') }}{% if log_type %}?type={{ log_type }}{% endif %}"
+                                class="btn btn-clear">
+                                <i class="fas fa-times me-2"></i>Clear Filters
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="action-buttons">
+                    <button id="refreshLogs" class="btn btn-primary">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh Logs
+                    </button>
+
+                    <!-- Add these new buttons -->
+                    <a href="{{ url_for('manage_logs') }}?type=sms" class="btn btn-info">
+                        <i class="fas fa-sms me-2"></i>SMS Logs
+                    </a>
+
+                    <a href="{{ url_for('manage_logs') }}?type=email" class="btn btn-warning">
+                        <i class="fas fa-envelope me-2"></i>Email Logs
+                    </a>
+
+                    <a href="{{ url_for('manage_logs') }}" class="btn btn-secondary">
+                        <i class="fas fa-list me-2"></i>All Logs
+                    </a>
+                </div>
+                {% if log_type %}
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Showing {{ log_type|upper }} logs only.
+                    <a href="{{ url_for('manage_logs') }}" class="alert-link">Show all logs</a>
+                </div>
+                {% endif %}
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table id="logsTable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Timestamp</th>
+                                    <th>User ID</th>
+                                    <th>Portal</th>
+                                    <th>Action</th>
+                                    <th>Ticket #</th>
+                                    <th>Details</th>
+                                    <th>Username</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.id }}</td>
+                                    <td class="timestamp-cell">{{ log.timestamp }}</td>
+                                    <td>{{ log.user_id }}</td>
+                                    <td>{{ log.portal_name }}</td>
+                                    <td>
+                                        {% if 'error' in log.action|lower %}
+                                        <span class="log-type-error">{{ log.action }}</span>
+                                        {% elif 'warning' in log.action|lower %}
+                                        <span class="log-type-warning">{{ log.action }}</span>
+                                        {% elif 'success' in log.action|lower or 'login' in log.action|lower %}
+                                        <span class="log-type-success">{{ log.action }}</span>
+                                        {% else %}
+                                        <span class="log-type-info">{{ log.action }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.ticket_number if log.ticket_number else 'N/A' }}</td>
+                                    <td class="text-truncate" style="max-width: 200px;" title="{{ log.relevant_data }}">
+                                        {{ log.relevant_data if log.relevant_data else 'N/A' }}</td>
+                                    <td>{{ log.username if log.username else 'N/A' }}</td>
+                                    <td>{{ log.ip_address if log.ip_address else 'N/A' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+        rel="stylesheet" />
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 for filter dropdowns
+            $('.filter-select').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: 'Select an option',
+                allowClear: true,
+                dropdownParent: $('.filter-section')
+            });
+
+            // Set default date values if not already set
+            if (!$('input[name="date_from"]').val()) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                $('input[name="date_from"]').val(yesterday.toISOString().split('T')[0]);
+            }
+
+            if (!$('input[name="date_to"]').val()) {
+                const today = new Date();
+                $('input[name="date_to"]').val(today.toISOString().split('T')[0]);
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var logsTable = $('#logsTable').DataTable({
+                "order": [[1, "desc"]],
+                responsive: true,
+                pageLength: 25,
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-2"></i>Export to CSV',
+                        className: 'btn btn-success',
+                        title: 'System_Logs_' + new Date().toISOString().slice(0, 10)
+                    }
+                ],
+                language: {
+                    search: "Search logs:",
+                    lengthMenu: "Show _MENU_ logs per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ logs",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                },
+                columnDefs: [
+                    { targets: [0, 2], width: "5%" },
+                    { targets: 1, width: "12%" },
+                    { targets: [3, 4], width: "15%" },
+                    { targets: 5, width: "10%" },
+                    { targets: 6, width: "25%" },
+                    { targets: [7, 8], width: "8%" }
+                ]
+            });
+
+            // Calculate and display statistics
+            function updateStats() {
+                var totalRows = logsTable.rows().count();
+                var infoLogs = 0;
+                var warningLogs = 0;
+                var errorLogs = 0;
+                var emailLogs = 0;
+                var smsLogs = 0;
+
+                logsTable.rows().data().each(function (row) {
+                    var action = row[4].toLowerCase();
+                    var portal = row[3].toLowerCase();
+
+                    if (action.includes('error')) {
+                        errorLogs++;
+                    } else if (action.includes('warning')) {
+                        warningLogs++;
+                    } else {
+                        infoLogs++;
+                    }
+
+                    // Count email and SMS logs
+                    if (action.includes('email') || portal.includes('email')) {
+                        emailLogs++;
+                    }
+                    if (action.includes('sms') || portal.includes('sms')) {
+                        smsLogs++;
+                    }
+                });
+
+                $('#totalLogs').text(totalRows);
+                $('#infoLogs').text(infoLogs);
+                $('#warningLogs').text(warningLogs);
+                $('#errorLogs').text(errorLogs);
+
+                // Add stats for email and SMS if we're showing all logs
+                if (!window.logType) {
+                    $('#emailLogs').text(emailLogs);
+                    $('#smsLogs').text(smsLogs);
+                }
+            }
+
+            // Initialize stats
+            updateStats();
+
+            // Export logs button
+            $('#exportLogs').click(function () {
+                logsTable.button('.buttons-csv').trigger();
+            });
+
+            // Refresh logs button
+            $('#refreshLogs').click(function () {
+                location.reload();
+            });
+
+            // Add row highlighting based on log type
+            $('#logsTable tbody tr').each(function () {
+                var action = $(this).find('td:eq(4)').text().toLowerCase();
+                if (action.includes('error')) {
+                    $(this).addClass('table-danger');
+                } else if (action.includes('warning')) {
+                    $(this).addClass('table-warning');
+                } else if (action.includes('success') || action.includes('login')) {
+                    $(this).addClass('table-success');
+                } else {
+                    $(this).addClass('table-info');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

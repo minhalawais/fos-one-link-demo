@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 Internal Server Error</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .error-container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        .logo {
+            max-width: 120px;
+            margin-bottom: 20px;
+            width: 150px;
+        }
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        p {
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #2980b9;
+        }
+        .icon {
+            font-size: 48px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .support-email {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo">
+        <div class="icon">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <h1>500 - Internal Server Error</h1>
+        <p>Oops! Something went wrong on our end. Our team has been notified and we're working to fix the issue.</p>
+        <a href="{{ url_for('login') }}" class="button"><i class="fas fa-home"></i> Go back to homepage</a>
+        <div class="support-email">
+            <p>Need help? Contact our support team:</p>
+            <a href="mailto:miqdam@fruitofsustainability.com">miqdam@fruitofsustainability.com</a>
+        </div>
+    </div>
+</body>
+</html>

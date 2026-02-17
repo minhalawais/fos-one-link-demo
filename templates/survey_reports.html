@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Reports</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#60BA81',
+                        primary1: '#284952',
+                        secondary: '#f5a83c',
+                        'primary-50': '#f0f9f4',
+                        'primary-100': '#dcf2e3',
+                        'primary-500': '#60BA81',
+                        'primary-600': '#4a9d6b',
+                        'primary-700': '#3d8157',
+                        'primary1-50': '#f1f5f6',
+                        'primary1-500': '#284952',
+                        'primary1-600': '#1f3a42',
+                        'secondary-50': '#fef7ed',
+                        'secondary-500': '#f5a83c',
+                        'secondary-600': '#d97706'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'shimmer': 'shimmer 2s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        shimmer: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' }
+                        }
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Flask URL Configuration for JavaScript -->
+    <script>
+        window.flaskUrls = {
+            generateAudioSummary: "{{ url_for('generate_audio_summary', survey_id=0) }}".replace('/0', ''),
+            downloadAudio: "{{ url_for('download_audio', survey_id=0, language='en') }}".replace('/0/en', ''),
+            deleteSurveyReport: "{{ url_for('delete_survey_report', survey_id=0) }}".replace('/0', ''),
+            updateSurveyReport: "{{ url_for('update_survey_report') }}",
+            updatePublicReport: "{{ url_for('update_public_report') }}",
+            audioSummariesStatic: "{{ url_for('static', filename='audio_summaries/') }}",
+            uploadPublicReport: "{{ url_for('upload_public_report') }}",
+            generateQRForPublic: "{{ url_for('generate_qr_for_public', filename='FILENAME') }}",
+            deleteQRForPublic: "{{ url_for('delete_qr_for_public', filename='FILENAME') }}",
+            deletePublicReport: "{{ url_for('delete_public_report', filename='FILENAME') }}",
+            downloadQRPublic: "{{ url_for('download_qr_public', filename='FILENAME') }}",
+            getPublicReports: "{{ url_for('get_public_reports_json') }}",
+            qrCodesStatic: "{{ url_for('static', filename='qr_codes/') }}"
+        };
+    </script>
+    
+    <style>
+        .navbar {
+            background-color: var(--primary1-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .container-fluid-nav{
+            display: contents;
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .gradient-border {
+            background: linear-gradient(135deg, #60BA81, #f5a83c);
+            padding: 2px;
+            border-radius: 16px;
+        }
+        
+        .gradient-border-content {
+            background: white;
+            border-radius: 14px;
+        }
+        
+        .shimmer-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shimmer-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .shimmer-effect:hover::before {
+            left: 100%;
+        }
+        
+        .card-hover-effect {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover-effect:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        .floating-action {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .audio-wave {
+            background: linear-gradient(45deg, #60BA81, #4a9d6b);
+            background-size: 400% 400%;
+            animation: gradient-wave 3s ease infinite;
+        }
+        
+        @keyframes gradient-wave {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .stagger-animation {
+            animation-delay: calc(var(--stagger) * 0.1s);
+        }
+
+        .qr-badge {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+
+<body class="font-inter bg-gradient-to-br from-slate-50 via-gray-50 to-primary-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid-nav">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_logs') }}">Logs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_company') }}">Company</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_employee') }}">Employees</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('manage_complaints') }}">Complaints</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('survey') }}">Surveys</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user_management') }}">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-full mx-auto px-4 sm:px-4 lg:px-4 py-8">
+        <!-- Enhanced Header -->
+        <div class="glass-effect rounded-2xl shadow-xl border border-white/20 mb-8 overflow-hidden">
+            <div class="bg-gradient-to-r from-primary/5 to-secondary/5 p-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+                    <div class="space-y-2">
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary1-600 to-primary-600 bg-clip-text text-transparent">
+                            Survey Reports
+                        </h1>
+                        <p class="text-gray-600 text-lg">Manage and analyze your survey data with AI-powered insights</p>
+                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                            <span class="flex items-center">
+                                <i class="bi bi-files mr-2"></i>
+                                {{ surveys|length }} Reports
+                            </span>
+                            <span class="flex items-center">
+                                <i class="bi bi-calendar3 mr-2"></i>
+                                Updated Today
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3 flex-col sm:flex-row">
+                        <button class="group relative bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                                data-bs-toggle="modal" data-bs-target="#publicReportsModal">
+                            <i class="bi bi-qr-code mr-2 text-lg"></i>
+                            Public Reports
+                        </button>
+                        <button class="group relative bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 shimmer-effect"
+                                data-bs-toggle="modal" data-bs-target="#uploadModal">
+                            <i class="bi bi-cloud-upload mr-3 text-lg"></i>
+                            Upload New Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Reports Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {% for survey in surveys %}
+            <div class="gradient-border card-hover-effect animate-fade-in-up stagger-animation" 
+                 style="--stagger: {{ loop.index }}">
+                <div class="gradient-border-content p-6 h-full">
+                    <!-- Card Header -->
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                                {{ survey.title }}
+                            </h3>
+                            <div class="flex items-center text-sm text-gray-500 mb-3">
+                                <i class="bi bi-hash mr-1"></i>
+                                Survey ID: {{ survey.id }}
+                            </div>
+                        </div>
+                        
+                        <!-- <CHANGE> Added edit button alongside delete button -->
+                            <div class="flex gap-1 opacity-70 hover:opacity-100 transition-all duration-300">
+                                <button class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-all duration-200 edit-survey-btn"
+                                        data-survey-id="{{ survey.id }}"
+                                        data-title="{{ survey.title }}"
+                                        data-date="{{ survey.date }}"
+                                        data-buyer-id="{{ survey.buyer_id }}"
+                                        title="Edit Survey">
+                                    <i class="bi bi-pencil-square text-lg"></i>
+                                </button>
+                                <button class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-200 delete-btn"
+                                        data-survey-id="{{ survey.id }}" title="Delete Survey">
+                                    <i class="bi bi-trash text-lg"></i>
+                                </button>
+                            </div>
+                    </div>
+                    
+                    <!-- Enhanced Badges -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                            <i class="bi bi-calendar-event mr-1"></i>
+                            {{ survey.date }}
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                            <i class="bi bi-building mr-1"></i>
+                            Buyer {{ survey.buyer_id }}
+                        </span>
+                    </div>
+
+                    <!-- Audio Summary Section -->
+                    {% if survey.get('pdf') %}
+                    <div class="mb-6">
+                        {% if survey.has_any_audio %}
+                        <button class="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-4 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 view-summary-btn"
+                                data-bs-toggle="modal" data-bs-target="#audioModal"
+                                data-survey-id="{{ survey.id }}"
+                                data-survey-title="{{ survey.title }}"
+                                data-has-english="{{ survey.has_english_audio }}"
+                                data-has-urdu="{{ survey.has_urdu_audio }}"
+                                data-english-audio="{{ survey.english_audio or '' }}"
+                                data-urdu-audio="{{ survey.urdu_audio or '' }}">
+                            <i class="bi bi-play-circle-fill mr-2 text-lg"></i>
+                            View Audio Summary
+                        </button>
+                        {% else %}
+                        <button class="w-full bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white px-4 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 generate-summary-btn audio-wave"
+                                data-survey-id="{{ survey.id }}"
+                                data-survey-title="{{ survey.title }}">
+                            <i class="bi bi-mic-fill mr-2 text-lg"></i>
+                            Generate Audio Summary
+                            <div class="text-xs opacity-80 mt-1">AI-Powered Analysis</div>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- File Download Buttons -->
+                    <div class="flex flex-wrap gap-3">
+                        {% if survey.get('pdf') %}
+                        <a href="{{ url_for('static', filename='survey_reports/' + survey.pdf) }}" 
+                           class="flex-1 min-w-0 bg-red-50 hover:bg-red-100 text-red-700 px-4 py-3 rounded-xl font-medium text-center transition-all duration-200 hover:shadow-md shimmer-effect group"
+                           target="_blank">
+                            <i class="bi bi-file-earmark-pdf-fill mr-2 text-lg"></i>
+                            <span class="hidden sm:inline">PDF Report</span>
+                            <span class="sm:hidden">PDF</span>
+                        </a>
+                        {% endif %}
+                        {% if survey.get('xlsx') %}
+                        <a href="{{ url_for('static', filename='survey_reports/' + survey.xlsx) }}" 
+                           class="flex-1 min-w-0 bg-green-50 hover:bg-green-100 text-green-700 px-4 py-3 rounded-xl font-medium text-center transition-all duration-200 hover:shadow-md shimmer-effect group"
+                           target="_blank">
+                            <i class="bi bi-file-earmark-excel-fill mr-2 text-lg"></i>
+                            <span class="hidden sm:inline">Excel Data</span>
+                            <span class="sm:hidden">Excel</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Enhanced Empty State -->
+            <div class="col-span-full">
+                <div class="text-center py-16 px-8">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-32 h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full animate-pulse-slow"></div>
+                        </div>
+                        <div class="relative">
+                            <i class="bi bi-folder2-open text-6xl text-gray-300 mb-6"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-700 mb-3">No Survey Reports Found</h3>
+                    <p class="text-gray-500 text-lg mb-8 max-w-md mx-auto">
+                        Get started by uploading your first survey report to unlock powerful AI-driven insights and analytics.
+                    </p>
+                    <button class="bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                            data-bs-toggle="modal" data-bs-target="#uploadModal">
+                        <i class="bi bi-plus-circle mr-2"></i>
+                        Upload Your First Report
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Audio Modal -->
+    <div class="modal fade" id="audioModal" tabindex="-1" aria-labelledby="audioModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-gradient-to-r from-primary/5 to-secondary/5 border-0 p-6">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800" id="audioModalLabel">
+                        <i class="bi bi-volume-up-fill mr-3 text-primary"></i>
+                        Audio Summary
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <div class="mb-6">
+                        <h6 class="text-lg font-semibold text-gray-700 mb-4" id="modalSurveyTitle">Survey Title</h6>
+                        
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-4 border border-blue-100" 
+                             id="englishAudioItem" style="display: none;">
+                            <div class="flex justify-between items-center mb-4">
+                                <h6 class="text-lg font-semibold text-blue-800 flex items-center">
+                                    <i class="bi bi-flag-fill mr-2"></i>
+                                    English Summary
+                                </h6>
+                                <a href="#" class="bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-md" 
+                                   id="downloadEnglish">
+                                    <i class="bi bi-download mr-1"></i>
+                                    Download
+                                </a>
+                            </div>
+                            <audio controls class="w-full rounded-lg" id="englishAudio">
+                                <source src="/placeholder.svg" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-100" 
+                             id="urduAudioItem" style="display: none;">
+                            <div class="flex justify-between items-center mb-4">
+                                <h6 class="text-lg font-semibold text-emerald-800 flex items-center">
+                                    <i class="bi bi-translate mr-2"></i>
+                                    Urdu Summary
+                                </h6>
+                                <a href="#" class="bg-primary hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-md" 
+                                   id="downloadUrdu">
+                                    <i class="bi bi-download mr-1"></i>
+                                    Download
+                                </a>
+                            </div>
+                            <audio controls class="w-full rounded-lg" id="urduAudio">
+                                <source src="/placeholder.svg" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200" 
+                            data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Survey Modal -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-gradient-to-r from-primary/5 to-secondary/5 border-0 p-6">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800" id="uploadModalLabel">
+                        <i class="bi bi-cloud-upload-fill mr-3 text-primary"></i>
+                        Upload Survey Report
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="uploadForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="survey_id" class="block text-sm font-semibold text-gray-700 mb-2">Survey ID</label>
+                                <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" 
+                                       id="survey_id" name="survey_id" value="{{ next_id }}" required>
+                            </div>
+                            <div>
+                                <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                                <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" 
+                                       id="date" name="date" value="{{ current_date }}" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="title" class="block text-sm font-semibold text-gray-700 mb-2">Survey Title</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" 
+                                   id="title" name="title" required>
+                            <p class="text-xs text-gray-500 mt-1">Special characters will be removed automatically</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="buyer_id" class="block text-sm font-semibold text-gray-700 mb-2">Buyer</label>
+                                <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" 
+                                        id="buyer_id" name="buyer_id" required>
+                                    {% for buyer in buyers %}
+                                    <option value="{{ buyer.buyer_id }}">{{ buyer.buyer_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="report_type" class="block text-sm font-semibold text-gray-700 mb-2">Report Type</label>
+                                <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200" 
+                                        id="report_type" name="report_type" required>
+                                    <option value="pdf">PDF Document</option>
+                                    <option value="xlsx">Excel Spreadsheet</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="report_file" class="block text-sm font-semibold text-gray-700 mb-2">Report File</label>
+                            <div class="relative">
+                                <input class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary-600" 
+                                       type="file" id="report_file" name="report_file" accept=".pdf,.xlsx,.xls" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6 flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200" 
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-8 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl" 
+                            data-upload-url="{{ url_for('upload_survey_report') }}" id="uploadBtn">
+                        <i class="bi bi-upload mr-2"></i>
+                        Upload Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Survey Modal -->
+    <div class="modal fade" id="editSurveyModal" tabindex="-1" aria-labelledby="editSurveyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-gradient-to-r from-blue-50 to-indigo-50 border-0 p-6">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800" id="editSurveyModalLabel">
+                        <i class="bi bi-pencil-square mr-3 text-blue-600"></i>
+                        Update Survey Report
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="editSurveyForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="edit_survey_id" class="block text-sm font-semibold text-gray-700 mb-2">Survey ID</label>
+                                <input type="number" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-100" 
+                                       id="edit_survey_id" name="survey_id" disabled>
+                            </div>
+                            <div>
+                                <label for="edit_date" class="block text-sm font-semibold text-gray-700 mb-2">Date</label>
+                                <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" 
+                                       id="edit_date" name="date" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="edit_title" class="block text-sm font-semibold text-gray-700 mb-2">Survey Title</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" 
+                                   id="edit_title" name="title" required>
+                            <p class="text-xs text-gray-500 mt-1">Special characters will be removed automatically</p>
+                        </div>
+                        
+                        <div>
+                            <label for="edit_buyer_id" class="block text-sm font-semibold text-gray-700 mb-2">Buyer</label>
+                            <select class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" 
+                                    id="edit_buyer_id" name="buyer_id" required>
+                                {% for buyer in buyers %}
+                                <option value="{{ buyer.buyer_id }}">{{ buyer.buyer_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="edit_report_file" class="block text-sm font-semibold text-gray-700 mb-2">Replace Report File (Optional)</label>
+                            <div class="relative">
+                                <input class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-500 file:text-white hover:file:bg-blue-600" 
+                                       type="file" id="edit_report_file" name="report_file" accept=".pdf,.xlsx,.xls">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Leave empty to keep the current file</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6 flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200" 
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl" 
+                            id="editSurveyBtn">
+                        <i class="bi bi-check-circle mr-2"></i>
+                        Update Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal for Survey Reports -->
+    <div class="modal fade" id="deleteSurveyModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-red-50 border-0 p-6">
+                    <h5 class="modal-title text-xl font-bold text-red-800">
+                        <i class="bi bi-exclamation-triangle-fill mr-2"></i>
+                        Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="bi bi-trash text-2xl text-red-600"></i>
+                        </div>
+                        <p class="text-gray-700 mb-2">Are you sure you want to delete this report?</p>
+                        <p class="text-sm text-gray-500 mb-4">This action cannot be undone and will permanently remove all associated data.</p>
+                        <p class="font-semibold text-gray-800" id="surveyToDelete"></p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6 flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200" 
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl" 
+                            id="confirmDeleteSurvey">
+                        <i class="bi bi-trash mr-2"></i>
+                        Delete Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Public Reports Modal -->
+    <div class="modal fade" id="publicReportsModal" tabindex="-1" aria-labelledby="publicReportsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-gradient-to-r from-purple-50 to-indigo-50 border-0 p-6">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800" id="publicReportsModalLabel">
+                        <i class="bi bi-qr-code mr-3 text-purple-600"></i>
+                        Public Reports & QR Codes
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6 max-h-96 overflow-y-auto">
+                    <!-- Upload Section -->
+                    <!-- In the Public Reports Modal section -->
+<div class="mb-8">
+    <h6 class="text-lg font-semibold text-gray-700 mb-4">
+        <i class="bi bi-cloud-upload mr-2"></i>Upload New Public Report
+    </h6>
+    <form id="uploadPublicForm" class="space-y-4">
+        <!-- Improved file drop zone with better click handling -->
+        <div class="relative border-2 border-dashed border-purple-300 rounded-xl p-6 bg-purple-50 hover:bg-purple-100 transition-all cursor-pointer"
+             id="fileDropZone">
+            <input type="file" id="public_report_file" name="report_file" 
+                   accept=".pdf,.xlsx,.xls,.doc,.docx" 
+                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+            <div class="text-center pointer-events-none">
+                <i class="bi bi-cloud-upload text-3xl text-purple-500 mb-2"></i>
+                <p class="text-gray-700 font-medium text-sm">Drag and drop your file here</p>
+                <p class="text-gray-500 text-xs">or click to browse</p>
+                <p class="text-xs text-gray-500 mt-2">Supported: PDF, XLSX, XLS, DOC, DOCX</p>
+            </div>
+            <div id="fileName" class="text-center text-xs text-purple-600 font-medium mt-3" style="display: none;"></div>
+        </div>
+        <button type="button" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg" 
+                id="uploadPublicBtn">
+            <i class="bi bi-upload mr-2"></i>
+            Upload Report
+        </button>
+    </form>
+</div>
+
+                    <!-- Divider -->
+                    <div class="border-t border-gray-200 my-6"></div>
+
+                    <!-- Current Public Reports -->
+                    <div>
+                        <h6 class="text-lg font-semibold text-gray-700 mb-4">
+                            <i class="bi bi-files mr-2"></i>Current Public Reports
+                        </h6>
+                        <div id="publicReportsList" class="space-y-3">
+                            <div class="flex items-center justify-center py-8">
+                                <div class="text-center">
+                                    <i class="bi bi-hourglass-split text-2xl text-gray-400 animate-spin mb-2"></i>
+                                    <p class="text-gray-500 text-sm">Loading reports...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Public Report Modal -->
+    <div class="modal fade" id="editPublicModal" tabindex="-1" aria-labelledby="editPublicModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-gradient-to-r from-indigo-50 to-purple-50 border-0 p-6">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800" id="editPublicModalLabel">
+                        <i class="bi bi-pencil-square mr-3 text-indigo-600"></i>
+                        Update Public Report
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <form id="editPublicForm" class="space-y-6">
+                        <div>
+                            <label for="edit_public_filename" class="block text-sm font-semibold text-gray-700 mb-2">Current Filename</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-gray-100" 
+                                   id="edit_public_filename" name="original_filename" disabled>
+                        </div>
+
+                        <div>
+                            <label for="edit_public_file" class="block text-sm font-semibold text-gray-700 mb-2">Upload New Report File</label>
+                            <div class="relative border-2 border-dashed border-indigo-300 rounded-xl p-6 bg-indigo-50 hover:bg-indigo-100 transition-all cursor-pointer"
+                                 id="editFileDropZone">
+                                <input type="file" id="edit_public_file" name="report_file" 
+                                       accept=".pdf,.xlsx,.xls,.doc,.docx" 
+                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                                <div class="text-center pointer-events-none">
+                                    <i class="bi bi-cloud-upload text-3xl text-indigo-500 mb-2"></i>
+                                    <p class="text-gray-700 font-medium text-sm">Drag and drop your file here</p>
+                                    <p class="text-gray-500 text-xs">or click to browse</p>
+                                    <p class="text-xs text-gray-500 mt-2">Supported: PDF, XLSX, XLS, DOC, DOCX</p>
+                                </div>
+                                <div id="editFileName" class="text-center text-xs text-indigo-600 font-medium mt-3" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6 flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200" 
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-8 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl" 
+                            id="editPublicBtn">
+                        <i class="bi bi-check-circle mr-2"></i>
+                        Update Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code View Modal -->
+    <div class="modal fade" id="qrViewModal" tabindex="-1" aria-labelledby="qrViewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-gradient-to-r from-purple-50 to-indigo-50 border-0 p-6">
+                    <h5 class="modal-title text-2xl font-bold text-gray-800" id="qrViewModalLabel">
+                        <i class="bi bi-qr-code mr-3 text-purple-600"></i>
+                        QR Code
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-8 text-center">
+                    <h6 class="text-lg font-semibold text-gray-700 mb-6" id="qrFilename"></h6>
+                    
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6 inline-block">
+                        <img id="qrImageDisplay" src="/placeholder.svg" alt="QR Code" class="w-64 h-64">
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <p class="text-sm text-blue-800">
+                            <i class="bi bi-info-circle mr-2"></i>
+                            <strong>Secure Public Link:</strong> Serialized access token
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-100 rounded-lg p-4 break-all mb-6 text-left max-h-24 overflow-y-auto">
+                        <p class="text-xs text-gray-500 mb-2">Public Link:</p>
+                        <p class="text-xs font-mono text-gray-700" id="publicLinkText"></p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6 flex justify-between gap-3">
+                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm" 
+                            id="deleteQRBtn">
+                        <i class="bi bi-trash mr-1"></i>
+                        Delete QR
+                    </button>
+                    <div class="space-x-2">
+                        <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm" 
+                                data-bs-dismiss="modal">Close</button>
+                        <a href="#" id="downloadQRBtn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all text-sm inline-block">
+                            <i class="bi bi-download mr-1"></i>
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal for Public Reports -->
+    <div class="modal fade" id="deletePublicModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-2xl rounded-2xl overflow-hidden">
+                <div class="modal-header bg-red-50 border-0 p-6">
+                    <h5 class="modal-title text-xl font-bold text-red-800">
+                        <i class="bi bi-exclamation-triangle-fill mr-2"></i>
+                        Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="bi bi-trash text-2xl text-red-600"></i>
+                        </div>
+                        <p class="text-gray-700 mb-2">Are you sure you want to delete this report?</p>
+                        <p class="text-sm text-gray-500 mb-4">This will also remove any associated QR codes. This action cannot be undone.</p>
+                        <p class="font-semibold text-gray-800" id="publicFileToDelete"></p>
+                    </div>
+                </div>
+                <div class="modal-footer bg-gray-50 border-0 p-6 flex justify-end space-x-3">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200" 
+                            data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl" 
+                            id="confirmDeletePublic">
+                        <i class="bi bi-trash mr-2"></i>
+                        Delete Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Enhanced file drop zone functionality
+function setupFileDropZone(dropZoneElement, fileInputElement, fileNameDisplay) {
+    // Drag and drop events
+    dropZoneElement.on('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).addClass('border-purple-600 bg-purple-200');
+    });
+
+    dropZoneElement.on('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('border-purple-600 bg-purple-200');
+    });
+
+    dropZoneElement.on('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).removeClass('border-purple-600 bg-purple-200');
+        
+        const files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            fileInputElement[0].files = files;
+            updateFileNameDisplay(fileInputElement, fileNameDisplay);
+        }
+    });
+
+    // Click handling - the input now covers the entire drop zone
+    fileInputElement.on('change', function() {
+        updateFileNameDisplay($(this), fileNameDisplay);
+    });
+}
+
+// Helper function to update file name display
+function updateFileNameDisplay(fileInput, fileNameDisplay) {
+    if (fileInput[0].files.length > 0) {
+        const fileName = fileInput[0].files[0].name;
+        fileNameDisplay.text(fileName).show();
+        
+        // Add file type badge
+        const fileExt = fileName.split('.').pop().toUpperCase();
+        fileNameDisplay.html(`
+            <div class="flex items-center justify-center space-x-2">
+                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">${fileExt}</span>
+                <span>${fileName}</span>
+            </div>
+        `);
+    } else {
+        fileNameDisplay.hide();
+    }
+}
+        $(document).ready(function() {
+            let currentSurveyId = null;
+            let currentPublicFilename = null;
+            
+            // Add stagger animation to cards
+            $('.stagger-animation').each(function(index) {
+                $(this).css('animation-delay', (index * 0.1) + 's');
+            });
+            setupFileDropZone($('#fileDropZone'), $('#public_report_file'), $('#fileName'));
+            setupFileDropZone($('#editFileDropZone'), $('#edit_public_file'), $('#editFileName'));
+            // Load public reports when modal opens
+            $('#publicReportsModal').on('show.bs.modal', function() {
+                loadPublicReports();
+            });
+
+            // Load public reports function
+            function loadPublicReports() {
+                $.ajax({
+                    url: window.flaskUrls.getPublicReports,
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            const reports = response.reports;
+                            let html = '';
+
+                            if (reports.length === 0) {
+                                html = '<div class="text-center py-8"><i class="bi bi-inbox text-3xl text-gray-400 mb-2"></i><p class="text-gray-500 text-sm">No public reports uploaded yet</p></div>';
+                            } else {
+                                reports.forEach(report => {
+                                    const hasQR = report.has_qr;
+                                    const badgeClass = hasQR ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200';
+                                    const badgeTextClass = hasQR ? 'text-green-700' : 'text-gray-700';
+                                    const badgeIcon = hasQR ? 'bi-check-circle' : 'bi-clock';
+                                    const badgeText = hasQR ? 'QR Generated' : 'No QR';
+
+                                    html += `
+                                        <div class="border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:shadow-md transition-all">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="font-medium text-gray-800 text-sm truncate">${report.filename}</p>
+                                                <div class="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                                                    <span>${report.file_type.toUpperCase()}</span>
+                                                    <span>•</span>
+                                                    <span>${report.file_size_formatted}</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+                                                <span class="px-3 py-1 rounded-full text-xs font-medium ${badgeClass} ${badgeTextClass} whitespace-nowrap">
+                                                    <i class="bi ${badgeIcon} mr-1"></i>${badgeText}
+                                                </span>
+                                                <div class="flex gap-1">
+                                                    <!-- <CHANGE> Added edit button for public reports -->
+                                                    <button class="p-1 text-blue-500 hover:bg-blue-50 rounded text-sm edit-public-report-btn transition-all" 
+                                                            data-filename="${report.filename}"
+                                                            title="Edit Report">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+                                                    ${hasQR ? `
+                                                        <button class="p-1 text-purple-500 hover:bg-purple-50 rounded text-sm view-qr-public-btn transition-all" 
+                                                                data-filename="${report.filename}" 
+                                                                data-qr-file="${report.qr_filename}" 
+                                                                data-public-link="${report.public_link}"
+                                                                title="View QR Code">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                    ` : `
+                                                        <button class="p-1 text-indigo-500 hover:bg-indigo-50 rounded text-sm generate-qr-public-btn transition-all" 
+                                                                data-filename="${report.filename}"
+                                                                title="Generate QR Code">
+                                                            <i class="bi bi-qr-code"></i>
+                                                        </button>
+                                                    `}
+                                                    <button class="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded text-sm delete-public-report-btn transition-all" 
+                                                            data-filename="${report.filename}"
+                                                            title="Delete Report">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                });
+                            }
+                            $('#publicReportsList').html(html);
+                        }
+                    },
+                    error: function() {
+                        $('#publicReportsList').html('<div class="text-center text-red-500 py-8 text-sm"><p>Error loading reports</p></div>');
+                    }
+                });
+            }
+
+            // File drag and drop for public upload
+            const fileDropZone = $('#fileDropZone');
+            const fileInput = $('#public_report_file');
+            const fileNameDisplay = $('#fileName');
+
+            fileDropZone.on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('border-purple-600 bg-purple-200');
+            });
+
+            fileDropZone.on('dragleave', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-purple-600 bg-purple-200');
+            });
+
+            fileDropZone.on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-purple-600 bg-purple-200');
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput[0].files = files;
+                    fileNameDisplay.text(files[0].name).show();
+                }
+            });
+
+            fileDropZone.on('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.on('change', function() {
+                if (this.files.length > 0) {
+                    fileNameDisplay.text(this.files[0].name).show();
+                }
+            });
+
+            // File drag and drop for edit public report
+            const editFileDropZone = $('#editFileDropZone');
+            const editFileInput = $('#edit_public_file');
+            const editFileNameDisplay = $('#editFileName');
+
+            editFileDropZone.on('dragover', function(e) {
+                e.preventDefault();
+                $(this).addClass('border-indigo-600 bg-indigo-200');
+            });
+
+            editFileDropZone.on('dragleave', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-indigo-600 bg-indigo-200');
+            });
+
+            editFileDropZone.on('drop', function(e) {
+                e.preventDefault();
+                $(this).removeClass('border-indigo-600 bg-indigo-200');
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    editFileInput[0].files = files;
+                    editFileNameDisplay.text(files[0].name).show();
+                }
+            });
+
+            editFileDropZone.on('click', function() {
+                editFileInput.click();
+            });
+
+            editFileInput.on('change', function() {
+                if (this.files.length > 0) {
+                    editFileNameDisplay.text(this.files[0].name).show();
+                }
+            });
+
+            // Upload public report
+            $('#uploadPublicBtn').click(function() {
+                if (!fileInput[0].files.length) {
+                    showNotification('error', 'Please select a file');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('report_file', fileInput[0].files[0]);
+
+                $(this).html('<i class="bi bi-hourglass-split mr-2"></i>Uploading...').prop('disabled', true);
+
+                $.ajax({
+                    url: window.flaskUrls.uploadPublicReport,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        showNotification('success', 'Report uploaded successfully!');
+                        fileInput.val('');
+                        fileNameDisplay.hide();
+                        $('#uploadPublicBtn').html('<i class="bi bi-upload mr-2"></i>Upload Report').prop('disabled', false);
+                        loadPublicReports();
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error uploading report');
+                        $('#uploadPublicBtn').html('<i class="bi bi-upload mr-2"></i>Upload Report').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Edit Survey Report
+            $(document).on('click', '.edit-survey-btn', function() {
+                const surveyId = $(this).data('survey-id');
+                const title = $(this).data('title');
+                const date = $(this).data('date');
+                const buyerId = $(this).data('buyer-id');
+
+                $('#edit_survey_id').val(surveyId);
+                $('#edit_title').val(title);
+                $('#edit_date').val(date);
+                $('#edit_buyer_id').val(buyerId);
+                $('#edit_report_file').val('');
+                $('#editFileName').hide();
+
+                currentSurveyId = surveyId;
+                const editModal = new bootstrap.Modal(document.getElementById('editSurveyModal'));
+                editModal.show();
+            });
+
+            // Update Survey Report
+            $('#editSurveyBtn').click(function() {
+                if (!currentSurveyId) return;
+
+                const formData = new FormData();
+                formData.append('survey_id', currentSurveyId);
+                formData.append('title', $('#edit_title').val());
+                formData.append('date', $('#edit_date').val());
+                formData.append('buyer_id', $('#edit_buyer_id').val());
+                
+                if ($('#edit_report_file')[0].files.length > 0) {
+                    formData.append('report_file', $('#edit_report_file')[0].files[0]);
+                }
+
+                $(this).html('<i class="bi bi-hourglass-split mr-2"></i>Updating...').prop('disabled', true);
+
+                $.ajax({
+                    url: window.flaskUrls.updateSurveyReport,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        showNotification('success', 'Report updated successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('editSurveyModal')).hide();
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error updating report');
+                        $('#editSurveyBtn').html('<i class="bi bi-check-circle mr-2"></i>Update Report').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Edit Public Report
+            $(document).on('click', '.edit-public-report-btn', function() {
+                currentPublicFilename = $(this).data('filename');
+                
+                $('#edit_public_filename').val(currentPublicFilename);
+                $('#edit_public_file').val('');
+                $('#editFileName').hide();
+
+                const editModal = new bootstrap.Modal(document.getElementById('editPublicModal'));
+                editModal.show();
+            });
+
+            // Update Public Report
+            $('#editPublicBtn').click(function() {
+                if (!currentPublicFilename || !editFileInput[0].files.length) {
+                    showNotification('error', 'Please select a file to upload');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('original_filename', currentPublicFilename);
+                formData.append('report_file', editFileInput[0].files[0]);
+
+                $(this).html('<i class="bi bi-hourglass-split mr-2"></i>Updating...').prop('disabled', true);
+
+                $.ajax({
+                    url: window.flaskUrls.updatePublicReport,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        showNotification('success', 'Report updated successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('editPublicModal')).hide();
+                        loadPublicReports();
+                        $('#editPublicBtn').html('<i class="bi bi-check-circle mr-2"></i>Update Report').prop('disabled', false);
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error updating report');
+                        $('#editPublicBtn').html('<i class="bi bi-check-circle mr-2"></i>Update Report').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Generate QR Code for public report
+            $(document).on('click', '.generate-qr-public-btn', function() {
+                const filename = $(this).data('filename');
+                const button = $(this);
+
+                button.prop('disabled', true).html('<i class="bi bi-hourglass-split animate-spin"></i>');
+
+                const url = window.flaskUrls.generateQRForPublic.replace('FILENAME', encodeURIComponent(filename));
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    success: function(response) {
+                        showNotification('success', 'QR code generated successfully!');
+                        loadPublicReports();
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error generating QR code');
+                        button.prop('disabled', false).html('<i class="bi bi-qr-code"></i>');
+                    }
+                });
+            });
+
+            // View QR Code
+            $(document).on('click', '.view-qr-public-btn', function() {
+                const filename = $(this).data('filename');
+                const qrFile = $(this).data('qr-file');
+                const publicLink = $(this).data('public-link');
+
+                $('#qrFilename').text(filename);
+                $('#qrImageDisplay').attr('src', window.flaskUrls.qrCodesStatic + qrFile);
+                $('#publicLinkText').text(publicLink);
+
+                const downloadUrl = window.flaskUrls.downloadQRPublic.replace('FILENAME', encodeURIComponent(filename));
+                $('#downloadQRBtn').attr('href', downloadUrl);
+
+                currentPublicFilename = filename;
+                $('#deleteQRBtn').data('filename', filename);
+
+                const qrModal = new bootstrap.Modal(document.getElementById('qrViewModal'));
+                qrModal.show();
+            });
+
+            // Delete QR Code
+            $(document).on('click', '#deleteQRBtn', function() {
+                if (!currentPublicFilename) return;
+
+                $(this).html('<i class="bi bi-hourglass-split mr-1"></i>Deleting...').prop('disabled', true);
+
+                const url = window.flaskUrls.deleteQRForPublic.replace('FILENAME', encodeURIComponent(currentPublicFilename));
+
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function() {
+                        showNotification('success', 'QR code deleted successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('qrViewModal')).hide();
+                        loadPublicReports();
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error deleting QR code');
+                        $('#deleteQRBtn').html('<i class="bi bi-trash mr-1"></i>Delete QR').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Delete Public Report
+            $(document).on('click', '.delete-public-report-btn', function() {
+                currentPublicFilename = $(this).data('filename');
+                $('#publicFileToDelete').text(currentPublicFilename);
+                const deleteModal = new bootstrap.Modal(document.getElementById('deletePublicModal'));
+                deleteModal.show();
+            });
+
+            // Confirm delete public report
+            $('#confirmDeletePublic').click(function() {
+                if (!currentPublicFilename) return;
+
+                $(this).html('<i class="bi bi-hourglass-split mr-2"></i>Deleting...').prop('disabled', true);
+
+                const url = window.flaskUrls.deletePublicReport.replace('FILENAME', encodeURIComponent(currentPublicFilename));
+
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function() {
+                        showNotification('success', 'Report deleted successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('deletePublicModal')).hide();
+                        loadPublicReports();
+                        $('#confirmDeletePublic').html('<i class="bi bi-trash mr-2"></i>Delete Report').prop('disabled', false);
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error deleting report');
+                        $('#confirmDeletePublic').html('<i class="bi bi-trash mr-2"></i>Delete Report').prop('disabled', false);
+                    }
+                });
+            });
+            
+            // Upload functionality for survey reports
+            $('#uploadBtn').click(function() {
+                const formData = new FormData();
+                formData.append('survey_id', $('#survey_id').val());
+                formData.append('title', $('#title').val());
+                formData.append('buyer_id', $('#buyer_id').val());
+                formData.append('date', $('#date').val());
+                formData.append('report_type', $('#report_type').val());
+                formData.append('report_file', $('#report_file')[0].files[0]);
+                
+                const uploadUrl = $('#uploadBtn').data('upload-url');
+                
+                $(this).html('<i class="bi bi-hourglass-split mr-2"></i>Uploading...').prop('disabled', true);
+                
+                $.ajax({
+                    url: uploadUrl,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        showNotification('success', 'Report uploaded successfully!');
+                        $('#uploadModal').modal('hide');
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error uploading report');
+                        $('#uploadBtn').html('<i class="bi bi-upload mr-2"></i>Upload Report').prop('disabled', false);
+                    }
+                });
+            });
+            
+            // Generate Audio Summary
+            $('.generate-summary-btn').click(function() {
+                const button = $(this);
+                const surveyId = button.data('survey-id');
+                
+                button.prop('disabled', true)
+                      .removeClass('audio-wave')
+                      .html(`<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>Generating...</div><div class="text-xs opacity-80 mt-1">This may take a few minutes</div>`);
+                
+                const generateUrl = window.flaskUrls.generateAudioSummary + '/' + surveyId;
+                
+                $.ajax({
+                    url: generateUrl,
+                    type: 'POST',
+                    timeout: 300000,
+                    success: function(response) {
+                        showNotification('success', 'Audio summary generated successfully!');
+                        setTimeout(() => location.reload(), 1500);
+                    },
+                    error: function(xhr) {
+                        const errorMsg = xhr.responseJSON?.error || 'Error generating audio summary';
+                        showNotification('error', `Failed to generate audio summary: ${errorMsg}`);
+                        
+                        button.prop('disabled', false)
+                              .addClass('audio-wave')
+                              .html(`<i class="bi bi-mic-fill mr-2 text-lg"></i>Generate Audio Summary<div class="text-xs opacity-80 mt-1">AI-Powered Analysis</div>`);
+                    }
+                });
+            });
+
+            // View Audio Summary
+            $('.view-summary-btn').click(function() {
+                const surveyId = $(this).data('survey-id');
+                const surveyTitle = $(this).data('survey-title');
+                const hasEnglish = $(this).data('has-english');
+                const hasUrdu = $(this).data('has-urdu');
+                const englishAudio = $(this).data('english-audio');
+                const urduAudio = $(this).data('urdu-audio');
+
+                $('#modalSurveyTitle').text(surveyTitle);
+
+                if (hasEnglish && englishAudio) {
+                    $('#englishAudioItem').show();
+                    $('#englishAudio source').attr('src', window.flaskUrls.audioSummariesStatic + englishAudio);
+                    $('#englishAudio')[0].load();
+                    
+                    const downloadEnglishUrl = window.flaskUrls.downloadAudio + '/' + surveyId + '/en';
+                    $('#downloadEnglish').attr('href', downloadEnglishUrl);
+                } else {
+                    $('#englishAudioItem').hide();
+                }
+
+                if (hasUrdu && urduAudio) {
+                    $('#urduAudioItem').show();
+                    $('#urduAudio source').attr('src', window.flaskUrls.audioSummariesStatic + urduAudio);
+                    $('#urduAudio')[0].load();
+                    
+                    const downloadUrduUrl = window.flaskUrls.downloadAudio + '/' + surveyId + '/ur';
+                    $('#downloadUrdu').attr('href', downloadUrduUrl);
+                } else {
+                    $('#urduAudioItem').hide();
+                }
+            });
+
+            // Delete survey report
+            $('.delete-btn').click(function() {
+                currentSurveyId = $(this).data('survey-id');
+                $('#surveyToDelete').text('Survey ID: ' + currentSurveyId);
+                const deleteModal = new bootstrap.Modal(document.getElementById('deleteSurveyModal'));
+                deleteModal.show();
+            });
+
+            $('#confirmDeleteSurvey').click(function() {
+                if (!currentSurveyId) return;
+                
+                $(this).html('<i class="bi bi-hourglass-split mr-2"></i>Deleting...').prop('disabled', true);
+                
+                const deleteUrl = window.flaskUrls.deleteSurveyReport + '/' + currentSurveyId;
+                
+                $.ajax({
+                    url: deleteUrl,
+                    type: 'DELETE',
+                    success: function(response) {
+                        showNotification('success', 'Survey report deleted successfully!');
+                        bootstrap.Modal.getInstance(document.getElementById('deleteSurveyModal')).hide();
+                        setTimeout(() => location.reload(), 1000);
+                    },
+                    error: function(xhr) {
+                        showNotification('error', xhr.responseJSON?.error || 'Error deleting report');
+                        bootstrap.Modal.getInstance(document.getElementById('deleteSurveyModal')).hide();
+                        $('#confirmDeleteSurvey').html('<i class="bi bi-trash mr-2"></i>Delete Report').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Enhanced notification system
+            function showNotification(type, message) {
+                const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+                
+                const notification = $(`
+                    <div class="fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-50 transform translate-x-full transition-transform duration-300">
+                        <div class="flex items-center">
+                            <i class="bi ${icon} mr-3 text-lg"></i>
+                            <span class="font-medium">${message}</span>
+                        </div>
+                    </div>
+                `);
+                
+                $('body').append(notification);
+                
+                setTimeout(() => {
+                    notification.removeClass('translate-x-full');
+                }, 100);
+                
+                setTimeout(() => {
+                    notification.addClass('translate-x-full');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

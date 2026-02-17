@@ -103,26 +103,26 @@ const SkillNode = ({
       }}
       transition={{ type: "spring", stiffness: 100, damping: 15 }}
       className="absolute flex flex-col items-center justify-center z-20"
-      style={{ left: '50%', top: '50%', marginLeft: '-3.5rem', marginTop: '-3.5rem' }} // Center the 7rem (w-28) box
+      style={{ left: '50%', top: '50%', marginLeft: '-4.5rem', marginTop: '-4.5rem' }} // Center the 9rem (w-36) box
     >
       <div className={`
-          relative w-28 h-28 bg-white rounded-2xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.1)] 
-          flex flex-col items-center justify-center p-2
+          relative w-36 h-36 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] 
+          flex flex-col items-center justify-center p-3
           border-2 transition-colors duration-300
           ${isActive ? 'border-[#60BA81]' : 'border-transparent'}
           ${isCompleted ? 'border-[#60BA81]/50' : ''}
       `}>
         {isActive ? (
-          <div className="w-16 h-16 mb-2">
+          <div className="w-20 h-20 mb-2">
             <Anim />
           </div>
         ) : (
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${isCompleted ? 'bg-[#60BA81]/10 text-[#60BA81]' : 'bg-gray-100 text-gray-400'}`}>
-            {isCompleted ? <Check size={24} strokeWidth={3} /> : <Icon size={24} />}
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 ${isCompleted ? 'bg-[#60BA81]/10 text-[#60BA81]' : 'bg-gray-100 text-gray-400'}`}>
+            {isCompleted ? <Check size={32} strokeWidth={3} /> : <Icon size={32} />}
           </div>
         )}
 
-        <span className={`text-[10px] font-bold text-center leading-tight ${isActive ? 'text-[#284952]' : 'text-gray-500'}`}>
+        <span className={`text-xs font-bold text-center leading-tight ${isActive ? 'text-[#284952]' : 'text-gray-500'}`}>
           {title}
         </span>
 
@@ -166,13 +166,13 @@ export default function SceneIOTraining({ isActive, progress }: { isActive: bool
   ]
 
   // Wider Layout Positions to prevent overlap
-  // Center is (0,0). Avatar radius is ~80px.
-  // We place cards at +/- 220px in X and +/- 120px in Y
+  // Center is (0,0). Avatar radius is ~104px (w-52).
+  // We place cards at +/- 260px in X and +/- 140px in Y
   const positions = [
-    { x: -220, y: -120 }, // Top Left
-    { x: 220, y: -120 },  // Top Right
-    { x: -220, y: 120 },  // Bottom Left
-    { x: 220, y: 120 }    // Bottom Right
+    { x: -260, y: -140 }, // Top Left
+    { x: 260, y: -140 },  // Top Right
+    { x: -260, y: 140 },  // Bottom Left
+    { x: 260, y: 140 }    // Bottom Right
   ]
 
   return (
@@ -205,43 +205,59 @@ export default function SceneIOTraining({ isActive, progress }: { isActive: bool
         ))}
       </svg>
 
-      {/* --- CENTRAL AVATAR (Z-10) --- */}
       <motion.div
-        className="relative z-10 w-40 h-40 rounded-full border-[6px] border-white shadow-2xl flex items-center justify-center bg-gray-100 overflow-hidden"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1, boxShadow: stage === 4 ? "0 0 60px #60BA81" : "0 20px 40px rgba(0,0,0,0.1)" }}
-        transition={{ type: "spring" }}
+        className="relative z-10 flex flex-col items-center gap-0 bg-transparent"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 80, damping: 20 }}
+        style={{ boxShadow: "none" }}
       >
-        <img src="/assets/avatars/male_io_training.png" className="w-full h-full object-cover" alt="Officer" />
+        <motion.div
+          className="w-52 h-52 rounded-full border-[8px] border-white shadow-2xl flex items-center justify-center bg-gray-100 overflow-hidden relative shrink-0"
+          animate={{ boxShadow: stage === 4 ? "0 0 60px #60BA81" : "0 20px 40px rgba(0,0,0,0.1)" }}
+        >
+          <img src="/assets/avatars/male_io_training.png" className="w-full h-full object-cover" alt="Officer" />
 
-        {/* FOS Team Intro Overlay */}
-        <AnimatePresence>
-          {stage === -1 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-[#284952]/90 flex flex-col items-center justify-center text-white"
-            >
-              <Users size={32} className="mb-2" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-center px-4 leading-tight">
-                FOS Team<br />Training
-              </span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* FOS Team Intro Overlay */}
+          <AnimatePresence>
+            {stage === -1 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-[#284952]/90 flex flex-col items-center justify-center text-white"
+              >
+                <Users size={48} className="mb-2" />
+                <span className="text-xs font-bold uppercase tracking-widest text-center px-4 leading-tight">
+                  FOS Team<br />Training
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        <AnimatePresence>
-          {stage === 4 && (
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              className="absolute inset-0 bg-[#60BA81]/90 flex flex-col items-center justify-center text-white"
-            >
-              <CheckCircle2 size={48} className="mb-1" />
-              <span className="text-xs font-bold uppercase tracking-widest">Certified</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <AnimatePresence>
+            {stage === 4 && (
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-[#60BA81]/90 flex flex-col items-center justify-center text-white"
+              >
+                <CheckCircle2 size={64} className="mb-2" />
+                <span className="text-sm font-bold uppercase tracking-widest">Certified</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Attractive Title Badge */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#284952] to-[#3a636e] shadow-xl border border-white/20 backdrop-blur-md flex flex-col items-center"
+        >
+          <span className="text-[10px] text-[#60BA81] font-black uppercase tracking-[0.2em] mb-0.5">Role Identification</span>
+          <span className="text-sm font-black text-white tracking-wide">INVESTIGATION OFFICER</span>
+        </motion.div>
       </motion.div>
 
       {/* --- SKILL NODES (Z-20) --- */}

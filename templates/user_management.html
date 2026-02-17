@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User & Filter Management | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Shared Personal Dashboard Styles -->
+    <link href="{{ url_for('static', filename='css/personal-dashboard.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+        }
+
+        .navbar {
+            background-color: var(--primary1-color) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4da570 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 2.2rem;
+        }
+
+        .page-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: var(--primary1-color);
+            color: white;
+            border-radius: 8px 8px 0 0 !important;
+            padding: 1.25rem;
+            border-bottom: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #4da570;
+            border-color: #4da570;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            border-radius: 6px;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            border-radius: 6px;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            border-radius: 6px;
+        }
+
+        .btn-secondary {
+            background-color: var(--text-muted);
+            border-color: var(--text-muted);
+            border-radius: 6px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 0.8rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(96, 186, 129, 0.15);
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4da570 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            border-bottom: none;
+        }
+
+        .modal-lg {
+            max-width: 900px;
+        }
+
+        .modal-xl {
+            max-width: 1200px;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border-left: 4px solid var(--info-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .info-section h6 {
+            color: #0c4a6e;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-section p {
+            color: #075985;
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .role-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .role-io {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .role-admin {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .role-cs {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .role-personal {
+            background-color: #7c3aed;
+            color: white;
+        }
+
+        .filter-badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            background-color: #10b981;
+            color: white;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .table thead th {
+            background-color: var(--primary1-color);
+            color: white;
+            border: none;
+            font-weight: 500;
+            padding: 1rem 0.75rem;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(96, 186, 129, 0.05);
+        }
+
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-width: 0.3rem;
+            color: var(--primary-color);
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .password-display {
+            background-color: #f8f9fa;
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            text-align: center;
+            color: var(--success-color);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .password-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .contact-info {
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .contact-info div {
+            margin-bottom: 0.2rem;
+        }
+
+        .contact-info i {
+            width: 16px;
+            margin-right: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            border-color: var(--info-color);
+            border-radius: 6px;
+        }
+
+        .btn-info:hover {
+            background-color: #0891b2;
+            border-color: #0891b2;
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+
+        .feature-highlight .fa-check-circle {
+            color: var(--success-color);
+            margin-right: 0.5rem;
+        }
+
+        .filter-section {
+            background-color: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section h6 {
+            color: var(--primary1-color);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 50px;
+            background: white;
+        }
+
+        .tag-item {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .tag-item .remove-tag {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tag-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            min-width: 150px;
+        }
+
+        .range-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .range-input-group input {
+            flex: 1;
+        }
+
+        .filter-preview {
+            background-color: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .filter-preview h6 {
+            color: #92400e;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-preview pre {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 0.75rem;
+            margin: 0;
+            font-size: 0.875rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .validation-message {
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .validation-message.error {
+            background-color: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+        }
+
+        .validation-message.warning {
+            background-color: #fef3c7;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+        }
+
+        .validation-message.success {
+            background-color: #d1fae5;
+            border: 1px solid #6ee7b7;
+            color: #065f46;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--text-muted);
+            border: none;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            background: none;
+        }
+
+        .preset-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_employee') }}">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_complaints') }}">Complaints</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link"
+                            href="{{ url_for('manage_counseling_sessions') }}">Counseling</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('survey') }}">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('user_management') }}">Users</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_backups') }}">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="page-header">
+                <h1><i class="fas fa-users-cog me-3"></i>User & Filter Management System</h1>
+                <p>Create and manage user accounts with comprehensive filter configuration</p>
+            </div>
+
+            <!-- System Info Alert -->
+            <div class="feature-highlight">
+                <i class="fas fa-check-circle"></i>
+                <strong>Advanced Filter System:</strong> Manage all user filters with precision control.
+                Configure office IDs, ranges, categories, keywords, and more!
+            </div>
+
+            <!-- Create User Button -->
+            <div class="text-end mb-4">
+                <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                    <i class="fas fa-user-plus me-2"></i>Create New User
+                </button>
+            </div>
+
+            <!-- Users Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="fas fa-table me-2"></i>User Accounts</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="usersTable" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Access ID</th>
+                                    <th>Filters</th>
+                                    <th>Contact Details</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Filters Modal -->
+    <div class="modal fade" id="manageFiltersModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-filter me-2"></i>Manage Filters: <span id="filterUserEmail"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="filterUserId">
+                    <input type="hidden" id="filterUserRole">
+                    <input type="hidden" id="filterAccessId">
+
+                    <!-- Tabs for different filter sections -->
+                    <ul class="nav nav-tabs mb-3" id="filterTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="basic-tab" data-bs-toggle="tab"
+                                data-bs-target="#basic-filters" type="button">
+                                <i class="fas fa-cog me-1"></i> Basic Filters
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="advanced-tab" data-bs-toggle="tab"
+                                data-bs-target="#advanced-filters" type="button">
+                                <i class="fas fa-sliders-h me-1"></i> Advanced Filters
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="categories-tab" data-bs-toggle="tab"
+                                data-bs-target="#category-filters" type="button">
+                                <i class="fas fa-tags me-1"></i> Categories & Keywords
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="preview-tab" data-bs-toggle="tab"
+                                data-bs-target="#filter-preview" type="button">
+                                <i class="fas fa-eye me-1"></i> Preview & Validate
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="filterTabsContent">
+                        <!-- Basic Filters Tab -->
+                        <div class="tab-pane fade show active" id="basic-filters" role="tabpanel">
+                            <div class="filter-section">
+                                <h6><i class="fas fa-building me-2"></i>Office Configuration</h6>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Office IDs (comma-separated)</label>
+                                    <input type="text" class="form-control" id="officeIds" placeholder="60,61,62,63">
+                                    <small class="text-muted">Specific office IDs this user can access</small>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Office ID Range</label>
+                                    <div class="range-input-group">
+                                        <input type="number" class="form-control" id="officeRangeStart"
+                                            placeholder="Start">
+                                        <span>to</span>
+                                        <input type="number" class="form-control" id="officeRangeEnd" placeholder="End">
+                                    </div>
+                                    <small class="text-muted">Range of office IDs (e.g., 72 to 110)</small>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Exclude Office IDs (comma-separated)</label>
+                                    <input type="text" class="form-control" id="excludeOfficeIds" placeholder="50,51">
+                                    <small class="text-muted">Office IDs to exclude from access</small>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h6><i class="fas fa-users me-2"></i>Employee Filters</h6>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label class="form-label">Gender Filter</label>
+                                            <select class="form-select" id="genderFilter">
+                                                <option value="">No Filter</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label class="form-label">Employee ID Range</label>
+                                            <div class="range-input-group">
+                                                <input type="number" class="form-control" id="empRangeStart"
+                                                    placeholder="Start">
+                                                <span>to</span>
+                                                <input type="number" class="form-control" id="empRangeEnd"
+                                                    placeholder="End">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Departments (comma-separated)</label>
+                                    <input type="text" class="form-control" id="departments"
+                                        placeholder="HR,Finance,Operations">
+                                    <small class="text-muted">Specific departments to filter</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Filters Tab -->
+                        <div class="tab-pane fade" id="advanced-filters" role="tabpanel">
+                            <div class="filter-section">
+                                <h6><i class="fas fa-cogs me-2"></i>Admin-Specific Settings</h6>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label class="form-label">Status Filter</label>
+                                            <select class="form-select" id="statusFilter">
+                                                <option value="all">All Statuses</option>
+                                                <option value="Completed">Completed Only</option>
+                                                <option value="In Process">In Process</option>
+                                                <option value="Bounced">Bounced</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label class="form-label">Additional Options</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="enabledOnly">
+                                                <label class="form-check-label" for="enabledOnly">
+                                                    Show Enabled Complaints Only
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="maskData">
+                                                <label class="form-check-label" for="maskData">
+                                                    Mask Sensitive Data
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h6><i class="fas fa-database me-2"></i>Special Data Filters</h6>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Temp Data Keywords (comma-separated)</label>
+                                    <input type="text" class="form-control" id="tempDataKeywords"
+                                        placeholder="processing,knitting,garments">
+                                    <small class="text-muted">For filtering based on temp_data field</small>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label class="form-label">Temp Data Match Type</label>
+                                            <select class="form-select" id="tempDataMatch">
+                                                <option value="OR">Match Any (OR)</option>
+                                                <option value="AND">Match All (AND)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="filter-group">
+                                            <label class="form-label">&nbsp;</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="allowNullTempData">
+                                                <label class="form-check-label" for="allowNullTempData">
+                                                    Allow NULL temp_data values
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h6><i class="fas fa-code me-2"></i>Custom SQL Conditions</h6>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Special SQL Conditions (one per line)</label>
+                                    <textarea class="form-control" id="specialConditions" rows="4"
+                                        placeholder="Example:&#10;LOWER(c.rca) LIKE '%route to finance%'&#10;c.is_urgent = 1"></textarea>
+                                    <small class="text-muted">Advanced: Raw SQL WHERE conditions</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categories & Keywords Tab -->
+                        <div class="tab-pane fade" id="category-filters" role="tabpanel">
+                            <div class="filter-section">
+                                <h6><i class="fas fa-tags me-2"></i>Category Filters</h6>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Exclude Categories</label>
+                                    <div id="excludeCategoriesContainer" class="tag-input-container">
+                                        <input type="text" class="tag-input" id="excludeCategoryInput"
+                                            placeholder="Type category and press Enter">
+                                    </div>
+                                    <small class="text-muted">Categories to exclude (e.g., Feedback, Ethical
+                                        Business)</small>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Include Categories (Override)</label>
+                                    <div id="includeCategoriesContainer" class="tag-input-container">
+                                        <input type="text" class="tag-input" id="includeCategoryInput"
+                                            placeholder="Type category and press Enter">
+                                    </div>
+                                    <small class="text-muted">Always include these categories (e.g., Harassment)</small>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h6><i class="fas fa-ticket-alt me-2"></i>Ticket Filters</h6>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Exclude Ticket Numbers</label>
+                                    <div id="excludeTicketsContainer" class="tag-input-container">
+                                        <input type="text" class="tag-input" id="excludeTicketInput"
+                                            placeholder="Type ticket number and press Enter">
+                                    </div>
+                                    <small class="text-muted">Specific ticket numbers to exclude</small>
+                                </div>
+                            </div>
+
+                            <div class="filter-section">
+                                <h6><i class="fas fa-comment-dots me-2"></i>Comment Keyword Filters</h6>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Exclude Comment Keywords</label>
+                                    <div id="excludeKeywordsContainer" class="tag-input-container">
+                                        <input type="text" class="tag-input" id="excludeKeywordInput"
+                                            placeholder="Type keyword and press Enter">
+                                    </div>
+                                    <small class="text-muted">Keywords to exclude from comments (e.g., "dormitory
+                                        complaint")</small>
+                                </div>
+
+                                <div class="filter-group">
+                                    <label class="form-label">Include Comment Keywords (Required)</label>
+                                    <div id="includeKeywordsContainer" class="tag-input-container">
+                                        <input type="text" class="tag-input" id="includeKeywordInput"
+                                            placeholder="Type keyword and press Enter">
+                                    </div>
+                                    <small class="text-muted">Only show complaints with these keywords</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview Tab -->
+                        <div class="tab-pane fade" id="filter-preview" role="tabpanel">
+                            <div class="filter-section">
+                                <h6><i class="fas fa-info-circle me-2"></i>Filter Summary</h6>
+                                <div id="filterSummary" class="mb-3">
+                                    <p class="text-muted">Configure filters in other tabs to see summary here</p>
+                                </div>
+                            </div>
+
+                            <div class="filter-preview">
+                                <h6><i class="fas fa-code me-2"></i>Filter Configuration (JSON)</h6>
+                                <pre id="filterConfigPreview">{}</pre>
+                            </div>
+
+                            <div id="validationResults" style="display: none;">
+                                <!-- Validation messages will appear here -->
+                            </div>
+
+                            <div class="text-center mt-3">
+                                <button type="button" class="btn btn-info" onclick="validateFilters()">
+                                    <i class="fas fa-check-circle me-2"></i>Validate Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" onclick="resetToPreset()">
+                        <i class="fas fa-undo me-2"></i>Reset to Preset
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveFilters()">
+                        <i class="fas fa-save me-2"></i>Save Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Edit Modal -->
+    <div class="modal fade" id="editContactModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-address-book me-2"></i>Edit Contact Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editContactForm">
+                        <input type="hidden" id="contactUserId">
+                        <input type="hidden" id="contactAccessId">
+
+                        <div class="mb-3">
+                            <label for="contactPersonName" class="form-label">
+                                <i class="fas fa-user me-2"></i>Contact Person Name
+                            </label>
+                            <input type="text" class="form-control" id="contactPersonName">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="contactEmail" class="form-label">
+                                <i class="fas fa-envelope me-2"></i>Contact Email
+                            </label>
+                            <input type="email" class="form-control" id="contactEmail">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="contactPhone" class="form-label">
+                                <i class="fas fa-phone me-2"></i>Contact Phone
+                            </label>
+                            <input type="tel" class="form-control" id="contactPhone">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveContact()">
+                        <i class="fas fa-save me-2"></i>Save Contact
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Create New User
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createUserForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="userEmail" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email Address
+                                    </label>
+                                    <input type="email" class="form-control" id="userEmail" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="userRole" class="form-label">
+                                        <i class="fas fa-user-tag me-2"></i>User Role
+                                    </label>
+                                    <select class="form-select" id="userRole" required>
+                                        <option value="">Select Role</option>
+                                        <option value="io">IO (Internal Operations)</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="cs">CS (Customer Service)</option>
+                                        <option value="personal">Personal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="accessId" class="form-label">
+                                        <i class="fas fa-key me-2"></i>Access ID
+                                    </label>
+                                    <input type="number" class="form-control" id="accessId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-lock me-2"></i>Generated Password
+                                    </label>
+                                    <div class="password-display" id="generatedPassword">
+                                        Click "Generate Password" to create a secure password
+                                    </div>
+                                    <button type="button" class="btn btn-warning btn-sm mt-2"
+                                        onclick="generatePassword()">
+                                        <i class="fas fa-sync-alt me-2"></i>Generate Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gmail for Google Login -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="userGmailEmail" class="form-label">
+                                        <i class="fab fa-google me-2"></i>Gmail for Google Login (Optional)
+                                    </label>
+                                    <input type="email" class="form-control" id="userGmailEmail"
+                                        placeholder="user@gmail.com">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Link a Gmail address for "Login with Google" feature
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Automatic Filter Info -->
+                        <div id="filterInfoSection" style="display: none;">
+                            <div class="info-section">
+                                <h6><i class="fas fa-robot me-2"></i>Automatic Filter Configuration</h6>
+                                <p>
+                                    <i class="fas fa-check-circle text-success me-1"></i>
+                                    Filters will be automatically configured based on the Access ID and Role.
+                                    You can customize filters after user creation.
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="createUser()">
+                        <i class="fas fa-save me-2"></i>Create User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal fade" id="editUserModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-edit me-2"></i>Edit User
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editUserForm">
+                        <input type="hidden" id="editUserId">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editUserEmail" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email Address
+                                    </label>
+                                    <input type="email" class="form-control" id="editUserEmail" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editUserRole" class="form-label">
+                                        <i class="fas fa-user-tag me-2"></i>User Role
+                                    </label>
+                                    <select class="form-select" id="editUserRole" required>
+                                        <option value="">Select Role</option>
+                                        <option value="io">IO (Internal Operations)</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="cs">CS (Customer Service)</option>
+                                        <option value="personal">Personal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editAccessId" class="form-label">
+                                        <i class="fas fa-key me-2"></i>Access ID
+                                    </label>
+                                    <input type="number" class="form-control" id="editAccessId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="updatePassword">
+                                        <label class="form-check-label" for="updatePassword">
+                                            <i class="fas fa-lock me-2"></i>Update Password
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Update Section -->
+                        <div id="passwordUpdateSection" class="password-section" style="display: none;">
+                            <h6><i class="fas fa-exclamation-triangle me-2"></i>Password Update</h6>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="password-display" id="editGeneratedPassword">
+                                        Click "Generate New Password" to create a secure password
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-warning btn-sm"
+                                        onclick="generateEditPassword()">
+                                        <i class="fas fa-sync-alt me-2"></i>Generate New Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gmail for Google Login -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="editGmailEmail" class="form-label">
+                                        <i class="fab fa-google me-2"></i>Gmail for Google Login
+                                    </label>
+                                    <input type="email" class="form-control" id="editGmailEmail"
+                                        placeholder="user@gmail.com">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Link a Gmail address for "Login with Google" feature
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filter Update Info -->
+                        <div id="editFilterInfoSection" style="display: none;">
+                            <div class="info-section">
+                                <h6><i class="fas fa-sync-alt me-2"></i>Filter Auto-Update</h6>
+                                <p>
+                                    <i class="fas fa-info-circle text-info me-1"></i>
+                                    If you change the Access ID or Role, filters will be automatically updated
+                                    to match the new configuration.
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="updateUser()">
+                        <i class="fas fa-save me-2"></i>Update User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 mb-0 text-muted">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        var excludeCategories = [];
+        var includeCategories = [];
+        var excludeTickets = [];
+        var excludeKeywords = [];
+        var includeKeywords = [];
+
+        var usersTable;
+        var generatedPasswordValue = '';
+        var editGeneratedPasswordValue = '';
+        var currentFilters = {};
+
+        console.log('Global arrays declared at file level:', {
+            excludeCategories,
+            includeCategories,
+            excludeTickets,
+            excludeKeywords,
+            includeKeywords
+        });
+
+        $(document).ready(function () {
+            console.log('Document ready - arrays still accessible:', {
+                excludeCategories,
+                includeCategories,
+                excludeTickets,
+                excludeKeywords,
+                includeKeywords
+            });
+
+            // Initialize DataTable
+            usersTable = $('#usersTable').DataTable({
+                ajax: {
+                    url: "{{ url_for('get_users') }}",
+                    type: 'GET'
+                },
+                columns: [
+                    { data: 'id' },
+                    { data: 'email' },
+                    {
+                        data: 'role',
+                        render: function (data, type, row) {
+                            return `<span class="role-badge role-${data}">${data.toUpperCase()}</span>`;
+                        }
+                    },
+                    { data: 'access_id' },
+                    {
+                        data: 'has_filters',
+                        render: function (data, type, row) {
+                            if (data) {
+                                return '<span class="filter-badge"><i class="fas fa-check me-1"></i>Active</span>';
+                            } else {
+                                return '<span class="badge bg-warning">Not Set</span>';
+                            }
+                        }
+                    },
+                    {
+                        data: 'contact_details',
+                        render: function (data, type, row) {
+                            let html = '<div class="contact-info">';
+
+                            // Display Gmail email if available (for Google OAuth)
+                            if (row.gmail_email) {
+                                html += `<div><i class="fab fa-google text-danger"></i> ${row.gmail_email}</div>`;
+                            }
+
+                            if (data && (data.contact_person_name || data.contact_phone || data.contact_email)) {
+                                html += `<div><strong>${data.contact_person_name || 'N/A'}</strong></div>`;
+                                html += `<div><i class="fas fa-phone"></i> ${data.contact_phone || 'N/A'}</div>`;
+                                html += `<div><i class="fas fa-envelope"></i> ${data.contact_email || 'N/A'}</div>`;
+                            } else if (!row.gmail_email) {
+                                return '<span class="text-muted">No contact details</span>';
+                            }
+
+                            html += '</div>';
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'created_at',
+                        render: function (data, type, row) {
+                            return new Date(data).toLocaleDateString();
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+                        <button class="btn btn-sm btn-info me-1" onclick="manageFilters(${row.id})" title="Manage Filters">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning me-1" onclick="editUser(${row.id})" title="Edit User">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success me-1" onclick="editContact(${row.id})" title="Edit Contact">
+                            <i class="fas fa-address-book"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${row.id})" title="Delete User">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    `;
+                        }
+                    }
+                ],
+                order: [[0, 'desc']],
+                responsive: true,
+                pageLength: 25
+            });
+
+            // Role change handlers
+            $('#userRole').change(handleRoleChange);
+            $('#editUserRole').change(handleEditRoleChange);
+
+            // Password update checkbox handler
+            $('#updatePassword').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#passwordUpdateSection').show();
+                } else {
+                    $('#passwordUpdateSection').hide();
+                    editGeneratedPasswordValue = '';
+                    $('#editGeneratedPassword').text('Click "Generate New Password" to create a secure password');
+                }
+            });
+
+            // Setup tag input handlers
+            setupTagInput('excludeCategoryInput', 'excludeCategoriesContainer', excludeCategories);
+            setupTagInput('includeCategoryInput', 'includeCategoriesContainer', includeCategories);
+            setupTagInput('excludeTicketInput', 'excludeTicketsContainer', excludeTickets);
+            setupTagInput('excludeKeywordInput', 'excludeKeywordsContainer', excludeKeywords);
+            setupTagInput('includeKeywordInput', 'includeKeywordsContainer', includeKeywords);
+
+            // Update preview when switching to preview tab
+            $('#preview-tab').on('click', function () {
+                updateFilterPreview();
+            });
+
+            // Auto-update preview when values change
+            $('#basic-filters input, #basic-filters select, #advanced-filters input, #advanced-filters select, #advanced-filters textarea').on('change', function () {
+                if ($('#preview-tab').hasClass('active')) {
+                    updateFilterPreview();
+                }
+            });
+        });
+
+
+        function setupTagInput(inputId, containerId, tagArray) {
+            $(`#${inputId}`).on('keypress', function (e) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
+                    const value = $(this).val().trim();
+
+                    // Get reference to the correct global array
+                    let targetArray;
+                    if (containerId === 'excludeCategoriesContainer') targetArray = excludeCategories;
+                    else if (containerId === 'includeCategoriesContainer') targetArray = includeCategories;
+                    else if (containerId === 'excludeTicketsContainer') targetArray = excludeTickets;
+                    else if (containerId === 'excludeKeywordsContainer') targetArray = excludeKeywords;
+                    else if (containerId === 'includeKeywordsContainer') targetArray = includeKeywords;
+
+                    if (value && targetArray && !targetArray.includes(value)) {
+                        targetArray.push(value);
+                        console.log(`Added "${value}" to ${containerId}. Array now:`, targetArray);
+                        renderTags(containerId, targetArray);
+                        $(this).val('');
+                    }
+                }
+            });
+        }
+
+        function renderTags(containerId, tagArray) {
+            const container = $(`#${containerId}`);
+            const input = container.find('.tag-input');
+
+            // Remove existing tags
+            container.find('.tag-item').remove();
+
+            // Add tags
+            tagArray.forEach((tag, index) => {
+                const tagElement = $(`
+            <span class="tag-item">
+                ${tag}
+                <span class="remove-tag" onclick="removeTag('${containerId}', ${index})">&times;</span>
+            </span>
+        `);
+                input.before(tagElement);
+            });
+        }
+        function removeTag(containerId, index) {
+            let tagArray;
+            if (containerId === 'excludeCategoriesContainer') tagArray = excludeCategories;
+            else if (containerId === 'includeCategoriesContainer') tagArray = includeCategories;
+            else if (containerId === 'excludeTicketsContainer') tagArray = excludeTickets;
+            else if (containerId === 'excludeKeywordsContainer') tagArray = excludeKeywords;
+            else if (containerId === 'includeKeywordsContainer') tagArray = includeKeywords;
+
+            if (tagArray) {
+                tagArray.splice(index, 1);
+                renderTags(containerId, tagArray);
+            }
+        }
+
+        function manageFilters(userId) {
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('get_user_filters', user_id=0) }}".replace('0', userId),
+                method: 'GET',
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        populateFilterForm(response.user, response.filters);
+                        $('#manageFiltersModal').modal('show');
+                    } else {
+                        showAlert(response.message || 'Error loading filters', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error loading filters: ' + error, 'danger');
+                }
+            });
+        }
+
+        function manageFilters(userId) {
+            showLoading();
+
+            // RESET PREVIEW IMMEDIATELY - Don't show old data
+            $('#filterConfigPreview').text('{}');
+            $('#filterSummary').html('<p class="text-muted">Configure filters in other tabs to see summary here</p>');
+            $('#validationResults').empty().hide();
+
+            $.ajax({
+                url: "{{ url_for('get_user_filters', user_id=0) }}".replace('0', userId),
+                method: 'GET',
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        populateFilterForm(response.user, response.filters);
+                        $('#manageFiltersModal').modal('show');
+                    } else {
+                        showAlert(response.message || 'Error loading filters', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error loading filters: ' + error, 'danger');
+                }
+            });
+        }
+
+        function populateFilterForm(user, filters) {
+            currentFilters = filters;
+
+            $('#filterUserId').val(user.id);
+            $('#filterUserRole').val(user.role);
+            $('#filterAccessId').val(user.access_id);
+            $('#filterUserEmail').text(user.email);
+
+            // Clear basic inputs
+            $('#officeIds').val('');
+            $('#officeRangeStart').val('');
+            $('#officeRangeEnd').val('');
+            $('#excludeOfficeIds').val('');
+            $('#departments').val('');
+            $('#genderFilter').val('');
+            $('#empRangeStart').val('');
+            $('#empRangeEnd').val('');
+            $('#statusFilter').val('all');
+            $('#enabledOnly').prop('checked', false);
+            $('#maskData').prop('checked', false);
+            $('#tempDataKeywords').val('');
+            $('#tempDataMatch').val('OR');
+            $('#allowNullTempData').prop('checked', false);
+            $('#specialConditions').val('');
+
+            // CLEAR ALL TAG ARRAYS - This is critical
+            excludeCategories = [];
+            includeCategories = [];
+            excludeTickets = [];
+            excludeKeywords = [];
+            includeKeywords = [];
+
+            console.log('Cleared tag arrays');
+
+            // Populate filters from data
+            if (filters.office_ids && filters.office_ids.length > 0) {
+                $('#officeIds').val(filters.office_ids.join(','));
+            }
+
+            if (filters.office_id_range && filters.office_id_range.length === 2) {
+                $('#officeRangeStart').val(filters.office_id_range[0]);
+                $('#officeRangeEnd').val(filters.office_id_range[1]);
+            }
+
+            if (filters.exclude_office_ids && filters.exclude_office_ids.length > 0) {
+                $('#excludeOfficeIds').val(filters.exclude_office_ids.join(','));
+            }
+
+            if (filters.departments && filters.departments.length > 0) {
+                $('#departments').val(filters.departments.join(','));
+            }
+
+            if (filters.gender) {
+                $('#genderFilter').val(filters.gender.toLowerCase());
+            }
+
+            if (filters.employee_id_range && filters.employee_id_range.length === 2) {
+                $('#empRangeStart').val(filters.employee_id_range[0]);
+                $('#empRangeEnd').val(filters.employee_id_range[1]);
+            }
+
+            if (filters.status_filter) {
+                $('#statusFilter').val(filters.status_filter);
+            }
+
+            $('#enabledOnly').prop('checked', filters.enabled_only || false);
+            $('#maskData').prop('checked', filters.mask_data || false);
+
+            if (filters.temp_data_keywords && filters.temp_data_keywords.length > 0) {
+                $('#tempDataKeywords').val(filters.temp_data_keywords.join(','));
+            }
+
+            if (filters.temp_data_match) {
+                $('#tempDataMatch').val(filters.temp_data_match);
+            }
+
+            $('#allowNullTempData').prop('checked', filters.allow_null_temp_data || false);
+
+            if (filters.special_conditions && filters.special_conditions.length > 0) {
+                $('#specialConditions').val(filters.special_conditions.join('\n'));
+            }
+
+            // POPULATE TAG ARRAYS FROM FILTERS
+            if (filters.exclude_categories && filters.exclude_categories.length > 0) {
+                excludeCategories = [...filters.exclude_categories];
+                renderTags('excludeCategoriesContainer', excludeCategories);
+                console.log('Loaded exclude_categories:', excludeCategories);
+            }
+
+            if (filters.include_categories && filters.include_categories.length > 0) {
+                includeCategories = [...filters.include_categories];
+                renderTags('includeCategoriesContainer', includeCategories);
+                console.log('Loaded include_categories:', includeCategories);
+            }
+
+            if (filters.exclude_tickets && filters.exclude_tickets.length > 0) {
+                excludeTickets = [...filters.exclude_tickets];
+                renderTags('excludeTicketsContainer', excludeTickets);
+                console.log('Loaded exclude_tickets:', excludeTickets);
+            }
+
+            if (filters.exclude_comment_keywords && filters.exclude_comment_keywords.length > 0) {
+                excludeKeywords = [...filters.exclude_comment_keywords];
+                renderTags('excludeKeywordsContainer', excludeKeywords);
+                console.log('Loaded exclude_comment_keywords:', excludeKeywords);
+            }
+
+            if (filters.include_comment_keywords && filters.include_comment_keywords.length > 0) {
+                includeKeywords = [...filters.include_comment_keywords];
+                renderTags('includeKeywordsContainer', includeKeywords);
+                console.log('Loaded include_comment_keywords:', includeKeywords);
+            }
+        }
+
+        function collectFilterData() {
+            console.log('=== COLLECT FILTER DATA CALLED ===');
+            console.log('Checking global arrays:');
+            console.log('  excludeCategories:', excludeCategories);
+            console.log('  includeCategories:', includeCategories);
+            console.log('  excludeTickets:', excludeTickets);
+            console.log('  excludeKeywords:', excludeKeywords);
+            console.log('  includeKeywords:', includeKeywords);
+
+            const filters = {
+                type: $('#filterUserRole').val(),
+                access_id: parseInt($('#filterAccessId').val())
+            };
+
+            // Office IDs
+            const officeIds = $('#officeIds').val();
+            if (officeIds) {
+                filters.office_ids = officeIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+            }
+
+            // Office ID Range
+            const rangeStart = $('#officeRangeStart').val();
+            const rangeEnd = $('#officeRangeEnd').val();
+            if (rangeStart && rangeEnd) {
+                filters.office_id_range = [parseInt(rangeStart), parseInt(rangeEnd)];
+            }
+
+            // Exclude Office IDs
+            const excludeOfficeIds = $('#excludeOfficeIds').val();
+            if (excludeOfficeIds) {
+                filters.exclude_office_ids = excludeOfficeIds.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+            }
+
+            // Departments
+            const departments = $('#departments').val();
+            if (departments) {
+                filters.departments = departments.split(',').map(d => d.trim()).filter(d => d);
+            }
+
+            // Gender
+            const gender = $('#genderFilter').val();
+            if (gender) {
+                filters.gender = gender;
+            }
+
+            // Employee ID Range
+            const empStart = $('#empRangeStart').val();
+            const empEnd = $('#empRangeEnd').val();
+            if (empStart && empEnd) {
+                filters.employee_id_range = [parseInt(empStart), parseInt(empEnd)];
+            }
+
+            // Status Filter
+            const statusFilter = $('#statusFilter').val();
+            if (statusFilter && statusFilter !== 'all') {
+                filters.status_filter = statusFilter;
+            } else if (filters.type === 'admin') {
+                filters.status_filter = 'all';
+            }
+
+            // Checkboxes
+            filters.enabled_only = $('#enabledOnly').is(':checked');
+            filters.mask_data = $('#maskData').is(':checked');
+
+            // Temp Data
+            const tempKeywords = $('#tempDataKeywords').val();
+            if (tempKeywords) {
+                filters.temp_data_keywords = tempKeywords.split(',').map(k => k.trim()).filter(k => k);
+            }
+
+            filters.temp_data_match = $('#tempDataMatch').val();
+            filters.allow_null_temp_data = $('#allowNullTempData').is(':checked');
+
+            // Special Conditions
+            const specialConditions = $('#specialConditions').val();
+            if (specialConditions) {
+                filters.special_conditions = specialConditions.split('\n').map(c => c.trim()).filter(c => c);
+            }
+
+            // ========== TAG FILTERS - NOW THESE ARRAYS ARE ACCESSIBLE ==========
+            // Add only if they have values
+            if (excludeCategories && excludeCategories.length > 0) {
+                filters.exclude_categories = excludeCategories.slice();
+                console.log('✓ Added exclude_categories:', filters.exclude_categories);
+            }
+
+            if (includeCategories && includeCategories.length > 0) {
+                filters.include_categories = includeCategories.slice();
+                console.log('✓ Added include_categories:', filters.include_categories);
+            }
+
+            if (excludeTickets && excludeTickets.length > 0) {
+                filters.exclude_tickets = excludeTickets.slice();
+                console.log('✓ Added exclude_tickets:', filters.exclude_tickets);
+            }
+
+            if (excludeKeywords && excludeKeywords.length > 0) {
+                filters.exclude_comment_keywords = excludeKeywords.slice();
+                console.log('✓ Added exclude_comment_keywords:', filters.exclude_comment_keywords);
+            }
+
+            if (includeKeywords && includeKeywords.length > 0) {
+                filters.include_comment_keywords = includeKeywords.slice();
+                console.log('✓ Added include_comment_keywords:', filters.include_comment_keywords);
+            }
+
+            console.log('=== FINAL FILTER OBJECT ===');
+            console.log(JSON.stringify(filters, null, 2));
+
+            return filters;
+        }
+        function debugTagArrays() {
+            console.log('Current Tag Arrays:', {
+                excludeCategories: excludeCategories,
+                includeCategories: includeCategories,
+                excludeTickets: excludeTickets,
+                excludeKeywords: excludeKeywords,
+                includeKeywords: includeKeywords
+            });
+        }
+        function updateFilterPreview() {
+            const filters = collectFilterData();
+            $('#filterConfigPreview').text(JSON.stringify(filters, null, 2));
+
+            // Generate summary
+            let summary = [];
+
+            if (filters.office_ids && filters.office_ids.length > 0) {
+                summary.push(`<strong>Office IDs:</strong> ${filters.office_ids.join(', ')}`);
+            }
+            if (filters.office_id_range) {
+                summary.push(`<strong>Office Range:</strong> ${filters.office_id_range[0]} - ${filters.office_id_range[1]}`);
+            }
+            if (filters.exclude_categories && filters.exclude_categories.length > 0) {
+                summary.push(`<strong>Exclude Categories:</strong> ${filters.exclude_categories.join(', ')}`);
+            }
+            if (filters.include_categories && filters.include_categories.length > 0) {
+                summary.push(`<strong>Include Categories:</strong> ${filters.include_categories.join(', ')}`);
+            }
+            if (filters.exclude_tickets && filters.exclude_tickets.length > 0) {
+                summary.push(`<strong>Exclude Tickets:</strong> ${filters.exclude_tickets.join(', ')}`);
+            }
+            if (filters.exclude_comment_keywords && filters.exclude_comment_keywords.length > 0) {
+                summary.push(`<strong>Exclude Keywords:</strong> ${filters.exclude_comment_keywords.join(', ')}`);
+            }
+            if (filters.include_comment_keywords && filters.include_comment_keywords.length > 0) {
+                summary.push(`<strong>Include Keywords:</strong> ${filters.include_comment_keywords.join(', ')}`);
+            }
+
+            if (summary.length > 0) {
+                $('#filterSummary').html('<div class="alert alert-info">' + summary.join('<br>') + '</div>');
+            } else {
+                $('#filterSummary').html('<p class="text-muted">No filters configured</p>');
+            }
+        }
+
+        function validateFilters() {
+            const filters = collectFilterData();
+
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('validate_filter_config') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ filter_config: filters }),
+                success: function (response) {
+                    hideLoading();
+                    displayValidationResults(response);
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Validation failed: ' + error, 'danger');
+                }
+            });
+        }
+
+        function displayValidationResults(response) {
+            const container = $('#validationResults');
+            container.empty();
+
+            if (response.success) {
+                let html = '<div class="validation-message success">';
+                html += '<i class="fas fa-check-circle me-2"></i>';
+                html += '<strong>Validation Passed!</strong> Filter configuration is valid.';
+                html += '</div>';
+                container.html(html);
+            } else {
+                if (response.errors && response.errors.length > 0) {
+                    let html = '<div class="validation-message error">';
+                    html += '<i class="fas fa-exclamation-circle me-2"></i>';
+                    html += '<strong>Errors:</strong><ul class="mb-0 mt-2">';
+                    response.errors.forEach(error => {
+                        html += `<li>${error}</li>`;
+                    });
+                    html += '</ul></div>';
+                    container.append(html);
+                }
+            }
+
+            if (response.warnings && response.warnings.length > 0) {
+                let html = '<div class="validation-message warning">';
+                html += '<i class="fas fa-exclamation-triangle me-2"></i>';
+                html += '<strong>Warnings:</strong><ul class="mb-0 mt-2">';
+                response.warnings.forEach(warning => {
+                    html += `<li>${warning}</li>`;
+                });
+                html += '</ul></div>';
+                container.append(html);
+            }
+
+            container.show();
+        }
+
+        function saveFilters() {
+            const userId = $('#filterUserId').val();
+            const filters = collectFilterData();
+
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('update_user_filters_route', user_id=0) }}".replace('0', userId),
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ filter_config: filters }),
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        showAlert('Filters saved successfully!', 'success');
+                        $('#manageFiltersModal').modal('hide');
+                        usersTable.ajax.reload(null, false);
+                    } else {
+                        showAlert(response.message || 'Error saving filters', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error saving filters: ' + error, 'danger');
+                }
+            });
+        }
+        function resetPreview() {
+            $('#filterConfigPreview').text('{}');
+            $('#filterSummary').html('<p class="text-muted">Configure filters in other tabs to see summary here</p>');
+            $('#validationResults').empty().hide();
+        }
+        function resetToPreset() {
+            if (!confirm('Are you sure you want to reset filters to the default preset? Current changes will be lost.')) {
+                return;
+            }
+
+            const userId = $('#filterUserId').val();
+
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('reset_user_filters', user_id=0) }}".replace('0', userId),
+                method: 'POST',
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        showAlert('Filters reset to default preset!', 'success');
+                        $('#manageFiltersModal').modal('hide');
+                        usersTable.ajax.reload(null, false);
+                    } else {
+                        showAlert(response.message || 'Error resetting filters', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error resetting filters: ' + error, 'danger');
+                }
+            });
+        }
+
+        function handleRoleChange() {
+            const role = $('#userRole').val();
+            const filterInfoSection = $('#filterInfoSection');
+
+            if (role === 'io' || role === 'admin') {
+                filterInfoSection.show();
+            } else {
+                filterInfoSection.hide();
+            }
+        }
+
+        function handleEditRoleChange() {
+            const role = $('#editUserRole').val();
+            const filterInfoSection = $('#editFilterInfoSection');
+
+            if (role === 'io' || role === 'admin') {
+                filterInfoSection.show();
+            } else {
+                filterInfoSection.hide();
+            }
+        }
+
+        function generatePassword() {
+            $.ajax({
+                url: "{{ url_for('generate_password') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        generatedPasswordValue = response.password;
+                        $('#generatedPassword').text(response.password);
+                    } else {
+                        showAlert('Error generating password', 'danger');
+                    }
+                },
+                error: function () {
+                    showAlert('Error generating password', 'danger');
+                }
+            });
+        }
+
+        function generateEditPassword() {
+            $.ajax({
+                url: "{{ url_for('generate_password') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        editGeneratedPasswordValue = response.password;
+                        $('#editGeneratedPassword').text(response.password);
+                    } else {
+                        showAlert('Error generating password', 'danger');
+                    }
+                },
+                error: function () {
+                    showAlert('Error generating password', 'danger');
+                }
+            });
+        }
+
+        function createUser() {
+            const email = $('#userEmail').val();
+            const role = $('#userRole').val();
+            const accessId = $('#accessId').val();
+
+            if (!email || !role || !accessId || !generatedPasswordValue) {
+                showAlert('Please fill all required fields and generate a password.', 'danger');
+                return;
+            }
+
+            const userData = {
+                email: email,
+                password: generatedPasswordValue,
+                role: role,
+                access_id: accessId,
+                gmail_email: $('#userGmailEmail').val() || null
+            };
+
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('create_user') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(userData),
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        showAlert('User created successfully with automatic filter configuration!', 'success');
+                        $('#createUserModal').modal('hide');
+                        resetCreateForm();
+                        usersTable.ajax.reload();
+                    } else {
+                        showAlert(response.message || 'Error creating user', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error creating user: ' + error, 'danger');
+                }
+            });
+        }
+
+        function editUser(userId) {
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('get_user', user_id=0) }}".replace('0', userId),
+                method: 'GET',
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        populateEditForm(response.user);
+                        $('#editUserModal').modal('show');
+                    } else {
+                        showAlert(response.message || 'Error loading user data', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error loading user data: ' + error, 'danger');
+                }
+            });
+        }
+
+        function populateEditForm(user) {
+            $('#editUserId').val(user.id);
+            $('#editUserEmail').val(user.email);
+            $('#editUserRole').val(user.role);
+            $('#editAccessId').val(user.access_id);
+            $('#editGmailEmail').val(user.gmail_email || '');
+
+            // Reset password section
+            $('#updatePassword').prop('checked', false);
+            $('#passwordUpdateSection').hide();
+            editGeneratedPasswordValue = '';
+            $('#editGeneratedPassword').text('Click "Generate New Password" to create a secure password');
+
+            // Handle role-specific info
+            handleEditRoleChange();
+        }
+
+        function updateUser() {
+            const userId = $('#editUserId').val();
+            const email = $('#editUserEmail').val();
+            const role = $('#editUserRole').val();
+            const accessId = $('#editAccessId').val();
+            const updatePassword = $('#updatePassword').is(':checked');
+
+            if (!email || !role || !accessId) {
+                showAlert('Please fill all required fields.', 'danger');
+                return;
+            }
+
+            if (updatePassword && !editGeneratedPasswordValue) {
+                showAlert('Please generate a new password.', 'danger');
+                return;
+            }
+
+            const userData = {
+                email: email,
+                role: role,
+                access_id: accessId,
+                gmail_email: $('#editGmailEmail').val() || null
+            };
+
+            if (updatePassword) {
+                userData.password = editGeneratedPasswordValue;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('update_user', user_id=0) }}".replace('0', userId),
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(userData),
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        showAlert('User updated successfully! Filters auto-adjusted if needed.', 'success');
+                        $('#editUserModal').modal('hide');
+                        usersTable.ajax.reload(null, false);
+                    } else {
+                        showAlert(response.message || 'Error updating user', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error updating user: ' + error, 'danger');
+                }
+            });
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone and will also delete all associated filters.')) {
+                showLoading();
+
+                $.ajax({
+                    url: "{{ url_for('delete_user', user_id=0) }}".replace('0', userId),
+                    method: 'DELETE',
+                    success: function (response) {
+                        hideLoading();
+                        if (response.success) {
+                            showAlert('User and associated filters deleted successfully!', 'success');
+                            usersTable.ajax.reload();
+                        } else {
+                            showAlert(response.message || 'Error deleting user', 'danger');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        hideLoading();
+                        showAlert('Error deleting user: ' + error, 'danger');
+                    }
+                });
+            }
+        }
+
+        function editContact(userId) {
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('get_user_contact', user_id=0) }}".replace('0', userId),
+                method: 'GET',
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        populateContactForm(response.contact, userId);
+                        $('#editContactModal').modal('show');
+                    } else {
+                        showAlert(response.message || 'Error loading contact details', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error loading contact details: ' + error, 'danger');
+                }
+            });
+        }
+
+        function populateContactForm(contact, userId) {
+            if (contact === null) {
+                contact = {
+                    access_id: '',
+                    contact_person_name: '',
+                    contact_email: '',
+                    contact_phone: ''
+                };
+            }
+            $('#contactUserId').val(userId);
+            $('#contactAccessId').val(contact.access_id);
+            $('#contactPersonName').val(contact.contact_person_name || '');
+            $('#contactEmail').val(contact.contact_email || '');
+            $('#contactPhone').val(contact.contact_phone || '');
+        }
+
+        function saveContact() {
+            const userId = $('#contactUserId').val();
+            const accessId = $('#contactAccessId').val();
+            const contactPersonName = $('#contactPersonName').val();
+            const contactEmail = $('#contactEmail').val();
+            const contactPhone = $('#contactPhone').val();
+
+            const contactData = {
+                user_id: userId,
+                access_id: accessId,
+                username: '',
+                contact_person_name: contactPersonName,
+                contact_email: contactEmail,
+                contact_phone: contactPhone
+            };
+
+            // Get username from the users table
+            const userRow = usersTable.row((idx, data) => data.id == userId).data();
+            if (userRow) {
+                contactData.username = userRow.email;
+            }
+
+            showLoading();
+
+            $.ajax({
+                url: "{{ url_for('save_contact') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(contactData),
+                success: function (response) {
+                    hideLoading();
+                    if (response.success) {
+                        showAlert('Contact details saved successfully!', 'success');
+                        $('#editContactModal').modal('hide');
+                        usersTable.ajax.reload();
+                    } else {
+                        showAlert(response.message || 'Error saving contact details', 'danger');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    hideLoading();
+                    showAlert('Error saving contact details: ' + error, 'danger');
+                }
+            });
+        }
+
+        function resetCreateForm() {
+            $('#createUserForm')[0].reset();
+            generatedPasswordValue = '';
+            $('#generatedPassword').text('Click "Generate Password" to create a secure password');
+            $('#filterInfoSection').hide();
+        }
+
+        function showLoading() {
+            $('#loadingSpinner').show();
+        }
+
+        function hideLoading() {
+            $('#loadingSpinner').hide();
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            $('.main-container').prepend(alertHtml);
+
+            setTimeout(() => {
+                $('.alert').fadeOut();
+            }, 5000);
+        }
+    </script>
+</body>
+
+</html>

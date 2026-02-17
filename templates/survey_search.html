@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOS ID/CNIC Check</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        :root {
+            --primary-color: #60BA81;
+            --secondary-color: #284952;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --input-background: #f8f9fa;
+            --text-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-background);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo {
+            display: block;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-container {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            height: 60px;
+            background-color: var(--input-background);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 0 20px 0 50px;
+            font-size: 18px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(96, 186, 129, 0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: var(--card-background);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(96, 186, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background-color: #4e9d6d;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(96, 186, 129, 0.4);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        .loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 24px;
+        }
+
+        .loading div {
+            width: 8px;
+            height: 8px;
+            margin: 0 4px;
+            border-radius: 50%;
+            background-color: var(--card-background);
+            animation: loading 0.6s infinite alternate;
+        }
+
+        .loading div:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading div:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loading {
+            to {
+                transform: translateY(-8px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="FOS Logo" class="logo">
+        <h1>Enter FOS ID/CNIC</h1>
+        <h2>اپنا ایف او ایس آئی ڈی/شناختی کارڈ نمبر درج کریں</h2>
+        <div class="input-container">
+            <i class="fas fa-id-card input-icon"></i>
+            <input type="text" id="fosId" placeholder="Enter your FOS ID/CNIC..." inputmode="numeric" pattern="[0-9]*"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+        <button id="submitBtn" onclick="handleSubmit()">
+            <span>Submit</span>
+            <div class="loading">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        const input = document.getElementById('fosId');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingIndicator = submitBtn.querySelector('.loading');
+        const buttonText = submitBtn.querySelector('span');
+
+        input.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                handleSubmit();
+            }
+        });
+
+        async function handleSubmit() {
+            const inputText = input.value.trim();
+            if (!inputText) {
+                alert('Please enter your FOS ID.');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                const response = await fetch(`https://fruitofsustainability.com/app_api/restful_api.php?route=verify_employee&employee_id=${inputText}`);
+                if (!response.ok) {
+                    throw new Error('Employee ID validation failed');
+                }
+                const data = await response.json();
+                const employeeId = String(data.employee_id);
+                window.location.href = `/login/survey_list?employee_id=${employeeId}`;
+
+            } catch (error) {
+                alert('Invalid employee ID entered. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                submitBtn.disabled = true;
+                buttonText.style.display = 'none';
+                loadingIndicator.style.display = 'flex';
+            } else {
+                submitBtn.disabled = false;
+                buttonText.style.display = 'inline';
+                loadingIndicator.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

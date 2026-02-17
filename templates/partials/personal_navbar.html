@@ -1,0 +1,51 @@
+<nav class="bg-[#284952] shadow-2xl sticky top-0 z-40 backdrop-filter backdrop-blur-lg bg-opacity-95">
+    <div class="max-w-full mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+            <div class="flex items-center">
+                <a href="{{ url_for('tracking_dashboard.personal_tracking_dashboard') }}">
+                    <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo"
+                        class="h-10 w-auto mr-3">
+                </a>
+            </div>
+            <div class="hidden md:flex space-x-1">
+                {% if not is_dashboard %}
+                <a href="{{ url_for('manage_logs') }}"
+                    class="{% if active_page == 'logs' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Logs</a>
+
+                <a href="{{ url_for('manage_company') }}"
+                    class="{% if active_page == 'company' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Company</a>
+
+                <a href="{{ url_for('manage_employee') }}"
+                    class="{% if active_page == 'employees' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Employees</a>
+
+                <a href="{{ url_for('manage_buyer') }}"
+                    class="{% if active_page == 'buyers' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Buyers</a>
+
+                <a href="{{ url_for('manage_offices') }}"
+                    class="{% if active_page == 'offices' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Offices</a>
+
+                <a href="{{ url_for('manage_complaints') }}"
+                    class="{% if active_page == 'complaints' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Complaints</a>
+
+                <a href="{{ url_for('manage_counseling_sessions') }}"
+                    class="{% if active_page == 'counseling' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Counseling</a>
+
+                <a href="{{ url_for('survey') }}"
+                    class="{% if active_page == 'surveys' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Surveys</a>
+
+                <a href="{{ url_for('user_management') }}"
+                    class="{% if active_page == 'users' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Users</a>
+
+                <a href="{{ url_for('sms_management') }}"
+                    class="{% if active_page == 'sms' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">SMS</a>
+
+                <a href="{{ url_for('manage_backups') }}"
+                    class="{% if active_page == 'backups' %}bg-white bg-opacity-20 text-white{% else %}text-white hover:bg-white hover:bg-opacity-10{% endif %} px-3 py-2 rounded-md text-sm font-medium transition-colors">Backups</a>
+
+                {% endif %}
+                <a href="{{ url_for('logout') }}"
+                    class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>

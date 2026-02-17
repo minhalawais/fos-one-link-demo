@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="{{ url_for('static', filename='images/logo.png') }}" rel="icon" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOS-{{ survey.title }} - Report</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --secondary-color: #284952;
+            --accent-color: #f5a83c;
+            --tertiary-color: #2D9480;
+            --background-color: #ffffff;
+            --text-color: #284952;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #2D9480;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0px !important;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            display: contents;
+        }
+        .logo-img {
+            height: 15%;
+            width: 15%;
+            margin-right: 10px;
+        }
+        .portal-heading {
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            background-color: #60BA81;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .nav-btn:hover {
+            background-color: #f5a83c;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.8em;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h2 {
+            color: var(--tertiary-color);
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--tertiary-color);
+            padding-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .chart-container, .text-responses {
+            background-color: var(--background-color);
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(40, 73, 82, 0.1);
+            margin-bottom: 40px;
+            padding: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chart-container:hover, .text-responses:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(40, 73, 82, 0.15);
+        }
+
+        .text-responses p {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--secondary-color);
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            color: #fff9f9 !important;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            background-color: #f39c12;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(245, 168, 60, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 10px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="location.href='{{ url_for('survey_dashboard') }}'">Manage Surveys</button>
+            <button class="nav-btn" onclick="location.href='{{ url_for('survey_module') }}'">Manage Complaints</button>
+            <button class="nav-btn" onclick="location.href='{{ url_for('logout') }}'">Logout</button>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>{{ survey.title }}</h1>
+        <p>{{ survey.description }}</p>
+        
+        {% for item in charts %}
+            <div class="chart-container">
+                <h2>{{ item.question.question_text }}</h2>
+                {{ item.chart|safe }}
+            </div>
+        {% endfor %}
+
+        {% for item in text_responses %}
+            <div class="text-responses">
+                <h2>{{ item.question.question_text }}</h2>
+                {% for response in item.responses %}
+                    <p>{{ response.answer_text }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <a href="{{ url_for('generate_pdf', survey_id=survey.id) }}" class="download-btn">Download PDF Report</a>
+    </div>
+</body>
+</html>

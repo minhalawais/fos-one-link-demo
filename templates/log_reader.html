@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOS - Log Analytics Dashboard</title>
+    <link href="{{ url_for('static', filename='images/logo.png') }}" rel="icon" type="image/png" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'deep-teal': '#284952',
+                        'fresh-green': '#60BA81',
+                        'charcoal': '#17161A',
+                        'warm-orange': '#F5A83C',
+                        'pure-white': '#FFFFFF',
+                        'light-gray': '#F5F5F7',
+                        'medium-gray': '#767676',
+                        'soft-green': 'rgba(96, 186, 129, 0.42)',
+                        'border-gray': '#DEE2E6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary1-color: #284952;
+            --primary-color: #60BA81;
+        }
+
+        .navbar {
+            background-color: var(--primary1-color) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .logo-img {
+            height: 40px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .animate-spin {
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-light-gray">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img" onerror="this.style.display='none'">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/logs">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/company">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/employees">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/buyers">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/offices">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/complaints">Complaints</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/survey">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/users">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sms">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/backups">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="max-w-[1800px] mx-auto p-5">
+        <!-- Header -->
+        <header class="bg-gradient-to-br from-deep-teal to-fresh-green text-pure-white p-8 rounded-2xl mb-8 shadow-xl">
+            <div class="flex items-center gap-3 mb-2">
+                <i class="fas fa-chart-line text-3xl"></i>
+                <h1 class="text-3xl font-semibold">Log Analytics Dashboard</h1>
+            </div>
+            <p class="opacity-90 text-base">Real-time monitoring and comprehensive log analysis</p>
+        </header>
+        
+        <!-- Controls Bar -->
+        <div class="bg-pure-white p-6 rounded-xl mb-8 shadow-sm flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-sm font-semibold text-deep-teal mb-2">
+                    <i class="far fa-clock mr-1"></i> Time Frame
+                </label>
+                <select id="timeFrame" onchange="refreshDashboard()" class="w-full px-4 py-3 border-2 border-border-gray rounded-lg text-base bg-pure-white text-charcoal transition-all focus:outline-none focus:border-fresh-green focus:ring-2 focus:ring-soft-green">
+                    <option value="1">Last 1 Hour</option>
+                    <option value="6">Last 6 Hours</option>
+                    <option value="24" selected>Last 24 Hours</option>
+                    <option value="168">Last 7 Days</option>
+                    <option value="720">Last 30 Days</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-sm font-semibold text-deep-teal mb-2">
+                    <i class="far fa-file-alt mr-1"></i> Log File
+                </label>
+                <select id="logFile" class="w-full px-4 py-3 border-2 border-border-gray rounded-lg text-base bg-pure-white text-charcoal transition-all focus:outline-none focus:border-fresh-green focus:ring-2 focus:ring-soft-green">
+                    <option value="today.log">Today's Logs</option>
+                    <option value="info.log">Info Logs</option>
+                    <option value="warning.log">Warning Logs</option>
+                    <option value="error.log">Error Logs</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-sm font-semibold text-deep-teal mb-2">
+                    <i class="fas fa-filter mr-1"></i> Level Filter
+                </label>
+                <select id="levelFilter" class="w-full px-4 py-3 border-2 border-border-gray rounded-lg text-base bg-pure-white text-charcoal transition-all focus:outline-none focus:border-fresh-green focus:ring-2 focus:ring-soft-green">
+                    <option value="ALL">All Levels</option>
+                    <option value="ERROR">Errors Only</option>
+                    <option value="WARNING">Warnings Only</option>
+                    <option value="INFO">Info Only</option>
+                    <option value="CRITICAL">Critical Only</option>
+                </select>
+            </div>
+            
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-sm font-semibold text-deep-teal mb-2">
+                    <i class="fas fa-search mr-1"></i> Search
+                </label>
+                <input type="text" id="searchBox" placeholder="Search logs..." class="w-full px-4 py-3 border-2 border-border-gray rounded-lg text-base bg-pure-white text-charcoal transition-all focus:outline-none focus:border-fresh-green focus:ring-2 focus:ring-soft-green">
+            </div>
+            
+            <div class="flex gap-3">
+                <button class="px-6 py-3 bg-fresh-green text-pure-white border-0 rounded-lg text-base font-semibold cursor-pointer transition-all shadow-md hover:bg-[#4fa871] hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0" onclick="loadLogs()">
+                    <i class="fas fa-download mr-2"></i>Load Logs
+                </button>
+                <button class="px-6 py-3 bg-warm-orange text-pure-white border-0 rounded-lg text-base font-semibold cursor-pointer transition-all shadow-md hover:bg-[#e69b2e] hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8" id="statsGrid">
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm transition-all border-l-4 border-fresh-green hover:-translate-y-1 hover:shadow-lg">
+                <div class="text-sm text-medium-gray uppercase tracking-wide font-semibold mb-2">
+                    <i class="fas fa-list mr-1"></i> Total Logs
+                </div>
+                <div class="text-4xl font-bold text-deep-teal" id="totalLogs">-</div>
+            </div>
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm transition-all border-l-4 border-red-500 hover:-translate-y-1 hover:shadow-lg">
+                <div class="text-sm text-medium-gray uppercase tracking-wide font-semibold mb-2">
+                    <i class="fas fa-exclamation-circle mr-1"></i> Errors
+                </div>
+                <div class="text-4xl font-bold text-red-500" id="errorCount">-</div>
+            </div>
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm transition-all border-l-4 border-warm-orange hover:-translate-y-1 hover:shadow-lg">
+                <div class="text-sm text-medium-gray uppercase tracking-wide font-semibold mb-2">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> Warnings
+                </div>
+                <div class="text-4xl font-bold text-warm-orange" id="warningCount">-</div>
+            </div>
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm transition-all border-l-4 border-fresh-green hover:-translate-y-1 hover:shadow-lg">
+                <div class="text-sm text-medium-gray uppercase tracking-wide font-semibold mb-2">
+                    <i class="fas fa-info-circle mr-1"></i> Info
+                </div>
+                <div class="text-4xl font-bold text-deep-teal" id="infoCount">-</div>
+            </div>
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm transition-all border-l-4 border-red-700 hover:-translate-y-1 hover:shadow-lg">
+                <div class="text-sm text-medium-gray uppercase tracking-wide font-semibold mb-2">
+                    <i class="fas fa-skull-crossbones mr-1"></i> Critical
+                </div>
+                <div class="text-4xl font-bold text-red-700" id="criticalCount">-</div>
+            </div>
+        </div>
+        
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm">
+                <h3 class="text-deep-teal mb-5 text-lg font-semibold flex items-center gap-2">
+                    <i class="fas fa-chart-line text-red-500"></i> Error Trend
+                </h3>
+                <canvas id="errorChart"></canvas>
+            </div>
+            <div class="bg-pure-white p-6 rounded-xl shadow-sm">
+                <h3 class="text-deep-teal mb-5 text-lg font-semibold flex items-center gap-2">
+                    <i class="fas fa-chart-line text-warm-orange"></i> Warning Trend
+                </h3>
+                <canvas id="warningChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Top Modules -->
+        <div class="bg-pure-white rounded-xl p-6 mb-8 shadow-sm hidden" id="topModules">
+            <h3 class="text-deep-teal mb-5 text-lg font-semibold flex items-center gap-2">
+                <i class="fas fa-cubes"></i> Top Active Modules
+            </h3>
+            <div id="modulesList"></div>
+        </div>
+        
+        <!-- Recent Errors -->
+        <div class="bg-pure-white rounded-xl p-6 mb-8 shadow-sm hidden" id="recentErrors">
+            <h3 class="text-deep-teal mb-5 text-lg font-semibold flex items-center gap-2">
+                <i class="fas fa-exclamation-circle text-red-500"></i> Recent Errors
+            </h3>
+            <div id="errorsList"></div>
+        </div>
+        
+        <!-- Logs Section -->
+        <div class="bg-pure-white rounded-xl shadow-sm overflow-hidden">
+            <div class="bg-deep-teal text-pure-white p-5 flex justify-between items-center">
+                <h3 class="text-xl font-semibold flex items-center gap-2">
+                    <i class="fas fa-clipboard-list"></i> Log Entries
+                </h3>
+                <span class="bg-fresh-green px-4 py-1.5 rounded-full text-sm font-semibold" id="logCount">0 logs</span>
+            </div>
+            <div class="max-h-[600px] overflow-y-auto p-5" id="logsContainer">
+                <div class="text-center py-16 text-medium-gray">
+                    <div class="inline-block w-10 h-10 border-4 border-light-gray border-t-fresh-green rounded-full animate-spin"></div>
+                    <p class="mt-4">Select filters and click "Load Logs"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let errorChart, warningChart;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshDashboard();
+        });
+        
+        async function refreshDashboard() {
+            const hours = document.getElementById('timeFrame').value;
+            
+            try {
+                const response = await fetch(`/login/api/logs/analytics?hours=${hours}`);
+                const data = await response.json();
+                
+                updateStats(data);
+                updateCharts(data);
+                updateRecentErrors(data);
+                updateTopModules(data);
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+        
+        function updateStats(data) {
+            document.getElementById('totalLogs').textContent = data.total.toLocaleString();
+            document.getElementById('errorCount').textContent = data.by_level.ERROR.toLocaleString();
+            document.getElementById('warningCount').textContent = data.by_level.WARNING.toLocaleString();
+            document.getElementById('infoCount').textContent = data.by_level.INFO.toLocaleString();
+            document.getElementById('criticalCount').textContent = data.by_level.CRITICAL.toLocaleString();
+        }
+        
+        function updateCharts(data) {
+            const errorCtx = document.getElementById('errorChart').getContext('2d');
+            
+            if (errorChart) {
+                errorChart.destroy();
+            }
+            
+            errorChart = new Chart(errorCtx, {
+                type: 'line',
+                data: {
+                    labels: data.error_rate.map(d => d.time.split(' ')[1] || d.time.split('-')[2] + 'h'),
+                    datasets: [{
+                        label: 'Errors',
+                        data: data.error_rate.map(d => d.count),
+                        borderColor: '#E74C3C',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#E74C3C',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const warningCtx = document.getElementById('warningChart').getContext('2d');
+            
+            if (warningChart) {
+                warningChart.destroy();
+            }
+            
+            warningChart = new Chart(warningCtx, {
+                type: 'line',
+                data: {
+                    labels: data.warning_rate.map(d => d.time.split(' ')[1] || d.time.split('-')[2] + 'h'),
+                    datasets: [{
+                        label: 'Warnings',
+                        data: data.warning_rate.map(d => d.count),
+                        borderColor: '#F5A83C',
+                        backgroundColor: 'rgba(245, 168, 60, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#F5A83C',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateRecentErrors(data) {
+            const errorsSection = document.getElementById('recentErrors');
+            const errorsList = document.getElementById('errorsList');
+            
+            if (data.recent_errors && data.recent_errors.length > 0) {
+                errorsSection.classList.remove('hidden');
+                
+                errorsList.innerHTML = data.recent_errors.slice(0, 10).map(error => `
+                    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg mb-3">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-medium-gray text-sm font-semibold">${error.timestamp}</span>
+                            <span class="text-deep-teal text-sm font-semibold">${error.module || 'Unknown'}</span>
+                        </div>
+                        <div class="text-red-700 font-mono text-sm">${escapeHtml(error.message)}</div>
+                    </div>
+                `).join('');
+            } else {
+                errorsSection.classList.add('hidden');
+            }
+        }
+        
+        function updateTopModules(data) {
+            const modulesSection = document.getElementById('topModules');
+            const modulesList = document.getElementById('modulesList');
+            
+            if (data.top_modules && data.top_modules.length > 0) {
+                modulesSection.classList.remove('hidden');
+                
+                modulesList.innerHTML = data.top_modules.slice(0, 10).map(module => `
+                    <div class="flex justify-between items-center py-3 border-b border-border-gray last:border-b-0">
+                        <span class="text-deep-teal font-semibold">${module.module}</span>
+                        <span class="bg-soft-green text-deep-teal px-3 py-1 rounded-xl font-semibold text-sm">${module.count.toLocaleString()}</span>
+                    </div>
+                `).join('');
+            } else {
+                modulesSection.classList.add('hidden');
+            }
+        }
+        
+        async function loadLogs() {
+            const container = document.getElementById('logsContainer');
+            const countElement = document.getElementById('logCount');
+            
+            container.innerHTML = `
+                <div class="text-center py-16">
+                    <div class="inline-block w-10 h-10 border-4 border-light-gray border-t-fresh-green rounded-full animate-spin"></div>
+                    <p class="mt-4 text-medium-gray">Loading logs...</p>
+                </div>
+            `;
+            
+            const file = document.getElementById('logFile').value;
+            const hours = document.getElementById('timeFrame').value;
+            const level = document.getElementById('levelFilter').value;
+            const search = document.getElementById('searchBox').value;
+            
+            try {
+                const response = await fetch(
+                    `/login/api/logs/get?file=${file}&hours=${hours}&level=${level}&search=${encodeURIComponent(search)}&limit=1000`
+                );
+                const data = await response.json();
+                
+                countElement.textContent = `${data.count.toLocaleString()} logs`;
+                
+                if (data.logs.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-16 text-medium-gray">
+                            <i class="fas fa-inbox text-6xl opacity-30 mb-4"></i>
+                            <p>No logs found matching your criteria</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = data.logs.map(log => {
+                    const levelClass = log.level.toLowerCase();
+                    const levelConfig = {
+                        error: { bg: 'bg-red-50', border: 'border-red-500', badge: 'bg-red-500', icon: 'fa-times-circle' },
+                        warning: { bg: 'bg-orange-50', border: 'border-warm-orange', badge: 'bg-warm-orange', icon: 'fa-exclamation-triangle' },
+                        critical: { bg: 'bg-red-100', border: 'border-red-700', badge: 'bg-red-700', icon: 'fa-skull-crossbones' },
+                        info: { bg: 'bg-green-50', border: 'border-fresh-green', badge: 'bg-fresh-green', icon: 'fa-info-circle' }
+                    };
+                    const config = levelConfig[levelClass] || levelConfig.info;
+                    
+                    return `
+                        <div class="p-4 mb-3 rounded-lg border-l-4 ${config.border} ${config.bg} transition-all hover:translate-x-1">
+                            <div class="flex gap-4 mb-2 flex-wrap">
+                                <span class="text-medium-gray font-semibold text-sm">
+                                    <i class="far fa-clock mr-1"></i>${log.timestamp}
+                                </span>
+                                <span class="px-3 py-0.5 rounded text-xs font-bold uppercase text-white ${config.badge}">
+                                    <i class="fas ${config.icon} mr-1"></i>${log.level}
+                                </span>
+                                ${log.module ? `<span class="text-deep-teal font-semibold text-sm"><i class="fas fa-cube mr-1"></i>${escapeHtml(log.module)}</span>` : ''}
+                                ${log.location ? `<span class="text-deep-teal font-semibold text-sm"><i class="fas fa-map-marker-alt mr-1"></i>${escapeHtml(log.location)}</span>` : ''}
+                            </div>
+                            <div class="text-charcoal font-mono text-sm break-words leading-relaxed">${escapeHtml(log.message)}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="text-center py-16">
+                        <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+                        <p class="text-red-500">Error loading logs: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        document.getElementById('searchBox').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadLogs();
+            }
+        });
+        
+        setInterval(() => {
+            refreshDashboard();
+        }, 30000);
+    </script>
+</body>
+</html>

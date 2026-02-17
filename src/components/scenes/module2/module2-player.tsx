@@ -4,8 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SceneIntro } from "./scene-intro"
 import { SceneOmnichannel } from "./scene-omnichannel"
-import { SceneAssistedFiling } from "./scene-assisted-filing"
-import { SceneAnonymity } from "./scene-anonymity"
+import { SceneComplaintFiling } from "./scene-complaint-filing"
 import { SceneReview } from "./scene-review"
 import { SceneTicket } from "./scene-ticket"
 import { SceneNotification } from "./scene-notification"
@@ -25,8 +24,7 @@ const TOTAL_DURATION = 98 // seconds
 const SCENES = [
   { name: "intro", start: 0, end: 4.64, component: SceneIntro },
   { name: "omnichannel", start: 4.64, end: 22, component: SceneOmnichannel },
-  { name: "assisted", start: 22, end: 44.56, component: SceneAssistedFiling },
-  { name: "anonymity", start: 44.56, end: 61.24, component: SceneAnonymity },
+  { name: "complaint-filing", start: 22, end: 61.24, component: SceneComplaintFiling },
   { name: "review", start: 61.24, end: 71, component: SceneReview },
   { name: "ticket", start: 71, end: 82, component: SceneTicket },
   { name: "notification", start: 82, end: 98, component: SceneNotification },

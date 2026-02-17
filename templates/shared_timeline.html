@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <title>FOS-Complaint Timeline</title>
+    
+    <!-- CSS Libraries -->
+    <link href="{{ url_for('static', filename='chartist.min.css') }}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --secondary-color: #284952;
+            --accent-color: #f5a83c;
+            --light-primary: #8fd3a4;
+            --light-secondary: #3a6b76;
+            --light-accent: #f7bc64;
+            --dark-primary: #4a9465;
+            --dark-secondary: #1a2f35;
+            --dark-accent: #e09020;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #6c757d;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            color: var(--secondary-color);
+            line-height: 1.6;
+        }
+        
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--light-secondary));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .page-header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .page-header .ticket-badge {
+            display: inline-block;
+            background-color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        /* Enhanced Complaint Info Styling */
+        .complaint-info {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 0;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .complaint-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .complaint-info-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-primary));
+            color: white;
+            padding: 1.25rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .complaint-info-header::before {
+            content: "";
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            z-index: 0;
+            animation: pulse 8s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+        
+        .complaint-info-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .complaint-info-title i {
+            margin-right: 0.75rem;
+            font-size: 1.5rem;
+        }
+        
+        .complaint-info-body {
+            padding: 1.5rem;
+        }
+        
+        .complaint-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .complaint-info-item {
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .complaint-info-item:hover {
+            border-left-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        
+        .complaint-info-label {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .complaint-info-label i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+        
+        .complaint-info-value {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge i {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .status-in-process { 
+            background-color: #e0f2fe; 
+            color: #0369a1; 
+            border: 1px solid rgba(3, 105, 161, 0.2);
+        }
+        
+        .status-completed { 
+            background-color: #dcfce7; 
+            color: #166534; 
+            border: 1px solid rgba(22, 101, 52, 0.2);
+        }
+        
+        .status-bounced { 
+            background-color: #fee2e2; 
+            color: #b91c1c; 
+            border: 1px solid rgba(185, 28, 28, 0.2);
+        }
+        
+        .status-closed { 
+            background-color: #f1f5f9; 
+            color: #475569; 
+            border: 1px solid rgba(71, 85, 105, 0.2);
+        }
+        
+        .card {
+            background-color: transparent;
+            border-radius: var(--border-radius);
+            box-shadow: none;
+            border: none;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        .card-body {
+            padding: 0;
+        }
+        
+        /* Timeline Styling */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        .timeline::before {
+            content: "";
+            position: absolute;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+            z-index: 1;
+        }
+        
+        .timeline-row {
+            position: relative;
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .timeline-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-time {
+            position: absolute;
+            top: 0;
+            width: 150px;
+            padding: 0.5rem 1rem;
+            background: white;
+            box-shadow: var(--box-shadow);
+            border-radius: 50px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            z-index: 2;
+        }
+        
+        .timeline-row:nth-child(odd) .timeline-time {
+            right: calc(35% + 30px);
+        }
+        
+        .timeline-row:nth-child(even) .timeline-time {
+            left: calc(35% + 30px);
+        }
+        
+        .timeline-content {
+            position: relative;
+            width: calc(50% - 50px);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            z-index: 2;
+            min-height: 300px;
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .timeline-row:nth-child(odd) .timeline-content {
+            margin-right: auto;
+            margin-left: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-primary));
+            color: white;
+        }
+        
+        .timeline-row:nth-child(even) .timeline-content {
+            margin-left: auto;
+            margin-right: 0;
+            background: linear-gradient(135deg, var(--secondary-color), var(--light-secondary));
+            color: white;
+        }
+        
+        .timeline-content::after {
+            content: "";
+            position: absolute;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid var(--primary-color);
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 0 0 0 4px rgba(96, 186, 129, 0.2);
+        }
+        
+        .timeline-row:nth-child(odd) .timeline-content::after {
+            right: -60px;
+        }
+        
+        .timeline-row:nth-child(even) .timeline-content::after {
+            left: -60px;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 4px rgba(40, 73, 82, 0.2);
+        }
+        
+        .timeline-row:nth-child(odd) .timeline-content::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            right: -15px;
+            border-style: solid;
+            border-width: 10px 0 10px 15px;
+            border-color: transparent transparent transparent var(--dark-primary);
+        }
+        
+        .timeline-row:nth-child(even) .timeline-content::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: -15px;
+            border-style: solid;
+            border-width: 10px 15px 10px 0;
+            border-color: transparent var(--light-secondary) transparent transparent;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 0.75rem;
+        }
+        
+        .timeline-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .timeline-title i {
+            margin-right: 0.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .timeline-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .timeline-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .timeline-body {
+            margin-top: 1rem;
+        }
+        
+        .timeline-body p {
+            margin-bottom: 0.75rem;
+        }
+        
+        .timeline-body p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .timeline-body strong {
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        /* Slider Styling */
+        .slider-container {
+            width: calc(50% - 50px);
+            height: 250px;
+            top: 59px;
+            margin: 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: absolute;
+            overflow: hidden;
+            z-index: 2;
+            transition: var(--transition);
+        }
+        
+        .slider-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .timeline-row:nth-child(odd) .slider-container {
+            right: 0;
+        }
+        
+        .timeline-row:nth-child(even) .slider-container {
+            left: 0;
+        }
+        
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        .slide a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 10px; /* Add some padding around image */
+}
+
+.slide img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Maintain aspect ratio while fitting within container */
+    border-radius: 6px;
+    cursor: pointer;
+}
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .slider-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            z-index: 3;
+        }
+        
+        .prev-btn, .next-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .prev-btn:hover, .next-btn:hover {
+            background-color: var(--dark-secondary);
+        }
+        
+        .slide-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            z-index: 3;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(96, 186, 129, 0.5);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .dot:hover {
+            background-color: var(--primary-color);
+        }
+        
+        /* Feedback Box */
+        .feedback-wrapper {
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .background-rectangle {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-color), var(--dark-accent));
+            padding: 1.5rem 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(245, 168, 60, 0.2);
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            transition: var(--transition);
+        }
+        
+        .background-rectangle:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(245, 168, 60, 0.3);
+        }
+        
+        .status-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+        
+        .feedback-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.9;
+            display: block;
+        }
+        
+        /* Quill Content Styling */
+        .ql-content {
+            color: inherit;
+            font-family: inherit;
+        }
+        
+        .ql-content p {
+            margin-bottom: 0.75rem;
+        }
+        
+        .ql-content ul, .ql-content ol {
+            padding-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .ql-content h1, .ql-content h2, .ql-content h3, 
+        .ql-content h4, .ql-content h5, .ql-content h6 {
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .ql-content blockquote {
+            border-left: 4px solid rgba(255, 255, 255, 0.3);
+            padding-left: 1rem;
+            margin-left: 0;
+            font-style: italic;
+        }
+        
+        .ql-content a {
+            color: #e0f2fe;
+            text-decoration: underline;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+        
+        .action-button i {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .action-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .action-button.primary:hover {
+            background-color: var(--dark-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(96, 186, 129, 0.3);
+        }
+        
+        .action-button.secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .action-button.secondary:hover {
+            background-color: var(--dark-secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(40, 73, 82, 0.3);
+        }
+        
+        .action-button.accent {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .action-button.accent:hover {
+            background-color: var(--dark-accent);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(245, 168, 60, 0.3);
+        }
+        
+        /* Responsive Styling */
+        @media (max-width: 991px) {
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .timeline-time {
+                position: relative;
+                width: auto;
+                margin-bottom: 1rem;
+                left: 60px !important;
+                right: auto !important;
+            }
+            
+            .timeline-content {
+                width: calc(100% - 80px);
+                margin-left: 80px !important;
+                margin-right: 0 !important;
+            }
+            
+            .timeline-content::after {
+                left: -50px !important;
+                right: auto !important;
+            }
+            
+            .timeline-row:nth-child(odd) .timeline-content::before,
+            .timeline-row:nth-child(even) .timeline-content::before {
+                left: -15px;
+                right: auto;
+                border-width: 10px 15px 10px 0;
+                border-color: transparent var(--primary-color) transparent transparent;
+            }
+            
+            .timeline-row:nth-child(even) .timeline-content::before {
+                border-color: transparent var(--secondary-color) transparent transparent;
+            }
+            
+            .slider-container {
+                position: relative;
+                width: calc(100% - 80px);
+                margin-left: 80px;
+                margin-bottom: 1rem;
+                left: auto !important;
+                right: auto !important;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .complaint-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .complaint-info-item {
+                padding-left: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .timeline-content {
+                padding: 1rem;
+            }
+            
+            .timeline-title {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+            }
+            
+            .page-header {
+                background: none;
+                color: var(--secondary-color);
+                box-shadow: none;
+                border-bottom: 2px solid var(--primary-color);
+                padding: 1rem 0;
+            }
+            
+            .complaint-info {
+                box-shadow: none;
+                border: 1px solid var(--medium-gray);
+            }
+            
+            .complaint-info-header {
+                background: none;
+                color: var(--secondary-color);
+                border-bottom: 2px solid var(--primary-color);
+            }
+            
+            .card {
+                box-shadow: none;
+            }
+            
+            .timeline::before {
+                background: var(--medium-gray);
+            }
+            
+            .timeline-content {
+                box-shadow: none;
+                border: 1px solid var(--medium-gray);
+                page-break-inside: avoid;
+            }
+            
+            .timeline-row:nth-child(odd) .timeline-content,
+            .timeline-row:nth-child(even) .timeline-content {
+                background: white;
+                color: var(--secondary-color);
+            }
+            
+            .timeline-badge {
+                background-color: var(--light-gray);
+                color: var(--secondary-color);
+                border: 1px solid var(--medium-gray);
+            }
+            
+            .slider-container {
+                display: none;
+            }
+            
+            .background-rectangle {
+                background: white;
+                color: var(--secondary-color);
+                border: 2px solid var(--accent-color);
+                box-shadow: none;
+            }
+            
+            .action-buttons {
+                display: none;
+            }
+        }
+        .page-footer {
+    background: linear-gradient(135deg, var(--secondary-color), var(--light-secondary));
+    color: white;
+    padding: 2rem 1rem;
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    margin-top: 30px;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-logo-img {
+    height: 50px;
+    margin-bottom: 1rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.footer-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.footer-copyright {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    opacity: 0.8;
+}
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <div class="page-wrapper">
+            <div class="page-header" style="position: relative;">
+                <div class="container text-center">
+                    <!-- Add the FOS logo -->
+                    <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="fos-img" style="    position: absolute;
+                    top: 38px;
+                    left: 10px;
+                    height: 67px;
+                    background: white;
+                    border-radius: 7px;">
+
+                    <h1>Complaint Timeline</h1>
+                    <div class="ticket-badge">{{ complaint.ticket_number }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="complaint-info">
+                <div class="complaint-info-header">
+                    <h3 class="complaint-info-title">
+                        <i class="fas fa-info-circle"></i> Complaint Details
+                    </h3>
+                </div>
+                <div class="complaint-info-body">
+                    <div class="complaint-info-grid">
+                        <div class="complaint-info-item">
+                            <div class="complaint-info-label">
+                                <i class="fas fa-ticket-alt"></i> Ticket Number
+                            </div>
+                            <div class="complaint-info-value">{{ complaint.ticket_number }}</div>
+                        </div>
+                        <div class="complaint-info-item">
+                            <div class="complaint-info-label">
+                                <i class="fas fa-tag"></i> Category
+                            </div>
+                            <div class="complaint-info-value">{{ complaint.complaint_categories }}</div>
+                        </div>
+                        <div class="complaint-info-item">
+                            <div class="complaint-info-label">
+                                <i class="fas fa-chart-line"></i> Status
+                            </div>
+                            <div class="complaint-info-value">
+                                <span class="status-badge 
+                                    {% if complaint.status == 'In Process' %}status-in-process
+                                    {% elif complaint.status == 'Completed' %}status-completed
+                                    {% elif complaint.status == 'Bounced' or complaint.status == 'Bounced1' %}status-bounced
+                                    {% else %}status-closed{% endif %}">
+                                    <i class="fas 
+                                        {% if complaint.status == 'In Process' %}fa-spinner fa-spin
+                                        {% elif complaint.status == 'Completed' %}fa-check-circle
+                                        {% elif complaint.status == 'Bounced' or complaint.status == 'Bounced1' %}fa-exclamation-circle
+                                        {% else %}fa-lock{% endif %}"></i>
+                                    {{ complaint.status }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="complaint-info-item">
+                            <div class="complaint-info-label">
+                                <i class="far fa-calendar-alt"></i> Date
+                            </div>
+                            <div class="complaint-info-value">{{ complaint.date_entry }}</div>
+                        </div>
+                        <div class="complaint-info-item">
+                            <div class="complaint-info-label">
+                                <i class="fas fa-building"></i> Company
+                            </div>
+                            <div class="complaint-info-value">{{ complaint.company_name }}</div>
+                        </div>
+                        <div class="complaint-info-item">
+                            <div class="complaint-info-label">
+                                <i class="fas fa-map-marker-alt"></i> Office
+                            </div>
+                            <div class="complaint-info-value">{{ complaint.office_name }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-button primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Timeline
+                </button>
+                <button class="action-button secondary" id="shareBtn">
+                    <i class="fas fa-share-alt"></i> Share Timeline
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <!-- Timeline start -->
+                    <div class="timeline">
+                        <!-- In Process -->
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.in_process_date }}
+                            </div>
+                            
+                            {% if proof_files %}
+                            <div class="slider-container">
+                                <div class="slider" id="imageSlider">
+                                    {% for file in proof_files %}
+                                    <div class="slide">
+                                        {% if file.type == 'image' %}
+                                        <a href="{{ file.url }}" target="_blank">
+                                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                                        </a>
+                                        {% elif file.type == 'pdf' %}
+                                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                                            </svg>
+                                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                                Download PDF Proof
+                                            </span>
+                                        </a>
+                                        {% elif file.type == 'video' %}
+                                        <video controls style="max-width: 100%; max-height: 100%; border-radius: 6px;">
+                                            <source src="{{ file.url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        {% elif file.type == 'audio' %}
+                                        <audio controls style="width: 100%; border-radius: 6px;">
+                                            <source src="{{ file.url }}" type="audio/mpeg">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if proof_files|length > 1 %}
+                                <div class="slider-nav">
+                                    <button onclick="prevSlide('imageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                                    <button onclick="nextSlide('imageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="slide-indicator">
+                                    {% for file in proof_files %}
+                                    <span class="dot" onclick="goToSlide('imageSlider', {{ loop.index0 }})"></span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-clipboard-list"></i> In Process
+                                    </h4>
+                                </div>
+                                
+                                <div class="timeline-badges">
+                                    {% if complaint.employee_name %}
+                                    <span class="timeline-badge">{{ complaint.employee_name }}</span>
+                                    {% endif %}
+                                    {% if complaint.designation %}
+                                    <span class="timeline-badge">{{ complaint.designation }}</span>
+                                    {% endif %}
+                                    <span class="timeline-badge">{{ complaint.complaint_categories }}</span>
+                                </div>
+
+                                <div class="timeline-body">
+                                    {% if complaint.additional_comments %}
+                                        <strong>Additional Comments:</strong><br>
+                                        <div class="ql-content">{{ complaint.additional_comments|safe }}</div>
+                                    {% else %}
+                                        <p>No Additional information available</p>
+                                    {% endif %}
+                                    {% if complaint.date_of_issue %}
+                                    <p>
+                                        <strong>Date of Issue:</strong> {{ complaint.date_of_issue }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    {% if complaint.person_issue %}
+                                    <p>
+                                        <strong>Relevant Person:</strong> {{ complaint.person_issue }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    {% if complaint.concerned_department %}
+                                    <p>
+                                        <strong>Concerned Department:</strong> {{ complaint.concerned_department }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    {% if complaint.previous_history %}
+                                    <p>
+                                        <strong>Previous History:</strong> {{ complaint.previous_history }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    {% if complaint.proposed_solution %}
+                                    <p>
+                                        <strong>Proposed Solution:</strong> {{ complaint.proposed_solution }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    <p>
+                                        <strong>Lodged By:</strong>
+                                        {% if complaint.lodged_by_agent and complaint.lodged_from_web %}
+                                            Agent from Web
+                                        {% elif complaint.lodged_by_agent and not complaint.lodged_from_web %}
+                                            Agent from Mobile App
+                                        {% elif not complaint.lodged_by_agent and not complaint.lodged_from_web %}
+                                            Employee from Mobile App
+                                        {% else %}
+                                            Employee from Web
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if complaint.complaint_categories != 'Feedback' %}
+                        <!-- RCA -->
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.rca_date }}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-search"></i> RCA - Root Cause Analysis
+                                    </h4>
+                                </div>
+                                
+                                <div class="timeline-body">
+                                    {% if complaint.rca %}
+                                        <div class="ql-content">{{ complaint.rca|safe }}</div>
+                                        {% if complaint.capa_deadline %}
+                                        <p class="mt-3">
+                                            <strong>CAPA Deadline:</strong> {{ complaint.capa_deadline }}
+                                        </p>
+                                        {% endif %}
+                                    {% else %}
+                                        <p>No RCA information available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- CAPA -->
+                        <div class="timeline-row" style="min-height:300px;">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.capa_date }}
+                            </div>
+                            
+                            {% if capa_files %}
+                            <div class="slider-container">
+                                <div class="slider" id="capaImageSlider">
+                                    {% for file in capa_files %}
+                                    <div class="slide">
+                                        {% if file.type == 'image' %}
+                                        <a href="{{ file.url }}" target="_blank">
+                                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                                        </a>
+                                        {% elif file.type == 'pdf' %}
+                                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                                            </svg>
+                                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                                Download PDF Proof
+                                            </span>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if capa_files|length > 1 %}
+                                <div class="slider-nav">
+                                    <button onclick="prevSlide('capaImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                                    <button onclick="nextSlide('capaImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="slide-indicator">
+                                    {% for file in capa_files %}
+                                    <span class="dot" onclick="goToSlide('capaImageSlider', {{ loop.index0 }})"></span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-tools"></i> CAPA - Corrective & Preventive Actions
+                                    </h4>
+                                </div>
+                                
+                                <div class="timeline-body">
+                                    {% if complaint.capa %}
+                                        <div class="ql-content">{{ complaint.capa|safe }}</div>
+                                    {% else %}
+                                        <p>No CAPA information available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Feedback -->
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.capa_date }}
+                            </div>
+                            
+                            {% if capa_files %}
+                            <div class="slider-container">
+                                <div class="slider" id="capaImageSlider">
+                                    {% for file in capa_files %}
+                                    <div class="slide">
+                                        {% if file.type == 'image' %}
+                                        <a href="{{ file.url }}" target="_blank">
+                                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                                        </a>
+                                        {% elif file.type == 'pdf' %}
+                                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                                            </svg>
+                                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                                Download PDF Proof
+                                            </span>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if capa_files|length > 1 %}
+                                <div class="slider-nav">
+                                    <button onclick="prevSlide('capaImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                                    <button onclick="nextSlide('capaImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="slide-indicator">
+                                    {% for file in capa_files %}
+                                    <span class="dot" onclick="goToSlide('capaImageSlider', {{ loop.index0 }})"></span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-comment-alt"></i> Investigation Officer - IO Feedback
+                                    </h4>
+                                </div>
+                                
+                                <div class="timeline-body">
+                                    {% if complaint.capa %}
+                                        <div class="ql-content">{{ complaint.capa|safe }}</div>
+                                    {% else %}
+                                        <p>No feedback information available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if complaint.status == "Bounced" or complaint.capa1 %}
+<div class="feedback-wrapper">
+    <div class="background-rectangle">
+        <span class="status-text">The Complainant Was Not Satisfied</span>
+        <span class="feedback-text">Feedback: {{ complaint.feedback|safe }}</span>
+        
+        <!-- ADD FEEDBACK FILES SLIDER HERE -->
+        {% if feedback_files %}
+        <div style="margin-top: 0rem;">
+            <div class="slider-container" style="position: relative; width: 100%; height: 200px; margin: 0rem 0; top: 0px;">
+                <div class="slider" id="feedbackImageSlider">
+                    {% for file in feedback_files %}
+                    <div class="slide">
+                        {% if file.type == 'image' %}
+                        <a href="{{ file.url }}" target="_blank">
+                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                        </a>
+                        {% elif file.type == 'pdf' %}
+                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                            </svg>
+                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                Download PDF Proof
+                            </span>
+                        </a>
+                        {% elif file.type == 'video' %}
+                        <video controls style="max-width: 100%; max-height: 100%; border-radius: 6px;">
+                            <source src="{{ file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% elif file.type == 'audio' %}
+                        <audio controls style="width: 100%; border-radius: 6px;">
+                            <source src="{{ file.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if feedback_files|length > 1 %}
+                <div class="slider-nav">
+                    <button onclick="prevSlide('feedbackImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextSlide('feedbackImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="slide-indicator">
+                    {% for file in feedback_files %}
+                    <span class="dot" onclick="goToSlide('feedbackImageSlider', {{ loop.index0 }})"></span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+                        </div>
+                        
+                        <div class="timeline-row" style="min-height:300px;">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.capa1_date }}
+                            </div>
+                            
+                            {% if capa1_files %}
+                            <div class="slider-container">
+                                <div class="slider" id="capa1ImageSlider">
+                                    {% for file in capa1_files %}
+                                    <div class="slide">
+                                        {% if file.type == 'image' %}
+                                        <a href="{{ file.url }}" target="_blank">
+                                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                                        </a>
+                                        {% elif file.type == 'pdf' %}
+                                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                                            </svg>
+                                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                                Download PDF Proof
+                                            </span>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                {% if capa1_files|length > 1 %}
+                                <div class="slider-nav">
+                                    <button onclick="prevSlide('capa1ImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                                    <button onclick="nextSlide('capa1ImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                                <div class="slide-indicator">
+                                    {% for file in capa1_files %}
+                                    <span class="dot" onclick="goToSlide('capa1ImageSlider', {{ loop.index0 }})"></span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-tools"></i> CAPA1 - Corrective & Preventive Actions
+                                    </h4>
+                                </div>
+                                
+                                <div class="timeline-body">
+                                    {% if complaint.capa1 %}
+                                        <div class="ql-content">{{ complaint.capa1|safe }}</div>
+                                    {% else %}
+                                        <p>No CAPA1 information available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if complaint.status == "Bounced1" or complaint.capa2 %}
+<div class="feedback-wrapper">
+    <div class="background-rectangle">
+        <span class="status-text">The Complainant Was Not Satisfied</span>
+        <span class="feedback-text">Feedback: {{ complaint.feedback1|safe }}</span>
+        
+        <!-- ADD FEEDBACK1 FILES SLIDER HERE -->
+        {% if feedback1_files %}
+        <div style="margin-top: 0rem;">
+            <div class="slider-container" style="position: relative; width: 100%; height: 200px; margin: 0rem 0; top: 0px;">
+                <div class="slider" id="feedback1ImageSlider">
+                    {% for file in feedback1_files %}
+                    <div class="slide">
+                        {% if file.type == 'image' %}
+                        <a href="{{ file.url }}" target="_blank">
+                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                        </a>
+                        {% elif file.type == 'pdf' %}
+                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                            </svg>
+                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                Download PDF Proof
+                            </span>
+                        </a>
+                        {% elif file.type == 'video' %}
+                        <video controls style="max-width: 100%; max-height: 100%; border-radius: 6px;">
+                            <source src="{{ file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% elif file.type == 'audio' %}
+                        <audio controls style="width: 100%; border-radius: 6px;">
+                            <source src="{{ file.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if feedback1_files|length > 1 %}
+                <div class="slider-nav">
+                    <button onclick="prevSlide('feedback1ImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextSlide('feedback1ImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="slide-indicator">
+                    {% for file in feedback1_files %}
+                    <span class="dot" onclick="goToSlide('feedback1ImageSlider', {{ loop.index0 }})"></span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+                        </div>
+                        
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.capa2_date }}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-tools"></i> CAPA2 - Corrective & Preventive Actions
+                                    </h4>
+                                </div>
+                                
+                                <div class="timeline-body">
+                                    {% if complaint.capa2 %}
+                                        <div class="ql-content">{{ complaint.capa2|safe }}</div>
+                                    {% else %}
+                                        <p>No CAPA2 information available</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if complaint.status == "Unclosed" %}
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.closed_date }}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-exclamation-triangle"></i> UNCLOSED
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if complaint.status == "Closed" and complaint.complaint_categories != 'Feedback' %}
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.closed_date }}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-check-circle"></i> SUBMITTED
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if complaint.status == "Completed" and complaint.complaint_categories != 'Feedback' %}
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.closed_date }}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-check-circle"></i> SUBMITTED
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-row">
+                            <div class="timeline-time">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ complaint.completed_date }}
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-header">
+                                    <h4 class="timeline-title">
+                                        <i class="fas fa-flag-checkered"></i> COMPLETED
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="feedback-wrapper">
+                            <div class="background-rectangle" style="background: linear-gradient(135deg, var(--primary-color), var(--dark-primary));">
+                                <span class="status-text">The Complainant Was Satisfied</span>
+                                <span class="feedback-text">Feedback: {{ complaint.close_feedback|safe }}</span>
+                                
+                                <!-- DISPLAY FEEDBACK1 FILES IF AVAILABLE, OTHERWUSE FEEDBACK FILES -->
+                                {% set files_to_display = feedback1_files if feedback1_files else feedback_files %}
+                                
+                                {% if files_to_display %}
+                                <div style="margin-top: 0rem;">
+                                    <div class="slider-container" style="position: relative; width: 100%; height: 200px; margin: 0rem 0; top: 0px;">
+                                        <div class="slider" id="completedFeedbackImageSlider">
+                                            {% for file in files_to_display %}
+                                            <div class="slide">
+                                                {% if file.type == 'image' %}
+                                                <a href="{{ file.url }}" target="_blank">
+                                                    <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                                                </a>
+                                                {% elif file.type == 'pdf' %}
+                                                <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                                        <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                                        <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                                        <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                                                    </svg>
+                                                    <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                                        Download PDF Proof
+                                                    </span>
+                                                </a>
+                                                {% elif file.type == 'video' %}
+                                                <video controls style="max-width: 100%; max-height: 100%; border-radius: 6px;">
+                                                    <source src="{{ file.url }}" type="video/mp4">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                                {% elif file.type == 'audio' %}
+                                                <audio controls style="width: 100%; border-radius: 6px;">
+                                                    <source src="{{ file.url }}" type="audio/mpeg">
+                                                    Your browser does not support the audio element.
+                                                </audio>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        {% if files_to_display|length > 1 %}
+                                        <div class="slider-nav">
+                                            <button onclick="prevSlide('completedFeedbackImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                                            <button onclick="nextSlide('completedFeedbackImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                        <div class="slide-indicator">
+                                            {% for file in files_to_display %}
+                                            <span class="dot" onclick="goToSlide('completedFeedbackImageSlider', {{ loop.index0 }})"></span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% elif complaint.status == "Completed" %}
+<div class="feedback-wrapper">
+    <div class="background-rectangle" style="background: linear-gradient(135deg, var(--primary-color), var(--dark-primary));">
+        <span class="status-text">The Complainant Was Satisfied</span>
+        <span class="feedback-text">Feedback: {{ complaint.close_feedback|safe }}</span>
+        
+        <!-- DISPLAY FEEDBACK1 FILES IF AVAILABLE, OTHERWUSE FEEDBACK FILES -->
+        {% set files_to_display = feedback1_files if feedback1_files else feedback_files %}
+        
+        {% if files_to_display %}
+        <div style="margin-top: 0rem;">
+            <div class="slider-container" style="position: relative; width: 100%; height: 200px; margin: 0rem 0; top: 0px;">
+                <div class="slider" id="completedFeedbackImageSlider">
+                    {% for file in files_to_display %}
+                    <div class="slide">
+                        {% if file.type == 'image' %}
+                        <a href="{{ file.url }}" target="_blank">
+                            <img src="{{ file.url }}" alt="{{ file.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 6px; cursor: pointer;">
+                        </a>
+                        {% elif file.type == 'pdf' %}
+                        <a href="{{ file.url }}" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-decoration: none; color: inherit;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" style="width: 80px; height: 80px;">
+                                <path fill="#FF5722" d="M40 45H8c-2.2 0-4-1.8-4-4V7c0-2.2 1.8-4 4-4h22l14 14v24C44 43.2 42.2 45 40 45z"/>
+                                <path fill="#FBE9E7" d="M38.5 43h-29c-1.4 0-2.5-1.1-2.5-2.5v-33C7 6.1 8.1 5 9.5 5h21.7L41 14.3V40.5c0 1.4-1.1 2.5-2.5 2.5z"/>
+                                <text x="24" y="32" text-anchor="middle" fill="#FF5722" font-size="12">PDF</text>
+                            </svg>
+                            <span style="color: var(--secondary-color); text-decoration: none; margin-top: 10px; font-size: 14px;">
+                                Download PDF Proof
+                            </span>
+                        </a>
+                        {% elif file.type == 'video' %}
+                        <video controls style="max-width: 100%; max-height: 100%; border-radius: 6px;">
+                            <source src="{{ file.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {% elif file.type == 'audio' %}
+                        <audio controls style="width: 100%; border-radius: 6px;">
+                            <source src="{{ file.url }}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if files_to_display|length > 1 %}
+                <div class="slider-nav">
+                    <button onclick="prevSlide('completedFeedbackImageSlider')" class="prev-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextSlide('completedFeedbackImageSlider')" class="next-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="slide-indicator">
+                    {% for file in files_to_display %}
+                    <span class="dot" onclick="goToSlide('completedFeedbackImageSlider', {{ loop.index0 }})"></span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+                    </div>
+                    <!-- Timeline end -->
+                </div>
+            </div>
+        </div>
+        <footer class="page-footer">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="fos-logo" style="
+                    top: 38px;
+                    left: 10px;
+                    height: 67px;
+                    background: white;
+                    border-radius: 7px;">
+
+                </div>
+                <div class="footer-links">
+                    <a href="https://fruitofsustainability.com/" class="footer-link">Privacy Policy</a>
+                    <a href="https://fruitofsustainability.com/" class="footer-link">Terms of Service</a>
+                    <a href="https://fruitofsustainability.com/" class="footer-link">Contact Us</a>
+                </div>
+                <div class="footer-copyright">
+                    <p>&copy; {{ current_year }} Fruit of Sustainability. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content" style="border-radius: var(--border-radius); border: none; overflow: hidden;">
+                <div class="modal-header" style="background: var(--secondary-color); color: white; border: none;">
+                    <h5 class="modal-title" id="shareModalLabel">Share Timeline</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white; opacity: 1;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <div class="form-group">
+                        <label for="shareLink">Share Link</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="shareLink" value="{{ request.url }}" readonly>
+                            <div class="input-group-append">
+                                <button class="btn" style="background-color: var(--primary-color); color: white;" onclick="copyShareLink()">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted mt-2">Copy this link to share the timeline with others.</small>
+                    </div>
+                    <div id="copySuccess" style="display: none; text-align: center; margin-top: 1rem; padding: 0.5rem; background-color: #dcfce7; color: #166534; border-radius: 0.5rem;">
+                        <i class="fas fa-check-circle mr-2"></i> Link copied to clipboard!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Slider functionality
+const sliders = {};
+
+function initializeSlider(sliderId) {
+    const sliderElement = document.getElementById(sliderId);
+    if (!sliderElement) {
+        console.log(`Slider ${sliderId} not found`);
+        return;
+    }
+    
+    const slides = document.querySelectorAll(`#${sliderId} .slide`);
+    if (slides.length === 0) {
+        console.log(`No slides found for ${sliderId}`);
+        return;
+    }
+    
+    // Find dots - they might be in different positions in the DOM
+    let dots = [];
+    const sliderContainer = sliderElement.closest('.slider-container');
+    if (sliderContainer) {
+        const indicator = sliderContainer.querySelector('.slide-indicator');
+        if (indicator) {
+            dots = indicator.querySelectorAll('.dot');
+        }
+    }
+    
+    sliders[sliderId] = {
+        currentSlide: 0,
+        slides: slides,
+        dots: dots
+    };
+    
+    console.log(`Initialized slider ${sliderId} with ${slides.length} slides and ${dots.length} dots`);
+    updateSlider(sliderId);
+}
+
+function updateSlider(sliderId) {
+    const slider = sliders[sliderId];
+    if (!slider || slider.slides.length === 0) return;
+    
+    const sliderElement = document.getElementById(sliderId);
+    sliderElement.style.transform = `translateX(-${slider.currentSlide * 100}%)`;
+    
+    // Update dots if they exist
+    if (slider.dots.length > 0) {
+        slider.dots.forEach((dot, index) => {
+            dot.style.backgroundColor = index === slider.currentSlide ? '#60BA81' : 'rgba(96, 186, 129, 0.5)';
+        });
+    }
+}
+
+function prevSlide(sliderId) {
+    const slider = sliders[sliderId];
+    if (!slider || slider.slides.length === 0) {
+        console.log(`Slider ${sliderId} not found or no slides`);
+        return;
+    }
+    
+    slider.currentSlide = (slider.currentSlide - 1 + slider.slides.length) % slider.slides.length;
+    console.log(`Prev slide: ${sliderId} -> ${slider.currentSlide}`);
+    updateSlider(sliderId);
+}
+
+function nextSlide(sliderId) {
+    const slider = sliders[sliderId];
+    if (!slider || slider.slides.length === 0) {
+        console.log(`Slider ${sliderId} not found or no slides`);
+        return;
+    }
+    
+    slider.currentSlide = (slider.currentSlide + 1) % slider.slides.length;
+    console.log(`Next slide: ${sliderId} -> ${slider.currentSlide}`);
+    updateSlider(sliderId);
+}
+
+function goToSlide(sliderId, index) {
+    const slider = sliders[sliderId];
+    if (!slider || slider.slides.length === 0) return;
+    
+    slider.currentSlide = index;
+    updateSlider(sliderId);
+}
+        
+        // Share functionality
+        document.getElementById('shareBtn').addEventListener('click', function() {
+            $('#shareModal').modal('show');
+        });
+        
+        function copyShareLink() {
+            const shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            
+            const copySuccess = document.getElementById('copySuccess');
+            copySuccess.style.display = 'block';
+            
+            setTimeout(() => {
+                copySuccess.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Initialize all sliders on page load
+ // Initialize all sliders on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all possible sliders
+    const sliderIds = [
+        'imageSlider',
+        'capaImageSlider', 
+        'capa1ImageSlider',
+        'feedbackImageSlider',
+        'feedback1ImageSlider',
+        'completedFeedbackImageSlider'  // ADD THIS LINE
+    ];
+    
+    sliderIds.forEach(sliderId => {
+        initializeSlider(sliderId);
+    });
+    
+    // Add animation to timeline items
+    const timelineItems = document.querySelectorAll('.timeline-content, .slider-container');
+    timelineItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 200);
+    });
+});
+    </script>
+</body>
+</html>

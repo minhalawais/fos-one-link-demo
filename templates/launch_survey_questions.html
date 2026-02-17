@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FOS - Survey Question Management</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fomantic-ui/2.9.2/semantic.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.jqueryui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
+    <style>
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .table-section {
+            background-color: #f5f5f5;
+            padding: 30px 0;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .actions-column {
+            width: 100px;
+        }
+        [type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled), button:not(:disabled) {
+            cursor: pointer;
+            float: right;
+            margin-bottom: 10px;
+        }
+        .logo-img {
+            height:12%;
+            width: 12%;
+            margin-right: -50px;
+        }
+        #addQuestionModal{
+            padding-right: 0px !important;
+            overflow: auto;
+        }
+        .dataTables_wrapper{
+        display: grid;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">
+            <!-- Your logo image or text here -->
+                    <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('admin_portal') }}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('launch_survey_crud') }}">Manage Surveys</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="table-section">
+        <div class="container">
+            <h1>Survey Questions</h1>
+            <button id="addQuestionButton" class="btn btn-success">Add Question</button>
+            
+            <table id="datatable" class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Survey ID</th>
+                        <th>Question Text</th>
+                        <th>Question Type</th>
+                        <th>Is Required</th>
+                        <th>Order</th>
+                        <th>Help Text</th>
+                        <th>Options</th>
+                        <th class="actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in questions %}
+                        <tr>
+                            <td>{{ question.question_id }}</td>
+                            <td>{{ question.survey_id }}</td>
+                            <td>{{ question.question_text }}</td>
+                            <td>{{ question.question_type }}</td>
+                            <td>{{ question.is_required }}</td>
+                            <td>{{ question.order }}</td>
+                            <td>{{ question.help_text }}</td>
+                            <td>{{ question.options }}</td>
+                            <td>
+                                <button class="edit-btn btn btn-primary" data-id="{{ question.question_id }}">Edit</button>
+                                <button class="delete-btn btn btn-danger" data-id="{{ question.question_id }}">Delete</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Add Question Modal -->
+            <div class="modal fade" id="addQuestionModal" tabindex="-1" role="dialog" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addQuestionModalLabel">Add Question</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="surveySelect">Select Survey:</label>
+                                <select id="surveySelect" class="form-control">
+                                    {% for survey in surveys %}
+                                        <option value="{{ survey.id }}">{{ survey.id }} - {{ survey.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="questionText">Question Text:</label>
+                                <textarea id="questionText" class="form-control" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="questionType">Question Type:</label>
+                                <select id="questionType" class="form-control" required>
+                                    <option value="text">Text</option>
+                                    <option value="textarea">Textarea</option>
+                                    <option value="radio">Radio</option>
+                                    <option value="checkbox">Checkbox</option>
+                                    <option value="select">Select</option>
+                                    <option value="file">File</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="isRequired">Is Required:</label>
+                                <select id="isRequired" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="order">Order:</label>
+                                <input type="number" id="order" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="helpText">Help Text:</label>
+                                <textarea id="helpText" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group options-group" style="display: none;">
+                                <label for="options">Options:</label>
+                                <input type="text" id="options" class="form-control" readonly>
+                                <button type="button" class="btn btn-secondary mt-2" id="manageOptionsBtn">Manage Options</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructionMedia">Instruction Media (Image or Video URL):</label>
+                                <input type="file" id="instructionMedia" class="form-control" accept="image/*">
+                                <small class="form-text text-muted">Upload an image file or paste a video URL (YouTube or Vimeo)</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="addQuestionBtn">Add Question</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Question Modal -->
+            <div class="modal fade" id="editQuestionModal" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editQuestionModalLabel">Edit Question</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="editQuestionText">Question Text:</label>
+                                <textarea id="editQuestionText" class="form-control" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="editQuestionType">Question Type:</label>
+                                <select id="editQuestionType" class="form-control" required>
+                                    <option value="text">Text</option>
+                                    <option value="textarea">Textarea</option>
+                                    <option value="radio">Radio</option>
+                                    <option value="checkbox">Checkbox</option>
+                                    <option value="select">Select</option>
+                                    <option value="file">File</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editIsRequired">Is Required:</label>
+                                <select id="editIsRequired" class="form-control">
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editOrder">Order:</label>
+                                <input type="number" id="editOrder" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editHelpText">Help Text:</label>
+                                <textarea id="editHelpText" class="form-control"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="editOptions">Options:</label>
+                                <input type="text" id="editOptions" class="form-control" readonly>
+                                <button type="button" class="btn btn-secondary mt-2" id="editManageOptionsBtn">Manage Options</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="editInstructionMedia">Instruction Media (Image or Video URL):</label>
+                                <input type="file" id="editInstructionMedia" class="form-control" accept="image/*">
+                                <small class="form-text text-muted">Upload an image file or paste a video URL (YouTube or Vimeo)</small>
+                                <div id="currentInstructionMedia" style="margin-top: 10px;"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete this question?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button id="confirmDeleteBtn" class="btn btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Options Modal -->
+            <div class="modal fade" id="manageOptionsModal" tabindex="-1" role="dialog" aria-labelledby="manageOptionsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="manageOptionsModalLabel">Manage Options</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="optionsContainer">
+                                <div class="form-group">
+                                    <input type="text" class="form-control option-input" placeholder="Enter option">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary mt-2" id="addOptionBtn">Add Another Option</button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="saveOptionsBtn">Save Options</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.jqueryui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
+    <script>
+  $(document).ready(function() {
+    var dataTable = $('#datatable').DataTable();
+
+    $('#addQuestionButton').on('click', function() {
+        $('#addQuestionModal').modal('show');
+        $('#questionType').trigger('change');
+    });
+
+    $('#addQuestionBtn').on('click', function() {
+        var formData = new FormData();
+        
+        // Get form values and handle empty values
+        var surveyId = $('#surveySelect').val();
+        var questionText = $('#questionText').val() || '';
+        var questionType = $('#questionType').val() || '';
+        var isRequired = $('#isRequired').val() || 0;
+        var order = $('#order').val() || 0;
+        var helpText = $('#helpText').val() || '';
+        var options = $('#options').val() || '[]';
+        
+        formData.append('survey_id', surveyId);
+        formData.append('question_text', questionText);
+        formData.append('question_type', questionType);
+        formData.append('is_required', isRequired);
+        formData.append('order', order);
+        formData.append('help_text', helpText);
+        formData.append('options', options);
+        
+        var instructionMedia = $('#instructionMedia')[0].files[0];
+        console.log('instructionMedia', instructionMedia);
+        
+        if (instructionMedia) {
+            formData.append('instruction_media', instructionMedia);
+        } else {
+            var instructionMediaUrl = $('#instructionMedia').val();
+            if (isValidVideoUrl(instructionMediaUrl)) {
+                formData.append('instruction_media', instructionMediaUrl);
+            } else {
+                formData.append('instruction_media', ''); // Set to empty string if not valid URL
+            }
+        }
+
+        $.ajax({
+            url: "{{ url_for('add_question') }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log('Question added successfully');
+                location.reload();
+            }
+        });
+
+        $('#addQuestionModal').modal('hide');
+    });
+        function isValidVideoUrl(url) {
+        // Basic check for YouTube or Vimeo URLs
+        return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com)\/.+$/.test(url);
+    }
+
+    function handleInstructionMedia(input, previewElement) {
+        var file = input.files[0];
+        var reader = new FileReader();
+
+        if (file && file.type.startsWith('image/')) {
+            reader.onload = function(e) {
+                $(previewElement).html('<img src="' + e.target.result + '" style="max-width: 200px;">');
+            }
+            reader.readAsDataURL(file);
+        } else {
+            var url = $(input).val();
+            if (isValidVideoUrl(url)) {
+                $(previewElement).html('<p>Video URL: ' + url + '</p>');
+            } else {
+                $(previewElement).html('<p>Invalid input. Please upload an image or enter a valid video URL.</p>');
+            }
+        }
+    }
+
+    $('#instructionMedia, #editInstructionMedia').on('change', function() {
+        handleInstructionMedia(this, $(this).siblings('#currentInstructionMedia'));
+    });
+    $(document).on('click', '.edit-btn', function() {
+        var questionId = $(this).data('id');
+        var row = dataTable.row($(this).closest('tr')).data();
+
+        $('#editQuestionText').val(row[2]);
+        $('#editQuestionType').val(row[3]);
+        $('#editIsRequired').val(row[4]);
+        $('#editOrder').val(row[5]);
+        $('#editHelpText').val(row[6]);
+
+        // Safely parse options
+        var optionsString = row[7];
+        var options = [];
+        try {
+            options = JSON.parse(optionsString);
+        } catch (e) {
+            // If JSON parsing fails, try to clean up the string
+            optionsString = optionsString.replace(/'/g, '"').replace(/\s+/g, ' ').trim();
+            try {
+                options = JSON.parse(optionsString);
+            } catch (e) {
+                // If it still fails, split by comma
+                options = optionsString.split(',').map(item => item.trim());
+            }
+        }
+        $('#editOptions').val(JSON.stringify(options));
+        if (row.instruction_media) {
+            if (row.instruction_media.startsWith('http')) {
+                $('#editInstructionMedia').val(row.instruction_media);
+                $('#currentInstructionMedia').html('<p>Video URL: ' + row.instruction_media + '</p>');
+            } else {
+                $('#currentInstructionMedia').html('<img src="' + row.instruction_media + '" style="max-width: 200px;">');
+            }
+        }
+        $('#saveChangesBtn').data('id', questionId);
+        $('#editQuestionType').trigger('change');
+        $('#editQuestionModal').modal('show');
+    });
+
+    $('#saveChangesBtn').on('click', function() {
+        var questionId = $(this).data('id');
+        var formData = new FormData();
+        formData.append('question_id', questionId);
+        formData.append('question_text', $('#editQuestionText').val());
+        formData.append('question_type', $('#editQuestionType').val());
+        formData.append('is_required', $('#editIsRequired').val());
+        formData.append('order', $('#editOrder').val());
+        formData.append('help_text', $('#editHelpText').val());
+        formData.append('options', $('#editOptions').val());
+        
+        var instructionMedia = $('#editInstructionMedia')[0].files[0];
+        if (instructionMedia) {
+            formData.append('instruction_media', instructionMedia);
+        } else {
+            formData.append('instruction_media', $('#editInstructionMedia').val()); // URL
+        }
+
+        $.ajax({
+            url: "{{ url_for('edit_question') }}",
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log('Question updated successfully');
+                location.reload();
+            }
+        });
+
+        $('#editQuestionModal').modal('hide');
+    });
+
+    $(document).on('click', '.delete-btn', function() {
+        var questionId = $(this).data('id');
+        $('#confirmDeleteBtn').data('id', questionId);
+        $('#deleteModal').modal('show');
+    });
+
+    $('#confirmDeleteBtn').on('click', function() {
+        var questionId = $(this).data('id');
+
+        $.ajax({
+            url: "{{ url_for('delete_question') }}",
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({question_id: questionId}),
+            success: function(response) {
+                console.log('Question deleted successfully');
+                location.reload();
+            }
+        });
+
+        $('#deleteModal').modal('hide');
+    });
+
+    $('#manageOptionsBtn, #editManageOptionsBtn').on('click', function() {
+        $('#optionsContainer').empty();
+        var options = $(this).closest('.modal-content').find('[id$=Options]').val();
+        if (options) {
+            JSON.parse(options).forEach(function(option) {
+                addOptionInput(option);
+            });
+        } else {
+            addOptionInput();
+        }
+        $('#manageOptionsModal').modal('show');
+    });
+
+    $('#addOptionBtn').on('click', function() {
+        addOptionInput();
+    });
+
+    $('#saveOptionsBtn').on('click', function() {
+        var options = [];
+        $('.option-input').each(function() {
+            var value = $(this).val().trim();
+            if (value) options.push(value);
+        });
+        var optionsJson = JSON.stringify(options);
+        $('#options, #editOptions').val(optionsJson);
+        $('#manageOptionsModal').modal('hide');
+    });
+
+    function addOptionInput(value = '') {
+        var newInput = $('<div class="form-group mt-2">' +
+                         '<div class="input-group">' +
+                         '<input type="text" class="form-control option-input" value="' + value + '" placeholder="Enter option">' +
+                         '<div class="input-group-append">' +
+                         '<button class="btn btn-outline-secondary remove-option" type="button" style="margin-bottom:0px;">Remove</button>' +
+                         '</div>' +
+                         '</div>' +
+                         '</div>');
+        $('#optionsContainer').append(newInput);
+    }
+
+    $(document).on('click', '.remove-option', function() {
+        $(this).closest('.form-group').remove();
+    });
+    
+    $('#questionType, #editQuestionType').on('change', function() {
+        var type = $(this).val();
+        var optionsGroup = $(this).closest('.modal-content').find('.options-group');
+        
+        if (type === 'radio' || type === 'checkbox' || type === 'select') {
+            optionsGroup.show();
+        } else {
+            optionsGroup.hide();
+            optionsGroup.find('input').val('');
+        }
+    });
+    
+});
+</script>
+</body>
+</html>

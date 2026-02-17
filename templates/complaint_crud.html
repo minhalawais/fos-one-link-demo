@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Management | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <!-- Quill.js CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Shared Personal Dashboard Styles -->
+    <link href="{{ url_for('static', filename='css/personal-dashboard.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary1-color) 0%, #1e3a42 100%) !important;
+            box-shadow: var(--card-shadow-lg);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+            margin-right: 12px;
+            filter: brightness(1.1);
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            margin: 0 3px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .navbar-nav .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white !important;
+            box-shadow: 0 4px 8px rgba(96, 186, 129, 0.3);
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow-lg);
+            margin: 2rem auto;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary1-color));
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary1-color) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(180deg);
+            }
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+            box-shadow: 0 4px 8px rgba(96, 186, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4da570, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(96, 186, 129, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #047857);
+            color: white;
+            box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #b91c1c);
+            color: white;
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info-color), #0e7490);
+            color: white;
+            box-shadow: 0 4px 8px rgba(8, 145, 178, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            box-shadow: 0 4px 8px rgba(107, 114, 128, 0.3);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(96, 186, 129, 0.15);
+            background-color: white;
+            transform: translateY(-1px);
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary1-color));
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background-color: #f8fafc;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .table {
+            margin-bottom: 0;
+            border: none;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 1.25rem 1rem;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(96, 186, 129, 0.05), rgba(40, 73, 82, 0.05));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+
+        .status-unprocessed {
+            background: linear-gradient(135deg, #206E71, #1a5a5d);
+            color: white;
+        }
+
+        .status-in-process {
+            background: linear-gradient(135deg, #2D9480, #247d6b);
+            color: white;
+        }
+
+        .status-closed {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+        }
+
+        .status-bounced {
+            background: linear-gradient(135deg, var(--secondary-color), #e09420);
+            color: white;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #A5DC78, #8bc34a);
+            color: white;
+        }
+
+        .urgent-ticket {
+            color: #be0000;
+            font-weight: 800;
+            position: relative;
+        }
+
+        .urgent-ticket::after {
+            content: '🔥';
+            margin-left: 0.5rem;
+        }
+
+        .card {
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .file-preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .file-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            cursor: pointer;
+        }
+
+        .file-preview:hover {
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 16px rgba(96, 186, 129, 0.2);
+        }
+
+        .file-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .file-preview .file-icon {
+            font-size: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--primary-color);
+        }
+
+        .file-preview .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, var(--danger-color), #b91c1c);
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            z-index: 10;
+        }
+
+        .file-preview:hover .delete-btn {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .nav-tabs {
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            margin-right: 0.25rem;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background-color: rgba(96, 186, 129, 0.1);
+            color: var(--primary-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-content {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateX(5px);
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .timeline-date {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--primary1-color);
+            font-size: 1.1rem;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, white, #f8fafc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2s ease-in-out infinite;
+            background: white;
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .loading-logo {
+            width: 80%;
+            height: auto;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: var(--card-shadow-lg);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .form-section h5 {
+            color: var(--primary1-color);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section h5::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .file-upload-btn {
+            margin-top: 1rem;
+            background: linear-gradient(135deg, var(--secondary-color), #e09420);
+            border: none;
+            color: white;
+        }
+
+        .file-upload-btn:hover {
+            background: linear-gradient(135deg, #e09420, var(--secondary-color));
+            transform: translateY(-2px);
+        }
+
+        /* Quill Editor Styles */
+        .ql-editor {
+            min-height: 200px;
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 12px 15px;
+            color: #334155;
+        }
+
+        .ql-container.ql-snow {
+            border-radius: 0 0 8px 8px;
+            border: 2px solid var(--border-color);
+        }
+
+        .ql-toolbar.ql-snow {
+            border-radius: 8px 8px 0 0;
+            border: 2px solid var(--border-color);
+            background-color: #f8fafc;
+        }
+
+        /* DataTables Styling */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 1rem 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 6px;
+            margin: 0 2px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                padding: 2rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .file-preview-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+
+            .file-preview {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Add this to your existing styles */
+        .btn .spinner-border {
+            vertical-align: middle;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .dataTables_wrapper .dt-buttons .btn {
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .dataTables_wrapper .dt-buttons .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Update button colors if needed */
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #047857);
+            color: white;
+            box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #047857, var(--success-color));
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_employee') }}">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link active"
+                            href="{{ url_for('manage_complaints') }}">Complaints</a></li>
+                    <li class="nav-item"><a class="nav-link"
+                            href="{{ url_for('manage_counseling_sessions') }}">Counseling</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('survey') }}">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user_management') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_backups') }}">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="page-header">
+                <h1><i class="fas fa-exclamation-circle me-3"></i>Complaint Management</h1>
+                <p>Comprehensive complaint tracking and resolution system</p>
+            </div>
+
+            <div class="table-responsive">
+                <table id="complaintsTable" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-ticket-alt me-2"></i>Ticket No.</th>
+                            <th><i class="fas fa-user me-2"></i>Employee</th>
+                            <th><i class="fas fa-id-badge me-2"></i>Designation</th>
+                            <th><i class="fas fa-tags me-2"></i>Category</th>
+                            <th><i class="fas fa-calendar me-2"></i>Date</th>
+                            <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in data %}
+                        <tr>
+                            <td class="{% if complaint.is_urgent %}urgent-ticket{% endif %}">
+                                {{ complaint.ticket_number }}
+                            </td>
+                            <td>{{ complaint.employee_name }}</td>
+                            <td>{{ complaint.designation }}</td>
+                            <td>{{ complaint.complaint_categories }}</td>
+                            <td>{{ complaint.date_entry }}</td>
+                            <td>
+                                <span class="status-badge status-{{ complaint.status|lower|replace(' ', '-') }}">
+                                    {{ complaint.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary view-btn me-2"
+                                    data-id="{{ complaint.ticket_number }}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complaint Details Modal -->
+    <div class="modal fade" id="complaintModal" tabindex="-1" aria-labelledby="complaintModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="complaintModalLabel">
+                        <i class="fas fa-exclamation-circle me-2"></i>Complaint Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Ticket Number:</strong> <span id="ticketNumber"></span></p>
+                                            <p><strong>Employee Name:</strong> <span id="employeeName"></span></p>
+                                            <p><strong>Designation:</strong> <span id="designation"></span></p>
+                                            <p><strong>Gender:</strong> <span id="gender"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Company:</strong> <span id="companyName"></span></p>
+                                            <p><strong>Office:</strong> <span id="officeName"></span></p>
+                                            <p><strong>Mobile:</strong> <span id="mobileNumber"></span></p>
+                                            <p><strong>Date of Issue:</strong> <span id="dateOfIssue"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-clipboard-list me-2"></i>Complaint Details</h5>
+                                    <p><strong>Category:</strong> <span id="complaintCategory"></span></p>
+                                    <p><strong>Concerned Department:</strong> <span id="concernedDepartment"></span></p>
+                                    <p><strong>Relevant Person:</strong> <span id="personIssue"></span></p>
+                                    <p><strong>Status:</strong> <span id="complaintStatus" class="status-badge"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-comment-alt me-2"></i>Complaint Description</h5>
+                                    <div id="additionalComments" class="ql-editor"></div>
+                                    <p><strong>Previous History:</strong> <span id="previousHistory"></span></p>
+                                    <p><strong>Proposed Solution:</strong> <span id="proposedSolution"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-folder-open me-2"></i>Files & Documents</h5>
+                                    <ul class="nav nav-tabs" id="fileTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="proof-tab" data-bs-toggle="tab"
+                                                data-bs-target="#proof" type="button" role="tab">
+                                                <i class="fas fa-camera me-2"></i>Proof
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="capa-tab" data-bs-toggle="tab"
+                                                data-bs-target="#capa" type="button" role="tab">
+                                                <i class="fas fa-tools me-2"></i>CAPA
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="capa1-tab" data-bs-toggle="tab"
+                                                data-bs-target="#capa1" type="button" role="tab">
+                                                <i class="fas fa-tools me-2"></i>CAPA 1
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="feedback-tab" data-bs-toggle="tab"
+                                                data-bs-target="#feedback" type="button" role="tab">
+                                                <i class="fas fa-comments me-2"></i>Feedback
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="feedback1-tab" data-bs-toggle="tab"
+                                                data-bs-target="#feedback1" type="button" role="tab">
+                                                <i class="fas fa-comment-dots me-2"></i>Feedback 1
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content mt-3" id="fileTabContent">
+                                        <div class="tab-pane fade show active" id="proof" role="tabpanel">
+                                            <div class="file-preview-container" id="proofFiles"></div>
+                                        </div>
+                                        <div class="tab-pane fade" id="capa" role="tabpanel">
+                                            <div class="file-preview-container" id="capaFiles"></div>
+                                        </div>
+                                        <div class="tab-pane fade" id="capa1" role="tabpanel">
+                                            <div class="file-preview-container" id="capa1Files"></div>
+                                        </div>
+                                        <div class="tab-pane fade" id="feedback" role="tabpanel">
+                                            <div class="file-preview-container" id="feedbackFiles"></div>
+                                        </div>
+                                        <div class="tab-pane fade" id="feedback1" role="tabpanel">
+                                            <div class="file-preview-container" id="feedback1Files"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-history me-2"></i>Timeline</h5>
+                                    <div class="timeline" id="complaintTimeline"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                    <button type="button" class="btn btn-primary" id="editComplaintBtn">
+                        <i class="fas fa-edit me-2"></i>Edit Complaint
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Complaint Modal -->
+    <div class="modal fade" id="editComplaintModal" tabindex="-1" aria-labelledby="editComplaintModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editComplaintModalLabel">
+                        <i class="fas fa-edit me-2"></i>Edit Complaint
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editComplaintForm">
+                        <input type="hidden" id="editComplaintNo">
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-info-circle"></i>Basic Information</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editTicketNumber" class="form-label required-field">Ticket
+                                            Number</label>
+                                        <input type="text" class="form-control" id="editTicketNumber" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editReferenceNumber" class="form-label required-field">Employee
+                                            ID</label>
+                                        <input type="text" class="form-control" id="editReferenceNumber" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editEmployeeName" class="form-label">Employee Name</label>
+                                        <input type="text" class="form-control" id="editEmployeeName" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editIsUrgent" class="form-label">Is Urgent?</label>
+                                        <select class="form-select" id="editIsUrgent">
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editIsAnonymous" class="form-label">Is Anonymous?</label>
+                                        <select class="form-select" id="editIsAnonymous">
+                                            <option value="0">No</option>
+                                            <option value="1">Yes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editMobileNumber" class="form-label required-field">Mobile
+                                            Number</label>
+                                        <input type="text" class="form-control" id="editMobileNumber" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editStatus" class="form-label required-field">Status</label>
+                                        <select class="form-select" id="editStatus" required>
+                                            <option value="Unprocessed">Unprocessed</option>
+                                            <option value="In Process">In Process</option>
+                                            <option value="Closed">Closed</option>
+                                            <option value="Bounced">Bounced</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Rejected">Rejected</option>
+                                            <option value="Bounced1">Bounced1</option>
+                                            <option value="Unapproved">Unapproved</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editDateOfIssue" class="form-label">Date of Issue</label>
+                                        <input type="datetime-local" class="form-control" id="editDateOfIssue">
+                                    </div>
+                                </div>
+                                <!-- Find this section in the edit modal form and change the readonly attribute -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editDateEntry" class="form-label">Date Entry</label>
+                                        <input type="datetime-local" class="form-control" id="editDateEntry">
+                                        <!-- Remove the 'readonly' attribute to make it editable -->
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editComplaintCategory" class="form-label required-field">Complaint
+                                            Category</label>
+                                        <input type="text" class="form-control" id="editComplaintCategory" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-clipboard-list"></i>Complaint Details</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editPersonIssue" class="form-label">Relevant Person</label>
+                                        <input type="text" class="form-control" id="editPersonIssue">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editConcernedDepartment" class="form-label">Concerned
+                                            Department</label>
+                                        <input type="text" class="form-control" id="editConcernedDepartment">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="editAdditionalComments" class="form-label">Additional
+                                            Comments</label>
+                                        <div id="editAdditionalCommentsEditor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editAdditionalComments">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="editPreviousHistory" class="form-label">Previous History</label>
+                                        <textarea class="form-control" id="editPreviousHistory" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="editProposedSolution" class="form-label">Proposed Solution</label>
+                                        <textarea class="form-control" id="editProposedSolution" rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-calendar-alt"></i>Timeline Dates</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editInProcessDate" class="form-label">In Process Date</label>
+                                        <input type="datetime-local" class="form-control" id="editInProcessDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editCapaDate" class="form-label">CAPA Date</label>
+                                        <input type="datetime-local" class="form-control" id="editCapaDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editCapa1Date" class="form-label">CAPA 1 Date</label>
+                                        <input type="datetime-local" class="form-control" id="editCapa1Date">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="editClosedDate" class="form-label">Closed Date</label>
+                                        <input type="datetime-local" class="form-control" id="editClosedDate">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editBouncedDate" class="form-label">Bounced Date</label>
+                                        <input type="datetime-local" class="form-control" id="editBouncedDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="editCompletedDate" class="form-label">Completed Date</label>
+                                        <input type="datetime-local" class="form-control" id="editCompletedDate">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <h5><i class="fas fa-search"></i>Root Cause Analysis</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editRca" class="form-label">Root Cause Analysis</label>
+                                        <div id="editRcaEditor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editRca">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editRca1" class="form-label">RCA 1</label>
+                                        <div id="editRca1Editor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editRca1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-section">
+                            <h5><i class="fas fa-tools"></i>CAPA Details</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editCapa" class="form-label">Corrective Action Plan</label>
+                                        <div id="editCapaEditor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editCapa">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editCapa1" class="form-label">CAPA 1</label>
+                                        <div id="editCapa1Editor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editCapa1">
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editCloseFeedback" class="form-label">Close Feedback</label>
+                                        <div id="editCloseFeedbackEditor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editCloseFeedback">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="editFeedback" class="form-label">Feedback</label>
+                                        <div id="editFeedbackEditor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editFeedback">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="editFeedback1" class="form-label">Feedback 1</label>
+                                        <div id="editFeedback1Editor" style="height: 200px;"></div>
+                                        <input type="hidden" id="editFeedback1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-folder-open"></i>File Management</h5>
+                            <div class="card">
+                                <div class="card-body">
+                                    <ul class="nav nav-tabs" id="editFileTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="edit-proof-tab" data-bs-toggle="tab"
+                                                data-bs-target="#edit-proof" type="button" role="tab">
+                                                <i class="fas fa-camera me-2"></i>Proof
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="edit-capa-tab" data-bs-toggle="tab"
+                                                data-bs-target="#edit-capa" type="button" role="tab">
+                                                <i class="fas fa-tools me-2"></i>CAPA
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="edit-capa1-tab" data-bs-toggle="tab"
+                                                data-bs-target="#edit-capa1" type="button" role="tab">
+                                                <i class="fas fa-tools me-2"></i>CAPA 1
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="edit-feedback-tab" data-bs-toggle="tab"
+                                                data-bs-target="#edit-feedback" type="button" role="tab">
+                                                <i class="fas fa-comments me-2"></i>Feedback
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="edit-feedback1-tab" data-bs-toggle="tab"
+                                                data-bs-target="#edit-feedback1" type="button" role="tab">
+                                                <i class="fas fa-comment-dots me-2"></i>Feedback 1
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content mt-3" id="editFileTabContent">
+                                        <div class="tab-pane fade show active" id="edit-proof" role="tabpanel">
+                                            <div class="file-preview-container" id="editProofFiles"></div>
+                                            <div class="mt-3">
+                                                <input type="file" id="editProofFileInput" class="d-none"
+                                                    accept="image/*,.pdf,.mp4,.avi,.mkv,.mov,.mp3,.opus"
+                                                    data-url="{{ url_for('upload_file') }}">
+                                                <button type="button" class="btn btn-sm file-upload-btn"
+                                                    onclick="document.getElementById('editProofFileInput').click()">
+                                                    <i class="fas fa-plus me-2"></i>Add Proof File
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="edit-capa" role="tabpanel">
+                                            <div class="file-preview-container" id="editCapaFiles"></div>
+                                            <div class="mt-3">
+                                                <input type="file" id="editCapaFileInput" class="d-none"
+                                                    accept="image/*,.pdf,.mp4,.avi,.mkv,.mov,.mp3,.opus">
+                                                <button type="button" class="btn btn-sm file-upload-btn"
+                                                    onclick="document.getElementById('editCapaFileInput').click()">
+                                                    <i class="fas fa-plus me-2"></i>Add CAPA File
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="edit-capa1" role="tabpanel">
+                                            <div class="file-preview-container" id="editCapa1Files"></div>
+                                            <div class="mt-3">
+                                                <input type="file" id="editCapa1FileInput" class="d-none"
+                                                    accept="image/*,.pdf,.mp4,.avi,.mkv,.mov,.mp3,.opus">
+                                                <button type="button" class="btn btn-sm file-upload-btn"
+                                                    onclick="document.getElementById('editCapa1FileInput').click()">
+                                                    <i class="fas fa-plus me-2"></i>Add CAPA 1 File
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="edit-feedback" role="tabpanel">
+                                            <div class="file-preview-container" id="editFeedbackFiles"></div>
+                                            <div class="mt-3">
+                                                <input type="file" id="editFeedbackFileInput" class="d-none"
+                                                    accept="image/*,.pdf,.mp4,.avi,.mkv,.mov,.mp3,.opus">
+                                                <button type="button" class="btn btn-sm file-upload-btn"
+                                                    onclick="document.getElementById('editFeedbackFileInput').click()">
+                                                    <i class="fas fa-plus me-2"></i>Add Feedback File
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="edit-feedback1" role="tabpanel">
+                                            <div class="file-preview-container" id="editFeedback1Files"></div>
+                                            <div class="mt-3">
+                                                <input type="file" id="editFeedback1FileInput" class="d-none"
+                                                    accept="image/*,.pdf,.mp4,.avi,.mkv,.mov,.mp3,.opus">
+                                                <button type="button" class="btn btn-sm file-upload-btn"
+                                                    onclick="document.getElementById('editFeedback1FileInput').click()">
+                                                    <i class="fas fa-plus me-2"></i>Add Feedback 1 File
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveComplaintChangesBtn">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Complaints Modal -->
+    <div class="modal fade" id="exportComplaintsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-download me-2"></i>Export Complaints to CSV
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportComplaintsForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-building me-2"></i>Select Buyers (Optional)
+                            </label>
+                            <div class="form-text mb-2">Leave unchecked to export all complaints</div>
+                            <div id="exportBuyerCheckboxes"
+                                style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 6px; padding: 10px;">
+                                <!-- Checkboxes will be loaded dynamically -->
+                                <div class="text-center text-muted py-2">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Loading buyers...
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary me-1"
+                                    id="selectAllBuyers">
+                                    <i class="fas fa-check-double me-1"></i>Select All
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="clearAllBuyers">
+                                    <i class="fas fa-times me-1"></i>Clear All
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="exportStartDate" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-2"></i>Start Date (Optional)
+                                </label>
+                                <input type="date" class="form-control" id="exportStartDate">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="exportEndDate" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-2"></i>End Date (Optional)
+                                </label>
+                                <input type="date" class="form-control" id="exportEndDate">
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Tip:</strong> Leave all filters empty to export all complaints.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-success" id="confirmExportBtn">
+                        <i class="fas fa-download me-2"></i>Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loading-circle">
+            <img src="{{ url_for('static', filename='images/FOS-Original.png') }}" alt="Loading..."
+                class="loading-logo">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <!-- Quill.js -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize Quill editors
+            const additionalCommentsEditor = new Quill('#editAdditionalCommentsEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'script': 'sub' }, { 'script': 'super' }],
+                        [{ 'indent': '-1' }, { 'indent': '+1' }],
+                        [{ 'direction': 'rtl' }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'font': [] }],
+                        [{ 'align': [] }],
+                        ['clean'],
+                        ['link', 'image', 'video']
+                    ]
+                },
+                placeholder: 'Enter complaint details...'
+            });
+
+            const capaEditor = new Quill('#editCapaEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter corrective action plan...'
+            });
+            const capa1Editor = new Quill('#editCapa1Editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter corrective action plan...'
+            });
+            const rcaEditor = new Quill('#editRcaEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter root cause analysis...'
+            });
+
+            const rca1Editor = new Quill('#editRca1Editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter RCA 1 details...'
+            });
+            const closeFeedbackEditor = new Quill('#editCloseFeedbackEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter Close Feedback details...'
+            });
+            const feedbackEditor = new Quill('#editFeedbackEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter Feedback details...'
+            });
+            const feedback1Editor = new Quill('#editFeedback1Editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['clean'],
+                        ['link', 'image']
+                    ]
+                },
+                placeholder: 'Enter Feedback1 details...'
+            });
+            // Update hidden inputs when editors change
+            additionalCommentsEditor.on('text-change', function () {
+                $('#editAdditionalComments').val(additionalCommentsEditor.root.innerHTML);
+            });
+            rcaEditor.on('text-change', function () {
+                $('#editRca').val(rcaEditor.root.innerHTML);
+            });
+
+            rca1Editor.on('text-change', function () {
+                $('#editRca1').val(rca1Editor.root.innerHTML);
+            });
+
+            capaEditor.on('text-change', function () {
+                $('#editCapa').val(capaEditor.root.innerHTML);
+            });
+            capa1Editor.on('text-change', function () {
+                $('#editCapa1').val(capa1Editor.root.innerHTML);
+            });
+            closeFeedbackEditor.on('text-change', function () {
+                $('#editCloseFeedback').val(closeFeedbackEditor.root.innerHTML);
+            });
+            feedbackEditor.on('text-change', function () {
+                $('#editFeedback').val(feedbackEditor.root.innerHTML);
+            });
+            feedback1Editor.on('text-change', function () {
+                $('#editFeedback1').val(feedback1Editor.root.innerHTML);
+            });
+            // Hide loading screen with fade effect
+            $('.loading-screen').fadeOut(1000);
+
+            // Initialize DataTable with enhanced styling
+            // Replace the existing DataTable initialization with this:
+            var complaintsTable = $('#complaintsTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        text: '<i class="fas fa-download me-2"></i>Export CSV',
+                        className: 'btn btn-success btn-sm',
+                        action: function (e, dt, node, config) {
+                            // Open export modal instead of direct download
+                            openExportModal();
+                        }
+                    }
+                ],
+                order: [[4, 'desc']],
+                responsive: true,
+                pageLength: 25,
+                language: {
+                    search: '<i class="fas fa-search me-2"></i>Search:',
+                    lengthMenu: 'Show _MENU_ entries per page',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ complaints',
+                    paginate: {
+                        first: '<i class="fas fa-angle-double-left"></i>',
+                        previous: '<i class="fas fa-angle-left"></i>',
+                        next: '<i class="fas fa-angle-right"></i>',
+                        last: '<i class="fas fa-angle-double-right"></i>'
+                    }
+                }
+            });
+
+            // Export Modal Functions
+            function openExportModal() {
+                // Load buyers for selection
+                loadBuyersForExport();
+                // Reset form
+                $('#exportComplaintsForm')[0].reset();
+                // Show modal
+                $('#exportComplaintsModal').modal('show');
+            }
+
+            function loadBuyersForExport() {
+                $.ajax({
+                    url: "{{ url_for('get_buyers_for_export') }}",
+                    method: 'GET',
+                    success: function (response) {
+                        var container = $('#exportBuyerCheckboxes');
+                        container.empty();
+                        if (response.buyers && response.buyers.length > 0) {
+                            response.buyers.forEach(function (buyer) {
+                                var checkboxHtml = `
+                                    <div class="form-check">
+                                        <input class="form-check-input buyer-checkbox" type="checkbox" 
+                                               value="${buyer.buyer_id}" id="buyer_${buyer.buyer_id}">
+                                        <label class="form-check-label" for="buyer_${buyer.buyer_id}">
+                                            ${buyer.buyer_name} <small class="text-muted">(ID: ${buyer.buyer_id})</small>
+                                        </label>
+                                    </div>
+                                `;
+                                container.append(checkboxHtml);
+                            });
+                        } else {
+                            container.html('<div class="text-center text-muted py-2">No buyers found</div>');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Failed to load buyers:', error);
+                        $('#exportBuyerCheckboxes').html('<div class="text-center text-danger py-2">Failed to load buyers</div>');
+                    }
+                });
+            }
+
+            // Select All / Clear All buttons
+            $('#selectAllBuyers').click(function () {
+                $('.buyer-checkbox').prop('checked', true);
+            });
+
+            $('#clearAllBuyers').click(function () {
+                $('.buyer-checkbox').prop('checked', false);
+            });
+
+            // Handle export button click
+            $('#confirmExportBtn').click(function () {
+                // Get all checked buyer checkboxes
+                var selectedBuyers = [];
+                $('.buyer-checkbox:checked').each(function () {
+                    selectedBuyers.push($(this).val());
+                });
+
+                var startDate = $('#exportStartDate').val();
+                var endDate = $('#exportEndDate').val();
+
+                // Build query string
+                var params = [];
+                if (selectedBuyers.length > 0) {
+                    params.push('buyers=' + selectedBuyers.join(','));
+                }
+                if (startDate) {
+                    params.push('startDate=' + startDate);
+                }
+                if (endDate) {
+                    params.push('endDate=' + endDate);
+                }
+
+                var url = "{{ url_for('export_complaints_csv_for_personal') }}";
+                if (params.length > 0) {
+                    url += '?' + params.join('&');
+                }
+
+                // Show loading
+                var btn = $(this);
+                var originalHtml = btn.html();
+                btn.html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Exporting...');
+                btn.prop('disabled', true);
+
+                // Trigger download
+                window.location.href = url;
+
+                // Reset button and close modal after delay
+                setTimeout(function () {
+                    btn.html(originalHtml);
+                    btn.prop('disabled', false);
+                    $('#exportComplaintsModal').modal('hide');
+                }, 2000);
+            });
+
+            // View complaint details
+            $('#complaintsTable').on('click', '.view-btn', function () {
+                var ticketNumber = $(this).data('id');
+                loadComplaintDetails(ticketNumber);
+                $('#complaintModal').modal('show');
+            });
+
+            // Edit complaint button
+            $('#editComplaintBtn').click(function () {
+                var ticketNumber = $('#ticketNumber').text();
+                loadComplaintForEdit(ticketNumber);
+            });
+
+
+
+
+            // Save edited complaint
+            $('#saveComplaintChangesBtn').click(function () {
+                saveComplaintChanges();
+            });
+
+            // Load file tabs when shown in view modal
+            $('#fileTabs button').on('shown.bs.tab', function (e) {
+                var tabId = $(e.target).attr('data-bs-target').substring(1);
+                var ticketNumber = $('#ticketNumber').text();
+                loadFiles(ticketNumber, tabId);
+            });
+
+            // Load file tabs when shown in edit modal
+            $('#editFileTabs button').on('shown.bs.tab', function (e) {
+                var tabId = $(e.target).attr('data-bs-target').substring(6); // Remove 'edit-' prefix
+                var ticketNumber = $('#editTicketNumber').val();
+                loadEditFiles(ticketNumber, tabId);
+            });
+
+            // File upload handlers for edit modal
+            $('#editProofFileInput').change(function () {
+                uploadFile('proof');
+            });
+
+            $('#editCapaFileInput').change(function () {
+                uploadFile('capa');
+            });
+
+            $('#editCapa1FileInput').change(function () {
+                uploadFile('capa1');
+            });
+
+            $('#editFeedbackFileInput').change(function () {
+                uploadFile('feedback');
+            });
+
+            $('#editFeedback1FileInput').change(function () {
+                uploadFile('feedback1');
+            });
+
+            // Functions
+            function loadComplaintDetails(ticketNumber) {
+                $.ajax({
+                    url: "{{ url_for('get_complaint_details_for_personal', ticket_number='') }}" + ticketNumber,
+                    method: 'GET',
+                    success: function (response) {
+                        if (response.error) {
+                            alert(response.error);
+                            return;
+                        }
+
+                        // Basic info
+                        $('#ticketNumber').text(response.ticket_number);
+                        $('#employeeName').text(response.employee_name);
+                        $('#designation').text(response.designation);
+                        $('#gender').text(response.gender);
+                        $('#companyName').text(response.company_name);
+                        $('#officeName').text(response.office_name);
+                        $('#mobileNumber').text(response.mobile_number);
+                        $('#dateOfIssue').text(response.date_of_issue);
+
+                        // Complaint details
+                        $('#complaintCategory').text(response.complaint_categories);
+                        $('#concernedDepartment').text(response.concerned_department);
+                        $('#personIssue').text(response.person_issue);
+                        $('#complaintStatus').text(response.status)
+                            .removeClass().addClass('status-badge')
+                            .addClass(`status-${response.status.toLowerCase().replace(' ', '-')}`);
+
+                        // Description
+                        $('#additionalComments').html(response.additional_comments || '');
+                        $('#previousHistory').text(response.previous_history);
+                        $('#proposedSolution').text(response.proposed_solution);
+
+                        // Load proof files by default
+                        loadFiles(ticketNumber, 'proof');
+
+                        // Build timeline
+                        buildTimeline(response);
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading complaint details: ' + error);
+                    }
+                });
+            }
+
+            function loadFiles(ticketNumber, fileCategory) {
+                var containerId = `${fileCategory}Files`;
+                $(`#${containerId}`).html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2">Loading files...</p></div>');
+
+                $.ajax({
+                    url: "{{ url_for('get_complaint_files', ticket_number='', file_category='') }}" + ticketNumber + "/" + fileCategory,
+                    method: 'GET',
+                    success: function (response) {
+                        if (response.error) {
+                            $(`#${containerId}`).html(`<div class="text-center text-muted"><i class="fas fa-exclamation-circle fa-2x"></i><p class="mt-2">${response.error}</p></div>`);
+                            return;
+                        }
+
+                        if (response.files.length === 0) {
+                            $(`#${containerId}`).html('<div class="text-center text-muted"><i class="fas fa-folder-open fa-2x"></i><p class="mt-2">No files found</p></div>');
+                            return;
+                        }
+
+                        var html = '';
+                        response.files.forEach(function (file) {
+                            if (file.type === 'image') {
+                                html += `
+                                    <div class="file-preview" onclick="window.open('${file.url}', '_blank')">
+                                        <img src="${file.url}" alt="${file.filename}" loading="lazy">
+                                        <div class="delete-btn" onclick="deleteFile('${ticketNumber}', '${fileCategory}', '${file.filename}')">
+                                            <i class="fas fa-times"></i>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                var iconClass = 'fa-file';
+                                if (file.type === 'pdf') iconClass = 'fa-file-pdf';
+                                if (file.type === 'video') iconClass = 'fa-file-video';
+                                if (file.type === 'audio') iconClass = 'fa-file-audio';
+
+                                html += `
+                                    <div class="file-preview" onclick="window.open('${file.url}', '_blank')">
+                                        <div class="file-icon">
+                                            <i class="fas ${iconClass}"></i>
+                                        </div>
+                                        <div class="delete-btn" onclick="deleteFile('${ticketNumber}', '${fileCategory}', '${file.filename}')">
+                                            <i class="fas fa-times"></i>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+
+                        $(`#${containerId}`).html(html);
+                    },
+                    error: function (xhr, status, error) {
+                        $(`#${containerId}`).html(`<div class="text-center text-danger"><i class="fas fa-exclamation-triangle fa-2x"></i><p class="mt-2">Error loading files: ${error}</p></div>`);
+                    }
+                });
+            }
+
+            function buildTimeline(complaint) {
+                var timelineHtml = '';
+
+                // Date Entry
+                if (complaint.date_entry) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.date_entry}</div>
+                                <h6 class="timeline-title">Complaint Registered</h6>
+                                <p>Complaint was registered in the system</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // In Process
+                if (complaint.in_process_date) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.in_process_date}</div>
+                                <h6 class="timeline-title">Complaint In Process</h6>
+                                <p>Complaint processing started</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // CAPA
+                if (complaint.capa_date) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.capa_date}</div>
+                                <h6 class="timeline-title">Corrective Action</h6>
+                                <div class="ql-editor">${complaint.capa || 'No CAPA provided'}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // CAPA 1
+                if (complaint.capa1_date) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.capa1_date}</div>
+                                <h6 class="timeline-title">CAPA 1</h6>
+                                <p>${complaint.capa1 || 'No CAPA 1 provided'}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Closed
+                if (complaint.closed_date) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.closed_date}</div>
+                                <h6 class="timeline-title">Complaint Closed</h6>
+                                <p>${complaint.close_feedback || 'No feedback provided'}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Completed
+                if (complaint.completed_date) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.completed_date}</div>
+                                <h6 class="timeline-title">Complaint Completed</h6>
+                                <p>Complainant was satisfied with resolution</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Bounced
+                if (complaint.bounced_date) {
+                    timelineHtml += `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-date">${complaint.bounced_date}</div>
+                                <h6 class="timeline-title">Complaint Bounced</h6>
+                                <p>Complaint was returned for additional information</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                $('#complaintTimeline').html(timelineHtml);
+            }
+
+            function loadComplaintForEdit(ticketNumber) {
+                $.ajax({
+                    url: "{{ url_for('get_complaint_details_for_personal', ticket_number='') }}" + ticketNumber,
+                    method: 'GET',
+                    success: function (response) {
+                        if (response.error) {
+                            alert(response.error);
+                            return;
+                        }
+
+                        // Basic info
+                        $('#editComplaintNo').val(response.complaint_no);
+                        $('#editTicketNumber').val(response.ticket_number);
+                        $('#editReferenceNumber').val(response.reference_number);
+                        $('#editEmployeeName').val(response.employee_name);
+                        $('#editIsUrgent').val(response.is_urgent);
+                        $('#editIsAnonymous').val(response.is_anonymous);
+                        $('#editMobileNumber').val(response.mobile_number);
+                        $('#editStatus').val(response.status);
+                        $('#editComplaintCategory').val(response.complaint_categories);
+                        $('#editPersonIssue').val(response.person_issue);
+                        $('#editConcernedDepartment').val(response.concerned_department);
+                        $('#editPreviousHistory').val(response.previous_history);
+                        $('#editProposedSolution').val(response.proposed_solution);
+
+                        // Set Quill editors content
+                        additionalCommentsEditor.root.innerHTML = response.additional_comments || '';
+                        capaEditor.root.innerHTML = response.capa || '';
+                        capa1Editor.root.innerHTML = response.capa1 || '';
+                        rcaEditor.root.innerHTML = response.rca || '';
+                        rca1Editor.root.innerHTML = response.rca1 || '';
+                        closeFeedbackEditor.root.innerHTML = response.close_feedback || '';
+                        feedbackEditor.root.innerHTML = response.feedback || '';
+                        feedback1Editor.root.innerHTML = response.feedback1 || '';
+
+                        // Dates
+                        $('#editDateOfIssue').val(response.date_of_issue ? response.date_of_issue.replace(' ', 'T') : '');
+                        $('#editDateEntry').val(response.date_entry ? response.date_entry.replace(' ', 'T') : '');
+                        $('#editInProcessDate').val(response.in_process_date ? response.in_process_date.replace(' ', 'T') : '');
+                        $('#editCapaDate').val(response.capa_date ? response.capa_date.replace(' ', 'T') : '');
+                        $('#editCapa1Date').val(response.capa1_date ? response.capa1_date.replace(' ', 'T') : '');
+                        $('#editClosedDate').val(response.closed_date ? response.closed_date.replace(' ', 'T') : '');
+                        $('#editBouncedDate').val(response.bounced_date ? response.bounced_date.replace(' ', 'T') : '');
+                        $('#editCompletedDate').val(response.completed_date ? response.completed_date.replace(' ', 'T') : '');
+
+                        // CAPA and Feedback
+                        $('#editCapa1').val(response.capa1);
+                        $('#editCloseFeedback').val(response.close_feedback);
+                        $('#editFeedback').val(response.feedback);
+                        $('#editFeedback1').val(response.feedback1);
+
+                        // Load files
+                        loadEditFiles(ticketNumber, 'proof');
+
+                        // Show modal
+                        $('#complaintModal').modal('hide');
+                        $('#editComplaintModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading complaint for edit: ' + error);
+                    }
+                });
+            }
+
+            function loadEditFiles(ticketNumber, fileCategory) {
+                var containerId = `edit${fileCategory.charAt(0).toUpperCase() + fileCategory.slice(1)}Files`;
+                $(`#${containerId}`).html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i><p class="mt-2">Loading files...</p></div>');
+
+                $.ajax({
+                    url: "{{ url_for('get_complaint_files', ticket_number='', file_category='') }}" + ticketNumber + "/" + fileCategory,
+                    method: 'GET',
+                    success: function (response) {
+                        if (response.error) {
+                            $(`#${containerId}`).html(`<div class="text-center text-muted"><i class="fas fa-exclamation-circle fa-2x"></i><p class="mt-2">${response.error}</p></div>`);
+                            return;
+                        }
+
+                        if (response.files.length === 0) {
+                            $(`#${containerId}`).html('<div class="text-center text-muted"><i class="fas fa-folder-open fa-2x"></i><p class="mt-2">No files found</p></div>');
+                            return;
+                        }
+
+                        var html = '';
+                        response.files.forEach(function (file) {
+                            if (file.type === 'image') {
+                                html += `
+                                    <div class="file-preview" onclick="window.open('${file.url}', '_blank')">
+                                        <img src="${file.url}" alt="${file.filename}" loading="lazy">
+                                        <div class="delete-btn" onclick="deleteFile('${ticketNumber}', '${fileCategory}', '${file.filename}')">
+                                            <i class="fas fa-times"></i>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                var iconClass = 'fa-file';
+                                if (file.type === 'pdf') iconClass = 'fa-file-pdf';
+                                if (file.type === 'video') iconClass = 'fa-file-video';
+                                if (file.type === 'audio') iconClass = 'fa-file-audio';
+
+                                html += `
+                                    <div class="file-preview" onclick="window.open('${file.url}', '_blank')">
+                                        <div class="file-icon">
+                                            <i class="fas ${iconClass}"></i>
+                                        </div>
+                                        <div class="delete-btn" onclick="deleteFile('${ticketNumber}', '${fileCategory}', '${file.filename}')">
+                                            <i class="fas fa-times"></i>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+
+                        $(`#${containerId}`).html(html);
+                    },
+                    error: function (xhr, status, error) {
+                        $(`#${containerId}`).html(`<div class="text-center text-danger"><i class="fas fa-exclamation-triangle fa-2x"></i><p class="mt-2">Error loading files: ${error}</p></div>`);
+                    }
+                });
+            }
+
+            function uploadFile(fileCategory) {
+                var inputId = `edit${fileCategory.charAt(0).toUpperCase() + fileCategory.slice(1)}FileInput`;
+                var fileInput = document.getElementById(inputId);
+                var ticketNumber = $('#editTicketNumber').val();
+
+                if (fileInput.files.length === 0) return;
+
+                var formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('ticket_number', ticketNumber);
+                formData.append('capa_type', fileCategory);
+
+                // Find the next available file index
+                var existingFiles = $(`#edit${fileCategory.charAt(0).toUpperCase() + fileCategory.slice(1)}Files .file-preview`).length;
+                formData.append('file_index', existingFiles + 1);
+
+                $.ajax({
+                    url: "{{ url_for('upload_file') }}",
+                    method: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response.error) {
+                            alert(response.error);
+                            return;
+                        }
+
+                        alert('File uploaded successfully');
+                        loadEditFiles(ticketNumber, fileCategory);
+                        fileInput.value = ''; // Reset file input
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error uploading file: ' + error);
+                        fileInput.value = ''; // Reset file input
+                    }
+                });
+            }
+
+            function saveComplaintChanges() {
+                // Validate required fields
+                if (!$('#editTicketNumber').val() || !$('#editReferenceNumber').val() ||
+                    !$('#editMobileNumber').val() || !$('#editStatus').val() ||
+                    !$('#editComplaintCategory').val()) {
+                    alert('Please fill in all required fields (marked with *)');
+                    return;
+                }
+
+                // Get the Quill editor content properly
+                var additionalCommentsHtml = additionalCommentsEditor.root.innerHTML;
+                var capaHtml = capaEditor.root.innerHTML;
+                var capa1Html = capa1Editor.root.innerHTML;
+                var rcaHtml = rcaEditor.root.innerHTML;
+                var rca1Html = rca1Editor.root.innerHTML;
+                var closeFeedbackHtml = closeFeedbackEditor.root.innerHTML;
+                var feedbackHtml = feedbackEditor.root.innerHTML;
+                var feedback1Html = feedback1Editor.root.innerHTML;
+
+                var formData = {
+                    complaint_no: $('#editComplaintNo').val(),
+                    ticket_number: $('#editTicketNumber').val(),
+                    reference_number: $('#editReferenceNumber').val(),
+                    is_urgent: $('#editIsUrgent').val(),
+                    is_anonymous: $('#editIsAnonymous').val(),
+                    date_entry: $('#editDateEntry').val() ? $('#editDateEntry').val().replace('T', ' ') : null,
+                    mobile_number: $('#editMobileNumber').val(),
+                    status: $('#editStatus').val(),
+                    complaint_categories: $('#editComplaintCategory').val(),
+                    person_issue: $('#editPersonIssue').val(),
+                    concerned_department: $('#editConcernedDepartment').val(),
+                    additional_comments: additionalCommentsHtml,
+                    previous_history: $('#editPreviousHistory').val(),
+                    proposed_solution: $('#editProposedSolution').val(),
+                    date_of_issue: $('#editDateOfIssue').val() ? $('#editDateOfIssue').val().replace('T', ' ') : null,
+                    in_process_date: $('#editInProcessDate').val() ? $('#editInProcessDate').val().replace('T', ' ') : null,
+                    capa_date: $('#editCapaDate').val() ? $('#editCapaDate').val().replace('T', ' ') : null,
+                    capa1_date: $('#editCapa1Date').val() ? $('#editCapa1Date').val().replace('T', ' ') : null,
+                    closed_date: $('#editClosedDate').val() ? $('#editClosedDate').val().replace('T', ' ') : null,
+                    bounced_date: $('#editBouncedDate').val() ? $('#editBouncedDate').val().replace('T', ' ') : null,
+                    completed_date: $('#editCompletedDate').val() ? $('#editCompletedDate').val().replace('T', ' ') : null,
+                    capa: capaHtml,
+                    capa1: capa1Html,
+                    rca: rcaHtml,
+                    rca1: rca1Html,
+                    close_feedback: closeFeedbackHtml,
+                    feedback: feedbackHtml,
+                    feedback1: feedback1Html
+                };
+
+                var ticketNumber = $('#editTicketNumber').val();
+
+                $.ajax({
+                    url: "{{ url_for('update_complaint_for_personal', ticket_number='') }}" + ticketNumber,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        if (response.error) {
+                            alert(response.error);
+                            return;
+                        }
+
+                        alert('Complaint updated successfully');
+                        $('#editComplaintModal').modal('hide');
+                        location.reload(); // Reload page to show updated data
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error updating complaint: ' + error);
+                    }
+                });
+            }
+
+
+        });
+
+        // Global function for file deletion
+        function deleteFile(ticketNumber, fileCategory, filename) {
+            if (!confirm('Are you sure you want to delete this file?')) return;
+
+            $.ajax({
+                url: "{{ url_for('delete_uploaded_file') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    filepath: `static/images/capa_images/${filename}`
+                }),
+                success: function (response) {
+                    if (response.error) {
+                        alert(response.error);
+                        return;
+                    }
+
+                    alert('File deleted successfully');
+                    // Reload files in both modals
+                    if ($('#complaintModal').hasClass('show')) {
+                        loadFiles(ticketNumber, fileCategory);
+                    }
+                    if ($('#editComplaintModal').hasClass('show')) {
+                        loadEditFiles(ticketNumber, fileCategory);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Error deleting file: ' + error);
+                }
+            });
+        }
+
+        // Add smooth scrolling for better UX
+        $('html').css('scroll-behavior', 'smooth');
+
+        // Add tooltips for better user experience
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+</body>
+
+</html>

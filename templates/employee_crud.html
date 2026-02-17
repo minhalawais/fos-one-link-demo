@@ -1,0 +1,3333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap5.min.css" rel="stylesheet">
+    <!-- Shared Personal Dashboard Styles -->
+    <link href="{{ url_for('static', filename='css/personal-dashboard.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+        }
+
+        .navbar {
+            background-color: var(--primary1-color) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-buttons {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            border-radius: 6px;
+            margin: 0.25rem;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+            border-color: #047857;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 6px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #4da570;
+            border-color: #4da570;
+            transform: translateY(-1px);
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            border-bottom: none;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .table thead th {
+            background-color: var(--primary1-color);
+            color: white;
+            border: none;
+            font-weight: 500;
+            padding: 1rem 0.75rem;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary1-color) 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .stats-section .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Wizard Styles */
+        .match-option-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .match-option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .match-option-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(96, 186, 129, 0.05);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color) !important;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(96, 186, 129, 0.05) !important;
+        }
+
+        .wizard-step {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .log-console::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .log-console::-webkit-scrollbar-track {
+            background: #333;
+        }
+
+        .log-console::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+
+        /* Required Columns Section - Compact Premium Styles */
+        .required-columns-section {
+            background: #FFFFFF;
+            border-radius: 8px;
+            border: 1px solid #DEE2E6;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .required-columns-header {
+            background: linear-gradient(135deg, #284952 0%, #1a3038 100%);
+            padding: 0.5rem 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .required-columns-header i {
+            font-size: 0.8rem;
+            color: #60BA81;
+        }
+
+        .required-columns-header h6 {
+            margin: 0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            letter-spacing: 0.2px;
+        }
+
+        .required-columns-body {
+            padding: 0.75rem;
+        }
+
+        .columns-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .columns-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .columns-group-label {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .column-type-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.375rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-radius: 3px;
+        }
+
+        .column-type-badge.required {
+            background: #dc3545;
+            color: #FFFFFF;
+        }
+
+        .column-type-badge.optional {
+            background: #60BA81;
+            color: #FFFFFF;
+        }
+
+        .column-type-badge.auto {
+            background: #F5A83C;
+            color: #FFFFFF;
+        }
+
+        .columns-group-desc {
+            font-size: 0.65rem;
+            color: #767676;
+        }
+
+        .column-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .column-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 500;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+
+        .column-tag.required {
+            background: rgba(220, 53, 69, 0.08);
+            color: #dc3545;
+            border-color: rgba(220, 53, 69, 0.15);
+        }
+
+        .column-tag.optional {
+            background: rgba(96, 186, 129, 0.1);
+            color: #2d8a4e;
+            border-color: rgba(96, 186, 129, 0.2);
+        }
+
+        .column-tag.dynamic {
+            background: linear-gradient(135deg, rgba(40, 73, 82, 0.08) 0%, rgba(96, 186, 129, 0.1) 100%);
+            color: #284952;
+            border-color: #284952;
+            font-weight: 600;
+        }
+
+        .required-columns-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.375rem;
+            padding: 0.375rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            margin-top: 0.5rem;
+        }
+
+        .required-columns-note.info {
+            background: rgba(40, 73, 82, 0.04);
+            border: 1px solid rgba(40, 73, 82, 0.1);
+            color: #284952;
+        }
+
+        .required-columns-note.success {
+            background: rgba(96, 186, 129, 0.06);
+            border: 1px solid rgba(96, 186, 129, 0.15);
+            color: #2d8a4e;
+        }
+
+        .required-columns-note.warning {
+            background: rgba(245, 168, 60, 0.06);
+            border: 1px solid rgba(245, 168, 60, 0.15);
+            color: #b87c1d;
+        }
+
+        .required-columns-note i {
+            font-size: 0.7rem;
+            margin-top: 0.05rem;
+        }
+
+        .required-columns-note strong {
+            font-weight: 600;
+        }
+
+        .columns-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #DEE2E6 50%, transparent 100%);
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link active"
+                            href="{{ url_for('manage_employee') }}">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_complaints') }}">Complaints</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link"
+                            href="{{ url_for('manage_counseling_sessions') }}">Counseling</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('survey') }}">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user_management') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_backups') }}">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="stats-section">
+                <div class="content">
+                    <h1 class="page-title">
+                        <i class="fas fa-users me-3"></i>Employee Management System
+                    </h1>
+                    <p class="page-subtitle">Manage employee records, generate cards, and handle bulk operations</p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card" id="totalEmployeesCard">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <span class="stat-number" id="totalEmployees">0</span>
+                            <div class="stat-label">Total Employees</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                            <span class="stat-number" id="activeEmployees">0</span>
+                            <div class="stat-label">Active Employees</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-user-minus"></i></div>
+                            <span class="stat-number" id="leftEmployees">0</span>
+                            <div class="stat-label">Left Employees</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <!-- Updated buttons to open wizard modals instead of direct file inputs -->
+                    <button class="btn btn-success" onclick="openAddManualWizard()">
+                        <i class="fas fa-plus me-2"></i>Add Manually
+                    </button>
+
+                    <button class="btn btn-success" onclick="openLeaversJoinersWizard()">
+                        <i class="fas fa-download me-2"></i>Download Joiners/Leavers
+                    </button>
+
+                    <button class="btn btn-success" onclick="openUpdateWizard()">
+                        <i class="fas fa-sync-alt me-2"></i>Update Employees
+                    </button>
+
+                    <button class="btn btn-success" onclick="openAddLeaversWizard()">
+                        <i class="fas fa-user-minus me-2"></i>Add Leavers
+                    </button>
+
+                    <button class="btn btn-success" onclick="openAddJoinersWizard()">
+                        <i class="fas fa-user-plus me-2"></i>Add Joiners
+                    </button>
+
+                    <button class="btn btn-success" onclick="openGenerateCardsWizard()">
+                        <i class="fas fa-id-card me-2"></i>Generate Cards
+                    </button>
+                </div>
+            </div>
+
+            <!-- Employee Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="fas fa-table me-2"></i>Employee Records</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="employeeTable" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Worker Type</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Mobile Number</th>
+                                    <th>Gender</th>
+                                    <th>Company Name</th>
+                                    <th>CNIC</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Employee Wizard Modal -->
+    <div class="modal fade" id="updateEmployeeWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-sync-alt me-2"></i>Update Employees</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Step 1: Match Column Selection -->
+                    <div id="step-match-column" class="wizard-step p-4">
+                        <h6 class="text-center mb-4">Select the column to match employees by:</h6>
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card h-100 match-option-card" onclick="selectMatchColumn('cnic_no', this)">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-id-card fa-2x mb-3 text-primary"></i>
+                                        <h5>CNIC Number</h5>
+                                        <p class="small text-muted">Match using Computerized National Identity Card</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 match-option-card"
+                                    onclick="selectMatchColumn('company_id', this)">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-building fa-2x mb-3 text-success"></i>
+                                        <h5>Company ID</h5>
+                                        <p class="small text-muted">Match using your internal Company ID</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 match-option-card"
+                                    onclick="selectMatchColumn('employee_id', this)">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-tag fa-2x mb-3 text-info"></i>
+                                        <h5>Employee ID</h5>
+                                        <p class="small text-muted">Match using System Employee ID</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary disabled" id="btn-step1-next"
+                                onclick="showStep('upload')">Next <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: File Upload -->
+                    <div id="step-upload" class="wizard-step p-4 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="showStep('match-column')"><i
+                                    class="fas fa-arrow-left me-1"></i> Back</button>
+                            <h6 class="m-0">Upload Data File</h6>
+                            <div style="width: 60px;"></div> <!-- Spacer -->
+                        </div>
+
+                        <!-- Required Columns Info - Premium Design -->
+                        <div class="required-columns-section">
+                            <div class="required-columns-header">
+                                <i class="fas fa-table"></i>
+                                <h6>Required Excel/CSV Columns</h6>
+                            </div>
+                            <div class="required-columns-body">
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge required">Required</span>
+                                        <span class="columns-group-desc">Must be present in your file</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag required">employee_name</span>
+                                        <span class="column-tag required">worker_type</span>
+                                        <span class="column-tag required">department</span>
+                                        <span class="column-tag required">designation</span>
+                                        <span class="column-tag required">mobile_number</span>
+                                        <span class="column-tag required">gender</span>
+                                        <span class="column-tag required">office_id</span>
+                                        <span class="column-tag required">temp_data</span>
+                                        <span class="column-tag required">cnic_no</span>
+                                        <span class="column-tag required">company_id</span>
+                                        <span class="column-tag required">employee_left</span>
+                                        <span class="column-tag dynamic" id="update-match-column-badge">cnic_no</span>
+                                    </div>
+                                </div>
+                                <div class="required-columns-note info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span><strong>Match Column:</strong> The selected column (<span
+                                            id="update-match-column-name">cnic_no</span>) will be used to identify and
+                                        match existing employees in the database.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-area p-5 text-center border rounded bg-light" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="mb-2">Upload Employee Data</h5>
+                            <p class="text-muted mb-4">Drag and drop your file here or click to browse</p>
+                            <input type="file" id="wizardFileInput" class="d-none" accept=".xlsx, .csv">
+                            <button class="btn btn-primary px-4" onclick="$('#wizardFileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>Browse File
+                            </button>
+                            <p class="mt-3 small text-muted">Supported formats: Excel (.xlsx), CSV (.csv)</p>
+                            <div id="selected-file-name" class="mt-3 text-primary fw-bold d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Validation & Stats -->
+                    <div id="step-validation" class="wizard-step p-4 d-none">
+                        <div class="text-center py-5" id="validating-spinner">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"
+                                role="status"></div>
+                            <h5>Validating File...</h5>
+                            <p class="text-muted">Checking columns and data integrity</p>
+                        </div>
+
+                        <div id="validation-stats" class="d-none">
+                            <h5 class="mb-4 text-center">File Analysis Results</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <div class="p-3 border rounded bg-light text-center h-100">
+                                        <strong class="d-block h3 mb-1" id="stat-total">0</strong>
+                                        <span class="small text-muted text-uppercase fw-bold">Total Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="p-3 border rounded bg-success-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-success" id="stat-updates">0</strong>
+                                        <span class="small text-success text-uppercase fw-bold">Updates</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="p-3 border rounded bg-info-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-info" id="stat-inserts">0</strong>
+                                        <span class="small text-info text-uppercase fw-bold">New Records</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="p-3 border rounded bg-danger-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-danger" id="stat-errors">0</strong>
+                                        <span class="small text-danger text-uppercase fw-bold">Errors</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning d-none" id="validation-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="validation-warning-msg"></span>
+                            </div>
+
+                            <!-- Added error details section -->
+                            <div id="error-details-section" class="d-none mb-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-10">
+                                        <div class="card border-danger">
+                                            <div
+                                                class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-exclamation-triangle me-2"></i>Error
+                                                    Details</span>
+                                                <button class="btn btn-sm btn-light" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#errorDetailsCollapse">
+                                                    <i class="fas fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                            <div class="collapse show" id="errorDetailsCollapse">
+                                                <div class="card-body">
+                                                    <div class="alert alert-warning mb-3">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <small>Showing up to 20 errors. Review and fix these rows in
+                                                            your file.</small>
+                                                    </div>
+                                                    <div id="error-details-list" class="small font-monospace"
+                                                        style="max-height: 300px; overflow-y: auto;">
+                                                        <!-- Error details will be populated here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-outline-secondary" onclick="showStep('upload')">Cancel</button>
+                                <button class="btn btn-primary px-4" onclick="startProcessing()">
+                                    Continue & Process <i class="fas fa-check ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Processing -->
+                    <div id="step-processing" class="wizard-step p-4 d-none">
+                        <h5 class="text-center mb-4">Processing Employees</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="process-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span id="process-status-text">Starting...</span>
+                            <span id="process-count">0/0</span>
+                        </div>
+
+                        <div class="log-console border rounded p-3 bg-dark text-light small font-monospace"
+                            style="height: 200px; overflow-y: auto;" id="process-logs">
+                            <div class="text-muted">> Ready to start...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Results -->
+                    <div id="step-results" class="wizard-step p-4 d-none">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                            <h4>Update Completed Successfully</h4>
+                            <p class="text-muted">The employee database has been updated.</p>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-file-alt me-2 text-muted"></i>Total Processed</span>
+                                            <span class="badge bg-primary rounded-pill fs-6" id="result-total">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-sync me-2 text-success"></i>Successful Updates</span>
+                                            <span class="badge bg-success rounded-pill fs-6"
+                                                id="result-updates">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-plus me-2 text-info"></i>New Records Added</span>
+                                            <span class="badge bg-info rounded-pill fs-6" id="result-inserts">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-times me-2 text-danger"></i>Failed Rows</span>
+                                            <span class="badge bg-danger rounded-pill fs-6" id="result-errors">0</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Added error details section -->
+                        <div id="error-details-section" class="d-none mb-4">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10">
+                                    <div class="card border-danger">
+                                        <div
+                                            class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-exclamation-triangle me-2"></i>Error Details</span>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#errorDetailsCollapse">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                        <div class="collapse show" id="errorDetailsCollapse">
+                                            <div class="card-body">
+                                                <div class="alert alert-warning mb-3">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <small>Showing up to 20 errors. Review and fix these rows in your
+                                                        file.</small>
+                                                </div>
+                                                <div id="error-details-list" class="small font-monospace"
+                                                    style="max-height: 300px; overflow-y: auto;">
+                                                    <!-- Error details will be populated here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary px-5" data-bs-dismiss="modal" onclick="location.reload()">
+                                Close & Refresh Table
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added Download Joiners/Leavers Wizard Modal -->
+    <div class="modal fade" id="leaversJoinersWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-download me-2"></i>Download Joiners/Leavers Report</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Step 1: Match Column Selection -->
+                    <div id="lj-step-match-column" class="wizard-step p-4">
+                        <h6 class="text-center mb-4">Select the column to match employees by:</h6>
+                        <div class="row g-3 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card h-100 match-option-card"
+                                    onclick="selectLJMatchColumn('cnic_no', this)">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-id-card fa-2x mb-3 text-primary"></i>
+                                        <h5>CNIC Number</h5>
+                                        <p class="small text-muted">Match using Computerized National Identity Card</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 match-option-card"
+                                    onclick="selectLJMatchColumn('company_id', this)">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-building fa-2x mb-3 text-success"></i>
+                                        <h5>Company ID</h5>
+                                        <p class="small text-muted">Match using your internal Company ID</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 match-option-card"
+                                    onclick="selectLJMatchColumn('employee_id', this)">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-tag fa-2x mb-3 text-info"></i>
+                                        <h5>Employee ID</h5>
+                                        <p class="small text-muted">Match using System Employee ID</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary disabled" id="btn-lj-step1-next"
+                                onclick="showLJStep('upload')">Next <i class="fas fa-arrow-right ms-2"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: File Upload -->
+                    <div id="lj-step-upload" class="wizard-step p-4 d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="showLJStep('match-column')"><i
+                                    class="fas fa-arrow-left me-1"></i> Back</button>
+                            <h6 class="m-0">Upload Current Employee Data</h6>
+                            <div style="width: 60px;"></div>
+                        </div>
+
+                        <!-- Required Columns Info - Premium Design -->
+                        <div class="required-columns-section">
+                            <div class="required-columns-header">
+                                <i class="fas fa-table"></i>
+                                <h6>Required Excel/CSV Columns</h6>
+                            </div>
+                            <div class="required-columns-body">
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge required">Required</span>
+                                        <span class="columns-group-desc">Must be present in your file</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag required">office_id</span>
+                                        <span class="column-tag required">employee_name</span>
+                                        <span class="column-tag dynamic" id="lj-match-column-badge">cnic_no</span>
+                                    </div>
+                                </div>
+                                <div class="columns-divider"></div>
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge optional">Optional</span>
+                                        <span class="columns-group-desc">Improves data comparison accuracy</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag optional">mobile_number</span>
+                                        <span class="column-tag optional">department</span>
+                                        <span class="column-tag optional">designation</span>
+                                    </div>
+                                </div>
+                                <div class="required-columns-note info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span><strong>Match Column:</strong> The selected column (<span
+                                            id="lj-match-column-name">cnic_no</span>) will be used to compare employees
+                                        between your file and the database.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-area p-5 text-center border rounded bg-light" id="lj-drop-zone">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="mb-2">Upload Employee Data File</h5>
+                            <p class="text-muted mb-4">Upload your current employee list to compare with database</p>
+                            <input type="file" id="ljWizardFileInput" class="d-none" accept=".xlsx, .csv">
+                            <button class="btn btn-primary px-4" onclick="$('#ljWizardFileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>Browse File
+                            </button>
+                            <p class="mt-3 small text-muted">Supported formats: Excel (.xlsx), CSV (.csv)</p>
+                            <div id="lj-selected-file-name" class="mt-3 text-primary fw-bold d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Validation & Stats -->
+                    <div id="lj-step-validation" class="wizard-step p-4 d-none">
+                        <div class="text-center py-5" id="lj-validating-spinner">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"
+                                role="status"></div>
+                            <h5>Analyzing Data...</h5>
+                            <p class="text-muted">Comparing with database records</p>
+                        </div>
+
+                        <div id="lj-validation-stats" class="d-none">
+                            <h5 class="mb-4 text-center">Analysis Results</h5>
+                            <div class="alert alert-info mb-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Note:</strong> This will generate 3 files for download. No database changes will
+                                be made.
+                            </div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-light text-center h-100">
+                                        <strong class="d-block h3 mb-1" id="lj-stat-total">0</strong>
+                                        <span class="small text-muted text-uppercase fw-bold">Total Rows in File</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-success-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-success" id="lj-stat-offices">0</strong>
+                                        <span class="small text-success text-uppercase fw-bold">Unique Offices</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-info-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-info" id="lj-stat-columns">0</strong>
+                                        <span class="small text-info text-uppercase fw-bold">Columns Found</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-file-download me-2"></i>Files to be
+                                        Generated:</h6>
+                                    <ul class="mb-0">
+                                        <li><strong>Leavers:</strong> Employees in database but not in your file</li>
+                                        <li><strong>Joiners:</strong> Employees in your file but not in database</li>
+                                        <li><strong>Employees to Update:</strong> Employees with data differences</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-outline-secondary" onclick="showLJStep('upload')">Cancel</button>
+                                <button class="btn btn-primary px-4" onclick="startLJProcessing()">
+                                    Generate & Download <i class="fas fa-download ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Processing -->
+                    <div id="lj-step-processing" class="wizard-step p-4 d-none">
+                        <h5 class="text-center mb-4">Generating Reports</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="lj-process-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span id="lj-process-status-text">Starting...</span>
+                        </div>
+
+                        <div class="log-console border rounded p-3 bg-dark text-light small font-monospace"
+                            style="height: 200px; overflow-y: auto;" id="lj-process-logs">
+                            <div class="text-muted">> Ready to generate reports...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Results -->
+                    <div id="lj-step-results" class="wizard-step p-4 d-none">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                            <h4>Files Generated Successfully</h4>
+                            <p class="text-muted">Your download should start automatically.</p>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-user-minus me-2 text-danger"></i>Leavers Found</span>
+                                            <span class="badge bg-danger rounded-pill fs-6"
+                                                id="lj-result-leavers">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-user-plus me-2 text-success"></i>Joiners Found</span>
+                                            <span class="badge bg-success rounded-pill fs-6"
+                                                id="lj-result-joiners">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-sync me-2 text-warning"></i>Employees to
+                                                Update</span>
+                                            <span class="badge bg-warning rounded-pill fs-6"
+                                                id="lj-result-updates">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-file-archive me-2 text-info"></i>Files in ZIP</span>
+                                            <span class="badge bg-info rounded-pill fs-6" id="lj-result-files">3</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary px-5" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added Generate Cards Wizard Modal -->
+    <div class="modal fade" id="generateCardsWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-id-card me-2"></i>Generate Employee Cards</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Step 1: File Upload -->
+                    <div id="gc-step-upload" class="wizard-step p-4">
+                        <!-- Required Columns Info - Compact Premium Design -->
+                        <div class="required-columns-section">
+                            <div class="required-columns-header">
+                                <i class="fas fa-table"></i>
+                                <h6>Required Excel/CSV Columns</h6>
+                            </div>
+                            <div class="required-columns-body">
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge required">Required</span>
+                                        <span class="columns-group-desc">Must be present in your data file</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag required">employee_id</span>
+                                        <span class="column-tag required">employee_name</span>
+                                        <span class="column-tag required">company_id</span>
+                                        <span class="column-tag required">department</span>
+                                    </div>
+                                </div>
+                                <div class="required-columns-note info">
+                                    <i class="fas fa-image"></i>
+                                    <span><strong>Also Required:</strong> Company logo image file (PNG, JPG, or
+                                        JPEG)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="upload-area p-4 text-center border rounded bg-light h-100"
+                                    id="gc-data-drop-zone">
+                                    <i class="fas fa-file-excel fa-3x text-success mb-3"></i>
+                                    <h6 class="mb-2">1. Employee Data File</h6>
+                                    <p class="text-muted small mb-3">Upload Excel or CSV file with employee details</p>
+                                    <input type="file" id="gcDataFileInput" class="d-none" accept=".xlsx, .csv">
+                                    <button class="btn btn-outline-success btn-sm"
+                                        onclick="$('#gcDataFileInput').click()">
+                                        Browse Data File
+                                    </button>
+                                    <div id="gc-data-filename" class="mt-2 text-success fw-bold small d-none"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="upload-area p-4 text-center border rounded bg-light h-100"
+                                    id="gc-profile-drop-zone">
+                                    <i class="fas fa-image fa-3x text-primary mb-3"></i>
+                                    <h6 class="mb-2">2. Company Logo</h6>
+                                    <p class="text-muted small mb-3">Upload company logo for the cards</p>
+                                    <input type="file" id="gcProfileFileInput" class="d-none"
+                                        accept=".png, .jpg, .jpeg">
+                                    <button class="btn btn-outline-primary btn-sm"
+                                        onclick="$('#gcProfileFileInput').click()">
+                                        Browse Logo
+                                    </button>
+                                    <div id="gc-profile-filename" class="mt-2 text-primary fw-bold small d-none"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary disabled" id="btn-gc-step1-next" onclick="validateGCFiles()">
+                                Validate Files <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Validation & Preview -->
+                    <div id="gc-step-validation" class="wizard-step p-4 d-none">
+                        <div class="text-center py-5" id="gc-validating-spinner">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"
+                                role="status"></div>
+                            <h5>Validating & Generating Preview...</h5>
+                            <p class="text-muted">Checking data and creating sample card</p>
+                        </div>
+
+                        <div id="gc-validation-result" class="d-none">
+                            <div class="row align-items-center">
+                                <div class="col-md-5 text-center">
+                                    <h6 class="mb-3">Sample Card Preview</h6>
+                                    <div class="border rounded p-2 bg-light d-inline-block shadow-sm">
+                                        <img id="gc-preview-image" src="/placeholder.svg" alt="Card Preview"
+                                            class="img-fluid" style="max-height: 250px;">
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <h5 class="mb-3">File Analysis</h5>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-6">
+                                            <div class="p-3 border rounded bg-light text-center">
+                                                <strong class="d-block h3 mb-1" id="gc-stat-total">0</strong>
+                                                <span class="small text-muted text-uppercase">Total Cards</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-3 border rounded bg-light text-center">
+                                                <strong class="d-block h3 mb-1" id="gc-stat-depts">0</strong>
+                                                <span class="small text-muted text-uppercase">Departments</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-success small mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Data file is valid. Ready to generate all cards.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-outline-secondary" onclick="showGCStep('upload')">Back</button>
+                                <button class="btn btn-primary px-4" onclick="startGCProcessing()">
+                                    Generate All Cards <i class="fas fa-cogs ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Processing -->
+                    <div id="gc-step-processing" class="wizard-step p-4 d-none">
+                        <h5 class="text-center mb-4">Generating Employee Cards</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="gc-process-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span id="gc-process-status-text">Starting generation...</span>
+                            <span id="gc-process-count">0/0</span>
+                        </div>
+
+                        <div class="log-console border rounded p-3 bg-dark text-light small font-monospace"
+                            style="height: 200px; overflow-y: auto;" id="gc-process-logs">
+                            <div class="text-muted">> Ready to generate cards...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Results -->
+                    <div id="gc-step-results" class="wizard-step p-4 d-none">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                            <h4>Cards Generated Successfully</h4>
+                            <p class="text-muted">Your download should start automatically.</p>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-id-card me-2 text-primary"></i>Cards Generated</span>
+                                            <span class="badge bg-primary rounded-pill fs-6"
+                                                id="gc-result-total">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-file-archive me-2 text-info"></i>ZIP File Size</span>
+                                            <span class="badge bg-info rounded-pill fs-6" id="gc-result-size">0
+                                                MB</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary px-5" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added Add Joiners Wizard Modal -->
+    <div class="modal fade" id="addJoinersWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add Joiners</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Step 1: Required Columns & Upload -->
+                    <div id="aj-step-upload" class="wizard-step p-4">
+                        <!-- Required Columns Info - Compact Premium Design -->
+                        <div class="required-columns-section">
+                            <div class="required-columns-header">
+                                <i class="fas fa-table"></i>
+                                <h6>Required Excel/CSV Columns</h6>
+                            </div>
+                            <div class="required-columns-body">
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge required">Required</span>
+                                        <span class="columns-group-desc">Must be present in your file</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag required">employee_name</span>
+                                        <span class="column-tag required">worker_type</span>
+                                        <span class="column-tag required">department</span>
+                                        <span class="column-tag required">designation</span>
+                                        <span class="column-tag required">mobile_number</span>
+                                        <span class="column-tag required">gender</span>
+                                        <span class="column-tag required">office_id</span>
+                                        <span class="column-tag required">cnic_no</span>
+                                        <span class="column-tag required">company_id</span>
+                                        <span class="column-tag required">temp_data</span>
+                                    </div>
+                                </div>
+                                <div class="required-columns-note success">
+                                    <i class="fas fa-magic"></i>
+                                    <span><strong>Auto-Generated:</strong> employee_id will be automatically generated
+                                        for each new joiner.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-area p-5 text-center border rounded bg-light">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="mb-2">Upload Joiners Data</h5>
+                            <p class="text-muted mb-4">Upload file with new employee information</p>
+                            <input type="file" id="ajFileInput" class="d-none" accept=".xlsx, .csv">
+                            <button class="btn btn-primary px-4" onclick="$('#ajFileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>Browse File
+                            </button>
+                            <p class="mt-3 small text-muted">Supported formats: Excel (.xlsx), CSV (.csv)</p>
+                            <div id="aj-selected-file-name" class="mt-3 text-primary fw-bold d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Validation & Stats -->
+                    <div id="aj-step-validation" class="wizard-step p-4 d-none">
+                        <div class="text-center py-5" id="aj-validating-spinner">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"
+                                role="status"></div>
+                            <h5>Validating File...</h5>
+                            <p class="text-muted">Checking columns and data integrity</p>
+                        </div>
+
+                        <div id="aj-validation-stats" class="d-none">
+                            <h5 class="mb-4 text-center">File Analysis Results</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-light text-center h-100">
+                                        <strong class="d-block h3 mb-1" id="aj-stat-total">0</strong>
+                                        <span class="small text-muted text-uppercase fw-bold">Total Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-success-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-success" id="aj-stat-valid">0</strong>
+                                        <span class="small text-success text-uppercase fw-bold">Valid Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-danger-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-danger" id="aj-stat-errors">0</strong>
+                                        <span class="small text-danger text-uppercase fw-bold">Errors</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning d-none" id="aj-validation-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="aj-validation-warning-msg"></span>
+                            </div>
+
+                            <!-- Added error details section -->
+                            <div id="aj-error-details-section" class="d-none mb-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-10">
+                                        <div class="card border-danger">
+                                            <div
+                                                class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-exclamation-triangle me-2"></i>Error
+                                                    Details</span>
+                                                <button class="btn btn-sm btn-light" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#ajErrorDetailsCollapse">
+                                                    <i class="fas fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                            <div class="collapse show" id="ajErrorDetailsCollapse">
+                                                <div class="card-body">
+                                                    <div class="alert alert-warning mb-3">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <small>Showing up to 20 errors. Review and fix these rows in
+                                                            your file.</small>
+                                                    </div>
+                                                    <div id="aj-error-details-list" class="small font-monospace"
+                                                        style="max-height: 300px; overflow-y: auto;">
+                                                        <!-- Error details will be populated here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-outline-secondary" onclick="showAJStep('upload')">Cancel</button>
+                                <button class="btn btn-primary px-4" onclick="startAJProcessing()">
+                                    Continue & Add Joiners <i class="fas fa-check ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Processing -->
+                    <div id="aj-step-processing" class="wizard-step p-4 d-none">
+                        <h5 class="text-center mb-4">Adding Joiners</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="aj-process-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span id="aj-process-status-text">Starting...</span>
+                            <span id="aj-process-count">0/0</span>
+                        </div>
+
+                        <div class="log-console border rounded p-3 bg-dark text-light small font-monospace"
+                            style="height: 200px; overflow-y: auto;" id="aj-process-logs">
+                            <div class="text-muted">> Ready to start...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Results -->
+                    <div id="aj-step-results" class="wizard-step p-4 d-none">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                            <h4>Joiners Added Successfully</h4>
+                            <p class="text-muted">New employees have been added to the database.</p>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-file-alt me-2 text-muted"></i>Total Processed</span>
+                                            <span class="badge bg-primary rounded-pill fs-6"
+                                                id="aj-result-total">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-user-plus me-2 text-success"></i>Employees
+                                                Added</span>
+                                            <span class="badge bg-success rounded-pill fs-6"
+                                                id="aj-result-inserts">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-times me-2 text-danger"></i>Failed Rows</span>
+                                            <span class="badge bg-danger rounded-pill fs-6"
+                                                id="aj-result-errors">0</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Added error details section -->
+                        <div id="aj-error-details-section" class="d-none mb-4">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10">
+                                    <div class="card border-danger">
+                                        <div
+                                            class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-exclamation-triangle me-2"></i>Error Details</span>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#ajErrorDetailsCollapse">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                        <div class="collapse show" id="ajErrorDetailsCollapse">
+                                            <div class="card-body">
+                                                <div class="alert alert-warning mb-3">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <small>Showing up to 20 errors. Review and fix these rows in your
+                                                        file.</small>
+                                                </div>
+                                                <div id="aj-error-details-list" class="small font-monospace"
+                                                    style="max-height: 300px; overflow-y: auto;">
+                                                    <!-- Error details will be populated here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary px-5" data-bs-dismiss="modal" onclick="location.reload()">
+                                Close & Refresh Table
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added Add Leavers Wizard Modal -->
+    <div class="modal fade" id="addLeaversWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-minus me-2"></i>Add Leavers</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Step 1: Required Columns & Upload -->
+                    <div id="al-step-upload" class="wizard-step p-4">
+                        <!-- Required Columns Info - Compact Premium Design -->
+                        <div class="required-columns-section">
+                            <div class="required-columns-header">
+                                <i class="fas fa-table"></i>
+                                <h6>Required Excel/CSV Columns</h6>
+                            </div>
+                            <div class="required-columns-body">
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge required">Required</span>
+                                        <span class="columns-group-desc">Must be present in your file</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag required">employee_id</span>
+                                    </div>
+                                </div>
+                                <div class="required-columns-note warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span><strong>Action:</strong> Employees matching the provided IDs will be marked as
+                                        "left" in the database.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-area p-5 text-center border rounded bg-light">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="mb-2">Upload Leavers Data</h5>
+                            <p class="text-muted mb-4">Upload file with employee IDs to mark as left</p>
+                            <input type="file" id="alFileInput" class="d-none" accept=".xlsx, .csv">
+                            <button class="btn btn-primary px-4" onclick="$('#alFileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>Browse File
+                            </button>
+                            <p class="mt-3 small text-muted">Supported formats: Excel (.xlsx), CSV (.csv)</p>
+                            <div id="al-selected-file-name" class="mt-3 text-primary fw-bold d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Validation & Stats -->
+                    <div id="al-step-validation" class="wizard-step p-4 d-none">
+                        <div class="text-center py-5" id="al-validating-spinner">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"
+                                role="status"></div>
+                            <h5>Validating File...</h5>
+                            <p class="text-muted">Checking employee IDs</p>
+                        </div>
+
+                        <div id="al-validation-stats" class="d-none">
+                            <h5 class="mb-4 text-center">File Analysis Results</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-light text-center h-100">
+                                        <strong class="d-block h3 mb-1" id="al-stat-total">0</strong>
+                                        <span class="small text-muted text-uppercase fw-bold">Total Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-success-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-success" id="al-stat-valid">0</strong>
+                                        <span class="small text-success text-uppercase fw-bold">Valid Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-danger-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-danger" id="al-stat-errors">0</strong>
+                                        <span class="small text-danger text-uppercase fw-bold">Errors</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning d-none" id="al-validation-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="al-validation-warning-msg"></span>
+                            </div>
+
+                            <!-- Added error details section -->
+                            <div id="al-error-details-section" class="d-none mb-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-10">
+                                        <div class="card border-danger">
+                                            <div
+                                                class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-exclamation-triangle me-2"></i>Error
+                                                    Details</span>
+                                                <button class="btn btn-sm btn-light" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#alErrorDetailsCollapse">
+                                                    <i class="fas fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                            <div class="collapse show" id="alErrorDetailsCollapse">
+                                                <div class="card-body">
+                                                    <div class="alert alert-warning mb-3">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <small>Showing up to 20 errors. Review and fix these rows in
+                                                            your file.</small>
+                                                    </div>
+                                                    <div id="al-error-details-list" class="small font-monospace"
+                                                        style="max-height: 300px; overflow-y: auto;">
+                                                        <!-- Error details will be populated here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-outline-secondary" onclick="showALStep('upload')">Cancel</button>
+                                <button class="btn btn-primary px-4" onclick="startALProcessing()">
+                                    Continue & Mark as Left <i class="fas fa-check ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Processing -->
+                    <div id="al-step-processing" class="wizard-step p-4 d-none">
+                        <h5 class="text-center mb-4">Marking Employees as Left</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="al-process-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span id="al-process-status-text">Starting...</span>
+                            <span id="al-process-count">0/0</span>
+                        </div>
+
+                        <div class="log-console border rounded p-3 bg-dark text-light small font-monospace"
+                            style="height: 200px; overflow-y: auto;" id="al-process-logs">
+                            <div class="text-muted">> Ready to start...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Results -->
+                    <div id="al-step-results" class="wizard-step p-4 d-none">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                            <h4>Leavers Marked Successfully</h4>
+                            <p class="text-muted">Employees have been marked as left in the database.</p>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-file-alt me-2 text-muted"></i>Total Processed</span>
+                                            <span class="badge bg-primary rounded-pill fs-6"
+                                                id="al-result-total">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-user-minus me-2 text-warning"></i>Employees Marked as
+                                                Left</span>
+                                            <span class="badge bg-warning rounded-pill fs-6"
+                                                id="al-result-updates">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-times me-2 text-danger"></i>Failed Rows</span>
+                                            <span class="badge bg-danger rounded-pill fs-6"
+                                                id="al-result-errors">0</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Added error details section -->
+                        <div id="al-error-details-section" class="d-none mb-4">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10">
+                                    <div class="card border-danger">
+                                        <div
+                                            class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-exclamation-triangle me-2"></i>Error Details</span>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#alErrorDetailsCollapse">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                        <div class="collapse show" id="alErrorDetailsCollapse">
+                                            <div class="card-body">
+                                                <div class="alert alert-warning mb-3">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <small>Showing up to 20 errors. Review and fix these rows in your
+                                                        file.</small>
+                                                </div>
+                                                <div id="al-error-details-list" class="small font-monospace"
+                                                    style="max-height: 300px; overflow-y: auto;">
+                                                    <!-- Error details will be populated here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary px-5" data-bs-dismiss="modal" onclick="location.reload()">
+                                Close & Refresh Table
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added Add Manual Wizard Modal -->
+    <div class="modal fade" id="addManualWizardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add Manually</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <!-- Step 1: Required Columns & Upload -->
+                    <div id="am-step-upload" class="wizard-step p-4">
+                        <!-- Required Columns Info - Compact Premium Design -->
+                        <div class="required-columns-section">
+                            <div class="required-columns-header">
+                                <i class="fas fa-table"></i>
+                                <h6>Required Excel/CSV Columns</h6>
+                            </div>
+                            <div class="required-columns-body">
+                                <div class="columns-group">
+                                    <div class="columns-group-label">
+                                        <span class="column-type-badge required">Required</span>
+                                        <span class="columns-group-desc">Must be present in your file</span>
+                                    </div>
+                                    <div class="column-tags">
+                                        <span class="column-tag required">employee_id</span>
+                                        <span class="column-tag required">employee_name</span>
+                                        <span class="column-tag required">worker_type</span>
+                                        <span class="column-tag required">department</span>
+                                        <span class="column-tag required">designation</span>
+                                        <span class="column-tag required">mobile_number</span>
+                                        <span class="column-tag required">gender</span>
+                                        <span class="column-tag required">office_id</span>
+                                        <span class="column-tag required">cnic_no</span>
+                                        <span class="column-tag required">company_id</span>
+                                        <span class="column-tag required">temp_data</span>
+                                    </div>
+                                </div>
+                                <div class="required-columns-note info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span><strong>Note:</strong> All columns including employee_id must be manually
+                                        <span><strong>Note:</strong> All columns including employee_id must be manually
+                                            provided in your file.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="upload-area p-5 text-center border rounded bg-light">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="mb-2">Upload Manual Employee Data</h5>
+                            <p class="text-muted mb-4">Upload file with complete employee information including IDs</p>
+                            <input type="file" id="amFileInput" class="d-none" accept=".xlsx, .csv">
+                            <button class="btn btn-primary px-4" onclick="$('#amFileInput').click()">
+                                <i class="fas fa-folder-open me-2"></i>Browse File
+                            </button>
+                            <p class="mt-3 small text-muted">Supported formats: Excel (.xlsx), CSV (.csv)</p>
+                            <div id="am-selected-file-name" class="mt-3 text-primary fw-bold d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Validation & Stats -->
+                    <div id="am-step-validation" class="wizard-step p-4 d-none">
+                        <div class="text-center py-5" id="am-validating-spinner">
+                            <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"
+                                role="status">
+                            </div>
+                            <h5>Validating File...</h5>
+                            <p class="text-muted">Checking columns and data integrity</p>
+                        </div>
+
+                        <div id="am-validation-stats" class="d-none">
+                            <h5 class="mb-4 text-center">File Analysis Results</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-light text-center h-100">
+                                        <strong class="d-block h3 mb-1" id="am-stat-total">0</strong>
+                                        <span class="small text-muted text-uppercase fw-bold">Total Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-success-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-success" id="am-stat-valid">0</strong>
+                                        <span class="small text-success text-uppercase fw-bold">Valid Rows</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3 border rounded bg-danger-subtle text-center h-100">
+                                        <strong class="d-block h3 mb-1 text-danger" id="am-stat-errors">0</strong>
+                                        <span class="small text-danger text-uppercase fw-bold">Errors</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning d-none" id="am-validation-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <span id="am-validation-warning-msg"></span>
+                            </div>
+
+                            <!-- Added error details section -->
+                            <div id="am-error-details-section" class="d-none mb-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-10">
+                                        <div class="card border-danger">
+                                            <div
+                                                class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                                <span><i class="fas fa-exclamation-triangle me-2"></i>Error
+                                                    Details</span>
+                                                <button class="btn btn-sm btn-light" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#amErrorDetailsCollapse">
+                                                    <i class="fas fa-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                            <div class="collapse show" id="amErrorDetailsCollapse">
+                                                <div class="card-body">
+                                                    <div class="alert alert-warning mb-3">
+                                                        <i class="fas fa-info-circle me-2"></i>
+                                                        <small>Showing up to 20 errors. Review and fix these rows in
+                                                            your file.</small>
+                                                    </div>
+                                                    <div id="am-error-details-list" class="small font-monospace"
+                                                        style="max-height: 300px; overflow-y: auto;">
+                                                        <!-- Error details will be populated here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button class="btn btn-outline-secondary" onclick="showAMStep('upload')">Cancel</button>
+                                <button class="btn btn-primary px-4" onclick="startAMProcessing()">
+                                    Continue & Add Employees <i class="fas fa-check ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Processing -->
+                    <div id="am-step-processing" class="wizard-step p-4 d-none">
+                        <h5 class="text-center mb-4">Adding Manual Employees</h5>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div id="am-process-progress-bar"
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-3">
+                            <span id="am-process-status-text">Starting...</span>
+                            <span id="am-process-count">0/0</span>
+                        </div>
+
+                        <div class="log-console border rounded p-3 bg-dark text-light small font-monospace"
+                            style="height: 200px; overflow-y: auto;" id="am-process-logs">
+                            <div class="text-muted">> Ready to start...</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Results -->
+                    <div id="am-step-results" class="wizard-step p-4 d-none">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-check-circle fa-5x text-success"></i>
+                            </div>
+                            <h4>Manual Employees Added Successfully</h4>
+                            <p class="text-muted">Employees have been added to the database.</p>
+                        </div>
+
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="card border-0 shadow-sm">
+                                    <ul class="list-group list-group-flush">
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-file-alt me-2 text-muted"></i>Total Processed</span>
+                                            <span class="badge bg-primary rounded-pill fs-6"
+                                                id="am-result-total">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-user-plus me-2 text-success"></i>Employees
+                                                Added</span>
+                                            <span class="badge bg-success rounded-pill fs-6"
+                                                id="am-result-inserts">0</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                            <span><i class="fas fa-times me-2 text-danger"></i>Failed Rows</span>
+                                            <span class="badge bg-danger rounded-pill fs-6"
+                                                id="am-result-errors">0</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Added error details section -->
+                        <div id="am-error-details-section" class="d-none mb-4">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10">
+                                    <div class="card border-danger">
+                                        <div
+                                            class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                            <span><i class="fas fa-exclamation-triangle me-2"></i>Error Details</span>
+                                            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#amErrorDetailsCollapse">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                        <div class="collapse show" id="amErrorDetailsCollapse">
+                                            <div class="card-body">
+                                                <div class="alert alert-warning mb-3">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    <small>Showing up to 20 errors. Review and fix these rows in your
+                                                        file.</small>
+                                                </div>
+                                                <div id="am-error-details-list" class="small font-monospace"
+                                                    style="max-height: 300px; overflow-y: auto;">
+                                                    <!-- Error details will be populated here -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary px-5" data-bs-dismiss="modal" onclick="location.reload()">
+                                Close & Refresh Table
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Buyer Selection Modal for CSV Export -->
+    <div class="modal fade" id="buyerSelectionModal" tabindex="-1" aria-labelledby="buyerSelectionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="buyerSelectionModalLabel">
+                        <i class="fas fa-filter me-2"></i>Select Buyers for Export
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Buyers:</label>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="selectAllBuyers">
+                            <label class="form-check-label" for="selectAllBuyers">
+                                Select All Buyers
+                            </label>
+                        </div>
+                        <div id="buyerCheckboxes" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Buyer checkboxes will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirmExportBtn">
+                        <i class="fas fa-download me-2"></i>Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Other Modals (Edit, Generate Card, etc.) remain unchanged -->
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Employee</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editEmployeeId">
+                        <div class="mb-3"><label class="form-label">Name</label><input type="text" class="form-control"
+                                id="editName" required></div>
+                        <div class="mb-3"><label class="form-label">Worker Type</label><input type="text"
+                                class="form-control" id="editWorkerType" required></div>
+                        <div class="mb-3"><label class="form-label">Department</label><input type="text"
+                                class="form-control" id="editDepartment" required></div>
+                        <div class="mb-3"><label class="form-label">Designation</label><input type="text"
+                                class="form-control" id="editDesignation" required></div>
+                        <div class="mb-3"><label class="form-label">Mobile Number</label><input type="text"
+                                class="form-control" id="editMobileNumber" required></div>
+                        <div class="mb-3"><label class="form-label">Gender</label><input type="text"
+                                class="form-control" id="editGender" required></div>
+                        <div class="mb-3"><label class="form-label">Company Name</label><input type="text"
+                                class="form-control" id="editCompanyName" readonly></div>
+                        <div class="mb-3"><label class="form-label">CNIC</label><input type="text" class="form-control"
+                                id="editCNIC" required></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+    <script>
+        // Wizard State (existing update employees code)
+        let wizardState = {
+            matchColumn: null,
+            file: null,
+            stats: null
+        };
+
+        function openUpdateWizard() {
+            // Reset state
+            wizardState = { matchColumn: null, file: null, stats: null };
+            $('.match-option-card').removeClass('selected');
+            $('#btn-step1-next').addClass('disabled');
+            $('#wizardFileInput').val('');
+            $('#selected-file-name').addClass('d-none').text('');
+            $('#process-logs').html('<div class="text-muted">> Ready to start...</div>');
+
+            showStep('match-column');
+            $('#updateEmployeeWizardModal').modal('show');
+        }
+
+        function selectMatchColumn(column, element) {
+            wizardState.matchColumn = column;
+            $('.match-option-card').removeClass('selected');
+            $(element).addClass('selected');
+            $('#btn-step1-next').removeClass('disabled');
+            // Update the required columns badge and info text
+            $('#update-match-column-badge').text(column);
+            $('#update-match-column-name').text(column);
+        }
+
+        function showStep(stepName) {
+            $('.wizard-step').addClass('d-none');
+            $(`#step-${stepName}`).removeClass('d-none');
+        }
+
+        // File Input Handler
+        $('#wizardFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                wizardState.file = this.files[0];
+                $('#selected-file-name').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+
+                // Auto proceed to validation
+                showStep('validation');
+                validateFile();
+            }
+        });
+
+        function validateFile() {
+            $('#validating-spinner').removeClass('d-none');
+            $('#validation-stats').addClass('d-none');
+
+            let formData = new FormData();
+            formData.append('file', wizardState.file);
+            formData.append('match_column', wizardState.matchColumn);
+
+            $.ajax({
+                url: "{{ url_for('validate_employee_update') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#validating-spinner').addClass('d-none');
+                    $('#validation-stats').removeClass('d-none');
+
+                    // Update stats using correct response structure
+                    $('#stat-total').text(response.stats.total_rows);
+                    $('#stat-updates').text(response.stats.existing_employees);
+                    $('#stat-inserts').text(response.stats.new_employees);
+                    $('#stat-errors').text(response.stats.invalid_rows);
+
+                    wizardState.stats = response.stats;
+
+                    if (response.stats.invalid_rows > 0) {
+                        $('#validation-warning').removeClass('d-none');
+                        let errorMsg = `Found ${response.stats.invalid_rows} invalid rows. These will be skipped.`;
+                        if (response.validation_errors && response.validation_errors.length > 0) {
+                            errorMsg += '<br><small>' + response.validation_errors.slice(0, 3).join('<br>') + '</small>';
+                        }
+                        $('#validation-warning-msg').html(errorMsg);
+
+                        // Show error details section
+                        $('#error-details-section').removeClass('d-none');
+                        let errorDetailsHtml = '';
+                        const errorsToShow = response.validation_errors.slice(0, 20); // Limit to 20
+                        errorsToShow.forEach(err => {
+                            errorDetailsHtml += `<p>${err}</p>`;
+                        });
+                        $('#error-details-list').html(errorDetailsHtml);
+
+                    } else {
+                        $('#validation-warning').addClass('d-none');
+                        $('#error-details-section').addClass('d-none'); // Hide if no errors
+                    }
+                },
+                error: function (err) {
+                    $('#validating-spinner').addClass('d-none');
+                    let errorMsg = 'Validation failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                        if (err.responseJSON.available_columns) {
+                            errorMsg += '<br><small>Available columns: ' + err.responseJSON.available_columns.join(', ') + '</small>';
+                        }
+                    }
+                    alert(errorMsg);
+                    showStep('upload');
+                }
+            });
+        }
+
+        function startProcessing() {
+            showStep('processing');
+
+            let formData = new FormData();
+            formData.append('match_column', wizardState.matchColumn);
+
+            // Simulate progress
+            let progress = 0;
+            let totalRows = wizardState.stats.total_rows;
+            let processedRows = 0;
+
+            log("Starting employee update process...", 'text-info');
+            log(`Match column: ${wizardState.matchColumn}`, 'text-muted');
+            log(`Total rows to process: ${totalRows}`, 'text-muted');
+
+            let progressInterval = setInterval(() => {
+                if (progress < 85) {
+                    progress += Math.random() * 8;
+                    processedRows = Math.floor((progress / 100) * totalRows);
+                    updateProgress(Math.min(85, progress), processedRows, totalRows);
+                }
+            }, 400);
+
+            $.ajax({
+                url: "{{ url_for('process_employee_update') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    clearInterval(progressInterval);
+                    updateProgress(100, totalRows, totalRows);
+
+                    // Log detailed results
+                    log("✓ Processing complete!", 'text-success');
+                    log(`Updates: ${response.results.updates}`, 'text-success');
+                    log(`New inserts: ${response.results.inserts}`, 'text-info');
+                    if (response.results.errors > 0) {
+                        log(`Errors: ${response.results.errors}`, 'text-warning');
+                    }
+
+                    setTimeout(() => {
+                        showResults(response.results);
+                    }, 800);
+                },
+                error: function (err) {
+                    clearInterval(progressInterval);
+                    let errorMsg = 'Processing failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                    }
+                    log("✗ Error: " + errorMsg, 'text-danger');
+                    alert('Processing failed: ' + errorMsg);
+                }
+            });
+        }
+
+        function updateProgress(percent, processed, total) {
+            let p = Math.round(percent);
+            $('#process-progress-bar').css('width', p + '%').text(p + '%');
+            $('#process-status-text').text(p < 100 ? 'Processing records...' : 'Finalizing...');
+            $('#process-count').text(`${processed}/${total}`);
+        }
+
+        function log(msg, className = 'text-success') {
+            let time = new Date().toLocaleTimeString();
+            $('#process-logs').append(`<div class="${className}">[${time}] ${msg}</div>`);
+            let d = $('#process-logs');
+            d.scrollTop(d.prop("scrollHeight"));
+        }
+
+        function showResults(results) {
+            showStep('results');
+            $('#result-total').text(results.total_processed);
+            $('#result-updates').text(results.updates);
+            $('#result-inserts').text(results.inserts);
+            $('#result-errors').text(results.errors);
+
+            if (results.error_details && results.error_details.length > 0) {
+                $('#error-details-section').removeClass('d-none');
+                const errorList = $('#error-details-list');
+                errorList.empty();
+
+                results.error_details.forEach((error, index) => {
+                    errorList.append(`
+                        <div class="p-2 mb-2 border-start border-danger border-3 bg-light">
+                            <strong class="text-danger">${index + 1}.</strong> ${error}
+                        </div>
+                    `);
+                });
+            } else {
+                $('#error-details-section').addClass('d-none');
+            }
+        }
+
+        let ljWizardState = {
+            matchColumn: null,
+            file: null,
+            stats: null
+        };
+
+        function openLeaversJoinersWizard() {
+            ljWizardState = { matchColumn: null, file: null, stats: null };
+            $('.match-option-card').removeClass('selected');
+            $('#btn-lj-step1-next').addClass('disabled');
+            $('#ljWizardFileInput').val('');
+            $('#lj-selected-file-name').addClass('d-none').text('');
+            $('#lj-process-logs').html('<div class="text-muted">> Ready to generate reports...</div>');
+
+            showLJStep('match-column');
+            $('#leaversJoinersWizardModal').modal('show');
+        }
+
+        function selectLJMatchColumn(column, element) {
+            ljWizardState.matchColumn = column;
+            $('.match-option-card').removeClass('selected');
+            $(element).addClass('selected');
+            $('#btn-lj-step1-next').removeClass('disabled');
+            // Update the required columns badge and info text
+            $('#lj-match-column-badge').text(column);
+            $('#lj-match-column-name').text(column);
+        }
+
+        function showLJStep(stepName) {
+            $('.wizard-step').addClass('d-none');
+            $(`#lj-step-${stepName}`).removeClass('d-none');
+        }
+
+        $('#ljWizardFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                ljWizardState.file = this.files[0];
+                $('#lj-selected-file-name').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+
+                showLJStep('validation');
+                validateLJFile();
+            }
+        });
+
+        function validateLJFile() {
+            $('#lj-validating-spinner').removeClass('d-none');
+            $('#lj-validation-stats').addClass('d-none');
+
+            let formData = new FormData();
+            formData.append('file', ljWizardState.file);
+            formData.append('match_column', ljWizardState.matchColumn);
+
+            $.ajax({
+                url: "{{ url_for('validate_leavers_joiners') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#lj-validating-spinner').addClass('d-none');
+                    $('#lj-validation-stats').removeClass('d-none');
+
+                    $('#lj-stat-total').text(response.stats.total_rows);
+                    $('#lj-stat-offices').text(response.stats.unique_offices);
+                    $('#lj-stat-columns').text(response.stats.columns_found.length);
+
+                    ljWizardState.stats = response.stats;
+                },
+                error: function (err) {
+                    $('#lj-validating-spinner').addClass('d-none');
+                    let errorMsg = 'Validation failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                        if (err.responseJSON.available_columns) {
+                            errorMsg += '<br><small>Available columns: ' + err.responseJSON.available_columns.join(', ') + '</small>';
+                        }
+                    }
+                    alert(errorMsg);
+                    showLJStep('upload');
+                }
+            });
+        }
+
+        function startLJProcessing() {
+            showLJStep('processing');
+
+            ljLog("Starting leavers/joiners analysis...", 'text-info');
+            ljLog(`Match column: ${ljWizardState.matchColumn}`, 'text-muted');
+            ljLog(`Total rows in file: ${ljWizardState.stats.total_rows}`, 'text-muted');
+
+            let progress = 0;
+            let progressInterval = setInterval(() => {
+                if (progress < 85) {
+                    progress += Math.random() * 10;
+                    updateLJProgress(Math.min(85, progress));
+                }
+            }, 300);
+
+            $.ajax({
+                url: "{{ url_for('process_leavers_joiners') }}",
+                method: 'POST',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (blob, status, xhr) {
+                    clearInterval(progressInterval);
+                    updateLJProgress(100);
+
+                    ljLog("✓ Files generated successfully!", 'text-success');
+                    ljLog("Preparing download...", 'text-info');
+
+                    // Extract stats from headers if available
+                    let leavers = xhr.getResponseHeader('X-Leavers-Count') || 0;
+                    let joiners = xhr.getResponseHeader('X-Joiners-Count') || 0;
+                    let updates = xhr.getResponseHeader('X-Updates-Count') || 0;
+                    let files = xhr.getResponseHeader('X-Files-Count') || 3;
+
+                    // Trigger download
+                    let url = window.URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'leavers_joiners_' + new Date().getTime() + '.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    ljLog("✓ Download started!", 'text-success');
+
+                    setTimeout(() => {
+                        showLJResults({
+                            leavers: leavers,
+                            joiners: joiners,
+                            to_update: updates,
+                            files_generated: files
+                        });
+                    }, 800);
+                },
+                error: function (err) {
+                    clearInterval(progressInterval);
+                    let errorMsg = 'Processing failed';
+                    try {
+                        let reader = new FileReader();
+                        reader.onload = function () {
+                            let response = JSON.parse(reader.result);
+                            errorMsg = response.error || errorMsg;
+                            ljLog("✗ Error: " + errorMsg, 'text-danger');
+                            alert('Processing failed: ' + errorMsg);
+                        };
+                        reader.readAsText(err.responseText);
+                    } catch (e) {
+                        ljLog("✗ Error: " + errorMsg, 'text-danger');
+                        alert('Processing failed: ' + errorMsg);
+                    }
+                }
+            });
+        }
+
+        function updateLJProgress(percent) {
+            let p = Math.round(percent);
+            $('#lj-process-progress-bar').css('width', p + '%').text(p + '%');
+            $('#lj-process-status-text').text(p < 100 ? 'Analyzing and generating files...' : 'Finalizing...');
+        }
+
+        function ljLog(msg, className = 'text-success') {
+            let time = new Date().toLocaleTimeString();
+            $('#lj-process-logs').append(`<div class="${className}">[${time}] ${msg}</div>`);
+            let d = $('#lj-process-logs');
+            d.scrollTop(d.prop("scrollHeight"));
+        }
+
+        function showLJResults(results) {
+            showLJStep('results');
+            $('#lj-result-leavers').text(results.leavers);
+            $('#lj-result-joiners').text(results.joiners);
+            $('#lj-result-updates').text(results.to_update);
+            $('#lj-result-files').text(results.files_generated);
+        }
+
+        let gcWizardState = {
+            dataFile: null,
+            profileFile: null,
+            stats: null
+        };
+
+        function openGenerateCardsWizard() {
+            gcWizardState = { dataFile: null, profileFile: null, stats: null };
+            $('#gcDataFileInput').val('');
+            $('#gcProfileFileInput').val('');
+            $('#gc-data-filename').addClass('d-none').text('');
+            $('#gc-profile-filename').addClass('d-none').text('');
+            $('#btn-gc-step1-next').addClass('disabled');
+            $('#gc-process-logs').html('<div class="text-muted">> Ready to generate cards...</div>');
+
+            showGCStep('upload');
+            $('#generateCardsWizardModal').modal('show');
+        }
+
+        function showGCStep(stepName) {
+            $('#generateCardsWizardModal .wizard-step').addClass('d-none');
+            $(`#gc-step-${stepName}`).removeClass('d-none');
+        }
+
+        $('#gcDataFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                gcWizardState.dataFile = this.files[0];
+                $('#gc-data-filename').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+                checkGCFiles();
+            }
+        });
+
+        $('#gcProfileFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                gcWizardState.profileFile = this.files[0];
+                $('#gc-profile-filename').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+                checkGCFiles();
+            }
+        });
+
+        function checkGCFiles() {
+            if (gcWizardState.dataFile && gcWizardState.profileFile) {
+                $('#btn-gc-step1-next').removeClass('disabled');
+            } else {
+                $('#btn-gc-step1-next').addClass('disabled');
+            }
+        }
+
+        function validateGCFiles() {
+            showGCStep('validation');
+            $('#gc-validating-spinner').removeClass('d-none');
+            $('#gc-validation-result').addClass('d-none');
+
+            let formData = new FormData();
+            formData.append('file', gcWizardState.dataFile);
+            formData.append('profile_image', gcWizardState.profileFile);
+
+            $.ajax({
+                url: "{{ url_for('validate_cards_generation') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#gc-validating-spinner').addClass('d-none');
+                    $('#gc-validation-result').removeClass('d-none');
+
+                    $('#gc-stat-total').text(response.stats.total_rows);
+                    $('#gc-stat-depts').text(response.stats.departments);
+                    $('#gc-preview-image').attr('src', 'data:image/png;base64,' + response.preview_image);
+
+                    gcWizardState.stats = response.stats;
+                },
+                error: function (err) {
+                    $('#gc-validating-spinner').addClass('d-none');
+                    let errorMsg = 'Validation failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                    }
+                    alert(errorMsg);
+                    showGCStep('upload');
+                }
+            });
+        }
+
+        function startGCProcessing() {
+            showGCStep('processing');
+
+            gcLog("Starting card generation process...", 'text-info');
+            gcLog(`Total cards to generate: ${gcWizardState.stats.total_rows}`, 'text-muted');
+
+            let formData = new FormData();
+            formData.append('file', gcWizardState.dataFile);
+            formData.append('profile_image', gcWizardState.profileFile);
+
+            // Simulate progress since the backend processes all at once
+            let progress = 0;
+            let progressInterval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.random() * 5;
+                    updateGCProgress(Math.min(90, progress));
+                }
+            }, 500);
+
+            $.ajax({
+                url: "{{ url_for('generate_cards') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function (blob, status, xhr) {
+                    clearInterval(progressInterval);
+                    updateGCProgress(100);
+
+                    gcLog("✓ Cards generated successfully!", 'text-success');
+                    gcLog("Preparing download...", 'text-info');
+
+                    // Trigger download
+                    let url = window.URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'employee_cards_' + new Date().getTime() + '.zip';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    // Calculate size in MB
+                    let sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+
+                    setTimeout(() => {
+                        showGCResults({
+                            total: gcWizardState.stats.total_rows,
+                            size: sizeMB + ' MB'
+                        });
+                    }, 800);
+                },
+                error: function (err) {
+                    clearInterval(progressInterval);
+                    let errorMsg = 'Processing failed';
+                    gcLog("✗ Error: " + errorMsg, 'text-danger');
+                    alert('Processing failed. Check logs for details.');
+                    showGCStep('upload');
+                }
+            });
+        }
+
+        function updateGCProgress(percent) {
+            let p = Math.round(percent);
+            $('#gc-process-progress-bar').css('width', p + '%').text(p + '%');
+            $('#gc-process-status-text').text(p < 100 ? 'Generating cards...' : 'Finalizing...');
+            $('#gc-process-count').text(p < 100 ? `Processing...` : 'Done');
+        }
+
+        function gcLog(msg, className = 'text-success') {
+            let time = new Date().toLocaleTimeString();
+            $('#gc-process-logs').append(`<div class="${className}">[${time}] ${msg}</div>`);
+            let d = $('#gc-process-logs');
+            d.scrollTop(d.prop("scrollHeight"));
+        }
+
+        function showGCResults(results) {
+            showGCStep('results');
+            $('#gc-result-total').text(results.total);
+            $('#gc-result-size').text(results.size);
+        }
+
+        let ajWizardState = { file: null, stats: null };
+
+        function openAddJoinersWizard() {
+            ajWizardState = { file: null, stats: null };
+            $('#ajFileInput').val('');
+            $('#aj-selected-file-name').addClass('d-none').text('');
+            $('#aj-process-logs').html('<div class="text-muted">> Ready to start...</div>');
+            showAJStep('upload');
+            $('#addJoinersWizardModal').modal('show');
+        }
+
+        function showAJStep(stepName) {
+            $('#addJoinersWizardModal .wizard-step').addClass('d-none');
+            $(`#aj-step-${stepName}`).removeClass('d-none');
+        }
+
+        $('#ajFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                ajWizardState.file = this.files[0];
+                $('#aj-selected-file-name').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+                showAJStep('validation');
+                validateAJFile();
+            }
+        });
+
+        function validateAJFile() {
+            $('#aj-validating-spinner').removeClass('d-none');
+            $('#aj-validation-stats').addClass('d-none');
+
+            let formData = new FormData();
+            formData.append('file', ajWizardState.file);
+
+            $.ajax({
+                url: "{{ url_for('validate_add_joiners') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#aj-validating-spinner').addClass('d-none');
+                    $('#aj-validation-stats').removeClass('d-none');
+
+                    $('#aj-stat-total').text(response.stats.total_rows);
+                    $('#aj-stat-valid').text(response.stats.valid_rows);
+                    $('#aj-stat-errors').text(response.stats.invalid_rows);
+
+                    ajWizardState.stats = response.stats;
+
+                    if (response.stats.invalid_rows > 0) {
+                        $('#aj-validation-warning').removeClass('d-none');
+                        let errorMsg = `Found ${response.stats.invalid_rows} invalid rows. These will be skipped.`;
+                        if (response.validation_errors && response.validation_errors.length > 0) {
+                            errorMsg += '<br><small>' + response.validation_errors.slice(0, 3).join('<br>') + '</small>';
+                        }
+                        $('#aj-validation-warning-msg').html(errorMsg);
+
+                        $('#aj-error-details-section').removeClass('d-none');
+                        let errorDetailsHtml = '';
+                        const errorsToShow = response.validation_errors.slice(0, 20);
+                        errorsToShow.forEach(err => {
+                            errorDetailsHtml += `<p>${err}</p>`;
+                        });
+                        $('#aj-error-details-list').html(errorDetailsHtml);
+                    } else {
+                        $('#aj-validation-warning').addClass('d-none');
+                        $('#aj-error-details-section').addClass('d-none');
+                    }
+                },
+                error: function (err) {
+                    $('#aj-validating-spinner').addClass('d-none');
+                    let errorMsg = 'Validation failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                        if (err.responseJSON.available_columns) {
+                            errorMsg += '<br><small>Available columns: ' + err.responseJSON.available_columns.join(', ') + '</small>';
+                        }
+                    }
+                    alert(errorMsg);
+                    showAJStep('upload');
+                }
+            });
+        }
+
+        function startAJProcessing() {
+            showAJStep('processing');
+
+            // No need to send file again - it's already stored temporarily on server
+            ajLog("Starting add joiners process...", 'text-info');
+            ajLog(`Total rows to process: ${ajWizardState.stats.total_rows}`, 'text-muted');
+
+            let progress = 0;
+            let totalRows = ajWizardState.stats.total_rows;
+            let processedRows = 0;
+
+            let progressInterval = setInterval(() => {
+                if (progress < 85) {
+                    progress += Math.random() * 8;
+                    processedRows = Math.floor((progress / 100) * totalRows);
+                    updateAJProgress(Math.min(85, progress), processedRows, totalRows);
+                }
+            }, 400);
+
+            // Send empty POST request - server will use the temporarily stored file
+            $.ajax({
+                url: "{{ url_for('process_add_joiners') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({}), // Empty data since file is already stored
+                success: function (response) {
+                    clearInterval(progressInterval);
+                    updateAJProgress(100, totalRows, totalRows);
+
+                    ajLog("✓ Processing complete!", 'text-success');
+                    ajLog(`Employees added: ${response.results.inserts}`, 'text-success');
+                    if (response.results.errors > 0) {
+                        ajLog(`Errors: ${response.results.errors}`, 'text-warning');
+                    }
+
+                    setTimeout(() => {
+                        showAJResults(response.results);
+                    }, 800);
+                },
+                error: function (err) {
+                    clearInterval(progressInterval);
+                    let errorMsg = 'Processing failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                    }
+                    ajLog("✗ Error: " + errorMsg, 'text-danger');
+                    alert('Processing failed: ' + errorMsg);
+                    showAJStep('upload'); // Go back to upload step on error
+                }
+            });
+        }
+
+        function updateAJProgress(percent, processed, total) {
+            let p = Math.round(percent);
+            $('#aj-process-progress-bar').css('width', p + '%').text(p + '%');
+            $('#aj-process-status-text').text(p < 100 ? 'Processing records...' : 'Finalizing...');
+            $('#aj-process-count').text(`${processed}/${total}`);
+        }
+
+        function ajLog(msg, className = 'text-success') {
+            let time = new Date().toLocaleTimeString();
+            $('#aj-process-logs').append(`<div class="${className}">[${time}] ${msg}</div>`);
+            let d = $('#aj-process-logs');
+            d.scrollTop(d.prop("scrollHeight"));
+        }
+
+        function showAJResults(results) {
+            showAJStep('results');
+            $('#aj-result-total').text(results.total_processed);
+            $('#aj-result-inserts').text(results.inserts);
+            $('#aj-result-errors').text(results.errors);
+
+            if (results.error_details && results.error_details.length > 0) {
+                $('#aj-step-results #aj-error-details-section').removeClass('d-none');
+                const errorList = $('#aj-step-results #aj-error-details-list');
+                errorList.empty();
+
+                results.error_details.forEach((error, index) => {
+                    errorList.append(`
+                        <div class="p-2 mb-2 border-start border-danger border-3 bg-light">
+                            <strong class="text-danger">${index + 1}.</strong> ${error}
+                        </div>
+                    `);
+                });
+            } else {
+                $('#aj-step-results #aj-error-details-section').addClass('d-none');
+            }
+        }
+
+        let alWizardState = { file: null, stats: null };
+
+        function openAddLeaversWizard() {
+            alWizardState = { file: null, stats: null };
+            $('#alFileInput').val('');
+            $('#al-selected-file-name').addClass('d-none').text('');
+            $('#al-process-logs').html('<div class="text-muted">> Ready to start...</div>');
+            showALStep('upload');
+            $('#addLeaversWizardModal').modal('show');
+        }
+
+        function showALStep(stepName) {
+            $('#addLeaversWizardModal .wizard-step').addClass('d-none');
+            $(`#al-step-${stepName}`).removeClass('d-none');
+        }
+
+        $('#alFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                alWizardState.file = this.files[0];
+                $('#al-selected-file-name').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+                showALStep('validation');
+                validateALFile();
+            }
+        });
+
+        function validateALFile() {
+            $('#al-validating-spinner').removeClass('d-none');
+            $('#al-validation-stats').addClass('d-none');
+
+            let formData = new FormData();
+            formData.append('file', alWizardState.file);
+
+            $.ajax({
+                url: "{{ url_for('validate_add_leavers') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#al-validating-spinner').addClass('d-none');
+                    $('#al-validation-stats').removeClass('d-none');
+
+                    $('#al-stat-total').text(response.stats.total_rows);
+                    $('#al-stat-valid').text(response.stats.valid_rows);
+                    $('#al-stat-errors').text(response.stats.invalid_rows);
+
+                    alWizardState.stats = response.stats;
+
+                    if (response.stats.invalid_rows > 0) {
+                        $('#al-validation-warning').removeClass('d-none');
+                        let errorMsg = `Found ${response.stats.invalid_rows} invalid rows. These will be skipped.`;
+                        if (response.validation_errors && response.validation_errors.length > 0) {
+                            errorMsg += '<br><small>' + response.validation_errors.slice(0, 3).join('<br>') + '</small>';
+                        }
+                        $('#al-validation-warning-msg').html(errorMsg);
+
+                        $('#al-error-details-section').removeClass('d-none');
+                        let errorDetailsHtml = '';
+                        const errorsToShow = response.validation_errors.slice(0, 20);
+                        errorsToShow.forEach(err => {
+                            errorDetailsHtml += `<p>${err}</p>`;
+                        });
+                        $('#al-error-details-list').html(errorDetailsHtml);
+                    } else {
+                        $('#al-validation-warning').addClass('d-none');
+                        $('#al-error-details-section').addClass('d-none');
+                    }
+                },
+                error: function (err) {
+                    $('#al-validating-spinner').addClass('d-none');
+                    let errorMsg = 'Validation failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                        if (err.responseJSON.available_columns) {
+                            errorMsg += '<br><small>Available columns: ' + err.responseJSON.available_columns.join(', ') + '</small>';
+                        }
+                    }
+                    alert(errorMsg);
+                    showALStep('upload');
+                }
+            });
+        }
+
+        function startALProcessing() {
+            showALStep('processing');
+
+            // No need to send file again - it's already stored temporarily on server
+            alLog("Starting add leavers process...", 'text-info');
+            alLog(`Total rows to process: ${alWizardState.stats.total_rows}`, 'text-muted');
+
+            let progress = 0;
+            let totalRows = alWizardState.stats.total_rows;
+            let processedRows = 0;
+
+            let progressInterval = setInterval(() => {
+                if (progress < 85) {
+                    progress += Math.random() * 8;
+                    processedRows = Math.floor((progress / 100) * totalRows);
+                    updateALProgress(Math.min(85, progress), processedRows, totalRows);
+                }
+            }, 400);
+
+            // Send empty POST request - server will use the temporarily stored file
+            $.ajax({
+                url: "{{ url_for('process_add_leavers') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({}), // Empty data since file is already stored
+                success: function (response) {
+                    clearInterval(progressInterval);
+                    updateALProgress(100, totalRows, totalRows);
+
+                    alLog("✓ Processing complete!", 'text-success');
+                    alLog(`Employees marked as left: ${response.results.updates}`, 'text-success');
+                    if (response.results.errors > 0) {
+                        alLog(`Errors: ${response.results.errors}`, 'text-warning');
+                    }
+
+                    setTimeout(() => {
+                        showALResults(response.results);
+                    }, 800);
+                },
+                error: function (err) {
+                    clearInterval(progressInterval);
+                    let errorMsg = 'Processing failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                    }
+                    alLog("✗ Error: " + errorMsg, 'text-danger');
+                    alert('Processing failed: ' + errorMsg);
+                    showALStep('upload'); // Go back to upload step on error
+                }
+            });
+        }
+
+
+        function updateALProgress(percent, processed, total) {
+            let p = Math.round(percent);
+            $('#al-process-progress-bar').css('width', p + '%').text(p + '%');
+            $('#al-process-status-text').text(p < 100 ? 'Processing records...' : 'Finalizing...');
+            $('#al-process-count').text(`${processed}/${total}`);
+        }
+
+        function alLog(msg, className = 'text-success') {
+            let time = new Date().toLocaleTimeString();
+            $('#al-process-logs').append(`<div class="${className}">[${time}] ${msg}</div>`);
+            let d = $('#al-process-logs');
+            d.scrollTop(d.prop("scrollHeight"));
+        }
+
+        function showALResults(results) {
+            showALStep('results');
+            $('#al-result-total').text(results.total_processed);
+            $('#al-result-updates').text(results.updates);
+            $('#al-result-errors').text(results.errors);
+
+            if (results.error_details && results.error_details.length > 0) {
+                $('#al-error-details-section').removeClass('d-none');
+                const errorList = $('#al-error-details-list');
+                errorList.empty();
+
+                results.error_details.forEach((error, index) => {
+                    errorList.append(`
+                        <div class="p-2 mb-2 border-start border-danger border-3 bg-light">
+                            <strong class="text-danger">${index + 1}.</strong> ${error}
+                        </div>
+                    `);
+                });
+            } else {
+                $('#al-error-details-section').addClass('d-none');
+            }
+        }
+
+        let amWizardState = { file: null, stats: null };
+
+        function openAddManualWizard() {
+            amWizardState = { file: null, stats: null };
+            $('#amFileInput').val('');
+            $('#am-selected-file-name').addClass('d-none').text('');
+            $('#am-process-logs').html('<div class="text-muted">> Ready to start...</div>');
+            showAMStep('upload');
+            $('#addManualWizardModal').modal('show');
+        }
+
+        function showAMStep(stepName) {
+            $('#addManualWizardModal .wizard-step').addClass('d-none');
+            $(`#am-step-${stepName}`).removeClass('d-none');
+        }
+
+        $('#amFileInput').change(function (e) {
+            if (this.files && this.files[0]) {
+                amWizardState.file = this.files[0];
+                $('#am-selected-file-name').removeClass('d-none').text(`Selected: ${this.files[0].name}`);
+                showAMStep('validation');
+                validateAMFile();
+            }
+        });
+
+        function validateAMFile() {
+            $('#am-validating-spinner').removeClass('d-none');
+            $('#am-validation-stats').addClass('d-none');
+
+            let formData = new FormData();
+            formData.append('file', amWizardState.file);
+
+            $.ajax({
+                url: "{{ url_for('validate_add_manual') }}",
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#am-validating-spinner').addClass('d-none');
+                    $('#am-validation-stats').removeClass('d-none');
+
+                    $('#am-stat-total').text(response.stats.total_rows);
+                    $('#am-stat-valid').text(response.stats.valid_rows);
+                    $('#am-stat-errors').text(response.stats.invalid_rows);
+
+                    amWizardState.stats = response.stats;
+
+                    if (response.stats.invalid_rows > 0) {
+                        $('#am-validation-warning').removeClass('d-none');
+                        let errorMsg = `Found ${response.stats.invalid_rows} invalid rows. These will be skipped.`;
+                        if (response.validation_errors && response.validation_errors.length > 0) {
+                            errorMsg += '<br><small>' + response.validation_errors.slice(0, 3).join('<br>') + '</small>';
+                        }
+                        $('#am-validation-warning-msg').html(errorMsg);
+
+                        // Added error details section
+                        $('#am-error-details-section').removeClass('d-none');
+                        let errorDetailsHtml = '';
+                        const errorsToShow = response.validation_errors.slice(0, 20);
+                        errorsToShow.forEach(err => {
+                            errorDetailsHtml += `<p>${err}</p>`;
+                        });
+                        $('#am-error-details-list').html(errorDetailsHtml);
+                    } else {
+                        $('#am-validation-warning').addClass('d-none');
+                        $('#am-error-details-section').addClass('d-none');
+                    }
+                },
+                error: function (err) {
+                    $('#am-validating-spinner').addClass('d-none');
+                    let errorMsg = 'Validation failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                        if (err.responseJSON.available_columns) {
+                            errorMsg += '<br><small>Available columns: ' + err.responseJSON.available_columns.join(', ') + '</small>';
+                        }
+                    }
+                    alert(errorMsg);
+                    showAMStep('upload');
+                }
+            });
+        }
+
+        function startAMProcessing() {
+            showAMStep('processing');
+
+            // No need to send file again - it's already stored temporarily on server
+            amLog("Starting add manual process...", 'text-info');
+            amLog(`Total rows to process: ${amWizardState.stats.total_rows}`, 'text-muted');
+
+            let progress = 0;
+            let totalRows = amWizardState.stats.total_rows;
+            let processedRows = 0;
+
+            let progressInterval = setInterval(() => {
+                if (progress < 85) {
+                    progress += Math.random() * 8;
+                    processedRows = Math.floor((progress / 100) * totalRows);
+                    updateAMProgress(Math.min(85, progress), processedRows, totalRows);
+                }
+            }, 400);
+
+            // Send empty POST request - server will use the temporarily stored file
+            $.ajax({
+                url: "{{ url_for('process_add_manual') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({}), // Empty data since file is already stored
+                success: function (response) {
+                    clearInterval(progressInterval);
+                    updateAMProgress(100, totalRows, totalRows);
+
+                    amLog("✓ Processing complete!", 'text-success');
+                    amLog(`Employees added: ${response.results.inserts}`, 'text-success');
+                    if (response.results.errors > 0) {
+                        amLog(`Errors: ${response.results.errors}`, 'text-warning');
+                    }
+
+                    setTimeout(() => {
+                        showAMResults(response.results);
+                    }, 800);
+                },
+                error: function (err) {
+                    clearInterval(progressInterval);
+                    let errorMsg = 'Processing failed';
+                    if (err.responseJSON && err.responseJSON.error) {
+                        errorMsg = err.responseJSON.error;
+                    }
+                    amLog("✗ Error: " + errorMsg, 'text-danger');
+                    alert('Processing failed: ' + errorMsg);
+                    showAMStep('upload'); // Go back to upload step on error
+                }
+            });
+        }
+
+        function updateAMProgress(percent, processed, total) {
+            let p = Math.round(percent);
+            $('#am-process-progress-bar').css('width', p + '%').text(p + '%');
+            $('#am-process-status-text').text(p < 100 ? 'Processing records...' : 'Finalizing...');
+            $('#am-process-count').text(`${processed}/${total}`);
+        }
+
+        function amLog(msg, className = 'text-success') {
+            let time = new Date().toLocaleTimeString();
+            $('#am-process-logs').append(`<div class="${className}">[${time}] ${msg}</div>`);
+            let d = $('#am-process-logs');
+            d.scrollTop(d.prop("scrollHeight"));
+        }
+
+        function showAMResults(results) {
+            showAMStep('results');
+            $('#am-result-total').text(results.total_processed);
+            $('#am-result-inserts').text(results.inserts);
+            $('#am-result-errors').text(results.errors);
+
+            // Added error details section
+            if (results.error_details && results.error_details.length > 0) {
+                $('#am-error-details-section').removeClass('d-none');
+                const errorList = $('#am-error-details-list');
+                errorList.empty();
+
+                results.error_details.forEach((error, index) => {
+                    errorList.append(`
+                        <div class="p-2 mb-2 border-start border-danger border-3 bg-light">
+                            <strong class="text-danger">${index + 1}.</strong> ${error}
+                        </div>
+                    `);
+                });
+            } else {
+                $('#am-error-details-section').addClass('d-none');
+            }
+        }
+
+        // Existing DataTable and other scripts...
+        $(document).ready(function () {
+            var table = $('#employeeTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "{{ url_for('get_employees_data') }}",
+                    "type": "POST",
+                    "data": function (d) {
+                        if (d.draw === 1) {
+                            d.include_stats = true;
+                        }
+                    },
+                    "dataSrc": function (json) {
+                        if (json.stats) {
+                            $('#totalEmployees').text(json.stats.total_employees || 0);
+                            $('#activeEmployees').text(json.stats.active_employees || 0);
+                            $('#leftEmployees').text(json.stats.left_employees || 0);
+                        }
+                        return json.data;
+                    }
+                },
+                "dom": 'Bfrtip',
+                "buttons": [
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-download me-2"></i>Export Full CSV',
+                        className: 'btn btn-success btn-sm',
+                        action: function (e, dt, node, config) {
+                            // Show buyer selection modal instead of direct download
+                            $('#buyerSelectionModal').modal('show');
+                        }
+                    }
+                ],
+                "columns": [
+                    { "data": "employee_id" },
+                    { "data": "employee_name" },
+                    { "data": "worker_type" },
+                    { "data": "department" },
+                    { "data": "designation" },
+                    { "data": "mobile_number" },
+                    { "data": "gender" },
+                    { "data": "company_name" },
+                    { "data": "cnic_no" },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return '<button class="btn btn-sm btn-primary edit-btn" data-id="' + row.employee_id + '"><i class="fas fa-edit"></i></button>';
+                        }
+                    }
+                ],
+                "order": [[0, "desc"]],
+                "language": {
+                    "search": '<i class="fas fa-search me-2"></i>Search:',
+                    "lengthMenu": "Show _MENU_ entries per page",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ employees",
+                    "paginate": {
+                        "first": '<i class="fas fa-angle-double-left"></i>',
+                        "previous": '<i class="fas fa-angle-left"></i>',
+                        "next": '<i class="fas fa-angle-right"></i>',
+                        "last": '<i class="fas fa-angle-double-right"></i>'
+                    }
+                }
+            });
+            // Load buyers for selection
+            function loadBuyersForExport() {
+                $.ajax({
+                    url: "{{ url_for('get_buyers_for_export') }}",
+                    method: 'GET',
+                    success: function (response) {
+                        var checkboxesHtml = '';
+                        response.buyers.forEach(function (buyer) {
+                            checkboxesHtml += `
+                    <div class="form-check">
+                        <input class="form-check-input buyer-checkbox" type="checkbox" value="${buyer.buyer_id}" id="buyer-${buyer.buyer_id}">
+                        <label class="form-check-label" for="buyer-${buyer.buyer_id}">
+                            ${buyer.buyer_name}
+                        </label>
+                    </div>
+                `;
+                        });
+                        $('#buyerCheckboxes').html(checkboxesHtml);
+                    },
+                    error: function (error) {
+                        console.error('Error loading buyers:', error);
+                        showAlert('Error loading buyers list', 'danger');
+                    }
+                });
+            }
+
+            // Select All Buyers checkbox handler
+            $('#selectAllBuyers').change(function () {
+                $('.buyer-checkbox').prop('checked', this.checked);
+            });
+
+            // Show buyer modal when it's opened
+            $('#buyerSelectionModal').on('show.bs.modal', function () {
+                loadBuyersForExport();
+            });
+
+            // Confirm export button handler
+            $('#confirmExportBtn').click(function () {
+                var selectedBuyers = [];
+                $('.buyer-checkbox:checked').each(function () {
+                    selectedBuyers.push($(this).val());
+                });
+
+                if (selectedBuyers.length === 0) {
+                    showAlert('Please select at least one buyer', 'warning');
+                    return;
+                }
+
+                $('#buyerSelectionModal').modal('hide');
+
+                // Show loading spinner
+                var originalHtml = $('.buttons-csv').html();
+                $('.buttons-csv').html('<span class="spinner-border spinner-border-sm me-2" role="status"></span>Exporting...');
+
+                // Trigger the server-side export with selected buyers
+                var url = "{{ url_for('export_employees_csv') }}?buyers=" + selectedBuyers.join(',');
+                window.location.href = url;
+
+                // Reset button after 2 seconds
+                setTimeout(function () {
+                    $('.buttons-csv').html(originalHtml);
+                }, 2000);
+            });
+
+            // Helper function to show alerts (add this if not already present)
+            function showAlert(message, type = 'success') {
+                const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+                $('.main-container').prepend(alertHtml);
+
+                setTimeout(() => {
+                    $('.alert').fadeOut();
+                }, 5000);
+            }
+            // Edit button handler
+            $('#employeeTable').on('click', '.edit-btn', function () {
+                var data = table.row($(this).closest('tr')).data();
+                $('#editEmployeeId').val(data.employee_id);
+                $('#editName').val(data.employee_name);
+                $('#editWorkerType').val(data.worker_type);
+                $('#editDepartment').val(data.department);
+                $('#editDesignation').val(data.designation);
+                $('#editMobileNumber').val(data.mobile_number);
+                $('#editGender').val(data.gender);
+                $('#editCompanyName').val(data.company_name);
+                $('#editCNIC').val(data.cnic_no);
+                $('#editModal').modal('show');
+            });
+
+            $('#saveChangesBtn').click(function () {
+                var employeeData = {
+                    employee_id: $('#editEmployeeId').val(),
+                    employee_name: $('#editName').val(),
+                    worker_type: $('#editWorkerType').val(),
+                    department: $('#editDepartment').val(),
+                    designation: $('#editDesignation').val(),
+                    mobile_number: $('#editMobileNumber').val(),
+                    gender: $('#editGender').val(),
+                    cnic_no: $('#editCNIC').val()
+                };
+
+                $.ajax({
+                    url: "{{ url_for('update_employee') }}",
+                    method: 'POST',
+                    data: JSON.stringify(employeeData),
+                    contentType: 'application/json',
+                    success: function (response) {
+                        $('#editModal').modal('hide');
+                        table.ajax.reload();
+                        alert('Employee updated successfully');
+                    },
+                    error: function (error) {
+                        console.error('Error updating employee:', error);
+                        alert('Error updating employee');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

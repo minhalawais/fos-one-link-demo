@@ -145,6 +145,37 @@ const AnimatedHeading = () => {
 
 // --- ATMOSPHERE COMPONENTS ---
 
+// Active Module Header - Professional reveal for selected modules
+const ActiveModuleHeader = ({ id, title, accentColor }: { id: number; title: string; accentColor: string }) => (
+  <motion.div
+    initial={{ y: -10, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    exit={{ y: 5, opacity: 0 }}
+    transition={SPRING_PHYSICS}
+    className="flex items-center gap-4 bg-white/40 backdrop-blur-md px-5 py-2 rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.08)] pointer-events-auto"
+  >
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] font-black tracking-[0.2em] uppercase text-[#284952]/40">Module</span>
+      <div
+        className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-mono font-black border-2"
+        style={{
+          color: accentColor,
+          borderColor: `${accentColor}40`,
+          backgroundColor: `${accentColor}10`
+        }}
+      >
+        {String(id).padStart(2, '0')}
+      </div>
+    </div>
+
+    <div className="w-[1px] h-6 bg-[#284952]/10" />
+
+    <h2 className="text-lg md:text-xl font-extrabold tracking-tight text-[#284952]">
+      {title}
+    </h2>
+  </motion.div>
+)
+
 const CinematicGrain = () => (
   <div
     className="pointer-events-none fixed inset-0 z-[100] opacity-[0.03] mix-blend-hard-light"
@@ -321,38 +352,54 @@ export default function App() {
 
   const currentSlideData = activeSlide !== null ? slides[activeSlide] : null
 
-  // --- Audio Logic (Preserved) ---
+  // --- Audio Logic (Updated for Pause/Play) ---
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current = null
-    }
+    // Cleanup function to pause audio on unmount or before switching
+    const cleanup = () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.removeEventListener("ended", handleEnded);
+      }
+    };
+
+    const handleEnded = () => {
+      if (activeSlide !== null && activeSlide < slides.length - 1) {
+        setActiveSlide((prev) => (prev !== null ? prev + 1 : null));
+        setIsPlaying(true);
+        setCurrentTime(0);
+      } else {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setActiveSlide(null);
+      }
+    };
 
     if (isPlaying && currentSlideData?.audioPath) {
-      audioRef.current = new Audio(currentSlideData.audioPath)
-      audioRef.current.volume = isMuted ? 0 : volume
-      audioRef.current.currentTime = 0
-      audioRef.current.play().catch((e) => console.warn("Autoplay blocked:", e))
+      // If audio object doesn't exist or source changed, create it
+      const currentSrc = audioRef.current?.src ? new URL(audioRef.current.src).pathname : '';
+      const targetSrc = currentSlideData.audioPath;
 
-      const handleEnded = () => {
-        if (activeSlide !== null && activeSlide < slides.length - 1) {
-          setActiveSlide((prev) => (prev !== null ? prev + 1 : null))
-          setIsPlaying(true)
-          setCurrentTime(0)
-        } else {
-          setIsPlaying(false)
-          setCurrentTime(0)
-          setActiveSlide(null)
+      if (!audioRef.current || !currentSrc.endsWith(targetSrc)) {
+        if (audioRef.current) {
+          audioRef.current.pause();
         }
+        audioRef.current = new Audio(targetSrc);
+        audioRef.current.currentTime = currentTime;
       }
 
-      audioRef.current.addEventListener("ended", handleEnded)
-      return () => {
-        audioRef.current?.removeEventListener("ended", handleEnded)
-        audioRef.current?.pause()
-      }
+      audioRef.current.volume = isMuted ? 0 : volume;
+      audioRef.current.play().catch((e) => console.warn("Playback blocked or interrupted:", e));
+      audioRef.current.addEventListener("ended", handleEnded);
+    } else {
+      audioRef.current?.pause();
     }
-  }, [isPlaying, activeSlide])
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener("ended", handleEnded);
+      }
+    };
+  }, [isPlaying, activeSlide]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = isMuted ? 0 : volume
@@ -428,8 +475,25 @@ export default function App() {
       {/* Floating Header "Island" */}
       <nav className="w-full pt-8 pb-4 flex flex-col items-center justify-center z-50 relative pointer-events-none gap-6">
         <AnimatedLogo />
-        <AnimatePresence>
-          {activeSlide === null && <AnimatedHeading />}
+        <AnimatePresence mode="wait">
+          {activeSlide === null || (!isPlaying && currentTime === 0) ? (
+            <AnimatedHeading key="main-heading" />
+          ) : (
+            currentSlideData && (
+              <ActiveModuleHeader
+                key={`module-header-${currentSlideData.id}`}
+                id={currentSlideData.id}
+                title={currentSlideData.headline}
+                accentColor={
+                  currentSlideData.id === 1 ? "#60BA81" :
+                    currentSlideData.id === 2 ? "#F5A83C" :
+                      currentSlideData.id === 3 ? "#60BA81" :
+                        currentSlideData.id === 4 ? "#3B82F6" :
+                          "#8B5CF6"
+                }
+              />
+            )
+          )}
         </AnimatePresence>
       </nav>
 

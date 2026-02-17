@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counseling Session Management | FOS Personal Account</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <!-- Quill.js CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Shared Personal Dashboard Styles -->
+    <link href="{{ url_for('static', filename='css/personal-dashboard.css') }}" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #60BA81;
+            --primary1-color: #284952;
+            --secondary-color: #f5a83c;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --light-bg: #f8fafc;
+            --dark-bg: #1e293b;
+            --border-color: #e2e8f0;
+            --text-muted: #64748b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary1-color) 0%, #1e3a42 100%) !important;
+            box-shadow: var(--card-shadow-lg);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+            margin-right: 12px;
+            filter: brightness(1.1);
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            margin: 0 3px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar-nav .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .navbar-nav .nav-link:hover::before {
+            left: 100%;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .navbar-nav .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white !important;
+            box-shadow: 0 4px 8px rgba(96, 186, 129, 0.3);
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow-lg);
+            margin: 2rem auto;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary1-color));
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary1-color) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(180deg);
+            }
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+            box-shadow: 0 4px 8px rgba(96, 186, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4da570, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(96, 186, 129, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #047857);
+            color: white;
+            box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #b91c1c);
+            color: white;
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, var(--info-color), #0e7490);
+            color: white;
+            box-shadow: 0 4px 8px rgba(8, 145, 178, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            box-shadow: 0 4px 8px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--secondary-color), #e09420);
+            color: white;
+            box-shadow: 0 4px 8px rgba(245, 168, 60, 0.3);
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(96, 186, 129, 0.15);
+            background-color: white;
+            transform: translateY(-1px);
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary1-color));
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            background-color: #f8fafc;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .table {
+            margin-bottom: 0;
+            border: none;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 1.25rem 1rem;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, rgba(96, 186, 129, 0.05), rgba(40, 73, 82, 0.05));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50rem;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+
+        .status-open {
+            background: linear-gradient(135deg, #206E71, #1a5a5d);
+            color: white;
+        }
+
+        .status-in-progress {
+            background: linear-gradient(135deg, #2D9480, #247d6b);
+            color: white;
+        }
+
+        .status-closed {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+        }
+
+        .status-resolved {
+            background: linear-gradient(135deg, #A5DC78, #8bc34a);
+            color: white;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, var(--secondary-color), #e09420);
+            color: white;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, var(--success-color), #047857);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+        }
+
+        .card {
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .session-type-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+            display: inline-block;
+        }
+
+        .anonymous-badge {
+            background: linear-gradient(135deg, var(--info-color), #0e7490);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, white, #f8fafc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2s ease-in-out infinite;
+            background: white;
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .loading-logo {
+            width: 80%;
+            height: auto;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: var(--card-shadow-lg);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .form-section h5 {
+            color: var(--primary1-color);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section h5::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        /* Quill Editor Styles */
+        .ql-editor {
+            min-height: 150px;
+            font-size: 16px;
+            line-height: 1.6;
+            padding: 12px 15px;
+            color: #334155;
+        }
+
+        .ql-container.ql-snow {
+            border-radius: 0 0 8px 8px;
+            border: 2px solid var(--border-color);
+        }
+
+        .ql-toolbar.ql-snow {
+            border-radius: 8px 8px 0 0;
+            border: 2px solid var(--border-color);
+            background-color: #f8fafc;
+        }
+
+        /* DataTables Styling */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            margin: 1rem 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 6px;
+            margin: 0 2px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .stat-card .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.sessions .stat-icon {
+            background: linear-gradient(135deg, var(--primary-color), #4da570);
+            color: white;
+        }
+
+        .stat-card.anonymous .stat-icon {
+            background: linear-gradient(135deg, var(--info-color), #0e7490);
+            color: white;
+        }
+
+        .stat-card.types .stat-icon {
+            background: linear-gradient(135deg, var(--secondary-color), #e09420);
+            color: white;
+        }
+
+        .stat-card.recent .stat-icon {
+            background: linear-gradient(135deg, var(--primary1-color), #1e3a42);
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary1-color);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                padding: 2rem 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .btn .spinner-border {
+            vertical-align: middle;
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .dataTables_wrapper .dt-buttons .btn {
+            margin-right: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .dataTables_wrapper .dt-buttons .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo" class="logo-img">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_logs') }}">Logs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_company') }}">Company</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_employee') }}">Employees</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_buyer') }}">Buyers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_offices') }}">Offices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_complaints') }}">Complaints</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link active"
+                            href="{{ url_for('manage_counseling_sessions') }}">Counseling</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('survey') }}">Surveys</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('user_management') }}">Users</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('sms_management') }}">SMS</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('manage_backups') }}">Backups</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="page-header">
+                <h1><i class="fas fa-comments me-3"></i>Counseling Session Management</h1>
+                <p>Manage and track employee counseling sessions</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card sessions">
+                    <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <span class="stat-number" id="totalSessions">{{ data|length if data else 0 }}</span>
+                    <div class="stat-label">Total Sessions</div>
+                </div>
+                <div class="stat-card anonymous">
+                    <div class="stat-icon"><i class="fas fa-user-secret"></i></div>
+                    <span class="stat-number" id="anonymousSessions">{{ data|selectattr('is_anonymous')|list|length if
+                        data else 0 }}</span>
+                    <div class="stat-label">Anonymous Sessions</div>
+                </div>
+                <div class="stat-card types">
+                    <div class="stat-icon"><i class="fas fa-tags"></i></div>
+                    <span class="stat-number" id="sessionTypes">{{ data|map(attribute='session_type')|unique|list|length
+                        if data else 0 }}</span>
+                    <div class="stat-label">Session Types</div>
+                </div>
+                <div class="stat-card recent">
+                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <span class="stat-number" id="thisMonthSessions">-</span>
+                    <div class="stat-label">This Month</div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="counselingTable" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-ticket-alt me-2"></i>Ticket No.</th>
+                            <th><i class="fas fa-user me-2"></i>Employee</th>
+                            <th><i class="fas fa-building me-2"></i>Company</th>
+                            <th><i class="fas fa-tags me-2"></i>Session Type</th>
+                            <th><i class="fas fa-calendar me-2"></i>Date</th>
+                            <th><i class="fas fa-clock me-2"></i>Time</th>
+                            <th><i class="fas fa-user-secret me-2"></i>Anonymous</th>
+                            <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in data %}
+                        <tr data-session-id="{{ session.session_id }}">
+                            <td>{{ session.ticket_number }}</td>
+                            <td>{{ session.employee_name }}</td>
+                            <td>{{ session.company_name }}</td>
+                            <td>
+                                <span class="session-type-badge">
+                                    {{ session.session_type|replace('_', ' ')|title }}
+                                </span>
+                            </td>
+                            <td>{{ session.session_date }}</td>
+                            <td>{{ session.session_time_period }}</td>
+                            <td>
+                                {% if session.is_anonymous %}
+                                <span class="anonymous-badge"><i class="fas fa-check me-1"></i>Yes</span>
+                                {% else %}
+                                <span class="text-muted">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span
+                                    class="status-badge status-{{ session.status|lower|replace(' ', '-') if session.status else 'open' }}">
+                                    {{ session.status or 'Open' }}
+                                </span>
+                            </td>
+                            <td style="padding: 5px; text-align: center; white-space: nowrap;">
+                                <button class="btn btn-sm btn-primary view-btn me-1 p-3"
+                                    data-id="{{ session.session_id }}" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning edit-btn me-1 p-3"
+                                    data-id="{{ session.session_id }}" title="Edit Session">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-btn me-1 p-3"
+                                    data-id="{{ session.session_id }}" data-ticket="{{ session.ticket_number }}"
+                                    title="Delete Session">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Session Modal -->
+    <div class="modal fade" id="viewSessionModal" tabindex="-1" aria-labelledby="viewSessionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewSessionModalLabel">
+                        <i class="fas fa-comments me-2"></i>Counseling Session Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-user-circle me-2"></i>Employee Information</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Ticket Number:</strong> <span id="viewTicketNumber"></span></p>
+                                            <p><strong>Employee Name:</strong> <span id="viewEmployeeName"></span></p>
+                                            <p><strong>FOS ID:</strong> <span id="viewEmployeeId"></span></p>
+                                            <p><strong>Gender:</strong> <span id="viewGender"></span></p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Company:</strong> <span id="viewCompanyName"></span></p>
+                                            <p><strong>Department:</strong> <span id="viewDepartment"></span></p>
+                                            <p><strong>Designation:</strong> <span id="viewDesignation"></span></p>
+                                            <p><strong>Mobile:</strong> <span id="viewMobile"></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-clipboard-list me-2"></i>Session Information</h5>
+                                    <p><strong>Session Type:</strong> <span id="viewSessionType"
+                                            class="session-type-badge"></span></p>
+                                    <p><strong>Session Date:</strong> <span id="viewSessionDate"></span></p>
+                                    <p><strong>Time Period:</strong> <span id="viewTimePeriod"></span></p>
+                                    <p><strong>Status:</strong> <span id="viewStatus" class="status-badge"></span></p>
+                                    <p><strong>Anonymous:</strong> <span id="viewAnonymous"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-file-alt me-2"></i>Session Details</h5>
+                                    <div id="viewSessionDetails" class="ql-editor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-tasks me-2"></i>Action Items / Recommendations</h5>
+                                    <div id="viewActionItems" class="ql-editor"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Session Modal -->
+    <div class="modal fade" id="editSessionModal" tabindex="-1" aria-labelledby="editSessionModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSessionModalLabel">
+                        <i class="fas fa-edit me-2"></i>Edit Counseling Session
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSessionForm">
+                        <input type="hidden" id="editSessionId">
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-info-circle"></i>Session Information</h5>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="editTicketNumber" class="form-label">Ticket Number</label>
+                                    <input type="text" class="form-control" id="editTicketNumber" readonly>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="editStatus" class="form-label">Status</label>
+                                    <select class="form-select" id="editStatus">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="editSessionType" class="form-label">Session Type</label>
+                                    <select class="form-select" id="editSessionType">
+                                        <option value="harassment">Harassment</option>
+                                        <option value="unfair_employment">Unfair Employment</option>
+                                        <option value="child_labor">Child Labor</option>
+                                        <option value="forced_labor">Forced Labor</option>
+                                        <option value="discrimination">Discrimination</option>
+                                        <option value="ethical_business">Ethical Business</option>
+                                        <option value="freedom_of_association">Freedom of Association</option>
+                                        <option value="wages_benefits">Wages & Benefits</option>
+                                        <option value="working_hours">Working Hours</option>
+                                        <option value="workplace_health_safety_environment">Health & Safety</option>
+                                        <option value="workplace_discipline">Workplace Discipline</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="editIsAnonymous" class="form-label">Anonymous Session</label>
+                                    <select class="form-select" id="editIsAnonymous">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="editSessionDate" class="form-label">Session Date</label>
+                                    <input type="date" class="form-control" id="editSessionDate">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="editSessionTimePeriod" class="form-label">Time Period</label>
+                                    <input type="text" class="form-control" id="editSessionTimePeriod"
+                                        placeholder="e.g. 10:00 AM - 11:00 AM">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="editWorkerType" class="form-label">Worker Type</label>
+                                    <select class="form-select" id="editWorkerType">
+                                        <option value="Worker">Worker</option>
+                                        <option value="Staff">Staff</option>
+                                        <option value="Management">Management</option>
+                                        <option value="Contractor">Contractor</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="editEmployeeId" class="form-label">FOS ID</label>
+                                <input type="text" class="form-control" id="editEmployeeId">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5><i class="fas fa-file-alt"></i>Session Details</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Session Details</label>
+                                <div id="editSessionDetailsEditor"></div>
+                                <input type="hidden" id="editSessionDetails">
+                            </div>
+                        </div>
+
+                        <div class="form-section" style="border-bottom: none;">
+                            <h5><i class="fas fa-tasks"></i>Action Items / Recommendations</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Action Items</label>
+                                <div id="editActionItemsEditor"></div>
+                                <input type="hidden" id="editActionItems">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" id="saveEditBtn">
+                        <i class="fas fa-save me-2"></i>Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the counseling session with ticket number <strong
+                            id="deleteTicketNumber"></strong>?</p>
+                    <p class="text-danger"><i class="fas fa-warning me-2"></i>This action cannot be undone.</p>
+                    <input type="hidden" id="deleteSessionId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                        <i class="fas fa-trash me-2"></i>Delete Session
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            var table = $('#counselingTable').DataTable({
+                order: [[4, 'desc']], // Sort by date descending
+                pageLength: 25,
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel me-2"></i>Export Excel',
+                        className: 'btn btn-success',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fas fa-file-csv me-2"></i>Export CSV',
+                        className: 'btn btn-info',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7]
+                        }
+                    }
+                ]
+            });
+
+            // Calculate this month's sessions
+            var thisMonthCount = 0;
+            var currentMonth = new Date().getMonth();
+            var currentYear = new Date().getFullYear();
+
+            $('#counselingTable tbody tr').each(function () {
+                var dateText = $(this).find('td:eq(4)').text();
+                if (dateText) {
+                    var sessionDate = new Date(dateText);
+                    if (sessionDate.getMonth() === currentMonth && sessionDate.getFullYear() === currentYear) {
+                        thisMonthCount++;
+                    }
+                }
+            });
+            $('#thisMonthSessions').text(thisMonthCount);
+
+            // Initialize Quill editors for edit modal
+            var editSessionDetailsEditor = new Quill('#editSessionDetailsEditor', {
+                theme: 'snow',
+                placeholder: 'Enter session details...'
+            });
+
+            var editActionItemsEditor = new Quill('#editActionItemsEditor', {
+                theme: 'snow',
+                placeholder: 'Enter action items...'
+            });
+
+            // View Session - Using event delegation for DataTables pagination support
+            $('#counselingTable').on('click', '.view-btn', function () {
+                var sessionId = $(this).data('id');
+
+                // Show loading
+                $(this).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                $.ajax({
+                    url: '/get_counseling_session/' + sessionId,
+                    type: 'GET',
+                    success: function (data) {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                            return;
+                        }
+
+                        // Populate modal - for anonymous sessions, don't show "Anonymous" text, show "-" instead
+                        var isAnon = data.is_anonymous;
+
+                        $('#viewTicketNumber').text(data.ticket_number);
+                        $('#viewEmployeeName').text(isAnon && data.employee_name === 'Anonymous' ? '-' : data.employee_name);
+                        $('#viewEmployeeId').text(isAnon && data.employee_id === 'Anonymous' ? '-' : data.employee_id);
+                        $('#viewGender').text(isAnon && data.gender === 'Anonymous' ? '-' : data.gender);
+                        $('#viewCompanyName').text(data.company_name);
+                        $('#viewDepartment').text(isAnon && data.department === 'Anonymous' ? '-' : data.department);
+                        $('#viewDesignation').text(isAnon && data.designation === 'Anonymous' ? '-' : data.designation);
+                        $('#viewMobile').text(isAnon && data.mobile_number === 'Anonymous' ? '-' : data.mobile_number);
+                        $('#viewSessionType').text(data.session_type ? data.session_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : '-');
+                        $('#viewSessionDate').text(data.session_date);
+                        $('#viewTimePeriod').text(data.session_time_period);
+                        $('#viewStatus').text(data.status || 'Active').attr('class', 'status-badge status-' + (data.status || 'active').toLowerCase().replace(' ', '-'));
+                        $('#viewAnonymous').html(data.is_anonymous ? '<span class="anonymous-badge"><i class="fas fa-check me-1"></i>Yes</span>' : 'No');
+                        $('#viewSessionDetails').html(data.session_details || '<em class="text-muted">No details provided</em>');
+                        $('#viewActionItems').html(data.action_items || '<em class="text-muted">No action items</em>');
+
+                        $('#viewSessionModal').modal('show');
+                    },
+                    complete: function () {
+                        $('.view-btn[data-id="' + sessionId + '"]').html('<i class="fas fa-eye"></i>');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading session details: ' + error);
+                    }
+                });
+            });
+
+            // Edit Session - Using event delegation for DataTables pagination support
+            $('#counselingTable').on('click', '.edit-btn', function () {
+                var sessionId = $(this).data('id');
+
+                // Show loading
+                $(this).html('<i class="fas fa-spinner fa-spin"></i>');
+
+                $.ajax({
+                    url: '/get_counseling_session/' + sessionId,
+                    type: 'GET',
+                    success: function (data) {
+                        if (data.error) {
+                            alert('Error: ' + data.error);
+                            return;
+                        }
+
+                        // Populate edit form
+                        $('#editSessionId').val(data.session_id);
+                        $('#editTicketNumber').val(data.ticket_number);
+                        $('#editStatus').val(data.status || 'Active');
+                        $('#editSessionType').val(data.session_type);
+
+                        // Set anonymous status
+                        var isAnon = data.is_anonymous ? '1' : '0';
+                        $('#editIsAnonymous').val(isAnon);
+
+                        // Session date and time
+                        if (data.session_date) {
+                            var dateStr = data.session_date;
+                            if (dateStr.includes('/')) {
+                                var parts = dateStr.split('/');
+                                if (parts.length === 3) {
+                                    dateStr = parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+                                }
+                            }
+                            $('#editSessionDate').val(dateStr);
+                        }
+                        $('#editSessionTimePeriod').val(data.session_time_period || '');
+                        $('#editWorkerType').val(data.worker_type || 'Worker');
+
+                        // FOS ID only
+                        $('#editEmployeeId').val(data.employee_id === 'Anonymous' ? '' : data.employee_id);
+
+                        // Rich text editors
+                        editSessionDetailsEditor.root.innerHTML = data.session_details || '';
+                        editActionItemsEditor.root.innerHTML = data.action_items || '';
+
+                        $('#editSessionModal').modal('show');
+                    },
+                    complete: function () {
+                        $('.edit-btn[data-id="' + sessionId + '"]').html('<i class="fas fa-edit"></i>');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error loading session for edit: ' + error);
+                    }
+                });
+            });
+
+            // Save Edit
+            $('#saveEditBtn').click(function () {
+                var sessionId = $('#editSessionId').val();
+                var data = {
+                    session_id: sessionId,
+                    status: $('#editStatus').val(),
+                    session_type: $('#editSessionType').val(),
+                    is_anonymous: $('#editIsAnonymous').val() === '1',
+                    session_date: $('#editSessionDate').val(),
+                    session_time_period: $('#editSessionTimePeriod').val(),
+                    worker_type: $('#editWorkerType').val(),
+                    employee_id: $('#editEmployeeId').val(),
+                    session_details: editSessionDetailsEditor.root.innerHTML,
+                    action_items: editActionItemsEditor.root.innerHTML
+                };
+
+                $(this).html('<i class="fas fa-spinner fa-spin me-2"></i>Saving...');
+                $(this).prop('disabled', true);
+
+                $.ajax({
+                    url: '/update_counseling_session',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Session updated successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error updating session: ' + response.error);
+                        }
+                    },
+                    complete: function () {
+                        $('#saveEditBtn').html('<i class="fas fa-save me-2"></i>Save Changes');
+                        $('#saveEditBtn').prop('disabled', false);
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error updating session: ' + error);
+                    }
+                });
+            });
+
+            // Delete Session - Using event delegation for DataTables pagination support
+            $('#counselingTable').on('click', '.delete-btn', function () {
+                var sessionId = $(this).data('id');
+                var ticketNumber = $(this).data('ticket');
+
+                $('#deleteSessionId').val(sessionId);
+                $('#deleteTicketNumber').text(ticketNumber);
+                $('#deleteModal').modal('show');
+            });
+
+            // Confirm Delete
+            $('#confirmDeleteBtn').click(function () {
+                var sessionId = $('#deleteSessionId').val();
+
+                $(this).html('<i class="fas fa-spinner fa-spin me-2"></i>Deleting...');
+                $(this).prop('disabled', true);
+
+                $.ajax({
+                    url: '/delete_counseling_session',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ session_id: sessionId }),
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Session deleted successfully!');
+                            location.reload();
+                        } else {
+                            alert('Error deleting session: ' + response.error);
+                        }
+                    },
+                    complete: function () {
+                        $('#confirmDeleteBtn').html('<i class="fas fa-trash me-2"></i>Delete Session');
+                        $('#confirmDeleteBtn').prop('disabled', false);
+                        $('#deleteModal').modal('hide');
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Error deleting session: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

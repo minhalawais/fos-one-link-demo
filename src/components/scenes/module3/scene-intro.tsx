@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Search, ShieldCheck, Activity, SearchIcon } from "lucide-react"
+import { Search, ShieldCheck, Activity } from "lucide-react"
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
 
@@ -78,7 +78,7 @@ export const SceneIntro = ({ isActive }: { isActive: boolean }) => {
             transition={{ delay: 0.3, duration: 0.8, ease: IOS_EASE }}
             className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#17161A]"
           >
-            Investigation & Resolution
+            Investigation-Remediation-Satisfaction Framework
           </motion.h1>
 
           <motion.div

@@ -968,7 +968,6 @@ const Slide: React.FC<SlideProps> = ({
       decorativeColor: "#60BA81",
       innerGlow: "radial-gradient(ellipse at top center, rgba(96,186,129,0.1) 0%, transparent 55%)",
       borderGradient: "linear-gradient(135deg, rgba(96,186,129,0.4) 0%, rgba(96,186,129,0.1) 50%, rgba(96,186,129,0.25) 100%)",
-      featureTags: ["Quick Deploy", "One-Click", "Guided Setup"],
       isDark: true,
     },
     {
@@ -985,7 +984,6 @@ const Slide: React.FC<SlideProps> = ({
       decorativeColor: "#F5A83C",
       innerGlow: "radial-gradient(ellipse at top center, rgba(245,168,60,0.1) 0%, transparent 55%)",
       borderGradient: "linear-gradient(135deg, rgba(245,168,60,0.4) 0%, rgba(245,168,60,0.1) 50%, rgba(245,168,60,0.25) 100%)",
-      featureTags: ["Multi-Channel", "Anonymous", "24/7 Access"],
       isDark: true,
     },
     {
@@ -1002,7 +1000,6 @@ const Slide: React.FC<SlideProps> = ({
       decorativeColor: "#60BA81",
       innerGlow: "radial-gradient(ellipse at top center, rgba(96,186,129,0.1) 0%, transparent 55%)",
       borderGradient: "linear-gradient(135deg, rgba(96,186,129,0.4) 0%, rgba(96,186,129,0.1) 50%, rgba(96,186,129,0.25) 100%)",
-      featureTags: ["Workflow Driven", "Resolution Focus"],
       isDark: true,
     },
     {
@@ -1019,7 +1016,6 @@ const Slide: React.FC<SlideProps> = ({
       decorativeColor: "#3B82F6",
       innerGlow: "radial-gradient(ellipse at top center, rgba(59,130,246,0.15) 0%, transparent 55%)",
       borderGradient: "linear-gradient(135deg, rgba(59,130,246,0.5) 0%, rgba(6,182,212,0.2) 50%, rgba(59,130,246,0.3) 100%)",
-      featureTags: ["Real-Time", "AI Insights", "HRDD Ready"],
       isDark: true,
     },
     {
@@ -1036,9 +1032,9 @@ const Slide: React.FC<SlideProps> = ({
       decorativeColor: "#8B5CF6",
       innerGlow: "radial-gradient(ellipse at top center, rgba(139,92,246,0.1) 0%, transparent 55%)",
       borderGradient: "linear-gradient(135deg, rgba(139,92,246,0.4) 0%, rgba(139,92,246,0.1) 50%, rgba(139,92,246,0.25) 100%)",
-      featureTags: ["Multi-Language", "AI Sentiment", "Proactive"],
       isDark: true,
     },
+
   ]
   const currentTheme = themeColors[index % themeColors.length]
 
@@ -1359,14 +1355,14 @@ const Slide: React.FC<SlideProps> = ({
                     : '#FFFFFF',
                 }}
                 animate={{
-                  width: isPlaying ? "0%" : isExpanded ? "45%" : "100%",
-                  padding: isPlaying ? 0 : isExpanded ? "3.5rem" : isPeek ? "1rem" : "2rem",
-                  opacity: isPlaying ? 0 : 1,
+                  width: (isPlaying || (isExpanded && currentTime > 0)) ? "0%" : isExpanded ? "45%" : "100%",
+                  padding: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : isExpanded ? "3.5rem" : isPeek ? "1rem" : "2rem",
+                  opacity: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : 1,
                 }}
                 transition={IOS_SPRING}
               >
-                {/* Decorative Background Elements for Expanded */}
-                {isExpanded && !isPlaying && (
+                {/* Decorative Background Elements for Expanded - Only when not playing and not paused mid-scene */}
+                {isExpanded && !isPlaying && currentTime === 0 && (
                   <>
                     {/* Floating accent orbs */}
                     <motion.div
@@ -1413,18 +1409,21 @@ const Slide: React.FC<SlideProps> = ({
                         }}
                         layoutId={`accent-${item.id}`}
                       />
-                      {/* Module icon for peek */}
+                      {/* Module number badge for peek */}
                       <motion.div
-                        className="absolute top-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-lg flex items-center justify-center"
+                        className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center border backdrop-blur-md"
                         style={{
                           backgroundColor: `${currentTheme.accent}15`,
                           color: currentTheme.accent,
+                          borderColor: `${currentTheme.accent}30`,
                         }}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
                       >
-                        <item.icon size={16} strokeWidth={2} />
+                        <span className="text-xs font-black tracking-tight font-mono">
+                          {String(item.id).padStart(2, "0")}
+                        </span>
                       </motion.div>
                     </>
                   )}
@@ -1475,7 +1474,7 @@ const Slide: React.FC<SlideProps> = ({
                             textShadow: `0 0 20px ${currentTheme.accent}30`,
                           }}
                         >
-                          {item.shortTitle}
+                          {item.headline}
                         </motion.h1>
                       </motion.div>
                     ) : (
@@ -1519,32 +1518,7 @@ const Slide: React.FC<SlideProps> = ({
                           </motion.p>
                         )}
 
-                        {/* Feature highlights for expanded */}
-                        {isExpanded && !isPlaying && (
-                          <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.25 }}
-                            className="flex flex-wrap gap-2 pt-2"
-                          >
-                            {currentTheme.featureTags.slice(0, 3).map((tag, i) => (
-                              <motion.span
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.3 + i * 0.08 }}
-                                className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full"
-                                style={{
-                                  backgroundColor: `${currentTheme.accent}12`,
-                                  color: currentTheme.accent,
-                                  border: `1px solid ${currentTheme.accent}20`,
-                                }}
-                              >
-                                {tag}
-                              </motion.span>
-                            ))}
-                          </motion.div>
-                        )}
+
 
                         {/* Enhanced CTA Button */}
                         {isExpanded && !isPlaying && (
@@ -1621,7 +1595,7 @@ const Slide: React.FC<SlideProps> = ({
                 className="h-full relative overflow-hidden"
                 initial={false}
                 animate={{
-                  width: isPlaying ? "100%" : isExpanded ? "55%" : "0%",
+                  width: (isPlaying || (isExpanded && currentTime > 0)) ? "100%" : isExpanded ? "55%" : "0%",
                   opacity: isExpanded ? 1 : 0,
                 }}
                 transition={IOS_SPRING}
@@ -1639,21 +1613,21 @@ const Slide: React.FC<SlideProps> = ({
                   />
                 )}
 
-                <AnimatePresence>
-                  {isPlaying ? (
+                <AnimatePresence mode="wait">
+                  {(isPlaying || (isExpanded && currentTime > 0)) ? (
                     <motion.div
                       key="player-container"
                       className="absolute inset-0 w-full h-full flex bg-[#17161A]"
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
+                      exit={{ opacity: 0, scale: 1.05 }}
                       transition={{ duration: 0.4 }}
                     >
                       {/* Control Panel - Left 25% */}
                       {scenes && scenes.length > 0 && onSeek && (
                         <motion.div
                           className="w-[25%] h-full flex-shrink-0 border-r border-white/5"
-                          initial={{ x: -50, opacity: 0 }}
+                          initial={{ x: -20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: 0.2, ...IOS_SPRING }}
                         >

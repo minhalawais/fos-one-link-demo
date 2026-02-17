@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+
+    <title>FOS Hotline Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body, html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #284952;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .chat-header {
+            background-color: #60BA81;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .chat-header i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #f9f9f9;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ */
+        }
+        .chat-messages::-webkit-scrollbar { /* WebKit */
+            width: 0;
+            height: 0;
+        }
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+            line-height: 1.4;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start;
+        }
+        .message-icon {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+        .message-content {
+            flex-grow: 1;
+        }
+        .user-message {
+            background-color: #f5a83c;
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .bot-message {
+            background-color: #ffffff;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .user-message .message-icon {
+            order: 2;
+            margin-right: 0;
+            margin-left: 10px;
+        }
+        .message::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            width: 20px;
+            height: 20px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            margin-right: 10px;
+            font-size: 1em;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+        .chat-input input:focus {
+            outline: none;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.2);
+        }
+        .chat-input button {
+            background-color: #60BA81;
+            color: #fff;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .chat-input button:hover {
+            background-color: #4e9e6d;
+        }
+        .chat-input button:active {
+            transform: scale(0.98);
+        }
+        .chat-input button i {
+            margin-left: 8px;
+        }
+        .loading {
+            display: none;
+            align-self: flex-start;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .loading .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #60BA81;
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .loading .dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        @media (max-width: 768px) {
+            .chat-container {
+                margin: 0;
+                border-radius: 0;
+                height: 100%;
+            }
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <i class="fas fa-comments"></i>
+            FOS Hotline Assistant
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="loading" id="loading">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your question...">
+            <button onclick="sendMessage()">Send <i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userInput = document.getElementById('userInput');
+            var message = userInput.value.trim();
+            if (message) {
+                addMessage(message, 'user-message');
+                userInput.value = '';
+                document.getElementById('loading').style.display = 'block';
+                
+                fetch("{{ url_for('ask') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({message: message}),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('loading').style.display = 'none';
+                    addMessage(data.message, 'bot-message');
+                })
+                .catch((error) => {
+                    document.getElementById('loading').style.display = 'none';
+                    console.error('Error:', error);
+                    addMessage('Sorry, an error occurred. Please try again.', 'bot-message');
+                });
+            }
+        }
+
+        function addMessage(message, className) {
+            var chatMessages = document.getElementById('chatMessages');
+            var messageElement = document.createElement('div');
+            messageElement.classList.add('message', className);
+            
+            var iconElement = document.createElement('i');
+            iconElement.classList.add('message-icon');
+            iconElement.classList.add(className === 'user-message' ? 'fa-user' : 'fa-robot');
+            iconElement.classList.add('fas');
+            
+            var contentElement = document.createElement('div');
+            contentElement.classList.add('message-content');
+            contentElement.textContent = message;
+            
+            messageElement.appendChild(iconElement);
+            messageElement.appendChild(contentElement);
+            
+            chatMessages.appendChild(messageElement);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            var chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Add welcome message when page is loaded
+        window.addEventListener('load', function() {
+            addMessage('Welcome to FOS Hotline Assistant! How can I help you today?', 'bot-message');
+        });
+    </script>
+</body>
+</html>
