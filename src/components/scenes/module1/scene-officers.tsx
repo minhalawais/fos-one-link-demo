@@ -110,7 +110,7 @@ export default function SceneOfficers({ isActive }: { isActive: boolean }) {
   }, [isActive])
 
   return (
-    <div className="w-full h-full bg-[#f8f9fc] relative overflow-hidden flex items-center justify-center font-sans perspective-1000">
+    <div className="w-full h-full bg-[#f8f9fc] relative overflow-hidden flex items-center justify-center font-sans perspective-1000 origin-center">
 
       {/* --- BACKGROUND EFFECTS --- */}
       <div className="absolute inset-0 pointer-events-none">
@@ -176,7 +176,7 @@ const AppointmentPhase = () => {
       transition={{ duration: 0.5 }}
     >
       {/* CENTRAL CARD */}
-      <div className="w-80 h-[530px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden relative flex flex-col items-center pt-8 perspective-card">
+      <div className="w-72 h-[480px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden relative flex flex-col items-center pt-8 perspective-card">
 
         {/* Holographic scanner effect */}
         <motion.div
@@ -193,7 +193,7 @@ const AppointmentPhase = () => {
         />
 
         {/* Avatar */}
-        <div className="w-32 h-32 rounded-full border-4 border-gray-100 shadow-inner overflow-hidden mb-6 relative z-10 bg-gray-50 flex items-center justify-center shrink-0">
+        <div className="w-28 h-28 rounded-full border-4 border-gray-100 shadow-inner overflow-hidden mb-6 relative z-10 bg-gray-50 flex items-center justify-center shrink-0">
           <img src="/assets/avatars/male_io.png" className="w-full h-full object-cover opacity-80" alt="Candidate" />
         </div>
 
@@ -202,7 +202,7 @@ const AppointmentPhase = () => {
           <div className="inline-block px-3 py-1 bg-gray-100 rounded-full text-[10px] font-bold text-gray-400 mb-1">
             Investigation Officer Appointed
           </div>
-          <h3 className="text-xl font-bold text-[#284952]">Internal Employee</h3>
+          <h3 className="text-lg font-bold text-[#284952]">Internal Employee</h3>
           <p className="text-xs text-gray-500">Processing Appointment...</p>
         </div>
 
@@ -315,7 +315,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
     <motion.div
       variants={cardVariants}
       whileHover="hover"
-      className="w-80 bg-white rounded-2xl shadow-xl border border-white/60 overflow-hidden relative flex flex-col items-center backdrop-blur-sm"
+      className="w-72 bg-white rounded-2xl shadow-xl border border-white/60 overflow-hidden relative flex flex-col items-center backdrop-blur-sm"
     >
       {/* Header Color Bar */}
       <div className="w-full h-2" style={{ backgroundColor: officer.color }} />
@@ -325,7 +325,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
         style={{ backgroundImage: `radial-gradient(${officer.color} 1px, transparent 1px)`, backgroundSize: '10px 10px' }} />
 
       {/* Officer Content */}
-      <div className="p-6 flex flex-col items-center w-full relative z-10">
+      <div className="p-5 flex flex-col items-center w-full relative z-10">
         {/* Badge Header */}
         <div className="flex justify-between w-full items-start mb-4">
           <div className="flex flex-col">
@@ -340,7 +340,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
         {/* Avatar Box */}
         <div className="relative mb-6 group-hover:scale-105 transition-transform duration-300 shrink-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/20 rounded-full blur-md" />
-          <img src={officer.avatar} alt={officer.role} className="w-24 h-24 object-contain drop-shadow-lg" />
+          <img src={officer.avatar} alt={officer.role} className="w-20 h-20 object-contain drop-shadow-lg" />
 
           {/* Verification Tick */}
           <motion.div
@@ -353,7 +353,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
           </motion.div>
         </div>
 
-        <h3 className="text-lg font-bold text-[#284952] mb-1">{officer.role}</h3>
+        <h3 className="text-base font-bold text-[#284952] mb-1">{officer.role}</h3>
 
         {/* Stats Grid */}
         <div className="w-full grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-dashed border-gray-200">

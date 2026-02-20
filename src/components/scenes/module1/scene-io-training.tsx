@@ -103,10 +103,10 @@ const SkillNode = ({
       }}
       transition={{ type: "spring", stiffness: 100, damping: 15 }}
       className="absolute flex flex-col items-center justify-center z-20"
-      style={{ left: '50%', top: '50%', marginLeft: '-4.5rem', marginTop: '-4.5rem' }} // Center the 9rem (w-36) box
+      style={{ left: '50%', top: '50%', marginLeft: '-4rem', marginTop: '-4rem' }} // Center the 8rem (w-32) box
     >
       <div className={`
-          relative w-36 h-36 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] 
+          relative w-32 h-32 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] 
           flex flex-col items-center justify-center p-3
           border-2 transition-colors duration-300
           ${isActive ? 'border-[#60BA81]' : 'border-transparent'}
@@ -169,14 +169,14 @@ export default function SceneIOTraining({ isActive, progress }: { isActive: bool
   // Center is (0,0). Avatar radius is ~104px (w-52).
   // We place cards at +/- 260px in X and +/- 140px in Y
   const positions = [
-    { x: -260, y: -140 }, // Top Left
-    { x: 260, y: -140 },  // Top Right
-    { x: -260, y: 140 },  // Bottom Left
-    { x: 260, y: 140 }    // Bottom Right
+    { x: -220, y: -120 }, // Top Left
+    { x: 220, y: -120 },  // Top Right
+    { x: -220, y: 120 },  // Bottom Left
+    { x: 220, y: 120 }    // Bottom Right
   ]
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-[#f8f9fc] relative overflow-hidden font-sans">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#f8f9fc] relative overflow-hidden font-sans origin-center">
 
       {/* Background Decor */}
       <div className="absolute inset-0 opacity-10 pointer-events-none"
@@ -213,7 +213,7 @@ export default function SceneIOTraining({ isActive, progress }: { isActive: bool
         style={{ boxShadow: "none" }}
       >
         <motion.div
-          className="w-52 h-52 rounded-full border-[8px] border-white shadow-2xl flex items-center justify-center bg-gray-100 overflow-hidden relative shrink-0"
+          className="w-44 h-44 rounded-full border-[8px] border-white shadow-2xl flex items-center justify-center bg-gray-100 overflow-hidden relative shrink-0"
           animate={{ boxShadow: stage === 4 ? "0 0 60px #60BA81" : "0 20px 40px rgba(0,0,0,0.1)" }}
         >
           <img src="/assets/avatars/male_io_training.png" className="w-full h-full object-cover" alt="Officer" />

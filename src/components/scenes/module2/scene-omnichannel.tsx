@@ -40,7 +40,7 @@ const COLORS = {
 // --- DATA & POSITIONS ---
 // Positions computed via polar coordinates: evenly spaced on a ring
 // Radius chosen to clear the central logo (224px diam) + node size (~160px) + gap
-const RING_RADIUS = 260
+const RING_RADIUS = 210
 // Angles in degrees, clockwise from top (0°=12 o'clock)
 // Arc from 240° (lower-left) to 480°/120° (lower-right) — open bottom
 const CHANNEL_ANGLES = [240, 288, 336, 24, 72, 120]
@@ -138,27 +138,27 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
     switch (data.type) {
       case 'mobile':
         return (
-          <div className="w-20 h-36 bg-gray-900 rounded-[18px] border-[5px] border-gray-800 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center">
-            <div className="absolute top-0 w-10 h-4 bg-black rounded-b-md z-10" />
-            <div className="w-full h-full bg-white flex flex-col items-center pt-8 gap-1.5">
-              <div className="w-10 h-10 rounded-xl bg-[#60BA81] flex items-center justify-center shadow-sm">
-                <Smartphone size={18} className="text-white" />
+          <div className="w-16 h-28 bg-gray-900 rounded-[14px] border-[4px] border-gray-800 shadow-2xl relative overflow-hidden flex flex-col items-center justify-center">
+            <div className="absolute top-0 w-8 h-3 bg-black rounded-b-md z-10" />
+            <div className="w-full h-full bg-white flex flex-col items-center pt-6 gap-1">
+              <div className="w-8 h-8 rounded-lg bg-[#60BA81] flex items-center justify-center shadow-sm">
+                <Smartphone size={14} className="text-white" />
               </div>
-              <div className="w-12 h-1.5 bg-gray-100 rounded-full mt-3" />
-              <div className="w-10 h-1.5 bg-gray-100 rounded-full" />
+              <div className="w-8 h-1 bg-gray-100 rounded-full mt-2" />
+              <div className="w-6 h-1 bg-gray-100 rounded-full" />
             </div>
           </div>
         )
       case 'browser':
         return (
-          <div className="w-32 h-20 bg-white rounded-xl border border-gray-200 shadow-2xl relative overflow-hidden flex flex-col">
-            <div className="h-5 bg-gray-50 border-b flex items-center px-2.5 gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-red-400" />
-              <div className="w-2 h-2 rounded-full bg-yellow-400" />
-              <div className="w-2 h-2 rounded-full bg-green-400" />
+          <div className="w-26 h-16 bg-white rounded-lg border border-gray-200 shadow-2xl relative overflow-hidden flex flex-col">
+            <div className="h-4 bg-gray-50 border-b flex items-center px-2 gap-1">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+              <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
             </div>
             <div className="flex-1 flex items-center justify-center bg-gray-50/50">
-              <Globe size={32} className="text-[#284952] opacity-20" />
+              <Globe size={24} className="text-[#284952] opacity-20" />
             </div>
           </div>
         )
@@ -166,10 +166,10 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
         return (
           <div className="relative">
             {/* Outer glow */}
-            <div className="absolute -inset-2 rounded-full opacity-30 blur-xl" style={{ backgroundColor: data.color }} />
+            <div className="absolute -inset-1.5 rounded-full opacity-30 blur-lg" style={{ backgroundColor: data.color }} />
             {/* Main bubble — circle */}
             <div
-              className="w-20 h-20 rounded-full flex items-center justify-center shadow-xl relative overflow-hidden"
+              className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden"
               style={{ background: `linear-gradient(135deg, ${data.color}, ${data.color}dd)` }}
             >
               {/* Glass shine overlay */}
@@ -177,9 +177,9 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
               {/* Icon */}
               <div className="relative z-10">
                 {data.imageSrc ? (
-                  <img src={data.imageSrc} alt={data.label} className="w-12 h-12 drop-shadow-md" />
+                  <img src={data.imageSrc} alt={data.label} className="w-9 h-9 drop-shadow-md" />
                 ) : (
-                  <data.icon size={36} className="text-white drop-shadow-md" />
+                  <data.icon size={28} className="text-white drop-shadow-md" />
                 )}
               </div>
             </div>
@@ -187,8 +187,8 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
         )
       default: // card/hotline
         return (
-          <div className="w-20 h-20 rounded-full bg-white border-2 flex items-center justify-center shadow-xl" style={{ borderColor: data.color }}>
-            <data.icon size={36} style={{ color: data.color }} />
+          <div className="w-16 h-16 rounded-full bg-white border flex items-center justify-center shadow-lg" style={{ borderColor: data.color }}>
+            <data.icon size={28} style={{ color: data.color }} />
           </div>
         )
     }
@@ -229,9 +229,9 @@ const ChannelNode = ({ data, isActive, index }: { data: typeof CHANNELS[0], isAc
           className="flex flex-col items-center gap-2"
         >
           {renderVisual()}
-          <div className="bg-white/95 backdrop-blur px-4 py-2 rounded-2xl shadow-lg border border-gray-100 flex flex-col items-center max-w-[160px]">
-            <span className="text-xs font-bold text-gray-800 leading-none mb-1">{data.label}</span>
-            <span className="text-[10px] text-gray-500 leading-tight text-center break-all">{data.sub}</span>
+          <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-md border border-gray-100 flex flex-col items-center max-w-[140px]">
+            <span className="text-[10px] font-bold text-gray-800 leading-none mb-0.5">{data.label}</span>
+            <span className="text-[9px] text-gray-500 leading-tight text-center break-all">{data.sub}</span>
           </div>
         </motion.div>
       </div>
@@ -281,7 +281,7 @@ const CentralCore = ({ isMerged }: { isMerged: boolean }) => (
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1.05 }}
             transition={{ duration: 0.8, ease: "backOut" }}
-            style={{ width: 280, height: 320, top: -50 }}
+            style={{ width: 220, height: 260, top: -40 }}
           >
             <div className="relative w-full h-full">
               <svg viewBox="0 0 100 120" className="w-full h-full drop-shadow-[0_0_20px_rgba(96,186,129,0.3)]">
@@ -338,14 +338,14 @@ const CentralCore = ({ isMerged }: { isMerged: boolean }) => (
 
       {/* Persistent Logo */}
       <motion.div
-        className="w-56 h-56 bg-white rounded-full shadow-2xl flex items-center justify-center relative z-20 border-4 border-white"
+        className="w-44 h-44 bg-white rounded-full shadow-2xl flex items-center justify-center relative z-20 border-[3px] border-white"
         animate={{
           scale: isMerged ? 0.9 : 1,
           boxShadow: isMerged ? "0 0 40px rgba(96,186,129,0.4)" : "0 30px 60px -12px rgba(0,0,0,0.3)"
         }}
         transition={{ duration: 0.8 }}
       >
-        <img src="/assets/images/FOS-01.png" alt="FOS" className="w-54 h-54 object-contain max-w-[130%]" />
+        <img src="/assets/images/FOS-01.png" alt="FOS" className="w-42 h-42 object-contain max-w-[130%]" />
       </motion.div>
 
     </div>
@@ -357,13 +357,13 @@ const CentralCore = ({ isMerged }: { isMerged: boolean }) => (
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="flex flex-col items-center gap-2 mt-6"
+          className="flex flex-col items-center gap-1.5 mt-4"
         >
-          <div className="flex items-center gap-3 text-[#284952] bg-white/95 backdrop-blur-md px-8 py-3 rounded-full border border-green-100 shadow-2xl">
-            <ShieldCheck size={22} className="text-[#60BA81]" />
-            <span className="text-sm font-black tracking-widest uppercase">100% Protected</span>
+          <div className="flex items-center gap-2.5 text-[#284952] bg-white/95 backdrop-blur-md px-6 py-2 rounded-full border border-green-100 shadow-2xl">
+            <ShieldCheck size={18} className="text-[#60BA81]" />
+            <span className="text-[11px] font-black tracking-widest uppercase">100% Protected</span>
           </div>
-          <p className="text-[#284952]/70 text-sm font-semibold max-w-sm leading-relaxed text-center">
+          <p className="text-[#284952]/70 text-[13px] font-semibold max-w-sm leading-relaxed text-center">
             "A simple and safe way for every worker to speak up."
           </p>
         </motion.div>
@@ -466,11 +466,11 @@ export default function SceneOmnichannel({ isActive, progress }: { isActive: boo
 
       {/* --- HEADER (Moved to Bottom) --- */}
       <motion.div
-        className="absolute bottom-12 z-50 text-center"
+        className="absolute bottom-8 z-50 text-center"
         variants={headerVariant}
         animate={isMerged ? "hidden" : "visible"}
       >
-        <h1 className="text-4xl font-extrabold text-[#284952] tracking-tight">FOS Multichannel Grievance Ecosystem</h1>
+        <h1 className="text-3xl font-extrabold text-[#284952] tracking-tight">FOS Multichannel Grievance Ecosystem</h1>
       </motion.div>
 
       {/* --- INTERACTIVE GRAPH CONTAINER --- */}

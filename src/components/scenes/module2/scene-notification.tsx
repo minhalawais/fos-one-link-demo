@@ -102,6 +102,7 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
         setTimeout(() => setStage(5), 12000), // Portal Enters (~125s - "The case appears on their portals")
         setTimeout(() => setStage(6), 15000), // Row Appears (~128s)
         setTimeout(() => setStage(7), 17500), // Cursor Interaction (~130.5s)
+        setTimeout(() => setStage(8), 19000), // Summary Nexus (~132s)
       ]
       return () => timers.forEach(clearTimeout)
     }
@@ -153,7 +154,7 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
         <AnimatePresence>
           {stage < 5 && (
             <motion.div
-              className="absolute inset-0 flex items-center justify-center w-full h-full"
+              className={`absolute inset-0 flex items-center justify-center w-full h-full ${stage >= 8 ? 'pointer-events-none opacity-0 scale-90 blur-xl' : ''} transition-all duration-1000`}
               exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
               transition={{ duration: 0.8 }}
             >
@@ -419,8 +420,11 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
           <motion.div
             key="dashboard"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={spring}
+            animate={stage >= 8
+              ? { opacity: 0.1, scale: 0.85, y: -20, rotateX: 10, filter: "blur(15px)" }
+              : { opacity: 1, scale: 1, y: 0, rotateX: 0, filter: "blur(0px)" }
+            }
+            transition={{ ...spring, duration: 1 }}
             className="w-full h-full flex flex-col items-center justify-center p-2"
           >
             <div className="w-full max-w-5xl bg-[#F5F5F7] rounded-[32px] shadow-2xl overflow-hidden border border-gray-200 flex flex-col h-[520px] relative">
@@ -570,6 +574,160 @@ export const SceneNotification = ({ isActive }: { isActive: boolean }) => {
             </div>
           </motion.div>
         )}
+
+        {/* --- PHASE 3: FINAL SUMMARY NEXUS --- */}
+        <AnimatePresence>
+          {stage >= 8 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, filter: "blur(20px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 1, ease: "circOut" }}
+              className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none"
+            >
+              <div className="relative w-full max-w-4xl h-[500px] flex items-center justify-center">
+
+                {/* Central Shield Pulse */}
+                <motion.div
+                  animate={{ scale: [1, 1.4, 1], opacity: [0.1, 0.3, 0.1] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute w-[400px] h-[400px] bg-[#60BA81]/20 rounded-full blur-[60px]"
+                />
+
+                {/* The Nexus Core */}
+                <div className="relative z-10 flex flex-col items-center">
+                  <motion.div
+                    initial={{ y: 20 }}
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-48 h-48 bg-white/40 backdrop-blur-3xl rounded-[40px] border border-white/50 shadow-2xl flex items-center justify-center relative group"
+                  >
+                    <img src="/assets/FOS-01.png" alt="FOS Shield" className="w-32 h-32 object-contain drop-shadow-[0_0_15px_rgba(96,186,129,0.4)]" />
+
+                    {/* Ring Particles */}
+                    <div className="absolute inset-0">
+                      {[...Array(12)].map((_, i) => (
+                        <motion.div
+                          key={i}
+                          animate={{
+                            rotate: 360,
+                            scale: [1, 1.1, 1]
+                          }}
+                          transition={{
+                            rotate: { duration: 15 + i, repeat: Infinity, ease: "linear" },
+                            scale: { duration: 2, repeat: Infinity, delay: i * 0.2 }
+                          }}
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            width: "2px",
+                            height: "2px",
+                            backgroundColor: "#60BA81",
+                            borderRadius: "50%",
+                            marginLeft: "-1px",
+                            marginTop: "-1px",
+                            transformOrigin: `${80 + i * 5}px 0px`
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Summary Text (Appearing sequentially) */}
+                  <div className="mt-12 flex flex-col items-center gap-4">
+                    <div className="flex gap-8">
+                      {['CLEARLY', 'SAFELY', 'RELIABLY'].map((word, i) => (
+                        <motion.div
+                          key={word}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.8 + (i * 0.4), duration: 0.6 }}
+                          className="flex flex-col items-center"
+                        >
+                          <div className="text-[#284952] text-xs font-black tracking-[0.3em] uppercase mb-1">{word}</div>
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: "100%" }}
+                            transition={{ delay: 1.2 + (i * 0.4), duration: 0.8 }}
+                            className="h-1 bg-[#60BA81] rounded-full"
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.6 }}
+                      transition={{ delay: 2.2 }}
+                      className="text-[#284952] text-sm font-bold mt-2 tracking-tight"
+                    >
+                      Empowering every voice with integrity.
+                    </motion.p>
+                  </div>
+                </div>
+
+                {/* Floating Channel Icons (Orbiting) */}
+                <div className="absolute inset-0 pointer-events-none">
+                  {[
+                    { Icon: Mail, label: 'Email', angle: 45 },
+                    { Icon: CheckCircle2, label: 'Portal', angle: 135 },
+                    { Icon: ShieldCheck, label: 'Safety', angle: 225 },
+                    { Icon: Bell, label: 'Alerts', angle: 315 },
+                  ].map((item, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{
+                        x: [
+                          Math.cos(item.angle * Math.PI / 180) * 220,
+                          Math.cos((item.angle + 20) * Math.PI / 180) * 240,
+                          Math.cos(item.angle * Math.PI / 180) * 220
+                        ],
+                        y: [
+                          Math.sin(item.angle * Math.PI / 180) * 220,
+                          Math.sin((item.angle + 20) * Math.PI / 180) * 240,
+                          Math.sin(item.angle * Math.PI / 180) * 220
+                        ],
+                        opacity: [0.3, 0.6, 0.3]
+                      }}
+                      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: i * 2 }}
+                      style={{ position: "absolute", top: "50%", left: "50%" }}
+                      className="flex flex-col items-center gap-1"
+                    >
+                      <div className="p-3 bg-white/60 backdrop-blur-xl rounded-2xl border border-white/40 shadow-xl">
+                        <item.Icon size={20} className="text-[#284952]" />
+                      </div>
+                      <span className="text-[8px] font-black text-[#284952]/40 uppercase tracking-widest">{item.label}</span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Connecting Rays (SVG) */}
+                <svg className="absolute inset-0 w-full h-full overflow-visible z-0 opacity-10">
+                  <defs>
+                    <radialGradient id="rayGradient" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor="#60BA81" stopOpacity="1" />
+                      <stop offset="100%" stopColor="#60BA81" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+                    <motion.line
+                      key={i}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 + i * 0.1 }}
+                      x1="50%" y1="50%"
+                      x2={`${50 + Math.cos(angle * Math.PI / 180) * 40}%`}
+                      y2={`${50 + Math.sin(angle * Math.PI / 180) * 40}%`}
+                      stroke="url(#rayGradient)"
+                      strokeWidth="2"
+                    />
+                  ))}
+                </svg>
+
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </div>

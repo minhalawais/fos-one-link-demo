@@ -1145,8 +1145,8 @@ const Slide: React.FC<SlideProps> = ({
                 />
               </div>
 
-              {/* Content Container - Increased padding for breathability */}
-              <div className="relative z-10 h-full flex flex-col p-7">
+              {/* Content Container - Reduced padding for zoom-out effect */}
+              <div className="relative z-10 h-full flex flex-col p-6">
                 {/* Top Section - Module indicator & Icon */}
                 <div className="flex justify-between items-start mb-auto">
                   {/* Step indicator with connecting line */}
@@ -1182,7 +1182,7 @@ const Slide: React.FC<SlideProps> = ({
                       }}
                     />
                     <div
-                      className="relative w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-[5deg]"
+                      className="relative w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-[5deg]"
                       style={{
                         backgroundColor: currentTheme.iconBg,
                         color: currentTheme.accent,
@@ -1190,7 +1190,7 @@ const Slide: React.FC<SlideProps> = ({
                         boxShadow: `0 4px 12px -2px ${currentTheme.accent}20`,
                       }}
                     >
-                      <item.icon size={24} strokeWidth={1.5} />
+                      <item.icon size={20} strokeWidth={1.5} />
                     </div>
                   </div>
                 </div>
@@ -1199,7 +1199,7 @@ const Slide: React.FC<SlideProps> = ({
                 <div className="flex-1 flex flex-col justify-center">
                   {/* Subtle module number - watermark style - Repositioned for depth */}
                   <div
-                    className="absolute -right-4 top-1/2 -translate-y-1/2 text-[120px] font-black leading-none select-none pointer-events-none z-0"
+                    className="absolute -right-4 top-1/2 -translate-y-1/2 text-[60px] font-black leading-none select-none pointer-events-none z-0"
                     style={{
                       color: currentTheme.accent,
                       opacity: 0.04,
@@ -1212,7 +1212,7 @@ const Slide: React.FC<SlideProps> = ({
 
                   {/* Headline - Rescaled for expert production-grade UI */}
                   <motion.h2
-                    className="text-[32px] leading-[1.1] mb-5 relative z-10"
+                    className="text-[22px] leading-[1.1] mb-5 relative z-10"
                     style={{
                       fontWeight: 900,
                       letterSpacing: '-0.01em',
@@ -1248,7 +1248,7 @@ const Slide: React.FC<SlideProps> = ({
 
                   {/* Subheading - Fine-tuned for breathability */}
                   <motion.p
-                    className="text-[14px] leading-[1.7] line-clamp-3 max-w-[90%] relative z-10"
+                    className="text-[12px] leading-[1.7] line-clamp-3 max-w-[90%] relative z-10"
                     style={{
                       color: 'rgba(255, 255, 255, 0.75)',
                       fontWeight: 500,
@@ -1319,14 +1319,14 @@ const Slide: React.FC<SlideProps> = ({
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
                     />
                     <div
-                      className="relative w-9 h-9 rounded-full flex items-center justify-center"
+                      className="relative w-8 h-8 rounded-full flex items-center justify-center"
                       style={{
                         backgroundColor: currentTheme.accent,
                         boxShadow: `0 4px 12px -3px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
                       }}
                     >
                       <ArrowRight
-                        size={14}
+                        size={12}
                         className={currentTheme.isDark ? "text-white" : "text-white"}
                         strokeWidth={2.5}
                       />
@@ -1356,7 +1356,7 @@ const Slide: React.FC<SlideProps> = ({
                 }}
                 animate={{
                   width: (isPlaying || (isExpanded && currentTime > 0)) ? "0%" : isExpanded ? "45%" : "100%",
-                  padding: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : isExpanded ? "3.5rem" : isPeek ? "1rem" : "2rem",
+                  padding: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : isExpanded ? "2.5rem" : isPeek ? "1rem" : "2rem",
                   opacity: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : 1,
                 }}
                 transition={IOS_SPRING}
@@ -1466,23 +1466,29 @@ const Slide: React.FC<SlideProps> = ({
                     {isPeek ? (
                       <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                         <motion.h1
-                          className="text-sm font-bold tracking-widest uppercase"
+                          className="text-sm font-bold tracking-widest uppercase max-h-[60vh] text-center"
                           style={{
                             color: currentTheme.accent,
                             writingMode: "vertical-rl",
                             transform: "rotate(180deg)",
                             textShadow: `0 0 20px ${currentTheme.accent}30`,
+                            // Ensure wrapping for long titles in vertical mode
+                            wordBreak: "break-word",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
                         >
                           {item.headline}
                         </motion.h1>
                       </motion.div>
                     ) : (
-                      <motion.div layout className="space-y-6 max-w-lg">
+                      <motion.div layout className="space-y-4 max-w-lg">
                         {/* Large Display Number - Background decoration */}
                         {isExpanded && (
                           <motion.div
-                            className="absolute -left-6 top-1/2 -translate-y-1/2 text-[240px] font-black leading-none select-none pointer-events-none"
+                            className="absolute -left-6 top-1/2 -translate-y-1/2 text-[100px] font-black leading-none select-none pointer-events-none"
                             style={{
                               background: `linear-gradient(180deg, ${currentTheme.accent}15, transparent)`,
                               WebkitBackgroundClip: 'text',
@@ -1500,7 +1506,7 @@ const Slide: React.FC<SlideProps> = ({
                         {/* Headline */}
                         <motion.h1
                           layout="position"
-                          className={`font-extrabold text-[#1A1D21] tracking-tight relative z-10 ${isExpanded ? "text-4xl lg:text-[2.75rem] leading-[1.1]" : "text-2xl"}`}
+                          className={`font-extrabold text-[#1A1D21] tracking-tight relative z-10 ${isExpanded ? "text-3xl lg:text-[2.25rem] leading-[1.1]" : "text-2xl"}`}
                         >
                           {item.headline}
                         </motion.h1>
@@ -1512,7 +1518,7 @@ const Slide: React.FC<SlideProps> = ({
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15, duration: 0.5 }}
-                            className="text-[#5A6169] font-medium leading-relaxed text-lg relative z-10"
+                            className="text-[#5A6169] font-medium leading-relaxed text-base relative z-10"
                           >
                             {item.subtext}
                           </motion.p>
@@ -1532,7 +1538,7 @@ const Slide: React.FC<SlideProps> = ({
                               e.stopPropagation();
                               onStartModule?.();
                             }}
-                            className="flex items-center gap-4 pl-7 pr-6 py-4 text-white rounded-2xl mt-6 shadow-xl hover:shadow-2xl transition-all duration-300 group/btn relative overflow-hidden"
+                            className="flex items-center gap-4 pl-6 pr-5 py-3 text-white rounded-2xl mt-6 shadow-xl hover:shadow-2xl transition-all duration-300 group/btn relative overflow-hidden"
                             style={{
                               background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}DD)`,
                             }}

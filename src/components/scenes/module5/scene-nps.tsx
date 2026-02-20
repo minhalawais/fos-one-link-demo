@@ -105,199 +105,199 @@ const loadScript = (src: string) =>
     const script = document.createElement("script");
     script.src = src;
     script.async = true;
-    
+
     script.onload = () => {
       console.log(`Script loaded: ${src}`);
       resolve();
     };
-    
+
     script.onerror = () => {
       console.error(`Failed to load script: ${src}`);
       reject(new Error(`Failed to load script: ${src}`));
     };
-    
+
     document.head.appendChild(script);
   });
 
-  const JSChartingCircularColorBar = ({
-    value,
-    chartId,
-  }: {
-    value: number;
-    chartId: string;
-  }) => {
-    const chartRef = useRef<HTMLDivElement>(null);
-    const chartInstance = useRef<any>(null);
-    const [scriptsLoaded, setScriptsLoaded] = useState(false);
-  
-    // Load scripts only once
-    useEffect(() => {
-      let mounted = true;
-      
-      const loadScripts = async () => {
+const JSChartingCircularColorBar = ({
+  value,
+  chartId,
+}: {
+  value: number;
+  chartId: string;
+}) => {
+  const chartRef = useRef<HTMLDivElement>(null);
+  const chartInstance = useRef<any>(null);
+  const [scriptsLoaded, setScriptsLoaded] = useState(false);
+
+  // Load scripts only once
+  useEffect(() => {
+    let mounted = true;
+
+    const loadScripts = async () => {
+      try {
+        await loadScript("/assets/jscharting.js");
+        await loadScript("/assets/types.js");
+
+        // Wait a bit more to ensure JSC is fully initialized
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        if (mounted) {
+          setScriptsLoaded(true);
+        }
+      } catch (error) {
+        console.error("Failed to load JSCharting scripts:", error);
+      }
+    };
+
+    loadScripts();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Initialize chart when scripts are loaded and value changes
+  useEffect(() => {
+    if (!scriptsLoaded || !chartRef.current) return;
+
+    let mounted = true;
+
+    const initChart = async () => {
+      // @ts-ignore
+      const JSC = window.JSC;
+
+      if (!JSC || !mounted) {
+        console.warn("JSC not available or component unmounted");
+        return;
+      }
+
+      // Dispose old chart
+      if (chartInstance.current) {
         try {
-          await loadScript("/assets/jscharting.js");
-          await loadScript("/assets/types.js");
-          
-          // Wait a bit more to ensure JSC is fully initialized
-          await new Promise(resolve => setTimeout(resolve, 200));
-          
-          if (mounted) {
-            setScriptsLoaded(true);
-          }
-        } catch (error) {
-          console.error("Failed to load JSCharting scripts:", error);
+          chartInstance.current.dispose();
+        } catch (e) {
+          console.warn("Error disposing old chart:", e);
         }
-      };
-  
-      loadScripts();
-  
-      return () => {
-        mounted = false;
-      };
-    }, []);
-  
-    // Initialize chart when scripts are loaded and value changes
-    useEffect(() => {
-      if (!scriptsLoaded || !chartRef.current) return;
-  
-      let mounted = true;
-  
-      const initChart = async () => {
-        // @ts-ignore
-        const JSC = window.JSC;
-  
-        if (!JSC || !mounted) {
-          console.warn("JSC not available or component unmounted");
-          return;
-        }
-  
-        // Dispose old chart
-        if (chartInstance.current) {
-          try {
-            chartInstance.current.dispose();
-          } catch (e) {
-            console.warn("Error disposing old chart:", e);
-          }
-        }
-  
-        const minValue = 0;
-        const maxValue = 100;
-  
-        try {
-          chartInstance.current = JSC.chart(chartRef.current, {
-            debug: false,
-            width: 300,
-            height: 330,
-            license: { jscharting: "no-logo-button" },
-  
-            legend_visible: false,
-            defaultTooltip_enabled: false,
-            xAxis_spacingPercentage: 0.4,
-  
-            yAxis: [
-              {
-                id: "ax1",
-                defaultTick: { padding: 10, enabled: false },
-                customTicks: [0, 25, 50, 75, 100],
-                line: {
-                  width: 10,
-                  breaks: {},
-                  color: "smartPalette:pal1",
-                },
-                scale_range: [minValue, maxValue],
+      }
+
+      const minValue = 0;
+      const maxValue = 100;
+
+      try {
+        chartInstance.current = JSC.chart(chartRef.current, {
+          debug: false,
+          width: 300,
+          height: 330,
+          license: { jscharting: "no-logo-button" },
+
+          legend_visible: false,
+          defaultTooltip_enabled: false,
+          xAxis_spacingPercentage: 0.4,
+
+          yAxis: [
+            {
+              id: "ax1",
+              defaultTick: { padding: 10, enabled: false },
+              customTicks: [0, 25, 50, 75, 100],
+              line: {
+                width: 10,
+                breaks: {},
+                color: "smartPalette:pal1",
               },
-  
-              {
-                id: "ax2",
-                scale_range: [minValue, maxValue],
-                defaultTick: { padding: 10, enabled: false },
-                customTicks: [minValue, maxValue],
-                line: {
-                  width: 10,
-                  color: "smartPalette:pal2",
-                },
-              },
-            ],
-  
-            defaultSeries: {
-              type: "gauge column roundcaps",
-              shape: {
-                label: {
-                  text: "%max",
-                  align: "center",
-                  verticalAlign: "middle",
-                  style_fontSize: 28,
-                },
+              scale_range: [minValue, maxValue],
+            },
+
+            {
+              id: "ax2",
+              scale_range: [minValue, maxValue],
+              defaultTick: { padding: 10, enabled: false },
+              customTicks: [minValue, maxValue],
+              line: {
+                width: 10,
+                color: "smartPalette:pal2",
               },
             },
-  
-            series: [
-              {
-                type: "column roundcaps",
-                name: "Temperatures",
-                yAxis: "ax1",
-  
-                palette: {
-                  id: "pal1",
-                  pointValue: "%yValue",
-                  ranges: [
-                    { value: 0, color: "#FF5353" },
-                    { value: 25, color: "#FFD221" },
-                    { value: 50, color: "#77E6B4" },
-                    { value: [75, 100], color: "#21D683" },
-                  ],
-                },
-  
-                points: [["x", [0, value]]],
+          ],
+
+          defaultSeries: {
+            type: "gauge column roundcaps",
+            shape: {
+              label: {
+                text: "%max",
+                align: "center",
+                verticalAlign: "middle",
+                style_fontSize: 28,
               },
-            ],
-          });
-        } catch (error) {
-          console.error("Error initializing JSCharting chart:", error);
+            },
+          },
+
+          series: [
+            {
+              type: "column roundcaps",
+              name: "Temperatures",
+              yAxis: "ax1",
+
+              palette: {
+                id: "pal1",
+                pointValue: "%yValue",
+                ranges: [
+                  { value: 0, color: "#FF5353" },
+                  { value: 25, color: "#FFD221" },
+                  { value: 50, color: "#77E6B4" },
+                  { value: [75, 100], color: "#21D683" },
+                ],
+              },
+
+              points: [["x", [0, value]]],
+            },
+          ],
+        });
+      } catch (error) {
+        console.error("Error initializing JSCharting chart:", error);
+      }
+    };
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(initChart, 100);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+      if (chartInstance.current) {
+        try {
+          chartInstance.current.dispose();
+        } catch (e) {
+          console.warn("Error disposing chart on unmount:", e);
         }
-      };
-  
-      // Small delay to ensure DOM is ready
-      const timer = setTimeout(initChart, 100);
-  
-      return () => {
-        mounted = false;
-        clearTimeout(timer);
-        if (chartInstance.current) {
-          try {
-            chartInstance.current.dispose();
-          } catch (e) {
-            console.warn("Error disposing chart on unmount:", e);
-          }
-        }
-      };
-    }, [scriptsLoaded, value]);
-  
-    // Show loading state or fallback
-    if (!scriptsLoaded) {
-      return (
-        <div
-          style={{ width: 260, height: 260 }}
-          className="flex items-center justify-center bg-gray-100 rounded-lg"
-        >
-          <div className="text-center text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#60BA81] mx-auto mb-2"></div>
-            <p className="text-sm">Loading chart...</p>
-          </div>
-        </div>
-      );
-    }
-  
+      }
+    };
+  }, [scriptsLoaded, value]);
+
+  // Show loading state or fallback
+  if (!scriptsLoaded) {
     return (
       <div
-        ref={chartRef}
-        id={chartId}
         style={{ width: 260, height: 260 }}
-        className="flex items-center justify-center"
-      />
+        className="flex items-center justify-center bg-gray-100 rounded-lg"
+      >
+        <div className="text-center text-gray-500">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#60BA81] mx-auto mb-2"></div>
+          <p className="text-sm">Loading chart...</p>
+        </div>
+      </div>
     );
-  };
+  }
+
+  return (
+    <div
+      ref={chartRef}
+      id={chartId}
+      style={{ width: 260, height: 260 }}
+      className="flex items-center justify-center"
+    />
+  );
+};
 
 
 //
@@ -415,8 +415,8 @@ interface SceneProps {
 }
 
 export function SceneNPS({ isActive, progress }: SceneProps) {
-  const sceneStart = 59.4;
-  const sceneEnd = 70.4;
+  const sceneStart = 137;
+  const sceneEnd = 155;
   const sceneDuration = sceneEnd - sceneStart;
   const sceneProgress = Math.max(
     0,

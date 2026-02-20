@@ -33,10 +33,10 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
-            className="w-40 h-40 mx-auto mb-8 bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center justify-center ring-8 ring-white/40"
+            className="w-28 h-28 mx-auto mb-5 bg-white rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] flex items-center justify-center ring-4 ring-white/40"
           >
             {/* The FOS Logo */}
-            <img src="/assets/images/FOS-01.png" alt="FOS" className="w-40 h-40 object-contain" />
+            <img src="/assets/images/FOS-01.png" alt="FOS" className="w-24 h-24 object-contain" />
           </motion.div>
         </motion.div>
 
@@ -44,7 +44,7 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
           initial={{ y: 15, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }} // Faster entrance
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#284952] mb-4 tracking-tighter leading-snug"
+          className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#284952] mb-4 tracking-tighter leading-snug"
           style={{ fontFamily: "'Montserrat', sans-serif" }}
         >
           Fruit of Sustainability
@@ -54,7 +54,7 @@ export const SceneHero = ({ isActive }: { isActive: boolean }) => {
           initial={{ y: 15, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5, ease: "easeOut" }} // Faster entrance
-          className="text-lg sm:text-xl md:text-2xl text-[#767676] font-light mb-8"
+          className="text-sm sm:text-base md:text-lg text-[#767676] font-light mb-8"
           style={{ fontFamily: "'Montserrat', sans-serif" }}
         >
           Your Partner in Grievance Management

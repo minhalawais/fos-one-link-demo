@@ -2,12 +2,11 @@
 
 import type React from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useMemo } from "react"
 import {
   Building2,
   Search,
   LogOut,
-  ChevronDown,
   Eye,
   FileText,
   Download,
@@ -18,6 +17,22 @@ import {
   Smile,
   ShieldCheck,
   CheckCircle2,
+  HeartPulse,
+  Scale,
+  UserX,
+  AlertTriangle,
+  Briefcase,
+  Menu,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  Share2,
+  FileSpreadsheet,
+  MousePointer2,
+  Lock,
+  RefreshCw,
+  BarChart2,
 } from "lucide-react"
 
 import { SceneAI } from "./scene-ai.tsx"
@@ -98,17 +113,32 @@ const ROLE_DATA = {
       { name: "PACKING", hasLogo: true },
       { name: "DRYING", hasLogo: true },
     ]
+  },
+  UNIT: {
+    title: "PRODUCTION UNIT",
+    subtitle: "UNIT SUPERVISOR (BAY 3)",
+    stats: { total: 12, anonymous: 4, completed: 8, inProcess: 4 },
+    sites: [
+      { name: "BAY 1", hasLogo: true },
+      { name: "BAY 2", hasLogo: true },
+      { name: "BAY 3", hasLogo: true, selected: true },
+      { name: "BAY 4", hasLogo: true },
+      { name: "BAY 5", hasLogo: true },
+      { name: "BAY 6", hasLogo: true },
+    ]
   }
 }
 
 const FILTER_TRANSITION_DATA = {
   SITES: [
-    { name: "ILO", hasLogo: true },
-    { name: "CENTAURUS", hasLogo: true, selected: true },
-    { name: "BAHRIA-4", hasLogo: true },
-    { name: "BAHRIA-7", hasLogo: true },
-    { name: "F-10 MARKAZ", hasLogo: true },
-    { name: "GIGA MALL", hasLogo: true },
+    { name: "ALL SITES", selected: true },
+    { name: "FOS (Unit 1)", selected: false },
+    { name: "FOS (Unit 2)", selected: false },
+    { name: "FOS (Unit 3)", selected: false },
+    { name: "FOS (Unit 4)", selected: false },
+    { name: "FOS (Unit 5)", selected: false },
+    { name: "FOS (Unit 7)", selected: false },
+    { name: "FOS (Unit 8)", selected: false },
   ],
   DEPARTMENTS: [
     { name: "HUMAN RES.", hasLogo: false },
@@ -164,6 +194,44 @@ const GENDER_DATA = [
   { category: "Discipline", male: 20, female: 0 },
 ]
 
+// --- BREAKDOWN SPECIFIC CONSTANTS ---
+const BREAKDOWN_CATEGORIES = [
+  { name: "Workplace Health, Safety and Environment", value: 3, id: "health", icon: HeartPulse },
+  { name: "Freedom of Association", value: 0, id: "freedom", icon: Building2 },
+  { name: "Child Labor", value: 0, id: "child", icon: UserX },
+  { name: "Wages & Benefits", value: 34, id: "wages", icon: Briefcase },
+  { name: "Working Hours", value: 9, id: "hours", icon: Clock },
+  { name: "Forced Labor", value: 0, id: "forced", icon: AlertTriangle },
+  { name: "Discrimination", value: 0, id: "discrimination", icon: Scale },
+  { name: "Unfair Employment", value: 9, id: "unfair", icon: UserX },
+  { name: "Ethical Business", value: 3, id: "ethical", icon: ShieldCheck },
+  { name: "Harassment", value: 0, id: "harassment", icon: AlertCircle },
+  { name: "Workplace Discipline", value: 41, id: "discipline", icon: FileText },
+]
+
+const BREAKDOWN_FEEDBACKS = [
+  { id: 1, text: "Request for Transfer to Mardan Branch due to family residence shift.", date: "Jan 28, 2026" },
+  { id: 2, text: "Suggestion for introducing monthly best employee awards and recognition.", date: "Jan 28, 2026" },
+  { id: 3, text: "Loan facility request for urgent domestic financial requirements.", date: "Jan 28, 2026" },
+  { id: 4, text: "New uniform replacement request for the night shift team members.", date: "Jan 27, 2026" },
+  { id: 5, text: "Safety Concern: Periodic inspection of electrical wiring in Bay 3.", date: "Jan 26, 2026" },
+  { id: 6, text: "Suggestion for more water coolers near cafeteria and warehouse.", date: "Jan 25, 2026" },
+]
+
+const BREAKDOWN_GENDER_DATA = [
+  { name: "Workplace Health, Safety and Environment", m: 19, f: 1 },
+  { name: "Freedom of Association", m: 0, f: 0 },
+  { name: "Child Labor", m: 0, f: 0 },
+  { name: "Wages & Benefits", m: 203, f: 3 },
+  { name: "Working Hours", m: 46, f: 2 },
+  { name: "Forced Labor", m: 1, f: 0 },
+  { name: "Discrimination", m: 2, f: 0 },
+  { name: "Unfair Employment", m: 11, f: 0 },
+  { name: "Ethical Business", m: 3, f: 0 },
+  { name: "Harassment", m: 9, f: 2 },
+  { name: "Workplace Discipline", m: 173, f: 2 },
+]
+
 const RESOLUTION_TIME = [
   { label: "Within same day", count: 21 },
   { label: "Within 3 days", count: 3 },
@@ -204,9 +272,7 @@ const StaticGauge = ({ value, color }: { value: number; color: string }) => {
   return (
     <div className="relative w-[160px] h-[160px] flex items-center justify-center">
       <svg className="w-full h-full" viewBox="0 0 200 200">
-        {/* Background Track */}
         <circle cx="100" cy="100" r="80" fill="none" stroke="#F0F2F5" strokeWidth="20" strokeLinecap="round" />
-        {/* Value Arc (Simple Approximation) */}
         <circle
           cx="100"
           cy="100"
@@ -215,7 +281,7 @@ const StaticGauge = ({ value, color }: { value: number; color: string }) => {
           stroke={color}
           strokeWidth="20"
           strokeLinecap="round"
-          strokeDasharray="502" // 2 * pi * 80
+          strokeDasharray="502"
           strokeDashoffset={502 - (502 * value) / 100}
           transform="rotate(-90 100 100)"
           className="transition-all duration-1000 ease-out"
@@ -228,6 +294,115 @@ const StaticGauge = ({ value, color }: { value: number; color: string }) => {
     </div>
   )
 }
+
+// --- CATEGORY BREAKDOWN COMPONENTS ---
+const GenderStatBox = ({ type, value, percentage, color }: any) => (
+  <div style={{ borderColor: `${color}40` }} className="border rounded-lg px-4 py-1 flex flex-col items-center min-w-[100px] bg-white shadow-sm">
+    <div style={{ color }} className="flex items-center gap-1.5 mb-0.5">
+      <Users size={8} strokeWidth={3} />
+      <span className="text-[7px] font-black uppercase tracking-wider">{type}</span>
+    </div>
+    <span className="text-lg font-black text-[#284952] leading-none mb-0.5">{value}</span>
+    <span className="text-[7px] font-bold text-gray-400">{percentage}</span>
+  </div>
+)
+
+const GenderBarChart = ({ isActive }: { isActive: boolean }) => {
+  const maxValue = 250
+  return (
+    <div className="flex flex-col">
+      <div className="absolute inset-y-0 left-[110px] right-2 flex justify-between pointer-events-none">
+        {[0, 50, 100, 150, 200, 250].map(v => (
+          <div key={v} className="h-full w-[1px] border-l border-solid border-gray-100/50 relative">
+            {v === 0 && <div className="absolute -left-[1px] inset-y-0 w-[1px] bg-gray-200" />}
+          </div>
+        ))}
+      </div>
+      <div className="flex-col gap-[3px] py-1 relative z-10 overflow-hidden flex">
+        {BREAKDOWN_GENDER_DATA.map((cat, i) => (
+          <div key={i} className="flex items-center gap-2 group h-[11px]">
+            <div className="w-[100px] text-right shrink-0">
+              <span className="text-[7px] font-bold text-[#767676] truncate block leading-none">{cat.name}</span>
+            </div>
+            <div className="flex-1 flex flex-col justify-center">
+              <div className="flex items-center gap-1 max-h-[5px]">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={isActive ? { width: `${(cat.m / maxValue) * 100}%` } : {}}
+                  transition={{ duration: 1, ease: "circOut", delay: i * 0.05 }}
+                  className="h-[4px] bg-[#5F9BFF] rounded-r-[1px] min-w-[1px]"
+                />
+                <span className="text-[6.5px] font-black text-[#5F9BFF] leading-none">{cat.m}</span>
+              </div>
+              <div className="flex items-center gap-1 max-h-[5px]">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={isActive ? { width: `${(cat.f / maxValue) * 100}%` } : {}}
+                  transition={{ duration: 1, ease: "circOut", delay: 0.2 + i * 0.05 }}
+                  className="h-[4px] bg-[#FF6BB5] rounded-r-[1px] min-w-[1px]"
+                />
+                <span className="text-[6.5px] font-black text-[#FF6BB5] leading-none">{cat.f}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-0.5 flex flex-col items-center shrink-0 border-t border-gray-100/50 pt-1">
+        <div className="w-full flex justify-between pl-[110px] pr-2">
+          {[0, 50, 100, 150, 200, 250].map(v => (
+            <span key={v} className="text-[7.5px] font-bold text-gray-400 w-4 text-center">{v}</span>
+          ))}
+        </div>
+        <span className="text-[7.5px] font-bold text-[#17161A] mt-0.5 uppercase tracking-tighter">Number of Complaints</span>
+      </div>
+    </div>
+  )
+}
+
+const TrendChart = ({ isActive }: { isActive: boolean }) => {
+  const data = [0, 2, 1, 0, 2, 2, 1, 0, 0, 2, 2, 0, 0, 0, 0, 4, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  const dates = ["01-12", "01-13", "01-14", "01-15", "01-16", "01-17", "01-18", "01-19", "01-20", "01-21", "01-22", "01-23", "01-24", "01-25", "01-26", "01-27", "01-28", "01-29", "01-30", "01-31", "02-01", "02-02", "02-03", "02-04", "02-05", "02-06", "02-07", "02-08", "02-09"]
+  const width = 1200
+  const height = 180
+  const paddingLeft = 40
+  const paddingBottom = 40
+  const chartWidth = width - paddingLeft
+  const chartHeight = height - paddingBottom
+  const points = data.length > 0 ? data.map((d, i) => `${paddingLeft + (i / (data.length - 1)) * chartWidth},${chartHeight - (d / 4) * chartHeight}`).join(" ") : ""
+
+  return (
+    <div className="w-full h-full flex flex-col relative">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+        <div className="w-8 h-4 border-2 border-[#206E71] bg-[#206E71]/10 rounded-sm" />
+        <span className="text-[10px] font-bold text-gray-500">Complaint Count</span>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
+        {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4].map(v => (
+          <g key={v}>
+            <line x1={paddingLeft} y1={chartHeight - (v / 4) * chartHeight} x2={width} y2={chartHeight - (v / 4) * chartHeight} stroke="#F0F2F5" strokeWidth="1" />
+            <text x={paddingLeft - 10} y={chartHeight - (v / 4) * chartHeight} textAnchor="end" alignmentBaseline="middle" className="text-[10px] fill-gray-400 font-bold">{v.toFixed(1)}</text>
+          </g>
+        ))}
+        {data.map((_, i) => (
+          <line key={i} x1={paddingLeft + (i / (data.length - 1)) * chartWidth} y1={0} x2={paddingLeft + (i / (data.length - 1)) * chartWidth} y2={chartHeight} stroke="#F0F2F5" strokeWidth="1" />
+        ))}
+        {dates.map((date, i) => (
+          <text key={i} x={paddingLeft + (i / (data.length - 1)) * chartWidth} y={chartHeight + 15} textAnchor="end" transform={`rotate(-45, ${paddingLeft + (i / (data.length - 1)) * chartWidth}, ${chartHeight + 15})`} className="text-[10px] fill-gray-400 font-bold">{date}</text>
+        ))}
+        <polyline points={points} fill="none" stroke="#206E71" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        {data.map((d, i) => (
+          <motion.circle
+            key={i} cx={paddingLeft + (i / (data.length - 1)) * chartWidth} cy={chartHeight - (d / 4) * chartHeight} r="4.5" fill="white" stroke="#206E71" strokeWidth="2.5"
+            initial={{ scale: 0 }} animate={isActive ? { scale: 1 } : { scale: 0 }} transition={{ delay: i * 0.02 }}
+          />
+        ))}
+        <line x1={paddingLeft} y1={0} x2={paddingLeft} y2={chartHeight} stroke="#E9ECEF" strokeWidth="2" />
+        <line x1={paddingLeft} y1={chartHeight} x2={width} y2={chartHeight} stroke="#E9ECEF" strokeWidth="2" />
+      </svg>
+    </div>
+  )
+}
+
 
 const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId: string }) => {
   const chartRef = useRef<HTMLDivElement>(null)
@@ -268,8 +443,8 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
       try {
         chartInstance.current = JSC.chart(chartRef.current, {
           debug: false,
-          width: 180,
-          height: 180,
+          width: 140,
+          height: 140,
           license: { jscharting: "no-logo-button" },
           legend_visible: false,
           defaultTooltip_enabled: false,
@@ -293,7 +468,7 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
           defaultSeries: {
             type: "gauge column roundcaps",
             shape: {
-              label: { text: "%max", align: "center", verticalAlign: "middle", style_fontSize: 20 },
+              label: { text: "%max", align: "center", verticalAlign: "middle", style_fontSize: 16 },
             },
           },
           series: [
@@ -341,7 +516,7 @@ const JSChartingCircularColorBar = ({ value, chartId }: { value: number; chartId
   }
 
   return (
-    <div ref={chartRef} id={chartId} style={{ width: 160, height: 160 }} className="flex items-center justify-center" />
+    <div ref={chartRef} id={chartId} style={{ width: 130, height: 130 }} className="flex items-center justify-center" />
   )
 }
 
@@ -354,6 +529,7 @@ const ScoreCard = ({
   chartId,
   delay = 0,
   showFactors,
+  isHighlighted = false,
   iconColor,
   staticMode = false // New Prop for preventing crashes
 }: {
@@ -365,26 +541,33 @@ const ScoreCard = ({
   chartId: string
   delay?: number
   showFactors: boolean
+  isHighlighted?: boolean
   iconColor: string
   staticMode?: boolean
 }) => {
   return (
     <motion.div
       initial={{ y: 30, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      animate={{
+        y: 0,
+        opacity: 1,
+        boxShadow: isHighlighted
+          ? `0 0 0 2px ${iconColor}40, 0 20px 40px -10px ${iconColor}25, 0 0 25px ${iconColor}30`
+          : "0 1px 3px rgba(0,0,0,0.08)",
+      }}
       transition={{ duration: 0.6, delay, ease: "backOut" }}
-      className="bg-white rounded-xl border border-[#DEE2E6]/60 p-3 flex flex-col items-center relative overflow-hidden shadow-sm"
+      className="bg-white rounded-xl border border-[#DEE2E6]/60 p-2 flex flex-col items-center relative overflow-hidden shadow-sm w-full"
     >
       <div className="flex items-center gap-2 mb-1">
-        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: `${iconColor}15` }}>
-          <Icon size={14} style={{ color: iconColor }} />
+        <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: `${iconColor}15` }}>
+          <Icon size={12} style={{ color: iconColor }} />
         </div>
-        <h2 className="text-[10px] font-bold" style={{ color: COLORS.deepTeal }}>
+        <h2 className="text-[9px] font-bold" style={{ color: COLORS.deepTeal }}>
           {title}
         </h2>
       </div>
 
-      <div className="relative flex items-center justify-center" style={{ minHeight: 160 }}>
+      <div className="relative flex items-center justify-center" style={{ minHeight: 130 }}>
         {/* Conditional Rendering: Static SVG vs Heavy JSChart */}
         {staticMode ? (
           <StaticGauge value={value} color={iconColor} />
@@ -392,6 +575,151 @@ const ScoreCard = ({
           <JSChartingCircularColorBar value={value} chartId={chartId} />
         )}
       </div>
+
+      {/* Factor Breakdown - shown during NPS focus */}
+      <AnimatePresence>
+        {showFactors && isHighlighted && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="w-full overflow-hidden"
+          >
+            <p className="text-[7px] font-bold uppercase tracking-[0.15em] text-[#767676] mb-1.5 text-center mt-1">
+              {factorLabel}
+            </p>
+            {factors.map((factor, i) => (
+              <motion.div
+                key={factor.label}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.3 }}
+                className="flex items-center gap-2 p-1.5 rounded-lg bg-[#F5F5F7] mb-1"
+              >
+                <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center shadow-sm" style={{ color: iconColor }}>
+                  <factor.icon size={9} />
+                </div>
+                <span className="text-[8px] font-semibold text-[#17161A] flex-1">{factor.label}</span>
+                <CheckCircle2 size={10} className="text-[#60BA81]" />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+// --- BROWSER FRAME COMPONENT ---
+const BrowserFrame = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="w-full h-full flex items-center justify-center p-0 relative z-10 overflow-x-visible">
+      <motion.div
+        initial={{ scale: 0.75, opacity: 0, y: 30 }}
+        animate={{ scale: 0.85, opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+        className="w-[125%] h-[110%] max-w-[2600px] max-h-[1100px] bg-white rounded-2xl shadow-[0_50px_100px_rgba(0,0,0,0.15)] border border-[#DEE2E6] flex flex-col overflow-x-visible overflow-y-clip relative origin-center"
+      >
+        {/* Browser Top Bar */}
+        <div className="h-10 bg-gradient-to-b from-[#F9FAFB] to-[#F3F4F6] border-b border-[#DEE2E6] flex items-center px-4 shrink-0 justify-between select-none rounded-t-2xl">
+          {/* Traffic Lights */}
+          <div className="flex gap-2 w-20">
+            <div className="w-3 h-3 rounded-full bg-[#FF5F57] border border-[#E0443E]" />
+            <div className="w-3 h-3 rounded-full bg-[#FEB12F] border border-[#D89724]" />
+            <div className="w-3 h-3 rounded-full bg-[#28C840] border border-[#1AAB29]" />
+          </div>
+
+          {/* Address Bar */}
+          <div className="flex-1 flex justify-center max-w-2xl px-4">
+            <div className="w-full bg-white h-7 rounded-md border border-[#E5E7EB] shadow-sm flex items-center px-3 gap-2">
+              <Lock size={10} className="text-[#60BA81]" fill="currentColor" />
+              <div className="flex-1 text-[10px] font-medium text-gray-500 flex items-center gap-1">
+                <span className="opacity-40">https://</span>
+                <span className="text-[#284952] font-semibold">fruitofsustainability.com</span>
+                <span className="opacity-100">/login/admin_portal</span>
+              </div>
+              <RefreshCw size={10} className="text-gray-400" />
+            </div>
+          </div>
+
+          {/* Search/User Mock */}
+          <div className="w-20 flex justify-end gap-3">
+            <div className="w-6 h-6 rounded-full bg-[#DEE2E6]/50 flex items-center justify-center">
+              <div className="w-3 h-3 rounded-full border border-gray-400" />
+            </div>
+          </div>
+        </div>
+
+        {/* Content Viewport */}
+        <div className="flex-1 relative overflow-x-visible overflow-y-clip bg-[#F5F5F7] rounded-b-2xl">
+          {children}
+          {/* Inner Vignette for depth */}
+          <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_60px_rgba(0,0,0,0.02)]" />
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+// --- CURSOR COMPONENT FOR INTERACTIVITY DEMO ---
+const MetricClickCursor = ({ progress }: { progress: number }) => {
+  const isPhase1 = progress >= 114 && progress < 118
+  const isPhase2 = progress >= 126 && progress < 130
+
+  if (!isPhase1 && !isPhase2) return null
+
+  let currentX, currentY, opacity, scale, isClicking;
+
+  if (isPhase1) {
+    // Phase 1: Dashboard click (114s - 118s)
+    opacity = progress < 114.2 ? (progress - 114) / 0.2 : progress > 117.5 ? (118 - progress) / 0.5 : 1
+    const startX = 85, startY = 80
+    // Coordinates relative to whole screen (Stat card top-left)
+    const targetX = 15, targetY = 44
+    const moveProgress = Math.min(1, Math.max(0, (progress - 114.5) / 1.0))
+    currentX = startX + (targetX - startX) * moveProgress
+    currentY = startY + (targetY - startY) * moveProgress
+    isClicking = progress >= 115.5 && progress < 115.8
+    scale = isClicking ? 0.75 : 1
+  } else {
+    // Phase 2: Modal Ticket click (126s - 130s)
+    opacity = progress < 126.2 ? (progress - 126) / 0.2 : progress > 129.5 ? (130 - progress) / 0.5 : 1
+    const startX = 60, startY = 60
+    // Coordinates relative to whole screen (Ticket ID in centered modal)
+    const targetX = 24, targetY = 32
+    const moveProgress = Math.min(1, Math.max(0, (progress - 126.5) / 1.0))
+    currentX = startX + (targetX - startX) * moveProgress
+    currentY = startY + (targetY - startY) * moveProgress
+    isClicking = progress >= 127.5 && progress < 127.8
+    scale = isClicking ? 0.75 : 1
+  }
+
+  return (
+    <motion.div
+      style={{
+        position: "absolute",
+        left: `${currentX}%`,
+        top: `${currentY}%`,
+        opacity,
+        scale,
+        zIndex: 5000,
+        pointerEvents: "none",
+        color: "#17161A",
+        filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.4))",
+        translateX: "-50%",
+        translateY: "-50%"
+      }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+    >
+      <MousePointer2 size={32} fill="#FFFFFF" strokeWidth={2.5} />
+      {isClicking && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0.8 }}
+          animate={{ scale: 2, opacity: 0 }}
+          className="absolute inset-0 bg-[#60BA81]/40 rounded-full"
+        />
+      )}
     </motion.div>
   )
 }
@@ -416,11 +744,115 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
     OVERVIEW_INPROCESS: 47.5,
     OVERVIEW_BOUNCED: 49.5,
     OVERVIEW_END: 51,
-    HEAVY_CHARTS_END: 60,
+    BREAKDOWN_START: 51,
+    BREAKDOWN_END: 88,
     COUNSELING_START: 88,
     COUNSELING_END: 102,
-    INTERACTIVE_START: 110,
+    PERFORMANCE_START: 102,
+    PERFORMANCE_END: 114,
+    INTERACTIVE_START: 114,
+    REPORTS_START: 155,
+    HEAVY_CHARTS_END: 170,
   }
+
+  const calculatedProgress = useMemo(() => {
+    const start = 51
+    const end = 114
+    const dur = end - start
+    return Math.min(1, Math.max(0, (progress - start) / dur))
+  }, [progress])
+
+  const showFiltersGlow = progress >= TIMING.FILTERS_HIGHLIGHT && progress <= TIMING.FILTERS_END
+  const showStatCardsGlow = progress >= TIMING.OVERVIEW_HIGHLIGHT && progress <= TIMING.OVERVIEW_END
+  const isBouncedHighlight = progress >= TIMING.OVERVIEW_BOUNCED && progress < 51
+  const isCategoriesHighlight = progress >= 51 && progress < 66
+  const focusDaily = progress >= 66 && progress < 71
+  const isGenderHighlight = progress >= 71 && progress < 76
+  const focusFeedback = progress >= 76 && progress < 88
+  const isCounselingHighlight = progress >= 88 && progress < 102
+  const focusPerformance = progress >= 102 && progress < 114
+  const focusHappiness = progress >= 137 && progress < 146
+  const focusSafety = progress >= 146 && progress < 155
+
+  const categoriesPhaseProgress = isCategoriesHighlight ? Math.min(1, Math.max(0, (progress - 51) / 15)) : 0
+  const isCategoriesZoomed = isCategoriesHighlight && categoriesPhaseProgress > 0.05 && categoriesPhaseProgress <= 0.95
+
+  const feedbackPhaseProgress = focusFeedback ? Math.min(1, Math.max(0, (progress - 76) / 12)) : 0
+  const totalSliderWidth = BREAKDOWN_FEEDBACKS.length * 296
+  const visibleWidth = 560
+  const sliderTranslateX = Math.max(-feedbackPhaseProgress * (totalSliderWidth - visibleWidth), -(totalSliderWidth - visibleWidth))
+
+  // Resolution Performance row sequencing: 102-114s (12s, 4 rows × 3s each)
+  const activeResolutionRow = focusPerformance ? Math.min(3, Math.floor(((progress - 102) / 12) * 4)) : -1
+
+  const SCRIPT_CATEGORIES = ["wages", "hours", "harassment", "health"]
+  const OTHER_CATEGORIES = ["discipline", "unfair", "ethical", "freedom", "child", "forced", "discrimination"]
+  const activeCategoryIds = categoriesPhaseProgress > 0.6
+    ? OTHER_CATEGORIES
+    : categoriesPhaseProgress > 0.3
+      ? SCRIPT_CATEGORIES
+      : []
+
+  const isSwap1 = Math.abs(progress - TIMING.ROLE_SWAP_1) < 0.8
+  const isSwap2 = Math.abs(progress - TIMING.ROLE_SWAP_2) < 0.8
+  const isSwap3 = Math.abs(progress - TIMING.ROLE_SWAP_3) < 0.8
+  const isFocusing = isSwap1 || isSwap2 || isSwap3 || (progress > 117 && progress < 124)
+
+  // --- CINEMATIC MULTI-STOP SCROLL LOGIC ---
+  const getScrollY = () => {
+    // 0-51: Overview (Stat Cards at Top)
+    if (progress < 51) return 0
+
+    // 51-66: Categories Breakdown (Focus on Middle-Left)
+    if (progress >= 51 && progress < 66) {
+      return -520 // Stable stop for Categories
+    }
+
+    // 66-71: Complaints by Days (Integrated in Bottom of Center Column)
+    if (progress >= 66 && progress < 71) {
+      return -850 // Target the lower part of the center column
+    }
+
+    // 71-76: Gender Distribution (Focus on Middle-Center)
+    if (progress >= 71 && progress < 76) {
+      return -450 // Center column focus
+    }
+
+    // 76-88: Feedback Section (scroll a bit more to show feedback card)
+    if (progress >= 76 && progress < 88) {
+      return -300
+    }
+
+    // 88-102: Counseling Analysis (Focus on Middle-Left, scroll back up slightly)
+    if (progress >= 88 && progress < 102) {
+      return -250
+    }
+
+    // 102-114: Resolution Performance (Right column, same height as analytics grid)
+    if (progress >= 102 && progress < 114) {
+      return -450 // Right column sits at same height as center analytics cards
+    }
+
+    // 114-137: Interactive modals / overview return
+    if (progress >= 114 && progress < 137) {
+      return 0
+    }
+
+    // 137-155: NPS Scores (Scroll to top of center column where ScoreCards live)
+    if (progress >= 137 && progress < 155) {
+      return -100
+    }
+
+    // 155-170: Survey Reports Focus (Scroll to bottom of dashboard)
+    if (progress >= 155 && progress < 170) {
+      return -650
+    }
+
+    // Final Return to Overview
+    return 0
+  }
+
+  const viewScrollY = getScrollY()
 
   const showHeader = isActive
   const showFilters = isActive
@@ -432,113 +864,59 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
   const getManagementInfo = () => {
     if (progress < TIMING.ROLE_SWAP_1) return ROLE_DATA.CEO
     if (progress < TIMING.ROLE_SWAP_2) return ROLE_DATA.REGIONAL
-    return ROLE_DATA.SITE
+    if (progress < TIMING.ROLE_SWAP_3) return ROLE_DATA.SITE
+    return ROLE_DATA.UNIT
   }
 
   const role = getManagementInfo()
 
-  const isSwap1 = Math.abs(progress - TIMING.ROLE_SWAP_1) < 0.8
-  const isSwap2 = Math.abs(progress - TIMING.ROLE_SWAP_2) < 0.8
-  const isSwap3 = Math.abs(progress - TIMING.ROLE_SWAP_3) < 0.8
-  const isFocusing = isSwap1 || isSwap2 || isSwap3
+  const shouldRenderHeavyCharts = progress < TIMING.HEAVY_CHARTS_END
 
-  const showFiltersGlow = progress >= TIMING.FILTERS_HIGHLIGHT && progress <= TIMING.FILTERS_END
-  const showStatCardsGlow = progress >= TIMING.OVERVIEW_HIGHLIGHT && progress <= TIMING.OVERVIEW_END
-  const isBouncedHighlight = progress >= TIMING.OVERVIEW_BOUNCED && progress < TIMING.OVERVIEW_END
-  const isCounselingHighlight = progress >= 89.5 && progress < 101
-
-  const shouldRenderHeavyCharts = progress < TIMING.HEAVY_CHARTS_END || progress > TIMING.INTERACTIVE_START
   const showDetailModal = progress >= 118 && progress < 128
   const showTimelineModal = progress >= 128 && progress < 137
-  const anyFocusActive = showFiltersGlow || isBouncedHighlight || isCounselingHighlight || showDetailModal || showTimelineModal
+  const focusReports = progress >= 155 && progress < 170
+  const isReportsZoomed = progress >= 158 && progress < 170
 
-  // Updated Blur Logic: Reduced blur radius (3px) and increased opacity (0.8)
-  const headerBlurDuringFilters = anyFocusActive ? "blur(3px) opacity(0.8)" : "blur(0px) opacity(1)"
-  const dashboardDimFilter = (showDetailModal || showTimelineModal) ? "blur(20px) brightness(0.7) grayscale(20%)" : "none"
+  const anyFocusActive = showFiltersGlow || isBouncedHighlight || isCounselingHighlight || isCategoriesHighlight || focusDaily || isGenderHighlight || focusFeedback || focusPerformance || focusHappiness || focusSafety || showDetailModal || showTimelineModal || focusReports
 
-  const headerScale = isFocusing ? 1.15 : 1
+  const headerBlurDuringFilters = anyFocusActive ? "blur(2px) opacity(0.6)" : "none"
+  const dashboardDimFilter = (showDetailModal || showTimelineModal || isCategoriesZoomed || isReportsZoomed) ? "blur(20px) brightness(0.7)" : "none"
+
+  const headerScale = isFocusing ? 1.05 : 1
   const headerZIndex = isFocusing ? 100 : 50
 
   return (
     <motion.div
-      className="w-full h-full"
+      className="w-full h-full overflow-x-visible overflow-y-clip"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div className="w-full h-full bg-[#F5F5F7] relative overflow-hidden font-sans">
-        <motion.div
-          className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#60BA81]/5 rounded-full blur-[120px]"
-          animate={{ opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
-        />
+      <BrowserFrame>
+        <div className="w-full h-full bg-[#F5F5F7] relative overflow-x-visible overflow-y-clip font-sans flex flex-col">
+          {/* ... Background Circles ... */}
+          <motion.div
+            className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#60BA81]/5 rounded-full blur-[120px]"
+            animate={{ opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
+          />
 
-        {/* Simulated Cursor and Click for Cinematic Transition (114s - 118s) */}
-        <AnimatePresence>
-          {progress >= 114 && progress < 118 && (
-            <motion.div
-              initial={{ x: 600, y: 400, opacity: 0 }}
-              animate={{
-                x: 110, y: 190, // Move towards "Total Complaints" card (below statistics)
-                opacity: 1
-              }}
-              transition={{ duration: 1.2, ease: "easeInOut" }}
-              className="absolute z-[1000] pointer-events-none"
-            >
-              {/* Simple SVG Cursor */}
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <motion.path
-                  d="M3 3L21 11L13 13L11 21L3 3Z"
-                  fill="white"
-                  stroke="black"
-                  strokeWidth="2"
-                  animate={{
-                    scale: progress >= 116 && progress < 116.5 ? [1, 0.8, 1] : 1
-                  }}
-                />
-                {/* Click Pulse */}
-                {progress >= 116 && (
-                  <motion.circle
-                    cx="3" cy="3" r="20"
-                    stroke="#60BA81"
-                    strokeWidth="2"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: [0, 1, 0], scale: [0, 2] }}
-                    transition={{ duration: 0.6 }}
-                  />
-                )}
-              </svg>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{
-            opacity: isActive ? 1 : 0,
-            scale: progress >= 117 && progress < 118 ? 1.05 : 1, // Slight predictive zoom before modal
-            filter: dashboardDimFilter
-          }}
-          exit={{ opacity: 0, scale: 1.02, filter: "blur(10px)" }}
-          transition={{ duration: 0.8, ease: IOS_EASE }}
-          className="relative z-10 w-full h-full flex flex-col"
-        >
-          {/* ===== HEADER BAR ===== */}
+          {/* ===== PINNED HEADER BAR ===== */}
           <motion.div
             animate={{
               scale: headerScale,
               zIndex: headerZIndex,
-              y: isFocusing ? 100 : 0,
+              y: isFocusing ? 20 : 0,
               filter: headerBlurDuringFilters,
-              boxShadow: isFocusing ? "0 40px 100px rgba(0,0,0,0.3)" : "0 1px 2px rgba(0,0,0,0.05)"
+              boxShadow: isFocusing ? "0 40px 100px rgba(0,0,0,0.15)" : "0 1px 2px rgba(0,0,0,0.05)"
             }}
             transition={{ duration: 0.8, ease: IOS_EASE }}
-            className="bg-white border-b border-[#DEE2E6] px-4 py-2 flex items-center justify-between relative"
+            className="bg-white border-b border-[#DEE2E6] px-4 py-1 flex items-center justify-between relative shrink-0 z-50"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center">
-                <img src="/assets/vertical_logo.png" alt="Fruit of Sustainability Logo" className="w-32 h-32 object-contain" />
+              <div className="w-8 h-8 flex items-center justify-center">
+                <img src="/assets/vertical_logo.png" alt="FOS" className="w-24 h-24 object-contain" />
               </div>
             </div>
             <div className="flex flex-col items-center">
@@ -548,690 +926,923 @@ export const SceneDashboard = ({ isActive, progress }: SceneDashboardProps) => {
                   initial={{ opacity: 0, y: 10, filter: "blur(10px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
-                  transition={{ duration: 0.4 }}
-                  className={`font-bold text-[#284952] transition-all duration-500 ${isFocusing ? 'text-lg' : 'text-sm'}`}
+                  className={`font-bold text-[#284952] ${isFocusing ? 'text-lg' : 'text-xs'}`}
                 >
                   {role.subtitle}
                 </motion.span>
               </AnimatePresence>
-              <span className="text-[10px] text-[#60BA81] font-bold tracking-[0.15em] uppercase">
+              <span className="text-[8px] text-[#60BA81] font-bold tracking-[0.15em] uppercase">
                 Human Rights Due Diligence Dashboard
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 flex items-center justify-center">
-                <img src="/assets/company_logo.png" alt="Company Logo" className="w-8 h-8 object-contain rounded-full" />
-              </div>
-              <div className="flex items-center gap-2 text-[#284952] bg-white border border-[#DEE2E6] rounded px-2 py-1">
-                <span className="text-xs">Logout</span>
-                <LogOut size={14} />
+              <div className="flex items-center gap-2 text-[#284952] bg-white border border-[#DEE2E6] rounded px-1.5 py-0.5">
+                <span className="text-[10px]">Logout</span>
+                <LogOut size={12} />
               </div>
             </div>
           </motion.div>
 
-          {/* ===== MAIN CONTENT ===== */}
-          <div className="flex-1 overflow-visible p-2">
-            {/* ===== TOP FILTER ROW ===== */}
+          {/* ===== SCROLLABLE CONTENT WINDOW ===== */}
+          <div className="flex-1 relative overflow-x-visible overflow-y-clip bg-[#F5F5F7]">
             <motion.div
-              animate={{
-                boxShadow: showFiltersGlow ? "0 0 80px rgba(96, 186, 129, 0.8)" : "none",
-                border: showFiltersGlow ? "3px solid #60BA81" : "2px solid transparent",
-                scale: showFiltersGlow ? 1.08 : 1,
-                zIndex: showFiltersGlow ? 200 : 1,
-                y: showFiltersGlow ? 80 : 0,
-                backgroundColor: showFiltersGlow ? "#FFFFFF" : "#DEE2E6",
-                // Apply gentle blur when OTHER things (like Counseling) are focused
-                filter: (anyFocusActive && !showFiltersGlow) ? "blur(3px) opacity(0.8) grayscale(20%)" : "none"
+              animate={{ y: viewScrollY }}
+              transition={{
+                type: "spring",
+                damping: 30,
+                stiffness: 150,
+                mass: 1
               }}
-              transition={{ duration: 0.8, ease: IOS_EASE }}
-              className="rounded-lg p-2 mb-2 relative overflow-visible"
+              style={{ willChange: "transform" }}
+              className="absolute top-0 left-0 w-full flex flex-col"
             >
-              {showFiltersGlow && (
-                <motion.div
-                  animate={{ x: ["-100%", "100%"] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
-                />
-              )}
-              <div className="grid grid-cols-12 gap-2">
-                <motion.div
-                  className="col-span-3 bg-white rounded-lg p-2 relative"
-                  animate={{
-                    scale: 1,
-                    boxShadow: "none"
-                  }}
-                >
-                  <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">STATISTICS</div>
-                  <div className="bg-gradient-to-r from-[#60BA81] to-[#4e9e6b] rounded-md px-3 py-2 flex items-center justify-center gap-2">
-                    <span className="text-white text-[9px] font-medium">All Time Complaints:</span>
-                    <motion.span
-                      key={role.stats.total}
-                      initial={{ scale: 1.2, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="text-white text-lg font-bold bg-white/20 px-2 py-0.5 rounded"
-                    >
-                      {role.stats.total}
-                    </motion.span>
-                  </div>
-                </motion.div>
+              {/* ----- SECTION 1: TOP OVERVIEW LAYER ----- */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{
+                  opacity: isActive ? 1 : 0,
+                  scale: (progress >= 117 && progress < 118) ? 1.1 : 1,
+                  filter: dashboardDimFilter
+                }}
+                className="w-full flex-shrink-0 flex flex-col p-2 origin-top"
+                style={{ minHeight: "2000px" }}
+              >
 
-                <div className="col-span-6 bg-white rounded-lg p-2">
+                {/* ===== MAIN CONTENT ===== */}
+                <div className="flex-1 overflow-x-visible overflow-y-clip p-2">
+                  {/* ===== TOP FILTER ROW ===== */}
                   <motion.div
-                    key={!showFiltersGlow ? "NORMAL" : progress < TIMING.FILTER_DEPT ? "SITE" : progress < TIMING.FILTER_SUPP ? "DEPT" : progress < TIMING.FILTER_BRANCH ? "SUPP" : "BRANCH"}
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-[8px] font-bold text-[#17161A] mb-1 text-center font-mono tracking-widest uppercase"
+                    animate={{
+                      boxShadow: showFiltersGlow ? "0 0 80px rgba(96, 186, 129, 0.8)" : "none",
+                      border: showFiltersGlow ? "3px solid #60BA81" : "2px solid transparent",
+                      scale: showFiltersGlow ? 1.08 : 1,
+                      zIndex: showFiltersGlow ? 200 : 1,
+                      y: showFiltersGlow ? 80 : 0,
+                      backgroundColor: showFiltersGlow ? "#FFFFFF" : "#DEE2E6",
+                      // Apply gentle blur when OTHER things (like Counseling) are focused
+                      filter: (anyFocusActive && !showFiltersGlow) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none"
+                    }}
+                    transition={{ duration: 0.8, ease: IOS_EASE }}
+                    className="rounded-lg p-1 mb-3 relative overflow-x-visible overflow-y-hidden"
                   >
-                    {!showFiltersGlow ? "UNIT FILTER (ACCESS LEVEL)" :
-                      progress < TIMING.FILTER_DEPT ? "VIEW BY SITE" :
-                        progress < TIMING.FILTER_SUPP ? "VIEW BY DEPARTMENT" :
-                          progress < TIMING.FILTER_BRANCH ? "VIEW BY SUPPLIER" : "VIEW BY BRANCH"}
-                  </motion.div>
-                  <div className="flex items-center gap-2 justify-center py-1">
-                    <AnimatePresence mode="popLayout">
-                      {(!showFiltersGlow ? role.sites :
-                        progress < TIMING.FILTER_DEPT ? FILTER_TRANSITION_DATA.SITES :
-                          progress < TIMING.FILTER_SUPP ? FILTER_TRANSITION_DATA.DEPARTMENTS :
-                            progress < TIMING.FILTER_BRANCH ? FILTER_TRANSITION_DATA.SUPPLIERS :
-                              FILTER_TRANSITION_DATA.BRANCHES).map((item, i) => (
-                                <motion.div
-                                  key={item.name}
-                                  initial={{ opacity: 0, scale: 0.8 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  exit={{ opacity: 0, scale: 0.8, position: 'absolute' }}
-                                  transition={{ delay: i * 0.03, duration: 0.3 }}
-                                  className="flex flex-col items-center shrink-0"
-                                >
-                                  <motion.div
-                                    animate={{
-                                      scale: item.selected ? 1.15 : 1,
-                                      backgroundColor: item.selected ? "#206E71" : "#FFFFFF",
-                                      borderColor: item.selected ? "#206E71" : "#DEE2E6"
-                                    }}
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center border-2 shadow-md transition-colors duration-300`}
-                                  >
-                                    <Building2 size={16} className={item.selected ? "text-white" : "text-[#284952]"} />
-                                  </motion.div>
-                                  <span className={`text-[7px] mt-1 w-14 text-center truncate font-medium ${item.selected ? "text-[#206E71] font-bold" : "text-[#284952]"}`}>
-                                    {item.name}
-                                  </span>
-                                </motion.div>
-                              ))}
-                    </AnimatePresence>
-                  </div>
-                </div>
-                <div className="col-span-3 bg-white rounded-lg p-2 relative">
-                  <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">FILTERS</div>
-                  <div className="grid grid-cols-2 gap-1">
-                    <div>
-                      <div className="text-[6px] text-[#767676] text-center mb-0.5">SEARCH</div>
-                      <div className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center">
-                        <Search size={10} className="text-[#767676]" />
-                      </div>
+                    <div className="absolute inset-0 overflow-hidden rounded-lg pointer-events-none">
+                      {showFiltersGlow && (
+                        <motion.div
+                          animate={{ x: ["-100%", "100%"] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12"
+                        />
+                      )}
                     </div>
-                    <div className="relative">
-                      <div className="text-[6px] text-[#767676] text-center mb-0.5">DATE RANGE</div>
+                    <div className="grid grid-cols-12 gap-2">
                       <motion.div
+                        className="col-span-3 bg-white rounded-lg p-2 relative"
                         animate={{
-                          borderColor: progress >= TIMING.DATE_RANGE_OPEN ? "#60BA81" : "transparent",
-                          boxShadow: progress >= TIMING.DATE_RANGE_OPEN ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none"
+                          scale: 1,
+                          boxShadow: "none"
                         }}
-                        className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center px-1 border-2"
                       >
-                        <span className="text-[6px] text-[#17161A]">Oct 28, 2025 - Nov 26, 2025</span>
+                        <div className="text-[7px] font-bold text-[#17161A] mb-1 text-center">STATISTICS</div>
+                        <div className="bg-gradient-to-r from-[#60BA81] to-[#4e9e6b] rounded-md px-2 py-1 flex items-center justify-center gap-2">
+                          <span className="text-white text-[8px] font-medium">All Time Complaints:</span>
+                          <motion.span
+                            key={role.stats.total}
+                            initial={{ scale: 1.2, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="text-white text-base font-bold bg-white/20 px-2 py-0.5 rounded"
+                          >
+                            {role.stats.total}
+                          </motion.span>
+                        </div>
                       </motion.div>
 
-                      <AnimatePresence>
-                        {progress >= TIMING.DATE_RANGE_OPEN && progress <= TIMING.FILTERS_END && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -10, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -10, scale: 0.9 }}
-                            transition={{ duration: 0.4, ease: IOS_EASE }}
-                            className="absolute top-8 left-0 right-0 bg-white rounded-lg shadow-2xl border border-[#DEE2E6] p-2 z-50"
-                          >
-                            <div className="grid grid-cols-7 gap-0.5 mb-1">
-                              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                                <div key={i} className="text-[5px] text-center text-[#767676] font-bold">{d}</div>
-                              ))}
+                      <div className="col-span-6 bg-white rounded-lg p-2">
+                        <motion.div
+                          key={!showFiltersGlow ? "NORMAL" : progress < TIMING.FILTER_DEPT ? "SITE" : progress < TIMING.FILTER_SUPP ? "DEPT" : progress < TIMING.FILTER_BRANCH ? "SUPP" : "BRANCH"}
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-[8px] font-bold text-[#17161A] mb-1 text-center font-mono tracking-widest uppercase"
+                        >
+                          {!showFiltersGlow ? "UNIT FILTER (ACCESS LEVEL)" :
+                            progress < TIMING.FILTER_DEPT ? "VIEW BY SITE" :
+                              progress < TIMING.FILTER_SUPP ? "VIEW BY DEPARTMENT" :
+                                progress < TIMING.FILTER_BRANCH ? "VIEW BY SUPPLIER" : "VIEW BY BRANCH"}
+                        </motion.div>
+                        <div className="flex items-center gap-2 justify-center py-1">
+                          <AnimatePresence mode="popLayout">
+                            {(!showFiltersGlow ? role.sites :
+                              progress < TIMING.FILTER_DEPT ? FILTER_TRANSITION_DATA.SITES :
+                                progress < TIMING.FILTER_SUPP ? FILTER_TRANSITION_DATA.DEPARTMENTS :
+                                  progress < TIMING.FILTER_BRANCH ? FILTER_TRANSITION_DATA.SUPPLIERS :
+                                    FILTER_TRANSITION_DATA.BRANCHES).map((item, i) => (
+                                      <motion.div
+                                        key={item.name}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8, position: 'absolute' }}
+                                        transition={{ delay: i * 0.03, duration: 0.3 }}
+                                        className="flex flex-col items-center shrink-0"
+                                      >
+                                        <motion.div
+                                          animate={{
+                                            scale: item.selected ? 1.15 : 1,
+                                            backgroundColor: item.selected ? "#206E71" : "#FFFFFF",
+                                            borderColor: item.selected ? "#206E71" : "#DEE2E6"
+                                          }}
+                                          className={`w-7 h-7 rounded-full flex items-center justify-center border-2 shadow-md transition-colors duration-300`}
+                                        >
+                                          <Building2 size={14} className={item.selected ? "text-white" : "text-[#284952]"} />
+                                        </motion.div>
+                                        <span className={`text-[6.5px] mt-1 w-14 text-center truncate font-medium ${item.selected ? "text-[#206E71] font-bold" : "text-[#284952]"}`}>
+                                          {item.name}
+                                        </span>
+                                      </motion.div>
+                                    ))}
+                          </AnimatePresence>
+                        </div>
+                      </div>
+                      <div className="col-span-3 bg-white rounded-lg p-2 relative">
+                        <div className="text-[8px] font-bold text-[#17161A] mb-1 text-center">FILTERS</div>
+                        <div className="grid grid-cols-2 gap-1">
+                          <div>
+                            <div className="text-[6px] text-[#767676] text-center mb-0.5">SEARCH</div>
+                            <div className="bg-[#F5F5F7] rounded h-6 flex items-center justify-center">
+                              <Search size={10} className="text-[#767676]" />
                             </div>
-                            <div className="grid grid-cols-7 gap-0.5">
-                              {[...Array(28)].map((_, i) => {
-                                const day = i + 1
-                                const isInRange = day >= 10 && day <= 26
-                                const isStart = day === 10
-                                const isEnd = day === 26
-                                return (
-                                  <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, scale: 0.5 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: i * 0.01, duration: 0.2 }}
-                                    className={`text-[5px] w-3 h-3 flex items-center justify-center rounded-full 
+                          </div>
+                          <div className="relative">
+                            <div className="text-[6px] text-[#767676] text-center mb-0.5">DATE RANGE</div>
+                            <motion.div
+                              animate={{
+                                borderColor: progress >= TIMING.DATE_RANGE_OPEN ? "#60BA81" : "transparent",
+                                boxShadow: progress >= TIMING.DATE_RANGE_OPEN ? "0 0 20px rgba(96, 186, 129, 0.5)" : "none"
+                              }}
+                              className="bg-[#F5F5F7] rounded h-5 flex items-center justify-center px-1 border-2"
+                            >
+                              <span className="text-[5.5px] text-[#17161A]">Oct 28, 2025 - Nov 26, 2025</span>
+                            </motion.div>
+
+                            <AnimatePresence>
+                              {progress >= TIMING.DATE_RANGE_OPEN && progress <= TIMING.FILTERS_END && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                                  exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                                  transition={{ duration: 0.4, ease: IOS_EASE }}
+                                  className="absolute top-8 left-0 right-0 bg-white rounded-lg shadow-2xl border border-[#DEE2E6] p-2 z-50"
+                                >
+                                  <div className="grid grid-cols-7 gap-0.5 mb-1">
+                                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                                      <div key={i} className="text-[5px] text-center text-[#767676] font-bold">{d}</div>
+                                    ))}
+                                  </div>
+                                  <div className="grid grid-cols-7 gap-0.5">
+                                    {[...Array(28)].map((_, i) => {
+                                      const day = i + 1
+                                      const isInRange = day >= 10 && day <= 26
+                                      const isStart = day === 10
+                                      const isEnd = day === 26
+                                      return (
+                                        <motion.div
+                                          key={i}
+                                          initial={{ opacity: 0, scale: 0.5 }}
+                                          animate={{ opacity: 1, scale: 1 }}
+                                          transition={{ delay: i * 0.01, duration: 0.2 }}
+                                          className={`text-[5px] w-3 h-3 flex items-center justify-center rounded-full 
                                     ${isStart || isEnd ? 'bg-[#60BA81] text-white' : ''}
                                     ${isInRange && !isStart && !isEnd ? 'bg-[#60BA81]/20 text-[#284952]' : ''}
                                     ${!isInRange ? 'text-[#767676]' : ''}
                                   `}
-                                  >
-                                    {day}
-                                  </motion.div>
-                                )
-                              })}
-                            </div>
-                            <div className="mt-1 pt-1 border-t border-[#DEE2E6] flex justify-between items-center">
-                              <span className="text-[5px] text-[#60BA81] font-bold">17 days selected</span>
-                              <motion.div
-                                animate={{ scale: [1, 1.1, 1] }}
-                                transition={{ repeat: Infinity, duration: 1 }}
-                                className="bg-[#60BA81] text-white text-[5px] px-1.5 py-0.5 rounded"
-                              >
-                                Apply
-                              </motion.div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* ===== STAT CARDS ROW ===== */}
-            <motion.div
-              animate={{
-                filter: (showFiltersGlow || isBouncedHighlight || isCounselingHighlight) ? "blur(3px) opacity(0.8) grayscale(20%)" : "none",
-                zIndex: showStatCardsGlow ? 250 : 10
-              }}
-              transition={{ duration: 0.5 }}
-              className="grid grid-cols-4 gap-2 mb-2 relative"
-            >
-              {/* ... (Stat cards content unchanged) ... */}
-              {/* Total Complaints */}
-              <motion.div
-                animate={{
-                  scale: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON) ? 1.15 :
-                    (progress >= 116 && progress < 117) ? 1.05 : 1,
-                  boxShadow: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON)
-                    ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)" :
-                    (progress >= 116 && progress < 117) ? "0 0 40px rgba(96, 186, 129, 0.5)"
-                      : "none",
-                  y: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON) ? -15 : 0,
-                  zIndex: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON || (progress >= 116 && progress < 117)) ? 100 : 1,
-                  filter: (showStatCardsGlow && !(progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON))
-                    ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
-                  borderWidth: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON || (progress >= 116 && progress < 117)) ? 3 : 0,
-                  borderColor: "#FFFFFF"
-                }}
-                transition={{ duration: 0.5, ease: IOS_EASE }}
-                className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
-              >
-                <motion.p key={role.stats.total} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
-                  {role.stats.total}
-                </motion.p>
-                <p className="text-[9px] text-white/90">Total Complaints</p>
-              </motion.div>
-
-              {/* Anonymous Complaints */}
-              <motion.div
-                animate={{
-                  scale: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 1.15 : 1,
-                  boxShadow: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED
-                    ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
-                    : "none",
-                  y: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? -15 : 0,
-                  zIndex: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 100 : 1,
-                  filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED)
-                    ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
-                  borderWidth: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 3 : 0,
-                  borderColor: "#FFFFFF"
-                }}
-                transition={{ duration: 0.5, ease: IOS_EASE }}
-                className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
-              >
-                <motion.p key={role.stats.anonymous} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
-                  {role.stats.anonymous}
-                </motion.p>
-                <p className="text-[9px] text-white/90">Anonymous Complaints</p>
-              </motion.div>
-
-              {/* Completed/Closed Complaints */}
-              <motion.div
-                animate={{
-                  scale: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 1.15 : 1,
-                  boxShadow: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS
-                    ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
-                    : "none",
-                  y: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? -15 : 0,
-                  zIndex: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 100 : 1,
-                  filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS)
-                    ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
-                  borderWidth: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 3 : 0,
-                  borderColor: "#FFFFFF"
-                }}
-                transition={{ duration: 0.5, ease: IOS_EASE }}
-                className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
-              >
-                <motion.p key={role.stats.completed} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
-                  {role.stats.completed}
-                </motion.p>
-                <p className="text-[9px] text-white/90">Closed Complaints</p>
-              </motion.div>
-
-              {/* In Process Complaints */}
-              <motion.div
-                animate={{
-                  scale: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 1.15 : 1,
-                  boxShadow: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED
-                    ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
-                    : "none",
-                  y: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? -15 : 0,
-                  zIndex: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 100 : 1,
-                  filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED)
-                    ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
-                  borderWidth: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 3 : 0,
-                  borderColor: "#FFFFFF"
-                }}
-                transition={{ duration: 0.5, ease: IOS_EASE }}
-                className="relative bg-[#60BA81] rounded-lg p-3 overflow-hidden border-solid"
-              >
-                <motion.p key={role.stats.inProcess} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-2xl font-bold text-white">
-                  {role.stats.inProcess}
-                </motion.p>
-                <p className="text-[9px] text-white/90">In Process Complaints</p>
-              </motion.div>
-            </motion.div>
-
-            {/* ===== MAIN DASHBOARD GRID ===== */}
-            <motion.div
-              animate={{
-                opacity: isActive ? 1 : 0,
-              }}
-              transition={{ duration: 0.5 }}
-              className="grid grid-cols-12 gap-2"
-              style={{ height: "calc(100% - 140px)" }}
-            >
-              {/* LEFT COLUMN - 25% width */}
-              <div className="col-span-3 flex flex-col gap-2 relative">
-                {/* Complaints Status Card */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{
-                    opacity: showFullDashboard ? 1 : 0,
-                    x: isBouncedHighlight ? 300 : (showFullDashboard ? 0 : -20),
-                    y: isBouncedHighlight ? 100 : 0,
-                    scale: isBouncedHighlight ? 1.8 : 1,
-                    zIndex: isBouncedHighlight ? 500 : 1,
-                    boxShadow: isBouncedHighlight ? "0 40px 80px rgba(0,0,0,0.5)" : "0 1px 2px rgba(0,0,0,0.05)",
-                    borderColor: isBouncedHighlight ? "#60BA81" : "#DEE2E6",
-                    filter: (anyFocusActive && !isBouncedHighlight) ? "blur(3px) opacity(0.8) grayscale(20%)" : "none"
-                  }}
-                  transition={{ duration: 0.6, ease: IOS_EASE }}
-                  className="bg-white rounded-lg border p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-2">Complaints Status</h3>
-                  <div className="flex justify-around">
-                    <div className="text-center">
-                      <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                        <img src="/assets/images/bounce_image.png" alt="Bounced 1.0" className="w-6 h-6 object-contain" />
-                      </div>
-                      <p className="text-[7px] text-[#284952]">Bounced 1.0</p>
-                      <p className="text-sm font-bold text-[#284952]">2.7%</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                        <img src="/assets/images/bounce_image1.png" alt="Bounced 2.0" className="w-6 h-6 object-contain" />
-                      </div>
-                      <p className="text-[7px] text-[#284952]">Bounced 2.0</p>
-                      <p className="text-sm font-bold text-[#284952]">0.0%</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="w-7 h-7 mx-auto mb-1 flex items-center justify-center">
-                        <img src="/assets/images/unclosed_image.png" alt="Unclosed" className="w-6 h-6 object-contain" />
-                      </div>
-                      <p className="text-[7px] text-[#284952]">Unclosed</p>
-                      <p className="text-sm font-bold text-[#284952]">0.0%</p>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Counseling Sessions Analysis - CENTERED NOW */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{
-                    opacity: showFullDashboard ? 1 : 0,
-                    // Expert Centering: 150% x-offset perfectly centers a 3-column card in a 12-column grid
-                    x: isCounselingHighlight ? "150%" : (showFullDashboard ? 0 : -20),
-                    y: isCounselingHighlight ? -126 : 0,
-                    scale: isCounselingHighlight ? 2.2 : 1,
-                    transformZ: isCounselingHighlight ? 0.1 : 0, // Force high-fidelity GPU composition
-                    zIndex: isCounselingHighlight ? 500 : 1,
-                    // Expert Filter Fix: 'none' is used instead of 'blur(0px)' to avoid subpixel rasterization blur
-                    filter: (anyFocusActive && !isCounselingHighlight)
-                      ? "blur(3px) opacity(0.8) grayscale(20%)"
-                      : "none",
-                    boxShadow: isCounselingHighlight ? "0 60px 100px rgba(0,0,0,0.4)" : "0 1px 2px rgba(0,0,0,0.05)",
-                    borderColor: isCounselingHighlight ? "#60BA81" : "#DEE2E6"
-                  }}
-                  style={{
-                    willChange: "transform, opacity",
-                    transformStyle: "preserve-3d",
-                    backfaceVisibility: "hidden"
-                  }}
-                  transition={{ duration: 0.6, ease: IOS_EASE }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm flex-1 flex flex-col"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-1">Counseling Sessions Analysis</h3>
-                  <div className="flex-1 flex items-center justify-center">
-                    <CounselingDonutChart showAnimation={showFullDashboard} progress={progress} />
-                  </div>
-                </motion.div>
-
-                {/* Complaints By Categories */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{
-                    opacity: showFullDashboard ? 1 : 0,
-                    x: showFullDashboard ? 0 : -20,
-                    filter: anyFocusActive ? "blur(3px) opacity(0.8) grayscale(20%)" : "blur(0px) opacity(1)"
-                  }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm flex-1 overflow-hidden"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-2">Complaints By Categories</h3>
-                  <div className="space-y-1.5">
-                    {COMPLAINT_CATEGORIES.map((cat, i) => (
-                      <div key={i} className="flex items-center gap-1">
-                        <span className="text-[5px] text-[#767676] w-20 truncate">{cat.name}</span>
-                        <div className="flex-1 h-2.5 bg-[#e6f5d7] rounded relative overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: showFullDashboard ? `${cat.percentage}%` : 0 }}
-                            transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
-                            className="h-full bg-[#206E71] rounded"
-                          />
-                          {cat.percentage > 0 && (
-                            <span className="absolute inset-y-0 right-1 flex items-center text-[4px] text-white pointer-events-none">
-                              {cat.percentage}%
-                            </span>
-                          )}
+                                        >
+                                          {day}
+                                        </motion.div>
+                                      )
+                                    })}
+                                  </div>
+                                  <div className="mt-1 pt-1 border-t border-[#DEE2E6] flex justify-between items-center">
+                                    <span className="text-[5px] text-[#60BA81] font-bold">17 days selected</span>
+                                    <motion.div
+                                      animate={{ scale: [1, 1.1, 1] }}
+                                      transition={{ repeat: Infinity, duration: 1 }}
+                                      className="bg-[#60BA81] text-white text-[5px] px-1.5 py-0.5 rounded"
+                                    >
+                                      Apply
+                                    </motion.div>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                  <p className="text-[6px] text-[#767676] text-center mt-2 italic">Complaint Categories</p>
-                </motion.div>
-              </div>
+                    </div>
+                  </motion.div>
 
-              {/* CENTER COLUMN - 50% width */}
-              <motion.div
-                animate={{
-                  filter: anyFocusActive ? "blur(3px) opacity(0.8) grayscale(20%)" : "blur(0px) opacity(1)"
-                }}
-                className="col-span-6 flex flex-col gap-2"
-              >
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Worker Happiness Score - Using Static Mode to prevent crashes */}
-                  <ScoreCard
-                    title="Worker Happiness Score"
-                    icon={Smile}
-                    value={85}
-                    factors={FACTORS_HAPPINESS}
-                    factorLabel="Calculated Based On"
-                    chartId="dashboardHappinessChart"
-                    delay={0}
-                    showFactors={showHappinessFactors}
-                    iconColor={COLORS.freshGreen}
-                    staticMode={!shouldRenderHeavyCharts} // Pass the flag
-                  />
+                  {/* ===== STAT CARDS ROW ===== */}
+                  <motion.div
+                    animate={{
+                      filter: (showFiltersGlow || isBouncedHighlight || isCounselingHighlight) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                      zIndex: showStatCardsGlow ? 250 : 10
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="grid grid-cols-4 gap-2 mb-2 relative"
+                  >
+                    {/* ... (Stat cards content unchanged) ... */}
+                    {/* Total Complaints */}
+                    <motion.div
+                      animate={{
+                        scale: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON) ? 1.15 :
+                          (progress >= 115.5 && progress < 116.8) ? 1.12 : 1,
+                        boxShadow: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON)
+                          ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)" :
+                          (progress >= 115.5 && progress < 116.8) ? "0 20px 40px rgba(96, 186, 129, 0.4), 0 0 30px rgba(96, 186, 129, 0.7)"
+                            : "none",
+                        y: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON) ? -15 : 0,
+                        zIndex: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON || (progress >= 115.5 && progress < 116.8)) ? 100 : 1,
+                        filter: (showStatCardsGlow && !(progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON))
+                          ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "opacity(1) grayscale(0%)",
+                        borderWidth: (progress >= TIMING.OVERVIEW_TOTAL && progress < TIMING.OVERVIEW_ANON || (progress >= 115.5 && progress < 116.8)) ? 3 : 0,
+                        borderColor: "#FFFFFF"
+                      }}
+                      transition={{ duration: 0.5, ease: IOS_EASE }}
+                      className="relative bg-[#60BA81] rounded-lg p-2 overflow-hidden border-solid"
+                    >
+                      <motion.p key={role.stats.total} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-xl font-bold text-white">
+                        {role.stats.total}
+                      </motion.p>
+                      <p className="text-[8px] text-white/90">Total Complaints</p>
+                    </motion.div>
 
-                  {/* Worker Safety Score - Using Static Mode */}
-                  <ScoreCard
-                    title="Worker Safety Score"
-                    icon={ShieldCheck}
-                    value={92}
-                    factors={FACTORS_SAFETY}
-                    factorLabel="Worker Satisfaction Based On"
-                    chartId="dashboardSafetyChart"
-                    delay={0.1}
-                    showFactors={showSafetyFactors}
-                    iconColor={COLORS.warmOrange}
-                    staticMode={!shouldRenderHeavyCharts} // Pass the flag
-                  />
-                </div>
+                    {/* Anonymous Complaints */}
+                    <motion.div
+                      animate={{
+                        scale: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 1.15 : 1,
+                        boxShadow: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED
+                          ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
+                          : "none",
+                        y: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? -15 : 0,
+                        zIndex: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 100 : 1,
+                        filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED)
+                          ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "opacity(1) grayscale(0%)",
+                        borderWidth: progress >= TIMING.OVERVIEW_ANON && progress < TIMING.OVERVIEW_CLOSED ? 3 : 0,
+                        borderColor: "#FFFFFF"
+                      }}
+                      transition={{ duration: 0.5, ease: IOS_EASE }}
+                      className="relative bg-[#60BA81] rounded-lg p-2 overflow-hidden border-solid"
+                    >
+                      <motion.p key={role.stats.anonymous} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-xl font-bold text-white">
+                        {role.stats.anonymous}
+                      </motion.p>
+                      <p className="text-[8px] text-white/90">Anonymous Complaints</p>
+                    </motion.div>
 
-                {/* Employees Feedback Section */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.25 }}
-                  className="rounded-lg overflow-hidden shadow-sm"
-                >
-                  <div className="bg-[#F5A83C] px-3 py-2">
-                    <div className="flex items-center justify-center gap-2">
-                      <h3 className="text-[10px] font-bold text-white">Employees Feedback / Suggestion List</h3>
-                      <span className="bg-white/20 text-white text-[7px] px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <span className="bg-white text-[#F5A83C] text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">46</span>
-                        Feedbacks
-                      </span>
-                    </div>
-                  </div>
-                  <div className="bg-[#fff9f0] px-2 py-2">
-                    <div className="flex gap-2 overflow-hidden">
-                      {FEEDBACK_ITEMS.map((item, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
-                          transition={{ delay: 0.3 + i * 0.1 }}
-                          className="bg-white rounded-lg px-2 py-1.5 min-w-[130px] border-l-4 border-[#F5A83C] shadow-sm"
-                        >
-                          <p className="text-[7px] text-[#17161A] font-medium truncate">{item.title}</p>
-                          <p className="text-[6px] text-[#767676]">{item.date}</p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                    {/* Completed/Closed Complaints */}
+                    <motion.div
+                      animate={{
+                        scale: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 1.15 : 1,
+                        boxShadow: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS
+                          ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
+                          : "none",
+                        y: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? -15 : 0,
+                        zIndex: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 100 : 1,
+                        filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS)
+                          ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "opacity(1) grayscale(0%)",
+                        borderWidth: progress >= TIMING.OVERVIEW_CLOSED && progress < TIMING.OVERVIEW_INPROCESS ? 3 : 0,
+                        borderColor: "#FFFFFF"
+                      }}
+                      transition={{ duration: 0.5, ease: IOS_EASE }}
+                      className="relative bg-[#60BA81] rounded-lg p-2 overflow-hidden border-solid"
+                    >
+                      <motion.p key={role.stats.completed} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-xl font-bold text-white">
+                        {role.stats.completed}
+                      </motion.p>
+                      <p className="text-[8px] text-white/90">Closed Complaints</p>
+                    </motion.div>
 
-                {/* Complaints by Gender */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.3 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm flex-1"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-[9px] font-semibold text-[#284952]">Complaints by Gender</h3>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <span className="w-2.5 h-2.5 bg-[#4A90D9] rounded-sm"></span>
-                        <span className="text-[6px] text-[#767676]">Male</span>
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="w-2.5 h-2.5 bg-[#E91E63] rounded-sm"></span>
-                        <span className="text-[6px] text-[#767676]">Female</span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-0.5">
-                    {GENDER_DATA.map((item, i) => (
-                      <div key={i} className="flex items-center gap-1">
-                        <span className="text-[5px] text-[#767676] w-14 truncate">{item.category}</span>
-                        <div className="flex-1 h-2 bg-gray-100 rounded relative">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: showFullDashboard ? `${Math.min(item.male * 4.5, 100)}%` : 0 }}
-                            transition={{ delay: 0.4 + i * 0.03, duration: 0.4 }}
-                            className="h-full bg-[#60BA81] rounded"
-                          />
-                          {item.male > 0 && (
-                            <span className="absolute right-1 top-0 text-[5px] text-[#284952]">{item.male}</span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-center gap-6 mt-1.5 pt-1.5 border-t border-[#DEE2E6]">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[#4A90D9] text-[7px]">♂ MALE</span>
-                      <span className="text-sm font-bold text-[#4A90D9]">36</span>
-                      <span className="text-[5px] text-[#767676]">100.0%</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[#E91E63] text-[7px]">♀ FEMALE</span>
-                      <span className="text-sm font-bold text-[#E91E63]">0</span>
-                      <span className="text-[5px] text-[#767676]">0.0%</span>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
+                    {/* In Process Complaints */}
+                    <motion.div
+                      animate={{
+                        scale: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 1.15 : 1,
+                        boxShadow: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED
+                          ? "0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(96, 186, 129, 0.6)"
+                          : "none",
+                        y: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? -15 : 0,
+                        zIndex: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 100 : 1,
+                        filter: showStatCardsGlow && !(progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED)
+                          ? "blur(3px) brightness(0.7)" : "blur(0px) brightness(1)",
+                        borderWidth: progress >= TIMING.OVERVIEW_INPROCESS && progress < TIMING.OVERVIEW_BOUNCED ? 3 : 0,
+                        borderColor: "#FFFFFF"
+                      }}
+                      transition={{ duration: 0.5, ease: IOS_EASE }}
+                      className="relative bg-[#60BA81] rounded-lg p-2 overflow-hidden border-solid"
+                    >
+                      <motion.p key={role.stats.inProcess} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-xl font-bold text-white">
+                        {role.stats.inProcess}
+                      </motion.p>
+                      <p className="text-[8px] text-white/90">In Process Complaints</p>
+                    </motion.div>
+                  </motion.div>
 
-              {/* RIGHT COLUMN - 25% width */}
-              <motion.div
-                animate={{
-                  filter: anyFocusActive ? "blur(3px) opacity(0.8) grayscale(20%)" : "blur(0px) opacity(1)"
-                }}
-                className="col-span-3 flex flex-col gap-2"
-              >
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.1 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-2">Executive Summary</h3>
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="w-7 h-7 bg-[#F5F5F7] rounded flex items-center justify-center">
-                      <Building2 size={14} className="text-[#284952]" />
-                    </div>
-                  </div>
-                  <p className="text-[8px] text-center text-[#60BA81] font-semibold mb-2">Suppliers</p>
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <span className="text-[7px] text-[#767676]">Companies:</span>
-                      <span className="text-[8px] font-bold text-[#60BA81]">24</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[7px] text-[#767676]">Employees:</span>
-                      <span className="text-[8px] font-bold text-[#60BA81]">4671</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[7px] text-[#767676]">Investigation Officers:</span>
-                      <span className="text-[8px] font-bold text-[#60BA81]">24</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[7px] text-[#767676]">Avg. Resolution Time:</span>
-                      <span className="text-[8px] font-bold text-[#60BA81]">1 days 9 hrs</span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
-                >
-                  <h3 className="text-[9px] font-semibold text-[#284952] mb-2">Resolution Time Per Complaint</h3>
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-[#2D9480]">
-                        <th className="text-[6px] text-white text-left px-1.5 py-1 rounded-l font-semibold">TIME TAKEN</th>
-                        <th className="text-[6px] text-white text-right px-1.5 py-1 rounded-r font-semibold">NO OF COMPLAINTS</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {RESOLUTION_TIME.map((item, i) => (
-                        <motion.tr
-                          key={i}
-                          initial={{ opacity: 0, x: 10 }}
-                          animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 10 }}
-                          transition={{ delay: 0.25 + i * 0.05 }}
-                          className={i % 2 === 0 ? "bg-[#f8f8f8]" : "bg-white"}
-                        >
-                          <td className="text-[6px] text-[#767676] px-1.5 py-1">{item.label}</td>
-                          <td className="text-[7px] font-bold text-[#60BA81] text-right px-1.5 py-1">{item.count}</td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: showFullDashboard ? 1 : 0, x: showFullDashboard ? 0 : 20 }}
-                  transition={{ delay: 0.3 }}
-                  className="rounded-lg overflow-hidden flex-1 shadow-lg"
-                  style={{ background: "linear-gradient(to bottom right, #60BA81, #284952)" }}
-                >
-                  <div className="bg-[#284952] px-2 py-1.5">
-                    <div className="flex items-center gap-1">
-                      <FileText size={10} className="text-white" />
-                      <h3 className="text-[9px] font-bold text-white">Survey Reports</h3>
-                    </div>
-                  </div>
-                  <div className="p-1.5 space-y-1 max-h-28 overflow-hidden bg-white">
-                    {SURVEY_REPORTS.map((report, i) => (
+                  {/* ===== MAIN DASHBOARD GRID ===== */}
+                  <motion.div
+                    animate={{
+                      opacity: isActive ? 1 : 0,
+                    }}
+                    transition={{ duration: 0.5 }}
+                    className="grid grid-cols-12 gap-2"
+                    style={{ minHeight: "1200px" }}
+                  >
+                    {/* --- LEFT COLUMN --- */}
+                    <div className="col-span-3 flex flex-col gap-3">
+                      {/* Complaints Status Card */}
                       <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: showFullDashboard ? 1 : 0, y: showFullDashboard ? 0 : 10 }}
-                        transition={{ delay: 0.35 + i * 0.05 }}
-                        className="border-b border-[#eee] pb-1 last:border-0"
+                        animate={{
+                          filter: (anyFocusActive && !isBouncedHighlight) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                          scale: isBouncedHighlight ? 1.05 : 1,
+                          zIndex: isBouncedHighlight ? 100 : 1,
+                        }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] p-2 shadow-sm"
                       >
-                        <p className="text-[6px] text-[#284952] font-semibold truncate">{report.title}</p>
-                        <div className="flex items-center justify-between mt-0.5">
-                          <p className="text-[5px] text-[#767676]">{report.date}</p>
-                          <div className="flex gap-0.5">
-                            {report.hasView && (
-                              <button className="bg-[#60BA81] text-white text-[5px] px-1 py-0.5 rounded flex items-center gap-0.5">
-                                <Eye size={6} /> View
-                              </button>
-                            )}
-                            {report.hasPdf && <button className="bg-[#E74C3C] text-white text-[5px] px-1 py-0.5 rounded">PDF</button>}
-                            {report.hasCsv && (
-                              <button className="bg-[#F5A83C] text-white text-[5px] px-1 py-0.5 rounded flex items-center gap-0.5">
-                                <Download size={5} /> CSV
-                              </button>
-                            )}
+                        <h3 className="text-[9px] font-bold text-[#284952] mb-3 uppercase tracking-wider">Complaints Status</h3>
+                        <div className="flex justify-around items-center">
+                          <div className="text-center">
+                            <img src="/assets/images/bounce_image.png" alt="Bounced 1.0" className="w-8 h-8 mx-auto mb-1 object-contain" />
+                            <p className="text-[8px] text-gray-500 font-bold">Bounced 1.0</p>
+                            <p className="text-sm font-black text-[#284952]">2.7%</p>
+                          </div>
+                          <div className="text-center">
+                            <img src="/assets/images/bounce_image1.png" alt="Bounced 2.0" className="w-8 h-8 mx-auto mb-1 object-contain" />
+                            <p className="text-[8px] text-gray-500 font-bold">Bounced 2.0</p>
+                            <p className="text-sm font-black text-[#284952]">0.0%</p>
+                          </div>
+                          <div className="text-center">
+                            <img src="/assets/images/unclosed_image.png" alt="Unclosed" className="w-8 h-8 mx-auto mb-1 object-contain" />
+                            <p className="text-[8px] text-gray-500 font-bold">Unclosed</p>
+                            <p className="text-sm font-black text-[#284952]">0.0%</p>
                           </div>
                         </div>
                       </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-            </motion.div>
-          </div>
-        </motion.div >
 
-        {/* --- CINEMATIC MODAL OVERLAYS --- */}
-        <AnimatePresence>
-          {showDetailModal && (
+                      {/* Counseling Sessions Analysis */}
+                      <motion.div
+                        animate={{
+                          filter: (anyFocusActive && !isCounselingHighlight) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                          scale: isCounselingHighlight ? 1.15 : 1,
+                          x: isCounselingHighlight ? 80 : 0,
+                          zIndex: isCounselingHighlight ? 100 : 1,
+                        }}
+                        transition={{ type: "spring", stiffness: 200, damping: 22 }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] p-3 shadow-sm flex flex-col items-center justify-center"
+                      >
+                        <h3 className="text-[9px] font-bold text-[#284952] mb-4 uppercase tracking-wider">Counseling Sessions Analysis</h3>
+                        <div className="scale-110 mb-4">
+                          <CounselingDonutChart showAnimation={showFullDashboard} progress={progress} />
+                        </div>
+                        <p className="text-[8px] text-gray-400 text-center italic font-bold uppercase tracking-widest">Global Distribution</p>
+                      </motion.div>
+
+                      {/* Complaints By Categories */}
+                      <motion.div
+                        animate={{
+                          filter: (anyFocusActive && !isCategoriesHighlight) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                          scale: isCategoriesHighlight ? 1.05 : 1,
+                          zIndex: isCategoriesHighlight ? 100 : 1,
+                        }}
+                        className={`bg-white rounded-lg border border-[#DEE2E6] p-3 shadow-sm flex flex-col ${isCategoriesHighlight ? "overflow-hidden" : ""}`}
+                        style={{
+                          minHeight: isCategoriesHighlight ? "400px" : "auto"
+                        }}
+                      >
+                        <h3 className="text-[9px] font-bold text-[#284952] mb-4 uppercase tracking-wider">Complaints By Categories</h3>
+                        <div className="space-y-2 flex-1 flex flex-col justify-between">
+                          {BREAKDOWN_CATEGORIES.map((cat, idx) => (
+                            <div key={cat.id} className="flex flex-col gap-1 w-full">
+                              <div className="flex justify-between items-center w-full px-0.5">
+                                <span className="text-[9px] font-bold text-[#555555] truncate max-w-[140px]">{cat.name}</span>
+                                <span className="text-[9px] font-black text-[#206E71]">{cat.value}%</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-[#E9F5E9] rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${cat.value}%` }}
+                                  transition={{ duration: 1, delay: idx * 0.05 }}
+                                  className="h-full bg-[#206E71] rounded-full"
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="text-center italic text-gray-400 text-[8px] mt-4 font-bold uppercase tracking-widest">Category Distribution</div>
+                      </motion.div>
+                    </div>
+
+                    {/* --- CENTER COLUMN --- */}
+                    <div className="col-span-6 flex flex-col gap-3">
+                      {/* Gauges Row */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <motion.div
+                          animate={{
+                            filter: (anyFocusActive && !focusHappiness) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                            scale: focusHappiness ? 1.05 : 1,
+                            zIndex: focusHappiness ? 100 : 1,
+                          }}
+                          transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                          className="rounded-lg flex flex-col items-center justify-center"
+                        >
+                          <ScoreCard
+                            title="Worker Happiness Score"
+                            icon={Smile}
+                            value={85}
+                            factors={FACTORS_HAPPINESS}
+                            factorLabel="Calculated Based On"
+                            chartId="dh1"
+                            delay={0}
+                            showFactors={focusHappiness}
+                            isHighlighted={focusHappiness}
+                            iconColor={COLORS.freshGreen}
+                            staticMode={!shouldRenderHeavyCharts}
+                          />
+                        </motion.div>
+                        <motion.div
+                          animate={{
+                            filter: (anyFocusActive && !focusSafety) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                            scale: focusSafety ? 1.05 : 1,
+                            zIndex: focusSafety ? 100 : 1,
+                          }}
+                          transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                          className="rounded-lg flex flex-col items-center justify-center"
+                        >
+                          <ScoreCard
+                            title="Worker Safety Score"
+                            icon={ShieldCheck}
+                            value={92}
+                            factors={FACTORS_SAFETY}
+                            factorLabel="Worker Satisfaction Based On"
+                            chartId="ds1"
+                            delay={0.1}
+                            showFactors={focusSafety}
+                            isHighlighted={focusSafety}
+                            iconColor={COLORS.warmOrange}
+                            staticMode={!shouldRenderHeavyCharts}
+                          />
+                        </motion.div>
+                      </div>
+
+                      {/* Feedback Slider */}
+                      <motion.div
+                        animate={{
+                          filter: (anyFocusActive && !focusFeedback) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                        }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] shadow-sm overflow-hidden flex flex-col h-[150px]"
+                      >
+                        <div className="bg-[#F5A83C] px-3 py-2 flex items-center justify-center gap-2">
+                          <h3 className="text-[10px] font-black text-white uppercase">Employees Feedback / Suggestion List</h3>
+                          <div className="bg-white/20 px-2 py-0.5 rounded-full flex items-center gap-1.5">
+                            <span className="bg-white text-[#F5A83C] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-sm">76</span>
+                            <span className="text-white text-[8px] font-bold uppercase">Feedbacks</span>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-[#FFF9F0]/30 flex-1 relative overflow-hidden flex items-center">
+                          <motion.div
+                            className="flex gap-4 h-full items-center"
+                            animate={{ x: focusFeedback ? sliderTranslateX : 0 }}
+                            transition={{ type: "tween", duration: 8, ease: "linear" }}
+                          >
+                            {BREAKDOWN_FEEDBACKS.map((item) => (
+                              <div key={item.id} className="min-w-[280px] bg-white rounded-lg p-3 border-l-4 border-[#F5A83C] shadow-sm flex flex-col justify-between h-[80%]">
+                                <p className="text-[10px] font-medium text-[#17161A] leading-tight">{item.text}</p>
+                                <span className="text-[8px] font-bold text-gray-400 text-right uppercase tracking-tighter">{item.date}</span>
+                              </div>
+                            ))}
+                          </motion.div>
+                        </div>
+                      </motion.div>
+
+                      {/* Complaints by Gender */}
+                      <motion.div
+                        animate={{
+                          filter: (anyFocusActive && !isGenderHighlight) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                          scale: isGenderHighlight ? 1.05 : 1,
+                          zIndex: isGenderHighlight ? 100 : 1,
+                        }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] p-3 shadow-sm flex flex-col"
+                      >
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="text-[9px] font-bold text-[#284952] uppercase tracking-wider">Complaints by Gender</h3>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-[#4A90D9] rounded-sm" /><span className="text-[8px] font-bold text-gray-400 uppercase">Male</span></div>
+                            <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-[#E91E63] rounded-sm" /><span className="text-[8px] font-bold text-gray-400 uppercase">Female</span></div>
+                          </div>
+                        </div>
+                        <div className="flex-1 min-h-[160px]">
+                          <GenderBarChart isActive={isActive} />
+                        </div>
+                        <div className="mt-4 flex justify-center gap-8 border-t border-[#F1F3F5] pt-4">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[#4A90D9] text-[9px] font-black">♂ MALE</span>
+                            <span className="text-lg font-black text-[#284952]">467</span>
+                            <span className="text-[8px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">97.9%</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[#E91E63] text-[9px] font-black">♀ FEMALE</span>
+                            <span className="text-lg font-black text-[#284952]">10</span>
+                            <span className="text-[8px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded">2.1%</span>
+                          </div>
+                        </div>
+                      </motion.div>
+
+                      {/* Complaints by Days */}
+                      <motion.div
+                        animate={{
+                          opacity: isActive ? 1 : 0,
+                          filter: (anyFocusActive && !focusDaily) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                          scale: focusDaily ? 1.05 : 1,
+                          zIndex: focusDaily ? 100 : 10,
+                          boxShadow: focusDaily ? "0 30px 60px -12px rgba(40,73,82,0.3)" : "0 1px 3px rgba(0,0,0,0.1)"
+                        }}
+                        transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] p-3 shadow-sm flex flex-col"
+                      >
+                        <h3 className="text-xs font-bold text-[#284952] mb-4">Complaints by Days</h3>
+                        <div className="h-[150px]">
+                          <TrendChart isActive={isActive && focusDaily} />
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    {/* --- RIGHT COLUMN --- */}
+                    <div className="col-span-3 flex flex-col gap-3">
+                      {/* Executive Summary */}
+                      <motion.div
+                        animate={{
+                          filter: anyFocusActive ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                        }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] p-3 shadow-sm flex flex-col"
+                      >
+                        <h3 className="text-[9px] font-bold text-[#206E71] mb-4 uppercase tracking-wider border-b pb-2">Business Units Summary</h3>
+                        <div className="flex items-center justify-center my-4">
+                          <div className="w-16 h-16 bg-[#F8F9FA] rounded-full flex items-center justify-center shadow-inner border border-gray-100">
+                            <Building2 size={32} className="text-[#206E71]" />
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          {[
+                            { l: "Companies", v: "24" },
+                            { l: "Employees", v: "4671" },
+                            { l: "Officers", v: "24" },
+                            { l: "Res. Time", v: "1.5 Days", highlight: true }
+                          ].map((row, i) => (
+                            <div key={i} className="flex justify-between items-center bg-[#F8F9FA] p-2 rounded-md border border-gray-50">
+                              <span className="text-[9px] font-bold text-gray-500 uppercase">{row.l}:</span>
+                              <span className={`text-xs font-black ${row.highlight ? "text-[#60BA81]" : "text-[#284952]"}`}>{row.v}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <p className="text-[8px] text-gray-400 text-center mt-6 font-bold uppercase tracking-[0.2em] opacity-60">Operations Statistics</p>
+                      </motion.div>
+
+                      {/* Resolution Table */}
+                      <motion.div
+                        animate={{
+                          filter: (anyFocusActive && !focusPerformance) ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)" : "none",
+                          scale: focusPerformance ? 1.05 : 1,
+                          zIndex: focusPerformance ? 100 : 1,
+                        }}
+                        transition={{ type: "spring", stiffness: 150, damping: 20 }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] p-3 shadow-sm flex flex-col"
+                      >
+                        <h3 className="text-[9px] font-bold text-[#284952] mb-4 uppercase tracking-wider">Resolution Performance</h3>
+                        <div className="rounded-lg overflow-hidden border border-gray-100">
+                          <div className="grid grid-cols-2 bg-[#2D9480] text-white text-[8px] font-black p-2 uppercase tracking-wide">
+                            <div className="text-center">Time Frame</div>
+                            <div className="text-center">Cases</div>
+                          </div>
+                          {[
+                            { t: "Same Day", v: 22 },
+                            { t: "3 Days", v: 1 },
+                            { t: "10 Days", v: 2 },
+                            { t: "Over 10 Days", v: 0 }
+                          ].map((row, i) => {
+                            const isCurrent = i === activeResolutionRow
+                            return (
+                              <motion.div key={i} animate={{ backgroundColor: isCurrent ? "#60BA81" : (i % 2 === 0 ? "#F8F9FA" : "#FFFFFF") }} className="grid grid-cols-2 p-2 border-t border-gray-50">
+                                <span className={`text-[9px] text-center font-bold ${isCurrent ? "text-white" : "text-gray-500"}`}>{row.t}</span>
+                                <span className={`text-[10px] text-center font-black ${isCurrent ? "text-white" : "text-[#206E71]"}`}>{row.v}</span>
+                              </motion.div>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+
+                      {/* Survey Reports */}
+                      <motion.div
+                        animate={{
+                          scale: (focusReports && !isReportsZoomed) ? 1.15 : 1,
+                          y: (focusReports && !isReportsZoomed) ? -15 : 0,
+                          zIndex: (focusReports && !isReportsZoomed) ? 100 : 1,
+                          boxShadow: (focusReports && !isReportsZoomed) ? "0 40px 100px rgba(96, 186, 129, 0.5)" : "none",
+                          filter: (anyFocusActive && !focusReports)
+                            ? "blur(2px) brightness(0.6) grayscale(100%) opacity(0.4)"
+                            : "none",
+                        }}
+                        transition={{ duration: 0.8, ease: IOS_EASE }}
+                        className="bg-white rounded-lg border border-[#DEE2E6] flex flex-col overflow-hidden shadow-sm flex-1"
+                      >
+                        <div className="bg-[#284952] px-4 py-3 flex items-center gap-3">
+                          <div className="bg-white/10 p-1.5 rounded">
+                            <BarChart2 size={16} className="text-white" />
+                          </div>
+                          <span className="text-sm font-black text-white uppercase tracking-wider">Survey Reports</span>
+                        </div>
+                        <div className="flex-1 relative flex overflow-hidden">
+                          {/* Scroll Content */}
+                          <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar p-0">
+                            {SURVEY_REPORTS.map((survey, i) => (
+                              <div key={i} className={`p-4 border-b border-gray-100 bg-white transition-all`}>
+                                <div className="flex flex-col gap-2">
+                                  <span className="text-[11px] font-black text-[#284952] leading-tight">{survey.title}</span>
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-bold text-gray-400">{survey.date}</span>
+                                    <div className="flex gap-2">
+                                      {survey.hasView && (
+                                        <button className="bg-[#60BA81] text-white px-2 py-1.5 rounded-md text-[9px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-md shadow-[#60BA81]/20">
+                                          <BarChart2 size={10} /> View
+                                        </button>
+                                      )}
+                                      {survey.hasPdf && (
+                                        <button className="bg-[#F5A83C] text-white px-2 py-1.5 rounded-md text-[9px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-md shadow-[#F5A83C]/20">
+                                          <FileText size={10} /> PDF
+                                        </button>
+                                      )}
+                                      {survey.hasCsv && (
+                                        <button className="bg-[#F5A83C] text-white px-2 py-1.5 rounded-md text-[9px] font-black uppercase tracking-tighter flex items-center gap-1.5 shadow-md shadow-[#F5A83C]/20">
+                                          <Download size={10} /> CSV
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Custom Scrollbar */}
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+
+                </div>
+              </motion.div>
+            </motion.div >
+
+            {/* REMOVED DUPLICATE CURSOR FROM INCORRECT NESTING */}
+          </div>
+        </div>
+      </BrowserFrame>
+
+      {/* --- CINEMATIC MODAL OVERLAYS (Outside Frame to prevent clipping) --- */}
+      <AnimatePresence>
+        {
+          showDetailModal && (
             <motion.div
               key="detail-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-[2000] flex items-center justify-center"
+              className="absolute inset-0 z-[2000] flex items-center justify-center bg-black/40 backdrop-blur-md"
             >
               <SceneAI isActive={true} progress={progress} />
             </motion.div>
-          )}
-          {showTimelineModal && (
+          )
+        }
+        {
+          showTimelineModal && (
             <motion.div
               key="timeline-modal"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-[2000] flex items-center justify-center"
+              className="absolute inset-0 z-[2000] flex items-center justify-center p-4 bg-black/40 backdrop-blur-md"
             >
               <SceneTimeline isActive={true} progress={progress} />
             </motion.div>
-          )}
-        </AnimatePresence>
-      </div >
+          )
+        }
+        {
+          isReportsZoomed && (
+            <motion.div
+              key="reports-zoom"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-[2000] flex items-center justify-center p-8 bg-black/40 backdrop-blur-md"
+            >
+              <motion.div
+                initial={{ scale: 0.7, y: 40, opacity: 0 }}
+                animate={{ scale: 0.85, y: 0, opacity: 1 }}
+                exit={{ scale: 0.8, y: -20, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                className="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/20 w-full max-w-4xl flex flex-col overflow-hidden"
+              >
+                <div className="bg-[#284952] p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-white" />
+                    <span className="text-white font-black text-base uppercase tracking-wider">Survey Intelligence & HRDD Reports</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {["HRDD", "ESG", "CSDD"].map((badge) => (
+                      <div key={badge} className="px-3 py-1 bg-white/10 border border-white/20 rounded-full">
+                        <span className="text-white font-bold text-[10px]">{badge}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-6 grid grid-cols-2 gap-6 overflow-y-auto max-h-[75vh]">
+                  {/* Left side: Report List */}
+                  <div className="flex flex-col border border-[#DEE2E6] rounded-2xl overflow-hidden bg-white shadow-xl">
+                    <div className="bg-[#284952] p-4 flex items-center gap-3 shrink-0">
+                      <div className="bg-white/10 p-1.5 rounded-lg">
+                        <BarChart2 className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-white font-black text-base uppercase tracking-wider">Survey Reports</span>
+                    </div>
+
+                    <div className="flex-1 relative flex overflow-hidden">
+                      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar max-h-[150vh]">
+                        {SURVEY_REPORTS.map((report, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + i * 0.1 }}
+                            className="p-6 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex flex-col gap-4">
+                              <span className="font-black text-[#284952] text-[13px] leading-tight">
+                                {report.title}
+                              </span>
+                              <div className="flex justify-between items-center">
+                                <span className="text-xs text-gray-400 font-bold">{report.date}</span>
+                                <div className="flex gap-2">
+                                  {report.hasView && (
+                                    <button className="bg-[#60BA81] text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-[#60BA81]/20 transform transition-transform hover:scale-105 active:scale-95">
+                                      <BarChart2 size={12} /> View
+                                    </button>
+                                  )}
+                                  {report.hasPdf && (
+                                    <button className="bg-[#F5A83C] text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-[#F5A83C]/20 transform transition-transform hover:scale-105 active:scale-95">
+                                      <FileText size={12} /> PDF
+                                    </button>
+                                  )}
+                                  {report.hasCsv && (
+                                    <button className="bg-[#F5A83C] text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-[#F5A83C]/20 transform transition-transform hover:scale-105 active:scale-95">
+                                      <Download size={12} /> CSV
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      {/* Scrollbar Mock for Modal */}
+                      <div className="w-[24px] h-full flex flex-col border-l border-gray-100 shrink-0 bg-[#F8F9FA]">
+                        <button className="h-[24px] w-full flex items-center justify-center text-gray-400 py-1">
+                          <ChevronUp size={16} />
+                        </button>
+                        <div className="flex-1 relative flex justify-center py-2">
+                          <div className="w-full mx-1 bg-gray-400 rounded-full" style={{ height: '40%' }} />
+                        </div>
+                        <button className="h-[24px] w-full flex items-center justify-center text-gray-400 py-1">
+                          <ChevronDown size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right side: Strategy & Analytics */}
+                  <div className="space-y-4">
+                    {[
+                      { icon: FileText, title: "Due Diligence Reports", desc: "Comprehensive documentation", color: "#60BA81" },
+                      { icon: Share2, title: "Brand Updates", desc: "Share progress with partners", color: "#284952" },
+                      { icon: FileSpreadsheet, title: "Social Audits", desc: "Audit-ready exports", color: "#F5A83C" },
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ x: 20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 + i * 0.1 }}
+                        className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${item.color}10` }}>
+                          <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[#284952] font-black text-sm uppercase tracking-tight">{item.title}</p>
+                          <p className="text-gray-400 text-xs font-medium">{item.desc}</p>
+                        </div>
+                        <div className="w-8 h-8 bg-[#F8F9FA] rounded-full flex items-center justify-center text-gray-400 hover:text-[#60BA81] transition-colors cursor-pointer">
+                          <Download size={14} />
+                        </div>
+                      </motion.div>
+                    ))}
+
+                    <div className="mt-6 p-6 bg-gradient-to-br from-[#284952] to-[#206E71] rounded-2xl text-white relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-xl" />
+                      <h4 className="font-black text-xs uppercase tracking-widest mb-2 opacity-80">Compliance Readiness</h4>
+                      <p className="text-xl font-bold leading-tight">System ready for CSDD & ESG Disclosure Requirements</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )
+        }
+        {
+          isCategoriesZoomed && (
+            <motion.div
+              key="categories-zoom"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="absolute inset-0 z-[2000] flex items-center justify-center p-8 bg-black/60 backdrop-blur-md"
+            >
+              <motion.div
+                initial={{ scale: 0.7, y: 40, opacity: 0, filter: "blur(10px)" }}
+                animate={{ scale: 1, y: 0, opacity: 1, filter: "blur(0px)" }}
+                exit={{ scale: 0.9, y: -20, opacity: 0, filter: "blur(6px)" }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 24,
+                  mass: 0.8,
+                }}
+                className="bg-white rounded-xl shadow-2xl border border-white/20 w-fit max-w-2xl max-h-[70vh] flex flex-col overflow-hidden"
+              >
+                <div className="px-6 py-4 flex justify-between items-center shrink-0 border-b border-gray-50">
+                  <h2 className="text-lg font-black text-[#284952] tracking-tight uppercase">
+                    Complaints By Categories
+                  </h2>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 space-y-0.5">
+                  {BREAKDOWN_CATEGORIES.map((cat, idx) => {
+                    const isHighlighted = activeCategoryIds.includes(cat.id)
+                    const isDimmed = activeCategoryIds.length > 0 && !isHighlighted
+
+                    return (
+                      <motion.div
+                        key={cat.id}
+                        layout="position"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{
+                          opacity: isDimmed ? 0.35 : 1,
+                          x: 0,
+                          scale: isHighlighted ? 1.01 : 1,
+                        }}
+                        className={`flex items-center gap-4 px-4 py-1.5 rounded-lg transition-colors duration-500 ${isHighlighted ? 'bg-[#60BA81]/5' : 'bg-transparent'}`}
+                      >
+                        <div className={`w-7 h-7 rounded flex items-center justify-center shrink-0 shadow-sm transition-all duration-500 ${isHighlighted ? 'bg-[#60BA81] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                          <cat.icon size={14} />
+                        </div>
+
+                        <div className="w-[240px] shrink-0">
+                          <span className={`text-[13px] font-bold transition-all duration-300 ${isHighlighted ? 'text-[#284952]' : 'text-[#767676]'}`}>
+                            {cat.name}
+                          </span>
+                        </div>
+
+                        <div className="w-32 h-1.5 bg-[#F0F2F5] rounded-full overflow-hidden relative">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: isHighlighted ? COLORS.freshGreen : "#CCCCCC" }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(cat.value / 41) * 100}%` }}
+                            transition={{ duration: 1.2, ease: "circOut", delay: idx * 0.05 }}
+                          />
+                        </div>
+
+                        <div className="w-12 text-right">
+                          <span className={`text-base font-black ${isHighlighted ? 'text-[#60BA81]' : 'text-gray-400'}`}>
+                            {cat.value}%
+                          </span>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </motion.div>
+            </motion.div>
+          )
+        }
+      </AnimatePresence >
+
+      {/* --- INTERACTIVE CURSOR (At Root Level to overlay everything) --- */}
+      <MetricClickCursor progress={progress} />
     </motion.div>
   )
 }

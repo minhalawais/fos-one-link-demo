@@ -1,6 +1,7 @@
 "use client"
 
 import { AnimatePresence } from "framer-motion"
+import { AssetPreloader } from "../components/common/AssetPreloader.tsx"
 
 
 // Import Scenes (Retaining original imports)
@@ -30,12 +31,14 @@ export default function Module3Player({ progress }: Module3PlayerProps) {
   const CurrentSceneComponent = currentSceneConfig.component
 
   return (
-    <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
-        </AnimatePresence>
+    <AssetPreloader>
+      <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
+        <div className="absolute inset-0 z-0">
+          <AnimatePresence mode="wait">
+            <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </AssetPreloader>
   )
 }

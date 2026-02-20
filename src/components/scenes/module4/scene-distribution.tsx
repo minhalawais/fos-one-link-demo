@@ -44,7 +44,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
     )), [])
 
     return (
-        <div className="w-full h-full font-sans overflow-hidden relative flex items-center justify-center p-8">
+        <div className="w-full h-full font-sans overflow-hidden relative flex items-center justify-center p-6">
 
             {/* BACKGROUND PATTERN */}
             <div className="absolute inset-0 grid grid-cols-[repeat(20,minmax(0,1fr))] opacity-[0.03] pointer-events-none">
@@ -61,54 +61,94 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                         className="flex flex-col items-center justify-center relative z-10"
                     >
                         {/* Central FOSSMS Mascot - Enhanced Hero Section */}
+                        {/* Central FOS SMS Gateway - Holographic Style */}
                         <div className="relative mb-6 group flex flex-col items-center">
+                            {/* 1. Orbiting Data Ring */}
                             <motion.div
-                                animate={{
-                                    y: [0, -15, 0],
-                                    filter: [
-                                        "drop-shadow(0 0 10px rgba(96, 186, 129, 0.2))",
-                                        "drop-shadow(0 0 30px rgba(96, 186, 129, 0.4))",
-                                        "drop-shadow(0 0 10px rgba(96, 186, 129, 0.2))"
-                                    ]
-                                }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="relative z-20 flex items-center justify-center"
-                            >
-                                <img
-                                    src="/assets/images/fos_sms_frontshot1.png"
-                                    alt="FOSSMS Mascot"
-                                    className="w-[210px] h-[200px] object-contain drop-shadow-[0_0_15px_rgba(96,186,129,0.3)] transition-transform duration-700"
-                                />
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                className="absolute w-52 h-52 border border-dashed border-green-200/20 rounded-full"
+                            />
 
-                                {/* Inner Screen Core Glow */}
-                                <div className="absolute top-[35%] w-[40%] h-[30%] bg-[#60BA81]/15 blur-[40px] rounded-full animate-pulse mix-blend-screen" />
-                            </motion.div>
-
-                            {/* Electronic Signal Waves (Ripple Effect from Antennas) */}
-                            {[1, 2, 3].map(i => (
+                            {/* 2. Signal Waves (Broadcasting Mode) */}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                {[...Array(3)].map((_, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ scale: 0.8, opacity: 0.8 }}
+                                        animate={{ scale: 3, opacity: 0 }}
+                                        transition={{ duration: 3, repeat: Infinity, delay: i * 1, ease: "easeOut" }}
+                                        className="absolute w-44 h-44 rounded-full border border-green-400/20"
+                                    />
+                                ))}
+                                {/* Glowing Core Aura */}
                                 <motion.div
-                                    key={i}
-                                    className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full border-t-4 border-green-500/30"
-                                    initial={{ width: 80, height: 25, opacity: 0, scale: 0.8 }}
-                                    animate={{
-                                        width: [150, 500],
-                                        height: [40, 140],
-                                        opacity: [0, 0.35, 0],
-                                        y: [-50, -220]
-                                    }}
-                                    transition={{ duration: 3.5, delay: i * 0.8, repeat: Infinity, ease: "easeOut" }}
+                                    animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+                                    transition={{ duration: 3, repeat: Infinity }}
+                                    className="absolute w-64 h-64 rounded-full bg-green-400/5 blur-3xl"
                                 />
-                            ))}
+                            </div>
+
+                            <div className="relative w-38 h-38 flex items-center justify-center">
+                                {/* A. Central Core (The "Brain") */}
+                                <motion.div
+                                    animate={{
+                                        scale: [1, 1.05, 1],
+                                        boxShadow: "0 0 30px rgba(96, 186, 129, 0.4), inset 0 0 20px rgba(96, 186, 129, 0.2)"
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                                    className="w-26 h-26 rounded-full flex items-center justify-center relative z-20 backdrop-blur-sm border bg-green-500/10 border-green-400/50"
+                                >
+                                    <div className="relative w-20 h-20">
+                                        <img
+                                            src="/assets/FOS-01.png"
+                                            alt="FOS Logo"
+                                            className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(96,186,129,0.5)]"
+                                        />
+                                    </div>
+
+                                    {/* Core pulse ring */}
+                                    <motion.div
+                                        animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                        className="absolute inset-0 rounded-full border border-green-400/30"
+                                    />
+                                </motion.div>
+
+                                {/* Outer Ring (Slow Reverse Spin) */}
+                                <motion.div
+                                    animate={{ rotateY: 45, rotateZ: -360 }}
+                                    transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                                    className="absolute w-44 h-44 rounded-full border-2 border-teal-400/20 box-border pointer-events-none z-10"
+                                    style={{ borderLeftColor: 'transparent', borderRightColor: 'transparent' }}
+                                />
+
+                                {/* Particles */}
+                                <div className="absolute inset-0 pointer-events-none">
+                                    {[0, 60, 120, 180, 240, 300].map((deg, i) => (
+                                        <motion.div
+                                            key={i}
+                                            animate={{
+                                                opacity: [0, 1, 0],
+                                                x: Math.cos(deg * Math.PI / 180) * 100,
+                                                y: Math.sin(deg * Math.PI / 180) * 100,
+                                            }}
+                                            transition={{ duration: 3, repeat: Infinity, delay: i * 0.3, ease: "easeOut" }}
+                                            className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_5px_#4ade80]"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
                         {/* Title */}
-                        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-8">
-                            <h2 className="text-4xl font-bold text-gray-800 mb-2">FOSSMS Service</h2>
-                            <p className="text-gray-500 text-lg">Automated Survey Invitations</p>
+                        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-6">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-1">FOSSMS Service</h2>
+                            <p className="text-gray-500 text-base">Automated Survey Invitations</p>
                         </motion.div>
 
                         {/* Broadcast Signals */}
-                        <div className="flex gap-12">
+                        <div className="flex gap-8">
                             {[
                                 { name: "Ali", delay: 0 },
                                 { name: "Abrar", delay: 0.2 },
@@ -132,8 +172,8 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                         className="flex flex-col items-center gap-3 relative"
                                     >
                                         {/* User Icon */}
-                                        <div className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-400 z-10 relative">
-                                            <Users size={20} />
+                                        <div className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-400 z-10 relative">
+                                            <Users size={16} />
                                             {/* Status Indicator Dot */}
                                             <motion.div
                                                 initial={{ scale: 0 }}
@@ -171,15 +211,15 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                             initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.2 }}
                                             className="text-center -mb-2 z-10"
                                         >
-                                            <div className="text-sm font-bold text-gray-700">{user.name}</div>
-                                            <div className="text-[10px] text-gray-400 leading-none">Employee</div>
+                                            <div className="text-xs font-bold text-gray-700">{user.name}</div>
+                                            <div className="text-[9px] text-gray-400 leading-none">Employee</div>
                                         </motion.div>
 
                                         {/* Vertical Assembly */}
                                         <div className="relative flex flex-col items-center">
 
                                             {/* The Pulse Line */}
-                                            <div className="w-0.5 h-[50px] relative rounded-full overflow-hidden bg-gray-200 mt-2">
+                                            <div className="w-0.5 h-[40px] relative rounded-full overflow-hidden bg-gray-200 mt-2">
                                                 {/* Pending State (Orange Background) */}
                                                 <motion.div
                                                     className="absolute inset-0 bg-orange-200"
@@ -204,7 +244,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                     initial={{ opacity: 0, y: 5 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -5 }}
-                                                    className={`text-[10px] font-bold uppercase tracking-wider ${isSent ? 'text-blue-600' : 'text-[#3B82F6]'}`}
+                                                    className={`text-[9px] font-bold uppercase tracking-wider ${isSent ? 'text-blue-600' : 'text-[#3B82F6]'}`}
                                                 >
                                                     {isSent ? "SENT" : "PENDING..."}
                                                 </motion.div>
@@ -239,10 +279,10 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                         transition={{ type: "spring", damping: 20, stiffness: 100 }}
                         className="relative z-20"
                     >
-                        <div className="w-[300px] h-[600px] bg-[#1a1a1a] rounded-[48px] border-[12px] border-[#2c2c2c] shadow-2xl overflow-hidden relative flex flex-col">
+                        <div className="w-[260px] h-[520px] bg-[#1a1a1a] rounded-[42px] border-[10px] border-[#2c2c2c] shadow-2xl overflow-hidden relative flex flex-col">
 
                             {/* Dynamic Island */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-b-2xl z-20" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-2xl z-20" />
 
                             {/* --- SCREEN CONTENT --- */}
                             <div className="flex-1 bg-white relative flex flex-col overflow-hidden rounded-[36px]">
@@ -272,28 +312,28 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                             <div className="absolute inset-0 backdrop-blur-md bg-white/30" />
 
                                             {/* Time */}
-                                            <div className="relative text-6xl font-thin text-gray-800 mb-2 tracking-tighter">9:41</div>
-                                            <div className="relative text-sm font-medium text-gray-600 mb-8">Wednesday, January 28</div>
+                                            <div className="relative text-5xl font-thin text-gray-800 mb-2 tracking-tighter">9:41</div>
+                                            <div className="relative text-xs font-medium text-gray-600 mb-8">Wednesday, January 28</div>
 
                                             {/* Notification */}
                                             <motion.div
                                                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                                                 animate={{ scale: 1, opacity: 1, y: 0 }}
                                                 transition={{ delay: 0.2, type: "spring" }}
-                                                className="w-[90%] bg-white/60 backdrop-blur-xl rounded-2xl p-4 shadow-xl border border-white/40 cursor-pointer"
+                                                className="w-[85%] bg-white/60 backdrop-blur-xl rounded-2xl p-3.5 shadow-xl border border-white/40 cursor-pointer"
                                                 whileTap={{ scale: 0.98 }}
                                             >
-                                                <div className="flex justify-between items-center mb-2">
+                                                <div className="flex justify-between items-center mb-1.5">
                                                     <div className="flex items-center gap-1.5">
-                                                        <div className="w-6 h-6 bg-gray-900 rounded-lg flex items-center justify-center">
-                                                            <MessageSquare size={12} className="text-white" fill="white" />
+                                                        <div className="w-5 h-5 bg-gray-900 rounded-lg flex items-center justify-center">
+                                                            <MessageSquare size={10} className="text-white" fill="white" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold text-gray-600 uppercase tracking-wide">MESSAGES</span>
+                                                        <span className="text-[9px] font-bold text-gray-600 uppercase tracking-wide">MESSAGES</span>
                                                     </div>
-                                                    <span className="text-[10px] text-gray-500">now</span>
+                                                    <span className="text-[9px] text-gray-500">now</span>
                                                 </div>
-                                                <div className="text-xs font-bold text-gray-900 mb-0.5">FOS Hotline</div>
-                                                <div className="text-xs text-gray-600 leading-snug line-clamp-2">
+                                                <div className="text-[11px] font-bold text-gray-900 mb-0.5">FOS Hotline</div>
+                                                <div className="text-[11px] text-gray-600 leading-snug line-clamp-2">
                                                     Dear Company A Employee, Company A has launched an Organizational Effectiveness & Engagement Survey...
                                                 </div>
                                             </motion.div>
@@ -311,13 +351,13 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                             className="flex-1 bg-white flex flex-col pt-2"
                                         >
                                             {/* App Header */}
-                                            <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3 bg-white/80 backdrop-blur-lg z-10">
-                                                <ArrowLeft size={20} className="text-blue-500" />
-                                                <div className="flex-1 flex flex-col items-center pr-5">
-                                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mb-1">
-                                                        <span className="text-[10px] font-bold text-gray-500">FT</span>
+                                            <div className="px-4 py-2 border-b border-gray-100 flex items-center gap-2.5 bg-white/80 backdrop-blur-lg z-10">
+                                                <ArrowLeft size={18} className="text-blue-500" />
+                                                <div className="flex-1 flex flex-col items-center pr-4">
+                                                    <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center mb-0.5">
+                                                        <span className="text-[9px] font-bold text-gray-500">FT</span>
                                                     </div>
-                                                    <span className="text-xs font-semibold text-gray-900">FOS Team - HRDD</span>
+                                                    <span className="text-[11px] font-semibold text-gray-900">FOS Team - HRDD</span>
                                                 </div>
                                             </div>
 
@@ -329,7 +369,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                     initial={{ opacity: 0, scale: 0.9, originX: 0 }}
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     transition={{ type: "spring" }}
-                                                    className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm p-4 max-w-[95%] shadow-sm text-sm text-gray-900"
+                                                    className="bg-[#E9E9EB] rounded-2xl rounded-tl-sm p-3.5 max-w-[95%] shadow-sm text-[13px] text-gray-900"
                                                 >
                                                     <p className="mb-3 leading-relaxed">
                                                         Dear Company A Employee,
@@ -345,22 +385,22 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                         whileHover={{ scale: 1.02 }}
                                                         whileTap={{ scale: 0.98 }}
                                                     >
-                                                        <div className="h-24 bg-gray-50 flex items-center justify-center relative overflow-hidden group">
+                                                        <div className="h-20 bg-gray-50 flex items-center justify-center relative overflow-hidden group">
                                                             <div className="absolute inset-0 bg-green-50 opacity-50 group-hover:opacity-100 transition-opacity" />
-                                                            <div className="relative z-10 flex flex-col items-center gap-2">
-                                                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                                                                    <Link size={20} />
+                                                            <div className="relative z-10 flex flex-col items-center gap-1.5">
+                                                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                                                                    <Link size={16} />
                                                                 </div>
-                                                                <span className="font-bold text-green-700 text-xs">FOS Survey Portal</span>
+                                                                <span className="font-bold text-green-700 text-[11px]">FOS Survey Portal</span>
                                                             </div>
                                                         </div>
-                                                        <div className="p-3 bg-white">
-                                                            <div className="text-xs font-bold text-gray-900 mb-0.5">Start Survey</div>
-                                                            <div className="text-[10px] text-gray-500">fruitofsustainability.com</div>
+                                                        <div className="p-2.5 bg-white">
+                                                            <div className="text-[11px] font-bold text-gray-900 mb-0.5">Start Survey</div>
+                                                            <div className="text-[9px] text-gray-500">fruitofsustainability.com</div>
                                                         </div>
                                                     </motion.div>
 
-                                                    <p className="leading-relaxed text-xs text-gray-600">
+                                                    <p className="leading-relaxed text-[11px] text-gray-600">
                                                         Your FOS ID is: <span className="font-bold text-gray-900 select-all">1019549</span> or use your CNIC.
                                                         <br /><br />
                                                         Regards,<br />
@@ -375,15 +415,15 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
                                                     transition={{ delay: 1.5 }}
                                                     className="flex justify-center mt-6"
                                                 >
-                                                    <div className="bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 cursor-pointer animate-pulse">
-                                                        Tap link to start <ChevronRight size={12} />
+                                                    <div className="bg-blue-500 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer animate-pulse">
+                                                        Tap link to start <ChevronRight size={10} />
                                                     </div>
                                                 </motion.div>
                                             </div>
 
                                             {/* Input Area */}
-                                            <div className="p-3 bg-gray-50 border-t border-gray-200">
-                                                <div className="h-9 bg-white border border-gray-300 rounded-full px-4 flex items-center text-gray-400 text-xs">
+                                            <div className="p-2.5 bg-gray-50 border-t border-gray-200">
+                                                <div className="h-8 bg-white border border-gray-300 rounded-full px-3 flex items-center text-gray-400 text-[11px]">
                                                     Text Message
                                                 </div>
                                             </div>

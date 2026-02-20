@@ -71,7 +71,7 @@ const pageTransitionVariants = {
 
 // --- CHART COMPONENTS (Preserved from Scene 1) ---
 const DonutChart = () => (
-  <svg width="180" height="180" viewBox="0 0 200 200" className="mx-auto">
+  <svg width="150" height="150" viewBox="0 0 200 200" className="mx-auto">
     <circle cx="100" cy="100" r="70" fill="none" stroke={COLORS.deepTeal} strokeWidth="22" opacity="0.9" />
     <circle cx="100" cy="100" r="70" fill="none" stroke={COLORS.freshGreen} strokeWidth="22" strokeDasharray="175 440" strokeDashoffset="0" transform="rotate(-90 100 100)" opacity="0.85" />
     <circle cx="100" cy="100" r="70" fill="none" stroke={COLORS.warmOrange} strokeWidth="22" strokeDasharray="44 440" strokeDashoffset="-175" transform="rotate(-90 100 100)" opacity="0.9" />
@@ -89,28 +89,28 @@ const StackedBarChart = () => {
     { heights: [3, 2, 1] }, { heights: [3, 2, 1] }, { heights: [2, 1, 0] }, { heights: [4, 2, 1] },
   ]
   return (
-    <svg width="100%" height="180" viewBox="0 0 700 180" className="w-full">
+    <svg width="100%" height="150" viewBox="0 0 700 150" className="w-full">
       {[0, 10, 20, 30].map((val) => (
         <g key={val}>
-          <text x="30" y={160 - val * 4.5} textAnchor="end" className="text-[9px] fill-gray-400">{val}</text>
-          <line x1="40" y1={160 - val * 4.5} x2="650" y2={160 - val * 4.5} stroke="#f0f0f0" strokeWidth="1" />
+          <text x="30" y={130 - val * 4} textAnchor="end" className="text-[9px] fill-gray-400">{val}</text>
+          <line x1="40" y1={130 - val * 4} x2="650" y2={130 - val * 4} stroke="#f0f0f0" strokeWidth="1" />
         </g>
       ))}
       {categories.map((bar, i) => {
         const x = 65 + i * 50
-        let yOffset = 160
+        let yOffset = 130
         return (
           <g key={i}>
             {bar.heights.map((h, j) => {
               const colors = [COLORS.deepTeal, COLORS.freshGreen, COLORS.warmOrange]
-              const height = h * 4.5
+              const height = h * 4
               yOffset -= height
               return <rect key={j} x={x - 12} y={yOffset} width="24" height={height} fill={colors[j]} opacity="0.9" rx="2" />
             })}
           </g>
         )
       })}
-      <line x1="40" y1="160" x2="650" y2="160" stroke={COLORS.border} strokeWidth="2" />
+      <line x1="40" y1="130" x2="650" y2="130" stroke={COLORS.border} strokeWidth="2" />
     </svg>
   )
 }
@@ -131,11 +131,11 @@ const PortalDashboard = () => {
     >
       <div className="scale-[0.58] origin-top-left p-6 w-[172%] h-[172%]">
         {/* Header */}
-        <div className="bg-white px-8 h-[70px] flex items-center justify-between shadow-sm relative z-20 rounded-xl mb-6">
-          <div className="flex items-center gap-3"><img src="assets/vertical_logo.png" alt="Logo" className="w-32 h-32 object-contain" /></div>
+        <div className="bg-white px-8 h-[60px] flex items-center justify-between shadow-sm relative z-20 rounded-xl mb-6">
+          <div className="flex items-center gap-3"><img src="assets/vertical_logo.png" alt="Logo" className="w-28 h-28 object-contain" /></div>
           <div className="absolute left-1/2 -translate-x-1/2 text-center">
-            <div className="text-[11px] font-bold uppercase tracking-[0.2em] mb-0.5" style={{ color: COLORS.green }}>MULTAN47</div>
-            <div className="text-xl font-bold" style={{ color: COLORS.deepTeal }}>Grievance Management Portal</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5" style={{ color: COLORS.green }}>MULTAN47</div>
+            <div className="text-lg font-bold" style={{ color: COLORS.deepTeal }}>Grievance Management Portal</div>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded text-white flex items-center justify-center shadow" style={{ backgroundColor: COLORS.green }}><Bell size={20} fill="currentColor" /></div>
@@ -144,7 +144,7 @@ const PortalDashboard = () => {
         </div>
         {/* Charts */}
         <div className="grid grid-cols-5 gap-6 mb-6">
-          <div className="col-span-2 bg-white rounded-2xl p-5" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
+          <div className="col-span-2 bg-white rounded-2xl p-4" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: COLORS.mediumGray }}>Complaint Status</h3>
             <DonutChart />
             <div className="flex justify-center gap-4 mt-4 text-[10px]">
@@ -153,7 +153,7 @@ const PortalDashboard = () => {
               <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.warmOrange }} /> Bounced</div>
             </div>
           </div>
-          <div className="col-span-3 bg-white rounded-2xl p-5" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
+          <div className="col-span-3 bg-white rounded-2xl p-4" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: COLORS.mediumGray }}>Complaints By Categories</h3>
             <StackedBarChart />
           </div>
@@ -169,7 +169,7 @@ const PortalDashboard = () => {
           </div>
           <div>
             {complaints.map((c, i) => (
-              <div key={i} className="grid grid-cols-7 gap-4 px-6 py-4 items-center" style={{
+              <div key={i} className="grid grid-cols-7 gap-4 px-6 py-3 items-center" style={{
                 borderBottom: `1px solid ${COLORS.border}`,
                 borderLeft: i === 0 ? `4px solid ${COLORS.freshGreen}` : "4px solid transparent",
                 backgroundColor: i === 0 ? COLORS.softGreen : "transparent"
@@ -177,7 +177,7 @@ const PortalDashboard = () => {
                 <div className="text-xs font-medium text-gray-500">{c.sr}</div>
                 <div className="text-xs font-bold font-mono text-[#284952]">{c.ticket}</div>
                 <div className="text-xs font-semibold text-[#1d1d1f]">{c.name}</div>
-                <div><span className="px-3 py-1.5 rounded-full text-[10px] font-bold inline-block" style={{ backgroundColor: c.initialStatus === "In Process" ? "rgba(96, 186, 129, 0.2)" : (c.initialStatus === "Unprocessed" ? "rgba(40, 73, 82, 0.15)" : "rgba(245, 168, 60, 0.2)"), color: c.initialStatus === "In Process" ? COLORS.freshGreen : (c.initialStatus === "Unprocessed" ? COLORS.deepTeal : COLORS.warmOrange) }}>{c.initialStatus}</span></div>
+                <div><span className="px-3 py-1.5 rounded-full text-[9px] font-bold inline-block" style={{ backgroundColor: c.initialStatus === "In Process" ? "rgba(96, 186, 129, 0.2)" : (c.initialStatus === "Unprocessed" ? "rgba(40, 73, 82, 0.15)" : "rgba(245, 168, 60, 0.2)"), color: c.initialStatus === "In Process" ? COLORS.freshGreen : (c.initialStatus === "Unprocessed" ? COLORS.deepTeal : COLORS.warmOrange) }}>{c.initialStatus}</span></div>
                 <div className="text-xs text-gray-500">{c.date}</div>
                 <div className="text-xs text-gray-500">{c.mobile}</div>
                 <div className="text-xs text-gray-500">{c.category}</div>
@@ -267,7 +267,7 @@ Investigation is now formally underway. The IO will proceed with evidence collec
         // Apple-like smooth spring animation for panning
         transition={{ type: "spring", stiffness: 50, damping: 20, mass: 1.2 }}
       >
-        <div className="w-[95%] h-[95%] max-w-[950px] max-h-[700px]">
+        <div className="w-[95%] h-[95%] max-w-[850px] max-h-[700px]">
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -335,14 +335,14 @@ Investigation is now formally underway. The IO will proceed with evidence collec
                         boxShadow: "0 10px 30px rgba(30, 126, 120, 0.25)",
                       }}
                     >
-                      <div className="p-4 space-y-3">
+                      <div className="p-3 space-y-3">
                         {/* Card Header Row */}
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-bold text-[13px] uppercase tracking-wide">
+                            <h3 className="font-bold text-[12px] uppercase tracking-wide">
                               HANZALA SIDDIQUE
                             </h3>
-                            <div className="font-bold text-[11px] opacity-90 uppercase mt-0.5">
+                            <div className="font-bold text-[10px] opacity-90 uppercase mt-0.5">
                               KITCHEN ASSISTANT
                             </div>
                             <div className="mt-2 inline-block bg-[#3AA888] text-white px-2 py-0.5 rounded text-[10px] font-bold shadow-sm">
@@ -367,7 +367,7 @@ Investigation is now formally underway. The IO will proceed with evidence collec
                           <div className="font-bold">Branch: Mardan</div>
                           <div className="font-bold">Employee ID: 2302285</div>
 
-                          <p className="opacity-95 text-[10px] leading-relaxed mt-2 text-justify">
+                          <p className="opacity-95 text-[9px] leading-relaxed mt-2 text-justify">
                             I would like to raise a concern regarding{" "}
                             <strong className="text-white font-extrabold">
                               my leaves
@@ -516,15 +516,15 @@ Investigation is now formally underway. The IO will proceed with evidence collec
                         </span>
                       </div>
 
-                      <div className="p-4">
-                        <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">
+                      <div className="p-3">
+                        <div className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-2">
                           Detail
                         </div>
 
                         <div
                           className="min-h-[140px] max-h-[180px] overflow-y-auto p-3 rounded-lg bg-gray-50/80 border border-gray-100"
                         >
-                          <div className="text-[11px] text-gray-600 leading-relaxed whitespace-pre-line font-mono">
+                          <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line font-mono">
                             {statusText ? (
                               <>
                                 {statusText.split("\n").map((line, idx) => (
@@ -552,7 +552,7 @@ Investigation is now formally underway. The IO will proceed with evidence collec
                                         repeat: Number.POSITIVE_INFINITY,
                                         duration: 0.6,
                                       }}
-                                      className="inline-block w-1.5 h-3 bg-[#60BA81] ml-1 align-middle"
+                                      className="inline-block w-1 h-2.5 bg-[#60BA81] ml-1 align-middle"
                                     />
                                   )}
                               </>
@@ -580,22 +580,22 @@ Investigation is now formally underway. The IO will proceed with evidence collec
             <div
               className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200"
             >
-              <motion.button className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition shadow-sm">
+              <motion.button className="flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition shadow-sm">
                 <Printer size={14} />
                 Print Timeline
               </motion.button>
               <div className="flex gap-3">
-                <button className="px-4 py-2 rounded-lg text-[11px] font-semibold text-white bg-gray-400 hover:bg-gray-500 transition shadow-sm">
+                <button className="px-3 py-1.5 rounded-lg text-[10px] font-semibold text-white bg-gray-400 hover:bg-gray-500 transition shadow-sm">
                   Close
                 </button>
                 <button
-                  className="px-4 py-2 rounded-lg text-[11px] font-semibold text-white transition shadow-sm hover:brightness-110"
+                  className="px-3 py-1.5 rounded-lg text-[10px] font-semibold text-white transition shadow-sm hover:brightness-110"
                   style={{ backgroundColor: COLORS.teal }}
                 >
                   Route Complaint
                 </button>
                 <motion.button
-                  className="px-4 py-2 rounded-lg text-[11px] font-semibold text-white shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-100 transition"
+                  className="px-3 py-1.5 rounded-lg text-[10px] font-semibold text-white shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-100 transition"
                   style={{ backgroundColor: COLORS.green }}
                   animate={{
                     scale: stage >= 15 ? [1, 1.05, 1] : 1,

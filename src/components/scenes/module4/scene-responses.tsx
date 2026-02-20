@@ -74,7 +74,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                 ))}
             </div>
 
-            <div className="relative z-10 flex gap-12 items-center">
+            <div className="relative z-10 flex gap-8 items-center">
 
                 {/* ===== PHONE MOCKUP ===== */}
                 <motion.div
@@ -85,24 +85,24 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                 >
                     {/* Phone Frame */}
                     <div
-                        className="w-[300px] h-[600px] rounded-[48px] p-3 relative"
+                        className="w-[270px] h-[540px] rounded-[40px] p-2.5 relative"
                         style={{
                             background: `linear-gradient(145deg, #2D3748, #1a202c)`,
-                            boxShadow: `0 40px 80px -20px rgba(0,0,0,0.4)`
+                            boxShadow: `0 30px 60px -15px rgba(0,0,0,0.4)`
                         }}
                     >
                         {/* Dynamic Island */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-b-2xl z-30" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-b-2xl z-30" />
 
                         {/* Screen */}
-                        <div className="w-full h-full rounded-[36px] overflow-hidden bg-white flex flex-col relative">
+                        <div className="w-full h-full rounded-[30px] overflow-hidden bg-white flex flex-col relative">
 
                             {/* Status Bar */}
-                            <div className="h-8 flex justify-between items-end px-6 pb-1 text-[10px] font-bold text-gray-800 bg-transparent z-20 relative pt-4">
+                            <div className="h-7 flex justify-between items-end px-5 pb-1 text-[9px] font-bold text-gray-800 bg-transparent z-20 relative pt-3">
                                 <span>9:41</span>
                                 <div className="flex gap-1 items-center">
-                                    <Signal size={10} />
-                                    <div className="w-5 h-2.5 bg-gray-800 rounded-[2px]" />
+                                    <Signal size={9} />
+                                    <div className="w-4 h-2 bg-gray-800 rounded-[1.5px]" />
                                 </div>
                             </div>
 
@@ -121,10 +121,10 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                         <motion.div
                                             initial={{ scale: 0.8, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
-                                            className="w-24 h-24 mb-6 rounded-full flex items-center justify-center"
+                                            className="w-20 h-20 mb-5 rounded-full flex items-center justify-center"
                                             style={{ backgroundColor: `${COLORS.green}15` }}
                                         >
-                                            <img src="/assets/images/FOS-01.png" alt="FOS" className="w-20 h-20 object-contain" />
+                                            <img src="/assets/images/FOS-01.png" alt="FOS" className="w-16 h-16 object-contain" />
                                         </motion.div>
 
                                         {/* Title */}
@@ -132,10 +132,10 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                             initial={{ y: 10, opacity: 0 }}
                                             animate={{ y: 0, opacity: 1 }}
                                             transition={{ delay: 0.2 }}
-                                            className="text-center mb-6"
+                                            className="text-center mb-5"
                                         >
-                                            <h2 className="text-xl font-bold" style={{ color: COLORS.text }}>Enter FOS ID/CNIC</h2>
-                                            <p className="text-sm mt-1" style={{ color: COLORS.textMuted, direction: 'rtl' }}>
+                                            <h2 className="text-lg font-bold" style={{ color: COLORS.text }}>Enter FOS ID/CNIC</h2>
+                                            <p className="text-[13px] mt-0.5" style={{ color: COLORS.textMuted, direction: 'rtl' }}>
                                                 اپنا ایف او ایس آئی ڈی/شناختی کارڈ نمبر درج کریں
                                             </p>
                                         </motion.div>
@@ -145,12 +145,12 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                             initial={{ y: 10, opacity: 0 }}
                                             animate={{ y: 0, opacity: 1 }}
                                             transition={{ delay: 0.3 }}
-                                            className="w-full rounded-full px-5 py-3 flex items-center gap-3 mb-4"
+                                            className="w-full rounded-full px-4 py-2.5 flex items-center gap-2.5 mb-3"
                                             style={{ border: `2px solid ${isVerified ? COLORS.green : COLORS.border}` }}
                                         >
-                                            <span className="text-lg">👤</span>
-                                            <span style={{ color: typedChars > 0 ? COLORS.text : COLORS.textMuted }}>
-                                                {typedChars > 0 ? cnicText.slice(0, typedChars) : "Enter your FOS ID/CNIC..."}
+                                            <span className="text-base">👤</span>
+                                            <span className="text-sm" style={{ color: typedChars > 0 ? COLORS.text : COLORS.textMuted }}>
+                                                {typedChars > 0 ? cnicText.slice(0, typedChars) : "Enter ID/CNIC..."}
                                             </span>
                                             {!isVerified && (
                                                 <motion.span
@@ -179,7 +179,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                 backgroundColor: isVerified ? COLORS.green : COLORS.green // Keep green
                                             }}
                                             transition={{ delay: 0.4 }}
-                                            className="w-full py-3 rounded-full text-white font-semibold text-lg relative overflow-hidden"
+                                            className="w-full py-2.5 rounded-full text-white font-bold text-base relative overflow-hidden"
                                             style={{ backgroundColor: COLORS.green }}
                                         >
                                             {isVerified ? "Verified" : "Submit"}
@@ -217,10 +217,10 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                     >
                                         {/* Header */}
                                         <div
-                                            className="py-4 px-5 text-center"
+                                            className="py-2.5 px-4 text-center"
                                             style={{ backgroundColor: COLORS.green }}
                                         >
-                                            <span className="text-white text-xl font-bold">Available Surveys</span>
+                                            <span className="text-white text-lg font-bold">Available Surveys</span>
                                         </div>
 
                                         {/* Survey Card */}
@@ -247,34 +247,34 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
 
                                                 <div className="flex">
                                                     <div className="w-1.5" style={{ backgroundColor: COLORS.green }} />
-                                                    <div className="flex-1 p-4">
-                                                        <h3 className="font-bold text-base mb-2" style={{ color: COLORS.text }}>
+                                                    <div className="flex-1 p-3">
+                                                        <h3 className="font-bold text-[14px] mb-1.5 leading-tight" style={{ color: COLORS.text }}>
                                                             Organizational Effectiveness & Engagement Survey
                                                         </h3>
-                                                        <p className="text-xs leading-relaxed mb-4" style={{ color: COLORS.textMuted }}>
+                                                        <p className="text-[11px] leading-snug mb-3 opacity-80" style={{ color: COLORS.textMuted }}>
                                                             Assess leadership effectiveness, communication, and workplace culture...
                                                         </p>
 
                                                         {/* Meta info */}
-                                                        <div className="flex gap-4 text-xs mb-3">
+                                                        <div className="flex gap-3 text-[11px] mb-2.5">
                                                             <div className="flex items-center gap-1">
-                                                                <HelpCircle size={14} style={{ color: COLORS.green }} />
+                                                                <HelpCircle size={12} style={{ color: COLORS.green }} />
                                                                 <span className="font-bold" style={{ color: COLORS.vibrantBlue }}>40 Qs</span>
                                                             </div>
                                                             <div className="flex items-center gap-1">
-                                                                <Clock size={14} style={{ color: COLORS.green }} />
+                                                                <Clock size={12} style={{ color: COLORS.green }} />
                                                                 <span className="font-bold" style={{ color: COLORS.teal }}>20 min</span>
                                                             </div>
                                                         </div>
 
                                                         {/* Footer */}
-                                                        <div className="flex items-center justify-between pt-2 border-t" style={{ borderColor: COLORS.border }}>
-                                                            <div className="flex items-center gap-1 text-xs" style={{ color: COLORS.textMuted }}>
-                                                                <Calendar size={12} />
+                                                        <div className="flex items-center justify-between pt-1.5 border-t" style={{ borderColor: COLORS.border }}>
+                                                            <div className="flex items-center gap-1 text-[10px]" style={{ color: COLORS.textMuted }}>
+                                                                <Calendar size={10} />
                                                                 <span>Jan 31, 2026</span>
                                                             </div>
                                                             <div
-                                                                className="px-3 py-1 rounded-full text-xs font-bold"
+                                                                className="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
                                                                 style={{ color: COLORS.red, backgroundColor: `${COLORS.red}10` }}
                                                             >
                                                                 Not Filled
@@ -307,16 +307,16 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                     >
                                         {/* Header */}
                                         <div
-                                            className="py-3 px-4 flex items-center gap-3"
+                                            className="py-2.5 px-4 flex items-center gap-2.5"
                                             style={{ backgroundColor: COLORS.green }}
                                         >
-                                            <ArrowLeft size={20} className="text-white" />
-                                            <span className="text-white font-semibold flex-1 text-center pr-6">Survey</span>
+                                            <ArrowLeft size={18} className="text-white" />
+                                            <span className="text-white font-semibold flex-1 text-center pr-5 text-sm">Survey Journey</span>
                                         </div>
 
                                         {/* Urdu Banner */}
-                                        <div className="py-2 px-4 text-right" style={{ backgroundColor: COLORS.teal, direction: 'rtl' }}>
-                                            <span className="text-white text-sm font-bold">ملازمین کی مصروفیت کا سروے</span>
+                                        <div className="py-1.5 px-4 text-right" style={{ backgroundColor: COLORS.teal, direction: 'rtl' }}>
+                                            <span className="text-white text-[13px] font-bold">ملازمین کی مصروفیت کا سروے</span>
                                         </div>
 
                                         {/* Scrollable Form Content */}
@@ -328,17 +328,17 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                             >
                                                 {/* Confidentiality Notice */}
                                                 <motion.div
-                                                    className="rounded-xl p-3 text-right"
+                                                    className="rounded-xl p-2.5 text-right"
                                                     style={{ backgroundColor: COLORS.surface, direction: 'rtl' }}
                                                 >
-                                                    <p className="text-xs leading-relaxed" style={{ color: COLORS.text }}>
+                                                    <p className="text-[11px] leading-relaxed" style={{ color: COLORS.text }}>
                                                         براہ مہربانی نوٹ فرمائیں کہ اس فارم میں فراہم کیا گیا آپ کا نام اور کمپنی آئی ڈی مکمل طور پر خفیہ رکھی جائے گی۔
                                                     </p>
                                                 </motion.div>
 
                                                 {/* Confirmation Question */}
-                                                <div className="rounded-xl p-3" style={{ backgroundColor: COLORS.surface }}>
-                                                    <div className="text-right text-sm mb-2 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
+                                                <div className="rounded-xl p-2.5" style={{ backgroundColor: COLORS.surface }}>
+                                                    <div className="text-right text-[13px] mb-1.5 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
                                                         کیا آپ کو معلوم ہے کہ اس فارم کے تمام جوابات گمنام طریقے سے محفوظ کیے جائیں گے؟
                                                     </div>
                                                     <motion.div
@@ -346,24 +346,24 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                         animate={{ scale: [1, 1.02, 1] }}
                                                     >
                                                         <div
-                                                            className="w-5 h-5 rounded-full flex items-center justify-center"
+                                                            className="w-4 h-4 rounded-full flex items-center justify-center"
                                                             style={{
                                                                 backgroundColor: COLORS.green,
                                                                 border: `2px solid ${COLORS.green}`
                                                             }}
                                                         >
-                                                            <div className="w-2 h-2 rounded-full bg-white" />
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-white" />
                                                         </div>
-                                                        <span className="text-sm" style={{ color: COLORS.text }}>ہاں</span>
+                                                        <span className="text-[13px]" style={{ color: COLORS.text }}>ہاں</span>
                                                     </motion.div>
                                                 </div>
 
                                                 {/* Mill Selection Question */}
                                                 <motion.div
-                                                    className="rounded-xl p-3"
+                                                    className="rounded-xl p-2.5"
                                                     style={{ backgroundColor: COLORS.surface }}
                                                 >
-                                                    <div className="text-right text-sm mb-3 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
+                                                    <div className="text-right text-[13px] mb-2.5 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
                                                         آپ صداقت لمیٹڈ کی کس مل میں کام کر رہے ہیں؟
                                                         <span style={{ color: COLORS.red }}> *</span>
                                                     </div>
@@ -393,10 +393,10 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
 
                                                 {/* Rating Question */}
                                                 <motion.div
-                                                    className="rounded-xl p-3"
+                                                    className="rounded-xl p-2.5"
                                                     style={{ backgroundColor: COLORS.surface }}
                                                 >
-                                                    <div className="text-right text-sm mb-3 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
+                                                    <div className="text-right text-[13px] mb-2.5 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
                                                         آپ ڈپارٹمنٹ کی ٹیم سپرٹ کو کیسے درجہ بندی کریں گے؟
                                                         <span style={{ color: COLORS.red }}> *</span>
                                                     </div>
@@ -406,7 +406,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                                             return (
                                                                 <div
                                                                     key={num}
-                                                                    className="w-10 h-10 rounded-lg flex items-center justify-center font-bold"
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
                                                                     style={{
                                                                         backgroundColor: isActive ? COLORS.green : COLORS.border,
                                                                         color: isActive ? 'white' : COLORS.textMuted
@@ -421,13 +421,13 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
 
                                                 {/* Long Text Question */}
                                                 <motion.div
-                                                    className="rounded-xl p-3"
+                                                    className="rounded-xl p-2.5"
                                                     style={{ backgroundColor: COLORS.surface }}
                                                 >
-                                                    <div className="text-right text-sm mb-3 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
+                                                    <div className="text-right text-[13px] mb-2.5 font-medium" style={{ color: COLORS.text, direction: 'rtl' }}>
                                                         کیا آپ کے پاس کوئی اور رائے ہے؟
                                                     </div>
-                                                    <div className="w-full h-24 rounded-lg border bg-white" style={{ borderColor: COLORS.border }} />
+                                                    <div className="w-full h-20 rounded-lg border bg-white" style={{ borderColor: COLORS.border }} />
                                                 </motion.div>
                                             </motion.div>
                                         </div>
@@ -468,7 +468,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                         x: localT > 5 ? 0 : 60
                     }}
                     transition={{ type: "spring", damping: 20 }}
-                    className="w-[360px]"
+                    className="w-[320px]"
                 >
                     <div
                         className="rounded-3xl overflow-hidden shadow-2xl"
@@ -476,15 +476,15 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                     >
                         {/* Header */}
                         <div
-                            className="px-6 py-4 flex items-center gap-3"
+                            className="px-5 py-3 flex items-center gap-2.5"
                             style={{ background: `linear-gradient(135deg, ${COLORS.teal}, ${COLORS.green})` }}
                         >
-                            <Lock size={22} className="text-white" />
-                            <span className="font-bold text-white text-lg">100% Confidential</span>
+                            <Lock size={20} className="text-white" />
+                            <span className="font-bold text-white text-base">Security & Privacy</span>
                         </div>
 
                         {/* Privacy Features */}
-                        <div className="p-5 space-y-3">
+                        <div className="p-4 space-y-2.5">
                             {[
                                 { icon: Shield, title: "Anonymous Responses", desc: "Identity never linked to answers" },
                                 { icon: Lock, title: "Encrypted Data", desc: "All submissions securely stored" },
@@ -501,14 +501,14 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                                     }}
                                 >
                                     <div
-                                        className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                                         style={{ backgroundColor: i === 0 ? `${COLORS.green}20` : `${COLORS.teal}15` }}
                                     >
-                                        <item.icon size={24} style={{ color: i === 0 ? COLORS.green : COLORS.teal }} />
+                                        <item.icon size={20} style={{ color: i === 0 ? COLORS.green : COLORS.teal }} />
                                     </div>
                                     <div>
-                                        <div className="font-semibold" style={{ color: COLORS.text }}>{item.title}</div>
-                                        <div className="text-sm mt-0.5" style={{ color: COLORS.textMuted }}>{item.desc}</div>
+                                        <div className="font-semibold text-sm" style={{ color: COLORS.text }}>{item.title}</div>
+                                        <div className="text-[13px] mt-0.5" style={{ color: COLORS.textMuted }}>{item.desc}</div>
                                     </div>
                                 </motion.div>
                             ))}
@@ -532,6 +532,56 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
                 </motion.div>
 
             </div>
+
+            {/* Worker/Employee Avatar Card - Bottom Left */}
+            <motion.div
+                className="absolute bottom-8 left-8 z-20"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 30 }}
+                transition={{ delay: 0.5, type: "spring", damping: 20 }}
+            >
+                {/* Pulsing Glow Ring */}
+                <motion.div
+                    className="absolute w-52 h-52 rounded-full -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                    style={{ background: `radial-gradient(circle, ${COLORS.teal}15 0%, transparent 70%)` }}
+                    animate={{ scale: [1, 1.08, 1], opacity: [0.5, 0.8, 0.5] }}
+                    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                />
+
+                {/* IO Avatar Card */}
+                <motion.div
+                    className="bg-white rounded-2xl shadow-2xl p-4 flex flex-col items-center border-[1.5px]"
+                    style={{ borderColor: COLORS.teal }}
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border-2 shadow-md mb-2" style={{ borderColor: COLORS.teal }}>
+                        <img src="/assets/avatars/worker_avatar.png" alt="Worker / Employee" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-[#284952] font-bold text-[13px]">Worker / Employee</span>
+                    <span className="text-teal-600 text-[9px] font-mono mb-2">Mobile App</span>
+
+                    {/* Status Badge */}
+                    <div
+                        className="px-3 py-1 rounded-full flex items-center gap-1.5"
+                        style={{ backgroundColor: `${COLORS.teal}12` }}
+                    >
+                        <motion.div
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: stage === 'form' ? "#60BA81" : COLORS.teal }}
+                            animate={{ opacity: [1, 0.4, 1] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                        />
+                        <span className="text-teal-700 text-[9px] font-bold tracking-tight">
+                            {stage === 'cnic' && "Entering CNIC"}
+                            {stage === 'list' && "Selecting Survey"}
+                            {stage === 'form' && "Filling Survey"}
+                        </span>
+                    </div>
+                </motion.div>
+            </motion.div>
+
+
         </motion.div>
     )
 }

@@ -23,6 +23,7 @@ import {
   AlertCircle,
   FileText,
   Upload,
+  Mail,
 } from "lucide-react"
 
 const ASSETS = {
@@ -207,19 +208,19 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                 initial={{ opacity: 0, y: -30, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                className="flex items-center gap-3 px-8 py-4 rounded-full relative"
+                className="flex items-center gap-2.5 px-6 py-3 rounded-full relative"
                 style={{
                   background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
-                  boxShadow: `0 10px 40px -10px ${COLORS.teal}80, 0 0 0 1px ${COLORS.teal}20`,
+                  boxShadow: `0 8px 30px -8px ${COLORS.teal}80, 0 0 0 1px ${COLORS.teal}20`,
                 }}
               >
                 <motion.div
                   animate={{ rotate: [0, 360] }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 >
-                  <Shield size={28} className="text-white" />
+                  <Shield size={24} className="text-white" />
                 </motion.div>
-                <span className="text-white font-bold text-xl">FOS Team Verification</span>
+                <span className="text-white font-bold text-lg">FOS Team Verification</span>
 
                 {/* Glow effect */}
                 <motion.div
@@ -267,7 +268,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                           transition={{ duration: 2, repeat: Infinity }}
                         />
 
-                        <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white relative">
+                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white relative">
                           <img
                             src={ASSETS.fosOfficer}
                             alt="FOS Officer"
@@ -281,12 +282,12 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             scale: [1, 1.15, 1],
                           }}
                           transition={{ duration: 1.5, repeat: Infinity }}
-                          className="absolute -top-2 -right-2 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                          className="absolute -top-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
                           style={{
                             background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
                           }}
                         >
-                          <Phone size={24} className="text-white" />
+                          <Phone size={18} className="text-white" />
                         </motion.div>
                       </div>
                       <div className="text-center">
@@ -365,7 +366,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                           transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                         />
 
-                        <div className="w-44 h-44 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white">
+                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white">
                           <img
                             src={ASSETS.workerNeutral}
                             alt="Worker"
@@ -380,12 +381,12 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             scale: [1, 1.1, 1.1, 1.1, 1.1, 1],
                           }}
                           transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.3 }}
-                          className="absolute -top-2 -right-2 w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                          className="absolute -top-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
                           style={{
                             background: `linear-gradient(135deg, ${COLORS.green} 0%, #4A9D6F 100%)`,
                           }}
                         >
-                          <Phone size={24} className="text-white" />
+                          <Phone size={18} className="text-white" />
                         </motion.div>
                       </div>
                       <div className="text-center">
@@ -430,7 +431,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                       transition={{ delay: 0.2, type: "spring" }}
                       className="flex flex-col items-center gap-4 flex-1"
                     >
-                      <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-gray-50 to-white">
+                      <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-gray-50 to-white">
                         <img src={ASSETS.fosOfficer} alt="FOS Officer" className="w-full h-full object-cover" />
                       </div>
                       <p className="text-sm font-bold text-gray-800">FOS Officer</p>
@@ -440,10 +441,10 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
-                        className="relative bg-white rounded-3xl shadow-2xl p-5 border-2 max-w-sm"
+                        className="relative bg-white rounded-3xl shadow-2xl p-4 border-2 max-w-sm"
                         style={{
                           borderColor: COLORS.teal,
-                          boxShadow: `0 20px 60px -15px ${COLORS.teal}30, 0 0 0 1px ${COLORS.teal}20`,
+                          boxShadow: `0 15px 40px -10px ${COLORS.teal}30, 0 0 0 1px ${COLORS.teal}20`,
                         }}
                       >
                         <div className="space-y-3">
@@ -451,7 +452,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.7 }}
-                            className="text-sm text-gray-700 leading-relaxed"
+                            className="text-[13px] text-gray-700 leading-relaxed"
                           >
                             "The Investigation Officer has reviewed your complaint and taken corrective actions..."
                           </motion.p>
@@ -459,7 +460,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 1.2 }}
-                            className="text-sm text-gray-800 leading-relaxed font-semibold"
+                            className="text-[13px] text-gray-800 leading-relaxed font-semibold"
                           >
                             "Are you satisfied with the outcome?"
                           </motion.p>
@@ -479,7 +480,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                       transition={{ delay: 0.4, type: "spring" }}
                       className="flex flex-col items-center gap-4 flex-1"
                     >
-                      <div className="w-36 h-36 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-gray-50 to-white">
+                      <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-xl bg-gradient-to-br from-gray-50 to-white">
                         <img src={ASSETS.workerNeutral} alt="Worker" className="w-full h-full object-cover" />
                       </div>
                       <p className="text-sm font-bold text-gray-800">Worker</p>
@@ -517,9 +518,9 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ type: "spring", stiffness: 200 }}
-                  className="bg-white rounded-3xl shadow-2xl p-8 flex items-center gap-8 relative overflow-hidden"
+                  className="bg-white rounded-3xl shadow-2xl p-6 flex items-center gap-6 relative overflow-hidden"
                   style={{
-                    boxShadow: `0 30px 80px -20px ${COLORS.green}30`,
+                    boxShadow: `0 20px 60px -15px ${COLORS.green}30`,
                   }}
                 >
                   {/* Background glow */}
@@ -534,27 +535,18 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                     transition={{ duration: 3, repeat: Infinity }}
                   />
 
-                  <motion.div
-                    animate={{
-                      rotate: [0, 360],
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      rotate: { duration: 3, ease: "linear", repeat: Infinity },
-                      scale: { duration: 2, repeat: Infinity },
-                    }}
-                    className="w-20 h-20 rounded-full flex items-center justify-center relative z-10"
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center relative z-10"
                     style={{
                       background: `linear-gradient(135deg, ${COLORS.green} 0%, #4A9D6F 100%)`,
-                      boxShadow: `0 10px 30px -10px ${COLORS.green}60`,
+                      boxShadow: `0 8px 25px -8px ${COLORS.green}60`,
                     }}
                   >
-                    <Shield size={40} className="text-white" />
-                  </motion.div>
+                    <Shield size={32} className="text-white" />
+                  </div>
 
                   <div className="relative z-10">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Independent Verification</h3>
-                    <p className="text-base text-gray-600">Ensures fairness and builds trust in the process</p>
+                    <h3 className="text-xl font-bold text-gray-800 mb-1">Independent Verification</h3>
+                    <p className="text-sm text-gray-600">Ensures fairness and builds trust in the process</p>
                   </div>
 
                 </motion.div>
@@ -596,7 +588,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                     transition={{ duration: 2, repeat: Infinity }}
                   />
 
-                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white relative">
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl bg-gradient-to-br from-gray-50 to-white relative">
                     <img
                       src={ASSETS.workerSad}
                       alt="Dissatisfied Worker"
@@ -609,17 +601,17 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-                    className="absolute -bottom-2 -right-2 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl"
+                    className="absolute -bottom-1 -right-1 w-12 h-12 rounded-full flex items-center justify-center shadow-2xl"
                     style={{
                       background: COLORS.orangeGradient,
-                      boxShadow: `0 10px 40px -10px ${COLORS.orange}80`,
+                      boxShadow: `0 8px 30px -8px ${COLORS.orange}80`,
                     }}
                   >
                     <motion.div
                       animate={{ rotate: [0, 10, -10, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <XCircle size={32} className="text-white" strokeWidth={2.5} />
+                      <XCircle size={24} className="text-white" strokeWidth={2.5} />
                     </motion.div>
                   </motion.div>
                 </div>
@@ -652,14 +644,14 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                   }}
                 />
 
-                <div className="p-6 text-white relative z-10">
+                <div className="p-4 text-white relative z-10">
                   <div className="flex items-center justify-center gap-3 mb-3">
-                    <XCircle size={24} className="text-white" strokeWidth={2.5} />
-                    <h2 className="text-xl font-bold">The Complainant Was Not Satisfied</h2>
+                    <XCircle size={20} className="text-white" strokeWidth={2.5} />
+                    <h2 className="text-lg font-bold">The Complainant Was Not Satisfied</h2>
                   </div>
                   <div className="text-center bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                    <p className="text-sm font-semibold mb-3 opacity-95">Feedback:</p>
-                    <p className="text-sm leading-relaxed opacity-95">
+                    <p className="text-xs font-semibold mb-2 opacity-95">Feedback:</p>
+                    <p className="text-xs leading-relaxed opacity-95">
                       The FOS team called the complainant and informed him about the response to his complaint. The
                       complainant mentioned that no renovation work has been done— all the washrooms are still in poor
                       condition, and no action has been taken. He requested that the issue be looked into and the
@@ -685,13 +677,13 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                     rotate: { duration: 2, repeat: Infinity, ease: "linear" },
                     y: { duration: 1.5, repeat: Infinity },
                   }}
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{
                     background: COLORS.orangeGradient,
-                    boxShadow: `0 5px 20px -5px ${COLORS.orange}60`,
+                    boxShadow: `0 4px 15px -4px ${COLORS.orange}60`,
                   }}
                 >
-                  <RotateCcw size={24} className="text-white" />
+                  <RotateCcw size={20} className="text-white" />
                 </motion.div>
                 <span className="text-base font-bold" style={{ color: COLORS.orange }}>
                   Case Bounced Back to Investigation Officer
@@ -725,7 +717,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                 mass: 1
               }}
             >
-              <div className="w-[90%] h-[90%] max-w-[850px] max-h-[550px]">
+              <div className="w-[90%] h-[90%] max-w-[750px] max-h-[480px]">
                 {/* Apple-style Card Container - matching scene-rca-capa-evidence.tsx */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -754,24 +746,24 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                       className="mb-3 relative z-20"
                     >
                       <motion.div
-                        className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300 mx-auto max-w-[500px]"
+                        className="rounded-lg overflow-hidden shadow-lg border-2 transition-all duration-300 mx-auto max-w-[420px]"
                         style={{
                           borderColor: COLORS.orange,
-                          boxShadow: `0 10px 40px -10px ${COLORS.orange}60`,
+                          boxShadow: `0 8px 30px -8px ${COLORS.orange}60`,
                         }}
                       >
                         {/* Card Header */}
                         <div
-                          className="px-3 py-2 flex items-center gap-2"
+                          className="px-2.5 py-1.5 flex items-center gap-2"
                           style={{ backgroundColor: COLORS.orange }}
                         >
-                          <XCircle size={14} className="text-white" strokeWidth={2.5} />
-                          <span className="font-bold text-white text-xs">Worker Feedback - Not Satisfied</span>
+                          <XCircle size={12} className="text-white" strokeWidth={2.5} />
+                          <span className="font-bold text-white text-[11px]">Worker Feedback - Not Satisfied</span>
                         </div>
 
                         {/* Card Body */}
-                        <div className="bg-white p-3">
-                          <div className="text-[10px] text-gray-600 leading-relaxed">
+                        <div className="bg-white p-2.5">
+                          <div className="text-[9px] text-gray-600 leading-relaxed">
                             The complainant mentioned that no renovation work has been done— all the washrooms are
                             still in poor condition. He requested the issue be properly addressed.
                           </div>
@@ -828,8 +820,8 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                               </div>
 
                               {/* Text Content */}
-                              <div className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50">
-                                <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
+                              <div className="min-h-[100px] max-h-[120px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50">
+                                <div className="text-[9px] text-gray-600 leading-relaxed whitespace-pre-line">
                                   {capaText ? (
                                     <>
                                       {capaText}
@@ -986,15 +978,15 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             }}
                           >
                             {/* Upload Area */}
-                            <div className="p-3" style={{ backgroundColor: COLORS.teal }}>
+                            <div className="p-2.5" style={{ backgroundColor: COLORS.teal }}>
                               <div className="flex items-center gap-3">
                                 {/* Select Files Button */}
-                                <div className="flex items-center gap-2 px-3 py-2 bg-white/20 rounded">
-                                  <Upload size={14} className="text-white" />
-                                  <span className="text-[10px] text-white font-medium">Select Files</span>
+                                <div className="flex items-center gap-2 px-2 py-1.5 bg-white/20 rounded">
+                                  <Upload size={12} className="text-white" />
+                                  <span className="text-[9px] text-white font-medium">Select Files</span>
                                 </div>
                                 {/* Drop Zone Text */}
-                                <span className="text-[10px] text-white">
+                                <span className="text-[9px] text-white">
                                   Drag and drop files here
                                 </span>
                               </div>
@@ -1027,10 +1019,10 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                   </div>
 
                   {/* Footer - Matching scene-rca-capa-evidence.tsx */}
-                  <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                  <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
                     {/* Rework Badge */}
                     <motion.div
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                      className="flex items-center gap-2 px-2.5 py-1 rounded-full"
                       style={{
                         background: COLORS.orangeGradient,
                         boxShadow: `0 4px 15px -5px ${COLORS.orange}60`,
@@ -1048,16 +1040,16 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                         animate={{ rotate: [0, 360] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       >
-                        <RefreshCw size={14} className="text-white" />
+                        <RefreshCw size={12} className="text-white" />
                       </motion.div>
-                      <span className="text-xs font-bold text-white">REWORK REQUIRED</span>
+                      <span className="text-[10px] font-bold text-white">REWORK REQUIRED</span>
                     </motion.div>
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2">
-                      <button className="px-3 py-1.5 rounded text-[10px] font-medium text-white bg-gray-500">Close</button>
+                      <button className="px-2.5 py-1.5 rounded text-[9px] font-medium text-white bg-gray-500">Close</button>
                       <motion.button
-                        className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
+                        className="px-2.5 py-1.5 rounded text-[9px] font-medium text-white"
                         style={{ backgroundColor: "#0095da" }}
                       >
                         Submit Changes
@@ -1078,24 +1070,24 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                   transition={{ type: "spring", stiffness: 120, damping: 20, delay: 0.4 }}
                   className="absolute bottom-8 left-8 z-40"
                 >
-                  <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden w-56">
+                  <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden w-48">
                     <div
-                      className="px-4 py-3 flex items-center gap-2"
+                      className="px-3 py-2 flex items-center gap-2"
                       style={{ background: COLORS.orangeGradient }}
                     >
                       <motion.div
                         animate={{ rotate: [0, 360] }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       >
-                        <RefreshCw size={16} className="text-white" />
+                        <RefreshCw size={14} className="text-white" />
                       </motion.div>
-                      <span className="text-xs font-bold text-white">Investigation Officer - Rework</span>
+                      <span className="text-[11px] font-bold text-white">Investigation Officer - Rework</span>
                     </div>
 
-                    <div className="p-4 bg-gradient-to-br from-gray-50 to-white">
+                    <div className="p-3 bg-gradient-to-br from-gray-50 to-white">
                       <div className="relative">
                         <div className="bg-gray-800 rounded-xl overflow-hidden shadow-lg">
-                          <div className="h-5 bg-gray-700 flex items-center px-2 gap-1">
+                          <div className="h-4 bg-gray-700 flex items-center px-2 gap-1">
                             <div className="flex gap-1">
                               <div className="w-2 h-2 rounded-full bg-red-400" />
                               <div className="w-2 h-2 rounded-full bg-yellow-400" />
@@ -1103,10 +1095,10 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                             </div>
                           </div>
 
-                          <div className="relative bg-gradient-to-br from-orange-50 to-red-50 h-32 flex items-center justify-center overflow-hidden">
+                          <div className="relative bg-gradient-to-br from-orange-50 to-red-50 h-28 flex items-center justify-center overflow-hidden">
 
                             <div className="relative z-10">
-                              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-xl">
+                              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-xl">
                                 <img
                                   src={ASSETS.officerPC}
                                   alt="Investigation Officer"
@@ -1119,7 +1111,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
 
                         {/* Status badge */}
                         <motion.div
-                          className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg"
+                          className="absolute -bottom-1.5 -right-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white shadow-lg"
                           style={{ background: COLORS.orangeGradient }}
                           animate={{
                             scale: [1, 1.1, 1],
@@ -1135,8 +1127,8 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                         </motion.div>
                       </div>
 
-                      <div className="mt-3 text-center">
-                        <p className="text-xs text-gray-600 font-medium">
+                      <div className="mt-2.5 text-center">
+                        <p className="text-[10px] text-gray-600 font-medium">
                           {stage >= 6 && stage < 8 && "Documenting new findings"}
                           {stage === 8 && "Creating revised action plan"}
                           {stage === 5 && "Preparing rework"}
@@ -1165,19 +1157,19 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                 initial={{ scale: 0.8, opacity: 0, y: -20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 200 }}
-                className="flex items-center gap-3 px-6 py-3 rounded-full"
+                className="flex items-center gap-2.5 px-5 py-2.5 rounded-full"
                 style={{
                   background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
-                  boxShadow: "0 10px 40px -10px rgba(239, 68, 68, 0.5)",
+                  boxShadow: "0 8px 30px -8px rgba(239, 68, 68, 0.5)",
                 }}
               >
                 <motion.div
                   animate={{ y: [0, -5, 0] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
-                  <ArrowUp size={24} className="text-white" />
+                  <ArrowUp size={20} className="text-white" />
                 </motion.div>
-                <span className="text-white font-bold text-lg">Escalation Triggered</span>
+                <span className="text-white font-bold text-base">Escalation Triggered</span>
               </motion.div>
 
               {/* Escalation Pyramid */}
@@ -1193,19 +1185,19 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                   <motion.div
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 border-2 border-red-200"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 border-2 border-red-200"
                   >
-                    <Clock size={18} className="text-red-500" />
-                    <span className="text-sm font-semibold text-red-600">Timeline Missed: 7 Days Overdue</span>
+                    <Clock size={16} className="text-red-500" />
+                    <span className="text-xs font-semibold text-red-600">Timeline Missed: 7 Days Overdue</span>
                   </motion.div>
 
                   <motion.div
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 border-2 border-orange-200"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 border-2 border-orange-200"
                   >
-                    <RotateCcw size={18} className="text-orange-500" />
-                    <span className="text-sm font-semibold text-orange-600">3 Bounce-backs</span>
+                    <RotateCcw size={16} className="text-orange-500" />
+                    <span className="text-xs font-semibold text-orange-600">3 Bounce-backs</span>
                   </motion.div>
                 </div>
 
@@ -1214,29 +1206,29 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                   {/* Level 1 - IO */}
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: 80 }}
+                    animate={{ height: 60 }}
                     transition={{ delay: 0.5, duration: 0.5 }}
-                    className="w-28 bg-gradient-to-t from-gray-200 to-gray-100 rounded-t-xl flex flex-col items-center justify-end pb-2"
+                    className="w-24 bg-gradient-to-t from-gray-200 to-gray-100 rounded-t-xl flex flex-col items-center justify-end pb-2"
                   >
-                    <span className="text-xs font-medium text-gray-600">IO</span>
+                    <span className="text-[10px] font-medium text-gray-600">IO</span>
                   </motion.div>
 
                   {/* Level 2 - Supervisor */}
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: 120 }}
+                    animate={{ height: 100 }}
                     transition={{ delay: 0.7, duration: 0.5 }}
-                    className="w-28 bg-gradient-to-t from-orange-300 to-orange-200 rounded-t-xl flex flex-col items-center justify-end pb-2"
+                    className="w-24 bg-gradient-to-t from-orange-300 to-orange-200 rounded-t-xl flex flex-col items-center justify-end pb-2"
                   >
-                    <span className="text-xs font-medium text-orange-700">Supervisor</span>
+                    <span className="text-[10px] font-medium text-orange-700">Supervisor</span>
                   </motion.div>
 
                   {/* Level 3 - Management */}
                   <motion.div
                     initial={{ height: 0 }}
-                    animate={{ height: 160 }}
+                    animate={{ height: 140 }}
                     transition={{ delay: 0.9, duration: 0.5 }}
-                    className="w-28 rounded-t-xl flex flex-col items-center justify-end pb-2 relative overflow-hidden"
+                    className="w-24 rounded-t-xl flex flex-col items-center justify-end pb-2 relative overflow-hidden"
                     style={{
                       background: "linear-gradient(180deg, #EF4444 0%, #DC2626 100%)",
                     }}
@@ -1249,7 +1241,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
                       style={{ background: "rgba(255,255,255,0.2)" }}
                     />
                     <ArrowUp size={20} className="text-white mb-1" />
-                    <span className="text-xs font-bold text-white">Senior Mgmt</span>
+                    <span className="text-[10px] font-bold text-white">Senior Mgmt</span>
                   </motion.div>
                 </div>
 
@@ -1269,7 +1261,7 @@ Deadline: 15 Dec 2025 | Escalated Priority`
           </motion.div>
         )}
 
-        {/* Stage 10: Senior Management */}
+        {/* Stage 10: Senior Management - Email Reminder Visualization */}
         {stage === 10 && (
           <motion.div
             key="senior-mgmt"
@@ -1278,193 +1270,255 @@ Deadline: 15 Dec 2025 | Escalated Priority`
             exit={{ opacity: 0 }}
             className="absolute inset-0 flex items-center justify-center px-6"
           >
-            <div className="flex flex-col items-center gap-6 max-w-[700px]">
-              {/* Header */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-                className="flex items-center gap-3 px-6 py-3 rounded-full"
-                style={{
-                  background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
-                  boxShadow: `0 10px 40px -10px ${COLORS.teal}80`,
-                }}
-              >
-                <Users size={24} className="text-white" />
-                <span className="text-white font-bold text-lg">Senior Management Engaged</span>
-              </motion.div>
+            <div className="flex items-start gap-8 max-w-[850px] w-full">
 
-              {/* Management Team */}
+              {/* Left Column: Management Receiving Notifications */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-3xl p-8 shadow-2xl w-full relative overflow-hidden"
-                style={{ boxShadow: "0 30px 80px -20px rgba(0,0,0,0.15)" }}
+                initial={{ x: -40, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="flex flex-col items-center gap-4 w-[220px] flex-shrink-0"
               >
-                {/* Background glow */}
+                {/* Header Badge */}
                 <motion.div
-                  className="absolute inset-0"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full"
                   style={{
-                    background: `radial-gradient(circle at 50% 50%, ${COLORS.teal}10 0%, transparent 60%)`,
+                    background: `linear-gradient(135deg, ${COLORS.teal} 0%, ${COLORS.darkTeal} 100%)`,
+                    boxShadow: `0 8px 30px -8px ${COLORS.teal}60`,
                   }}
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
+                >
+                  <Users size={16} className="text-white" />
+                  <span className="text-xs font-bold text-white">Senior Management</span>
+                </motion.div>
 
-                {/* Management avatars */}
-                <div className="flex items-center justify-center gap-8 mb-6 relative z-10">
+                {/* Management Avatars with notification dots */}
+                <div className="flex flex-col gap-4 w-full">
                   {[
-                    { title: "HR Director", color: "#8B5CF6" },
-                    { title: "Compliance Head", color: COLORS.teal },
-                    { title: "Plant Manager", color: "#F59E0B" },
+                    { title: "HR Director", subtitle: "Imran Ijaz", color: "#8B5CF6", delay: 0.3 },
+                    { title: "Compliance Head", subtitle: "Ahmed Khan", color: COLORS.teal, delay: 0.5 },
+                    { title: "Plant Manager", subtitle: "Asif Malik", color: "#F59E0B", delay: 0.7 },
                   ].map((person, i) => (
                     <motion.div
                       key={i}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.3 + i * 0.2, type: "spring" }}
-                      className="flex flex-col items-center gap-2"
+                      initial={{ x: -30, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: person.delay, type: "spring" }}
+                      className="flex items-center gap-3 bg-white rounded-xl px-3.5 py-2.5 shadow-lg border border-gray-100"
                     >
+                      <div className="relative">
+                        <motion.div
+                          animate={{ y: [0, -3, 0] }}
+                          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                          className="w-10 h-10 rounded-full flex items-center justify-center shadow-md"
+                          style={{ background: `linear-gradient(135deg, ${person.color} 0%, ${person.color}CC 100%)` }}
+                        >
+                          <Users size={18} className="text-white" />
+                        </motion.div>
+                        {/* Notification dot */}
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: person.delay + 0.5, type: "spring", stiffness: 300 }}
+                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 flex items-center justify-center"
+                        >
+                          <Mail size={10} className="text-white" />
+                        </motion.div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-gray-800 truncate">{person.title}</p>
+                        <p className="text-[10px] text-gray-500">{person.subtitle}</p>
+                      </div>
+                      {/* Delivery status */}
                       <motion.div
-                        animate={{ y: [0, -5, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-                        className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
-                        style={{ background: `linear-gradient(135deg, ${person.color} 0%, ${person.color}CC 100%)` }}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: person.delay + 0.8 }}
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold"
+                        style={{ backgroundColor: `${COLORS.green}20`, color: COLORS.green }}
                       >
-                        <Users size={32} className="text-white" />
+                        <CheckCircle2 size={10} />
+                        Sent
                       </motion.div>
-                      <span className="text-sm font-semibold text-gray-700">{person.title}</span>
                     </motion.div>
                   ))}
                 </div>
 
-                {/* Action items */}
+                {/* Sending animation line */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="bg-gray-50 rounded-xl p-4 relative z-10"
+                  transition={{ delay: 1 }}
+                  className="flex items-center gap-2 text-xs text-gray-500"
                 >
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 size={18} style={{ color: COLORS.teal }} />
-                    <span className="text-sm font-bold text-gray-800">Accountability Actions</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      "Direct intervention assigned",
-                      "Priority escalation active",
-                      "Daily progress reviews",
-                      "Compliance audit scheduled",
-                    ].map((action, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.9 + i * 0.1 }}
-                        className="flex items-center gap-2 text-sm text-gray-600"
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                  >
+                    <RefreshCw size={12} style={{ color: COLORS.teal }} />
+                  </motion.div>
+                  <span className="font-medium" style={{ color: COLORS.teal }}>Auto-reminders active</span>
+                </motion.div>
+              </motion.div>
+
+              {/* Animated arrow connecting columns */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, type: "spring" }}
+                className="flex flex-col items-center justify-center self-center gap-2"
+              >
+                <motion.div
+                  animate={{ x: [0, 8, 0] }}
+                  transition={{ duration: 1.2, repeat: Infinity }}
+                >
+                  <svg width="40" height="24" viewBox="0 0 40 24">
+                    <path d="M2 12H32M32 12L24 4M32 12L24 20" stroke={COLORS.teal} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
+                </motion.div>
+                <span className="text-[9px] font-bold" style={{ color: COLORS.teal }}>EMAIL</span>
+              </motion.div>
+
+              {/* Right Column: Email Preview */}
+              <motion.div
+                initial={{ x: 40, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.4, type: "spring", stiffness: 150 }}
+                className="flex-1 max-w-[420px]"
+              >
+                <motion.div
+                  className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200"
+                  style={{ boxShadow: `0 25px 60px -15px rgba(0,0,0,0.2)` }}
+                >
+                  {/* Email Header - FOS Branded Dark Teal */}
+                  <div className="px-4 py-3 text-center" style={{ backgroundColor: COLORS.darkTeal }}>
+                    {/* FOS Logo Badge */}
+                    <div className="flex justify-center mb-1.5">
+                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                        <span className="text-[7px] font-bold text-white leading-tight">FOS</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <h3 className="text-xs font-bold text-white">RCA & CAPA Submission Reminder</h3>
+                      <motion.span
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                        className="px-2 py-0.5 rounded text-[8px] font-bold text-white"
+                        style={{ backgroundColor: COLORS.green }}
                       >
-                        <div
-                          className="w-2 h-2 rounded-full"
-                          style={{ backgroundColor: COLORS.teal }}
-                        />
-                        {action}
+                        REMINDER
+                      </motion.span>
+                    </div>
+                  </div>
+
+                  {/* Email Body */}
+                  <div className="px-4 py-3 space-y-2.5">
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <p className="text-[10px] text-gray-600 mb-1">Dear Imran Ijaz,</p>
+                      <p className="text-[9px] text-gray-500 leading-relaxed">
+                        This is a friendly reminder to submit the Root Cause Analysis (RCA) and Corrective and Preventive Action (CAPA) for the following complaint ticket.
+                      </p>
+                    </motion.div>
+
+                    {/* Action Required Alert */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.8 }}
+                      className="px-2.5 py-2 rounded border-l-4 bg-amber-50"
+                      style={{ borderLeftColor: COLORS.orange }}
+                    >
+                      <p className="text-[9px] font-bold text-red-600 mb-0.5">Action Required</p>
+                      <p className="text-[9px] text-gray-600">
+                        Your RCA and CAPA submission is pending. Please complete and submit as soon as possible.
+                      </p>
+                    </motion.div>
+
+                    {/* Complaint Information */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 1.0 }}
+                      className="px-2.5 py-2 rounded border-l-4 bg-gray-50"
+                      style={{ borderLeftColor: COLORS.teal }}
+                    >
+                      <p className="text-[9px] font-bold mb-1" style={{ color: COLORS.darkTeal }}>Complaint Information</p>
+                      <div className="space-y-1">
+                        <div className="flex gap-3 text-[9px]">
+                          <span className="text-gray-500 w-16">Ticket Number:</span>
+                          <span className="font-medium" style={{ color: COLORS.teal }}>#FB021221-1002430</span>
+                        </div>
+                        <div className="flex gap-3 text-[9px]">
+                          <span className="text-gray-500 w-16">Time Elapsed:</span>
+                          <span className="font-medium text-red-500">48 hours</span>
+                        </div>
+                        <div className="flex gap-3 text-[9px]">
+                          <span className="text-gray-500 w-16">Status:</span>
+                          <span className="font-medium text-gray-700">Pending RCA & CAPA</span>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Next Steps */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 1.2 }}
+                      className="px-2.5 py-2 rounded border-l-4 bg-teal-50"
+                      style={{ borderLeftColor: COLORS.green }}
+                    >
+                      <p className="text-[9px] font-bold mb-0.5" style={{ color: COLORS.darkTeal }}>Next Steps</p>
+                      <p className="text-[9px] text-gray-600">
+                        Please complete the RCA and CAPA as soon as possible to ensure timely resolution.
+                      </p>
+                    </motion.div>
+
+                    {/* CTA Button */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.4 }}
+                      className="flex justify-center pt-1"
+                    >
+                      <motion.div
+                        className="px-4 py-1 rounded text-[9px] font-bold text-white"
+                        style={{ backgroundColor: COLORS.green }}
+                        animate={{ scale: [1, 1.05, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        Submit RCA & CAPA
                       </motion.div>
-                    ))}
+                    </motion.div>
+
+                    {/* Important Notice */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.5 }}
+                      className="px-2.5 py-1.5 rounded bg-gray-50 border border-gray-200"
+                    >
+                      <p className="text-[9px] text-gray-500">
+                        <span className="font-bold text-red-500">Important:</span> This link provides direct access to submit your RCA and CAPA findings. All investigation details must be documented through this portal.
+                      </p>
+                    </motion.div>
+                  </div>
+
+                  {/* Email Footer */}
+                  <div className="px-4 py-2 text-center border-t border-gray-200" style={{ backgroundColor: COLORS.darkTeal }}>
+                    <p className="text-[7px] text-white/60">This is an automated reminder. Please do not reply.</p>
+                    <p className="text-[7px] text-white/80 font-medium mt-0.5">Fruit of Sustainability | Your Partner in Grievance Management</p>
+                    <p className="text-[6px] text-white/50 mt-0.5">© 2025 Fruit of Sustainability. All rights reserved.</p>
                   </div>
                 </motion.div>
               </motion.div>
+
             </div>
           </motion.div>
         )}
 
-        {/* Stage 11: Quality Assurance Summary */}
-        {stage === 11 && (
-          <motion.div
-            key="success"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div className="flex flex-col items-center gap-8 max-w-[550px] px-6 relative">
-
-              {/* Success icon */}
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="w-28 h-28 rounded-full flex items-center justify-center shadow-2xl relative z-10"
-                style={{
-                  background: `linear-gradient(135deg, ${COLORS.green} 0%, #4A9D6F 100%)`,
-                  boxShadow: `0 20px 60px -15px ${COLORS.green}60`,
-                }}
-              >
-                {/* Glow */}
-                <motion.div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: `radial-gradient(circle, ${COLORS.green}40 0%, transparent 70%)`,
-                    filter: "blur(20px)",
-                  }}
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    opacity: [0.5, 0.9, 0.5],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-
-                <motion.div
-                  animate={{
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <CheckCircle2 size={56} className="text-white" strokeWidth={2.5} />
-                </motion.div>
-              </motion.div>
-
-              {/* Text content */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-center relative z-10"
-              >
-                <h2 className="text-3xl font-bold text-gray-800 mb-3">Quality Assurance</h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                  This verification loop prevents premature or incomplete closures, ensuring every complaint is properly
-                  resolved.
-                </p>
-              </motion.div>
-
-              {/* Trust badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white shadow-xl border border-gray-200 relative z-10"
-                style={{
-                  boxShadow: `0 20px 60px -15px ${COLORS.teal}30`,
-                }}
-              >
-                <motion.div
-                  animate={{
-                    rotate: [0, 360],
-                  }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                >
-                  <Shield size={24} style={{ color: COLORS.teal }} />
-                </motion.div>
-                <span className="text-base font-semibold text-gray-700">Fairness & Accountability Guaranteed</span>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
       </AnimatePresence>
     </div>
   )

@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { FileText, Download, Share2, FileSpreadsheet, Eye } from "lucide-react"
+import { FileText, Download, Share2, FileSpreadsheet, Eye, BarChart2, ChevronUp, ChevronDown } from "lucide-react"
 
 interface SceneProps {
   isActive: boolean
@@ -12,10 +12,10 @@ interface SceneProps {
 const appleEase = [0.4, 0, 0.2, 1]
 
 const surveyReports = [
-  { title: "Exit Interview Report August", date: "Sep 5, 2025" },
-  { title: "Exit Interview Report July 2025", date: "Aug 8, 2025" },
-  { title: "Exit Interview Report June-25", date: "Jul 10, 2025" },
-  { title: "Employee Well Being Survey (CHZ Call Centre)", date: "Jun 30, 2025" },
+  { title: "Exit Interview Report June-25", date: "Jul 10, 2025", hasView: true },
+  { title: "Employee Well Being Survey (CHZ Call Centre)", date: "Jun 30, 2025", hasView: true, hasPdf: true, hasCsv: true },
+  { title: "Quaterly Employee Due Diligence Survey & Assessment Report May-25", date: "Jun 19, 2025", hasView: true },
+  { title: "Exit Interview Report May-25", date: "Jun 4, 2025", hasView: true },
 ]
 
 export function SceneExport({ isActive, progress, sceneProgress }: SceneProps) {
@@ -56,36 +56,76 @@ export function SceneExport({ isActive, progress, sceneProgress }: SceneProps) {
             transition={{ delay: 0.3, duration: 0.8, ease: appleEase }}
             className="bg-white/90 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-[#284952]/10 overflow-hidden border border-[#DEE2E6]"
           >
-            <div className="bg-[#284952] p-4 flex items-center gap-3">
-              <FileText className="w-5 h-5 text-white" />
-              <span className="text-white font-semibold">Survey Reports</span>
+            <div className="bg-[#284952] p-5 flex items-center gap-4 shrink-0">
+              <div className="bg-white/10 p-2 rounded-lg">
+                <BarChart2 className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-white font-black text-lg uppercase tracking-wider">Survey Reports</span>
             </div>
 
-            <div className="p-4 space-y-3">
-              {surveyReports.map((report, i) => (
-                <motion.div
-                  key={report.title}
-                  initial={{ opacity: 0, x: -25 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + i * 0.12, duration: 0.6, ease: appleEase }}
-                  className="p-4 bg-[#F5F5F7] rounded-xl hover:bg-[#EAEAEC] transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-[#17161A] font-medium text-sm">{report.title}</p>
-                      <p className="text-[#767676] text-xs mt-1">{report.date}</p>
+            <div className="flex-1 relative flex overflow-hidden min-h-[400px]">
+              <div className="flex-1 overflow-y-auto no-scrollbar p-0">
+                {surveyReports.map((report, i) => (
+                  <motion.div
+                    key={report.title}
+                    initial={{ opacity: 0, x: -25 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + i * 0.12, duration: 0.6, ease: appleEase }}
+                    className="p-6 border-b border-gray-100 bg-white transition-all hover:bg-gray-50/50"
+                  >
+                    <div className="flex flex-col gap-4">
+                      <p className="text-[#284952] font-black text-base leading-tight">
+                        {report.title}
+                      </p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#767676] text-xs font-bold">{report.date}</span>
+                        <div className="flex gap-2.5">
+                          {report.hasView && (
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="px-4 py-2 bg-[#60BA81] text-white text-xs font-black rounded-lg flex items-center gap-2 shadow-lg shadow-[#60BA81]/20 uppercase tracking-widest"
+                            >
+                              <BarChart2 className="w-3.5 h-3.5" /> View
+                            </motion.button>
+                          )}
+                          {report.hasPdf && (
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="px-4 py-2 bg-[#F5A83C] text-white text-xs font-black rounded-lg flex items-center gap-2 shadow-lg shadow-[#F5A83C]/20 uppercase tracking-widest"
+                            >
+                              <FileText className="w-3.5 h-3.5" /> PDF
+                            </motion.button>
+                          )}
+                          {report.hasCsv && (
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="px-4 py-2 bg-[#F5A83C] text-white text-xs font-black rounded-lg flex items-center gap-2 shadow-lg shadow-[#F5A83C]/20 uppercase tracking-widest"
+                            >
+                              <Download className="w-3.5 h-3.5" /> CSV
+                            </motion.button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-3 py-1.5 bg-[#60BA81] text-white text-xs font-medium rounded-lg flex items-center gap-1 shadow-lg shadow-[#60BA81]/20"
-                    >
-                      <Eye className="w-3 h-3" />
-                      View
-                    </motion.button>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Custom Scrollbar Mock */}
+              <div className="w-[28px] h-full flex flex-col border-l border-gray-100 shrink-0 bg-[#F8F9FA]/60">
+                <button className="h-[28px] w-full flex items-center justify-center text-gray-400 hover:text-[#284952] transition-colors">
+                  <ChevronUp size={18} />
+                </button>
+                <div className="flex-1 relative flex justify-center py-4">
+                  <div className="w-full mx-1.5 bg-gray-400 rounded-full" style={{ height: '50%' }} />
+                </div>
+                <button className="h-[28px] w-full flex items-center justify-center text-gray-400 hover:text-[#284952] transition-colors">
+                  <ChevronDown size={18} />
+                </button>
+              </div>
             </div>
           </motion.div>
 

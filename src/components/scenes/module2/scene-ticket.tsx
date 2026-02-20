@@ -43,7 +43,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="absolute w-64 h-64 border border-dashed border-green-200/20 rounded-full"
+        className="absolute w-52 h-52 border border-dashed border-green-200/20 rounded-full"
       />
 
       {/* 2. Signal Waves (Broadcasting Mode) */}
@@ -69,7 +69,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
 
       <div className="relative group">
         <div
-          className={`relative w-48 h-48 flex items-center justify-center transition-all duration-1000
+          className={`relative w-38 h-38 flex items-center justify-center transition-all duration-1000
                         ${isBroadcasting ? "transform scale-110" : ""}
                     `}
         >
@@ -85,7 +85,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
                 : "0 0 10px rgba(203, 213, 225, 0.3)"
             }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className={`w-28 h-28 rounded-full flex items-center justify-center relative z-20 backdrop-blur-sm border
+            className={`w-22 h-22 rounded-full flex items-center justify-center relative z-20 backdrop-blur-sm border
                             ${isBroadcasting ? "bg-green-500/10 border-green-400/50" : "bg-slate-200/10 border-slate-300/30"}
                         `}
           >
@@ -112,7 +112,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
           <motion.div
             animate={{ rotateY: 45, rotateZ: -360 }}
             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className={`absolute w-52 h-52 rounded-full border-2 box-border pointer-events-none z-10
+            className={`absolute w-44 h-44 rounded-full border-2 box-border pointer-events-none z-10
                             ${isBroadcasting ? "border-teal-400/20" : "border-slate-300/10"}
                         `}
             style={{ borderLeftColor: 'transparent', borderRightColor: 'transparent' }}
@@ -222,7 +222,7 @@ const TechCallout = ({ label, value, position }: { label: string, value: string,
 
         {/* The Content Box */}
         <div
-          className="bg-[#284952]/95 backdrop-blur-xl text-white p-3 rounded-xl shadow-[0_10px_30px_rgba(40,73,82,0.3)] border border-white/20 min-w-[140px] text-center"
+          className="bg-[#284952]/95 backdrop-blur-xl text-white p-2 rounded-xl shadow-[0_10px_30px_rgba(40,73,82,0.3)] border border-white/20 min-w-[140px] text-center"
           style={{ transform: 'translate(-50%, -50%)' }} // Center div on the coordinate
         >
           <div className="text-[9px] font-bold text-[#60BA81] uppercase tracking-wider mb-0.5">{label}</div>
@@ -327,23 +327,23 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
               }}
               exit={{ opacity: 0, scale: 0.8, y: -30, filter: "blur(10px)" }}
               transition={{ type: "spring", stiffness: 200, damping: 22 }}
-              className="w-full max-w-[420px] bg-white shadow-[0_20px_60px_-10px_rgba(0,0,0,0.15)] rounded-2xl overflow-visible relative border-t-[6px] border-[#60BA81]"
+              className="w-full max-w-[360px] bg-white shadow-[0_20px_60px_-10px_rgba(0,0,0,0.15)] rounded-2xl overflow-visible relative border-t-[6px] border-[#60BA81]"
             >
-              <div className="p-8 flex flex-col items-center relative z-20">
+              <div className="p-6 flex flex-col items-center relative z-20">
 
                 {/* Success Check Animation */}
                 <motion.div
                   initial={{ scale: 0, rotate: -45 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.2, type: "spring" }}
-                  className="mb-6 bg-[#E6F4EA] p-4 rounded-full shadow-inner"
+                  className="mb-4 bg-[#E6F4EA] p-3 rounded-full shadow-inner"
                 >
-                  <CheckCircle2 size={40} className="text-[#60BA81]" strokeWidth={2.5} />
+                  <CheckCircle2 size={32} className="text-[#60BA81]" strokeWidth={2.5} />
                 </motion.div>
 
                 {/* --- THE TICKET NUMBER DISPLAY --- */}
-                <div className="text-center w-full mb-8 relative">
-                  <div className="text-[26px] tracking-tight font-mono text-[#212529] flex items-center justify-center gap-[2px] relative cursor-default select-none">
+                <div className="text-center w-full mb-6 relative">
+                  <div className="text-[22px] tracking-tight font-mono text-[#212529] flex items-center justify-center gap-[2px] relative cursor-default select-none">
 
                     {/* 1. Category (WH) */}
                     <div className="relative">
@@ -515,7 +515,7 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
                   <img
                     src="/assets/avatars/worker_avatar.png"
                     alt="Worker"
-                    className="w-32 h-32 lg:w-48 lg:h-48 object-contain drop-shadow-xl rounded-full border-4 border-white bg-white/20 backdrop-blur-sm"
+                    className="w-28 h-28 lg:w-40 lg:h-40 object-contain drop-shadow-xl rounded-full border-4 border-white bg-white/20 backdrop-blur-sm"
                   />
                   {/* Receiving Glow */}
                   <motion.div
@@ -572,7 +572,7 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
                       animate={{ y: 0, opacity: 1, rotate: 0 }}
                       exit={{ x: -50, opacity: 0, scale: 0.9, filter: "blur(5px)" }}
                       transition={{ duration: 0.6, ease: EASE_IOS }}
-                      className="absolute z-20 w-[260px] h-[520px] bg-white rounded-[35px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-[8px] border-[#1f1f1f] overflow-hidden"
+                      className="absolute z-20 w-[220px] h-[440px] bg-white rounded-[35px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] border-[8px] border-[#1f1f1f] overflow-hidden"
                     >
                       {/* Dynamic Island */}
                       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[24px] bg-[#1f1f1f] rounded-b-xl z-50 flex justify-center items-center">
@@ -600,8 +600,8 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
                               className="absolute inset-0 z-20 flex flex-col items-center pt-20 px-6 bg-cover bg-center"
                               style={{ backgroundImage: "url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop')" }}
                             >
-                              <div className="text-white text-6xl font-thin mb-2 tracking-tighter">09:41</div>
-                              <div className="text-white text-md font-medium opacity-80 mb-12">Monday, 24 Nov</div>
+                              <div className="text-white text-5xl font-thin mb-1 tracking-tighter">09:41</div>
+                              <div className="text-white text-sm font-medium opacity-80 mb-10">Monday, 24 Nov</div>
 
                               {/* Notification Banner */}
                               {showNotification && (
@@ -692,7 +692,7 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
                         y: showZoomTicket ? -50 : 0
                       }}
                       transition={{ duration: 0.6, ease: EASE_IOS }}
-                      className="absolute z-20 w-[200px] h-[400px] bg-[#1a1a1a] rounded-[30px] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] border-[4px] border-[#333] flex flex-col relative overflow-hidden"
+                      className="absolute z-20 w-[170px] h-[340px] bg-[#1a1a1a] rounded-[30px] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] border-[4px] border-[#333] flex flex-col relative overflow-hidden"
                     >
                       {/* Earpiece */}
                       <div className="h-4 w-full flex justify-center items-center opacity-50">

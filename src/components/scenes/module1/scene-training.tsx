@@ -244,7 +244,7 @@ export default function SceneTraining({ isActive, progress }: { isActive: boolea
             transition={{ duration: 0.4 }}
             className="flex flex-col items-center gap-1"
           >
-            <h2 className="text-2xl font-black text-[#0F172A] tracking-tight leading-tight">
+            <h2 className="text-xl font-black text-[#0F172A] tracking-tight leading-tight">
               {phase.label}
             </h2>
           </motion.div>
@@ -269,7 +269,7 @@ export default function SceneTraining({ isActive, progress }: { isActive: boolea
                   animate={{ scale: isPhaseActive ? 1 : 0.95 }}
                 >
                   <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                    className="w-6 h-6 rounded-lg flex items-center justify-center"
                     style={{
                       backgroundColor: isPhaseActive || isPhaseComplete ? p.color : '#E2E8F0',
                     }}
@@ -320,7 +320,7 @@ export default function SceneTraining({ isActive, progress }: { isActive: boolea
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="w-full h-full grid grid-cols-12 grid-rows-2 gap-4"
+              className="w-full h-full grid grid-cols-12 grid-rows-2 gap-4 scale-[0.9] origin-center"
             >
               {/* ── PRIMARY IMAGE (Large, Left) ── */}
               <div className="col-span-8 row-span-2 relative rounded-2xl overflow-hidden shadow-2xl bg-white p-1">

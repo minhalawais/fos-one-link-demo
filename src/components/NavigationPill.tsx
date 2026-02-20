@@ -48,7 +48,7 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
 
           {/* Main Glass Container - Premium material design */}
           <div
-            className="group relative backdrop-blur-2xl border text-white rounded-[28px] flex items-center gap-1 px-3 py-2.5 h-[72px] overflow-hidden select-none"
+            className="group relative backdrop-blur-2xl border text-white rounded-[22px] flex items-center gap-1 px-2 py-1.5 h-[60px] overflow-hidden select-none"
             style={{
               background: 'linear-gradient(135deg, rgba(23,22,26,0.95) 0%, rgba(30,29,34,0.92) 100%)',
               borderColor: 'rgba(255,255,255,0.08)',
@@ -61,14 +61,14 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
             }}
           >
             {/* Inner highlight gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent rounded-[28px] pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent rounded-[22px] pointer-events-none" />
 
             {/* Play/Pause Button - Premium tactile button */}
             <motion.button
               onClick={onPlayPause}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="relative w-14 h-14 rounded-full flex items-center justify-center z-10 overflow-hidden"
+              className="relative w-11 h-11 rounded-full flex items-center justify-center z-10 overflow-hidden"
               style={{
                 background: 'linear-gradient(145deg, #60BA81 0%, #4CAF7A 100%)',
                 boxShadow: `
@@ -91,7 +91,7 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
                     transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     className="relative z-10"
                   >
-                    <Pause size={22} fill="white" className="text-white drop-shadow-sm" />
+                    <Pause size={20} fill="white" className="text-white drop-shadow-sm" />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -102,14 +102,14 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
                     transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                     className="relative z-10"
                   >
-                    <Play size={22} fill="white" className="text-white ml-1 drop-shadow-sm" />
+                    <Play size={20} fill="white" className="text-white ml-1 drop-shadow-sm" />
                   </motion.div>
                 )}
               </AnimatePresence>
             </motion.button>
 
             {/* Info & Progress Section */}
-            <div className="flex flex-col justify-center min-w-[220px] max-w-[260px] px-3 gap-2">
+            <div className="flex flex-col justify-center min-w-[170px] max-w-[220px] px-3 gap-2">
               {/* Title and Time Row */}
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
@@ -135,11 +135,11 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
                       ))}
                     </motion.div>
                   )}
-                  <span className="text-[14px] font-semibold text-white tracking-tight truncate max-w-[140px]">
+                  <span className="text-[13px] font-semibold text-white tracking-tight truncate max-w-[140px]">
                     {activeSlideTitle || "Module"}
                   </span>
                 </div>
-                <span className="text-[11px] font-medium text-white/40 tabular-nums tracking-wide font-mono">
+                <span className="text-[10px] font-medium text-white/40 tabular-nums tracking-wide font-mono">
                   {formatTime(currentTime)} / {formatTime(totalDuration)}
                 </span>
               </div>
@@ -187,9 +187,9 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
                   onClick={onMuteToggle}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
+                  className="w-8 h-8 flex items-center justify-center rounded-xl text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
                 >
-                  {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                  {isMuted || volume === 0 ? <VolumeX size={16} /> : <Volume2 size={16} />}
                 </motion.button>
 
                 {/* Volume Slider Popup */}
@@ -242,10 +242,10 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
                 onClick={onClose}
                 whileHover={{ scale: 1.05, rotate: 90 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 flex items-center justify-center rounded-xl text-white/40 hover:text-white hover:bg-red-500/10 transition-all duration-200"
+                className="w-8 h-8 flex items-center justify-center rounded-xl text-white/40 hover:text-white hover:bg-red-500/10 transition-all duration-200"
                 title="Close Module"
               >
-                <X size={18} />
+                <X size={16} />
               </motion.button>
             </div>
           </div>

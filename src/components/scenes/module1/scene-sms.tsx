@@ -49,7 +49,7 @@ const MOCK_DATA = [
 
 const Avatar = ({ initials }: { initials: string }) => (
     <div
-        className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold text-white shadow-sm ring-2 ring-white shrink-0"
+        className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm ring-2 ring-white shrink-0"
         style={{
             background: `linear-gradient(135deg, ${THEME.secondary}, ${THEME.primary})`
         }}
@@ -139,7 +139,6 @@ const FOSIDGenerator = ({ text, Trigger, isLinked, className = "" }: any) => {
 
     return (
         <motion.span
-            layout
             className={`
                 ${className} transition-all duration-300
                 ${isLinked ? "text-[#60BA81] bg-green-100/80 px-1 rounded shadow-sm ring-1 ring-green-200/50 scale-110 font-black" : ""}
@@ -161,9 +160,8 @@ const IdentityRow = ({ data, showId, showLink, showSend }: any) => {
 
     return (
         <motion.div
-            layout
             className={`
-                flex items-center gap-3 p-3 rounded-xl border relative bg-white mb-1.5 group
+                flex items-center gap-2 p-2 rounded-xl border relative bg-white mb-1 group
                 ${showLink ? "border-green-200 bg-green-50/20 shadow-sm" : "border-slate-100"}
             `}
         >
@@ -171,16 +169,16 @@ const IdentityRow = ({ data, showId, showLink, showSend }: any) => {
 
             {/* Name */}
             <div className="flex-shrink-0 w-24">
-                <h4 className="text-xs font-bold truncate transition-colors" style={{ color: showLink ? THEME.primary : THEME.text }}>
+                <h4 className="text-[10px] font-bold truncate transition-colors" style={{ color: showLink ? THEME.primary : THEME.text }}>
                     {data.name}
                 </h4>
-                <span className="text-[10px] font-mono text-slate-400 block truncate">{data.role}</span>
+                <span className="text-[8px] font-mono text-slate-400 block truncate">{data.role}</span>
             </div>
 
             {/* CNIC Column */}
             <div className="flex-1 flex flex-col justify-center px-3 border-l border-slate-100 relative">
-                <span className="text-[9px] uppercase font-bold text-slate-400">CNIC Identity</span>
-                <div className="flex items-center text-[11px] font-mono relative z-10 whitespace-nowrap">
+                <span className="text-[8px] uppercase font-bold text-slate-400">CNIC Identity</span>
+                <div className="flex items-center text-[10px] font-mono relative z-10 whitespace-nowrap">
                     <span className="text-slate-500 shrink-0">{prefix}</span>
                     <span className={`transition-all duration-500 mx-0.5 ${showLink ? "text-[#60BA81] bg-green-100/80 px-1 rounded shadow-sm ring-1 ring-green-200/50 scale-110 font-black" : "text-slate-500 font-bold"}`}>
                         {highlightPart}
@@ -281,27 +279,21 @@ const IdentityRow = ({ data, showId, showLink, showSend }: any) => {
             </div>
 
             {/* FOS ID Column */}
-            <div className={`w-44 flex flex-col items-end justify-center gap-1 pl-2 relative transition-all duration-300 ${showLink ? "border-transparent" : "border-l border-slate-100"}`}>
+            <div className={`w-36 flex flex-col items-end justify-center gap-1 pl-2 relative transition-all duration-300 ${showLink ? "border-transparent" : "border-l border-slate-100"}`}>
                 <motion.span
                     animate={showLink ? { color: THEME.primary, scale: 1.05, opacity: 1 } : { color: "#94a3b8", scale: 1, opacity: 0.6 }}
-                    className="text-[9px] uppercase font-bold tracking-tight mb-0 pointer-events-none whitespace-nowrap"
+                    className="text-[8px] uppercase font-bold tracking-tight mb-0 pointer-events-none whitespace-nowrap"
                 >
                     FOS ID
                 </motion.span>
-                <motion.div
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{
-                        opacity: showId ? 1 : 0,
-                        scale: showId ? 1 : 0.8
-                    }}
+                <div
                     className={`
-                        flex items-center gap-0.5 bg-slate-50 border px-1.5 py-1 rounded-md min-w-[75px] justify-center transition-all duration-500 relative overflow-hidden z-10
+                        flex items-center gap-0.5 bg-slate-50 border px-1.5 py-1 rounded-md min-w-[75px] max-w-[75px] justify-center transition-all duration-500 relative overflow-hidden z-10
                         ${showLink ? "border-green-300 bg-green-50/50 shadow-sm" : "border-slate-100"}
                     `}
                 >
-                    <span className={`text-[11px] font-mono font-bold transition-colors ${showLink ? "text-slate-500/80" : "text-slate-400"}`}>{companyId}</span>
-                    <FOSIDGenerator text={fosIdSuffix} Trigger={showId} isLinked={showLink} className="text-[11px] font-mono" />
+                    <span className={`text-[10px] font-mono font-bold transition-colors ${showLink ? "text-slate-500/80" : "text-slate-400"}`}>{companyId}</span>
+                    <FOSIDGenerator text={fosIdSuffix} Trigger={showId} isLinked={showLink} className="text-[10px] font-mono" />
 
                     {/* Subtle Scanlight effect */}
                     {showLink && (
@@ -312,7 +304,7 @@ const IdentityRow = ({ data, showId, showLink, showSend }: any) => {
                             className="absolute inset-y-0 w-8 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
                         />
                     )}
-                </motion.div>
+                </div>
             </div>
 
             {/* Sending Animation Particle */}
@@ -444,8 +436,8 @@ const MappingNexus = ({ active }: { active: boolean }) => (
             />
 
             {/* Connection Visuals */}
-            <div className="relative z-10 p-6 bg-white/30 backdrop-blur-xl rounded-full border border-white/40 shadow-2xl ring-4 ring-green-500/5">
-                <LinkIcon size={36} className="text-[#284952]/60" />
+            <div className="relative z-10 p-5 bg-white/30 backdrop-blur-xl rounded-full border border-white/40 shadow-2xl ring-4 ring-green-500/5">
+                <LinkIcon size={28} className="text-[#284952]/60" />
             </div>
 
             {/* Inbound/Outbound Data Pulses */}
@@ -489,14 +481,14 @@ const PipelineStep = ({ label, value, isActive, isComplete, delay, highlight }: 
         transition={{ duration: 0.4, delay }}
         className="relative"
     >
-        <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all duration-500 ${isComplete
+        <div className={`flex items-center gap-2 px-2.5 py-2 rounded-xl border transition-all duration-500 ${isComplete
             ? "border-green-300 bg-green-50/60 shadow-sm"
             : isActive
                 ? "border-slate-200 bg-white/80 shadow-sm"
                 : "border-transparent bg-white/30"
             }`}>
             {/* Step indicator */}
-            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 transition-all duration-500 ${isComplete
+            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold shrink-0 transition-all duration-500 ${isComplete
                 ? "bg-green-500 text-white shadow-sm"
                 : isActive
                     ? "bg-slate-200 text-slate-500"
@@ -506,8 +498,8 @@ const PipelineStep = ({ label, value, isActive, isComplete, delay, highlight }: 
             </div>
 
             <div className="flex-1 min-w-0">
-                <div className="text-[8px] uppercase font-bold text-slate-400 tracking-wide">{label}</div>
-                <div className="text-[12px] font-mono font-bold mt-0.5 whitespace-nowrap">
+                <div className="text-[7px] uppercase font-bold text-slate-400 tracking-wide">{label}</div>
+                <div className="text-[10px] font-mono font-bold mt-0.5 whitespace-nowrap">
                     {highlight ? (
                         <span>
                             <span className="text-slate-400">{value.replace(highlight, "")}</span>
@@ -579,7 +571,7 @@ const CNICTransformationPipeline = ({ sceneTime, startIdGen, startMapping }: {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -60, filter: "blur(8px)" }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="absolute left-8 top-3/2 -translate-y-1/2 w-[260px] z-30"
+                    className="absolute left-8 top-1/2 -translate-y-1/2 w-48 z-30"
                 >
                     {/* Glass card container */}
                     <div className="relative rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] overflow-hidden">
@@ -686,12 +678,10 @@ const CNICTransformationPipeline = ({ sceneTime, startIdGen, startMapping }: {
 const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolean, isBroadcasting: boolean, isCentered: boolean }) => {
     return (
         <motion.div
-            layout
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{
                 opacity: active ? 1 : 0,
                 scale: active ? (isCentered ? 1.1 : 0.8) : 0.8,
-                x: isCentered ? 0 : 400,
             }}
             transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
             className="flex flex-col items-center justify-center relative z-40"
@@ -702,7 +692,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
             <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute w-64 h-64 border border-dashed border-green-200/20 rounded-full"
+                className="absolute w-40 h-40 border border-dashed border-green-200/20 rounded-full"
             />
 
             {/* 2. Signal Waves (Broadcasting Mode) */}
@@ -721,14 +711,14 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
                     <motion.div
                         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
                         transition={{ duration: 3, repeat: Infinity }}
-                        className="absolute w-80 h-80 rounded-full bg-green-400/5 blur-3xl"
+                        className="absolute w-60 h-60 rounded-full bg-green-400/5 blur-3xl"
                     />
                 </div>
             )}
 
             <div className="relative group">
                 <div
-                    className={`relative w-48 h-48 flex items-center justify-center transition-all duration-1000
+                    className={`relative w-32 h-32 flex items-center justify-center transition-all duration-1000
                         ${isBroadcasting ? "transform scale-110" : ""}
                     `}
                 >
@@ -744,11 +734,11 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
                                 : "0 0 10px rgba(203, 213, 225, 0.3)"
                         }}
                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className={`w-28 h-28 rounded-full flex items-center justify-center relative z-20 backdrop-blur-sm border
+                        className={`w-16 h-16 rounded-full flex items-center justify-center relative z-20 backdrop-blur-sm border
                             ${isBroadcasting ? "bg-green-500/10 border-green-400/50" : "bg-slate-200/10 border-slate-300/30"}
                         `}
                     >
-                        <Wifi size={40} className={isBroadcasting ? "text-green-400" : "text-slate-400"} />
+                        <Wifi size={24} className={isBroadcasting ? "text-green-400" : "text-slate-400"} />
 
                         {/* Core pulse ring */}
                         {isBroadcasting && (
@@ -765,7 +755,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
                     <motion.div
                         animate={{ rotateY: 45, rotateZ: -360 }}
                         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                        className={`absolute w-52 h-52 rounded-full border-2 box-border pointer-events-none z-10
+                        className={`absolute w-36 h-36 rounded-full border-2 box-border pointer-events-none z-10
                             ${isBroadcasting ? "border-teal-400/20" : "border-slate-300/10"}
                         `}
                         style={{ borderLeftColor: 'transparent', borderRightColor: 'transparent' }}
@@ -780,8 +770,8 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
                                     initial={{ opacity: 0, x: 0, y: 0 }}
                                     animate={{
                                         opacity: [0, 1, 0],
-                                        x: Math.cos(deg * Math.PI / 180) * 100,
-                                        y: Math.sin(deg * Math.PI / 180) * 100,
+                                        x: Math.cos(deg * Math.PI / 180) * 80,
+                                        y: Math.sin(deg * Math.PI / 180) * 80,
                                     }}
                                     transition={{ duration: 2, repeat: Infinity, delay: i * 0.2, ease: "easeOut" }}
                                     className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-green-400 rounded-full shadow-[0_0_5px_#4ade80]"
@@ -794,7 +784,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
 
             {/* Labels */}
             <div className="mt-4 text-center">
-                <h3 className="text-sm font-black text-[#284952] tracking-tight uppercase">
+                <h3 className="text-xs font-black text-[#284952] tracking-tight uppercase">
                     FOS SMS Gateway
                 </h3>
                 <div className="flex items-center justify-center gap-1.5 mt-1">
@@ -877,7 +867,7 @@ const FloatingDataChip = ({ emp, index, sceneTime }: {
                 <motion.div
                     key={`chip-${emp.id}`}
                     initial={{
-                        x: -120,
+                        x: -180,
                         y: yOffsets[index],
                         opacity: 1,
                         scale: 1,
@@ -1035,20 +1025,20 @@ const EmployeeStatusCard = ({ active }: { active: boolean }) => (
             scale: active ? 1 : 0.9
         }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="absolute bottom-32 left-6 z-[100] pointer-events-none"
+        className="absolute bottom-8 left-8 z-[100] pointer-events-none"
     >
         <div className="relative">
-            <div className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden w-48 font-sans">
+            <div className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden w-36 font-sans">
                 {/* Header */}
-                <div className="px-3 py-2 flex items-center gap-2" style={{ backgroundColor: THEME.primary }}>
-                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                        <User size={14} className="text-white" />
+                <div className="px-2 py-1.5 flex items-center gap-2" style={{ backgroundColor: THEME.primary }}>
+                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                        <User size={12} className="text-white" />
                     </div>
-                    <span className="text-[10px] font-bold text-white uppercase tracking-wider">Employee / Worker</span>
+                    <span className="text-[9px] font-bold text-white uppercase tracking-wider">Employee</span>
                 </div>
 
                 {/* Content Area */}
-                <div className="p-3 bg-gradient-to-br from-gray-50 to-white">
+                <div className="p-2.5 bg-gradient-to-br from-gray-50 to-white">
                     <div className="relative">
                         {/* Browser/Device Shell */}
                         <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700/50">
@@ -1117,7 +1107,7 @@ const EmployeeStatusCard = ({ active }: { active: boolean }) => (
                 </div>
             </div>
         </div>
-    </motion.div>
+    </motion.div >
 )
 
 // --- PHASE 3 COMPONENTS ---
@@ -1252,7 +1242,7 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                             opacity: { duration: 0.2 }
                         }}
                         className={`relative z-10 pointer-events-auto bg-[#1a1a1a] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] border border-[#333] ring-4 ring-black/20 overflow-hidden transform-gpu flex flex-col items-center justify-center
-                            ${showSMSApp ? 'w-[300px] h-[600px] rounded-[50px] p-[8px]' : 'w-[120px] h-[240px] rounded-[28px] p-[3px]'}`}
+                            ${showSMSApp ? 'w-[260px] h-[520px] rounded-[44px] p-[7px]' : 'w-[100px] h-[200px] rounded-[24px] p-[2.5px]'}`}
                     >
                         {/* High-fidelity detail layers */}
                         <div className="absolute inset-0 rounded-[inherit] border-[2px] border-white/10 pointer-events-none z-10" />
@@ -1266,7 +1256,7 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                             <motion.div
                                 layout
                                 className={`absolute inset-x-0 mx-auto z-50 bg-black rounded-full shadow-lg
-                                    ${showSMSApp ? 'top-[8px] w-[90px] h-[24px]' : 'top-[5px] w-[42px] h-[13px]'}`}
+                                    ${showSMSApp ? 'top-[7px] w-[80px] h-[20px]' : 'top-[4px] w-[36px] h-[11px]'}`}
                             />
 
                             {/* Internal Content Cross-fade */}
@@ -1370,7 +1360,11 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                             </AnimatePresence>
 
                             {/* Universal Home Indicator */}
-                            <motion.div layout className="absolute bottom-[4px] left-1/2 -translate-x-1/2 w-[100px] h-[4px] bg-black/10 rounded-full shrink-0" />
+                            <motion.div
+                                layout
+                                className={`absolute bottom-[4px] inset-x-0 mx-auto h-[3.5px] bg-black/10 rounded-full shrink-0
+                                    ${showSMSApp ? 'w-[80px]' : 'w-[32px]'}`}
+                            />
                         </motion.div>
                     </motion.div>
                 </motion.div>
@@ -1400,7 +1394,7 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
     const endScene = sceneTime > 34;
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-[#F5F5F7] relative overflow-hidden font-sans select-none p-8">
+        <div className="w-full h-full flex flex-col items-center justify-center bg-[#F5F5F7] relative overflow-hidden font-sans select-none p-4">
 
             {/* Ambient Background */}
             <div className="absolute inset-0 pointer-events-none">
@@ -1409,16 +1403,15 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                 />
             </div>
 
-            <div className="relative z-10 w-full max-w-7xl min-h-[850px] flex items-center justify-center">
+            <div className="relative z-10 w-full max-w-6xl h-[500px] flex items-center justify-center scale-[0.8] origin-center">
 
                 {/* === PHASE 1 & 2: CARD VIEW & PHASE 3: SOURCE === */}
                 <AnimatePresence>
                     {showCard && (
                         <motion.div
                             key="fos-card-view"
-                            layoutId="fos-card-view-container"
                             animate={{
-                                x: startPhase3 ? -350 : 0,
+                                x: startPhase3 ? -300 : 0,
                                 scale: startPhase3 ? 0.85 : 1,
                                 opacity: startPhase3 ? 0.8 : 1
                             }}
@@ -1432,12 +1425,11 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                             className="relative z-20"
                         >
                             <GlassCard
-                                layoutId="fos-platform-card"
                                 initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                                 title="FOS Platform"
                                 subtitle="FOS Onboarding System"
                                 logoSrc="/assets/images/FOS-01.png"
-                                className="w-[500px] min-h-[600px] border-green-100 transition-colors duration-500"
+                                className="w-[340px] h-[420px] border-green-100 transition-colors duration-500"
                             >
                                 <div className="flex justify-between items-center text-xs pb-3 border-b border-gray-100 mb-4">
                                     <div className="flex items-center gap-2">
@@ -1537,16 +1529,16 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                 <SMSFlowVisualization active={startPhase3 && showCard && !startFocusTransition} sceneTime={sceneTime} />
 
                 {/* === PHASE 3: RIGHT EMPLOYEE NETWORK === */}
-                <div className="absolute right-20 top-1/2 -translate-y-1/2 w-[300px] z-20">
+                <div className="absolute right-10 top-1/2 -translate-y-1/2 w-[300px] z-20">
                     <EmployeeNetwork active={startPhase3} progress={sceneTime} isFocusing={startFocusTransition} />
                 </div>
 
                 {/* === ACT 3: FOCUSED PHONE TRANSITION === */}
                 <FocusedPhoneView isActive={startFocusTransition} showSMSApp={showSMSApp} />
-
-                {/* === ACT 3: EMPLOYEE STATUS CARD === */}
-                <EmployeeStatusCard active={startFocusTransition} />
             </div>
+
+            {/* === ACT 3: EMPLOYEE STATUS CARD (At root for true corner placement) === */}
+            <EmployeeStatusCard active={startFocusTransition} />
         </div>
     )
 }

@@ -1,6 +1,6 @@
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Download, Share2, Info, CheckCircle, Clock, MapPin, Building, Briefcase, FileText, Search, Sparkles } from "lucide-react"
+import { Download, Share2, Info, CheckCircle, Clock, MapPin, Building, Briefcase, FileText, Search, Sparkles, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface SceneProps {
   isActive: boolean
@@ -8,6 +8,97 @@ interface SceneProps {
 }
 
 const IOS_EASE = [0.32, 0.72, 0, 1]
+
+// --- STATIC FILE DATA ---
+const PROOF_FILES_IN_PROCESS = [
+  { type: 'image', url: '/assets/setup1.jpeg', filename: 'Site_Security_Check_1.jpg' },
+  { type: 'image', url: '/assets/setup2.jpeg', filename: 'Site_Security_Check_2.jpg' },
+  { type: 'pdf', url: '#', filename: 'Incident_Report_FIR.pdf' }
+]
+
+const PROOF_FILES_RCA = [
+  { type: 'video', url: '/assets/fos_video.mp4', filename: 'Evidence_Capture.mp4' },
+  { type: 'image', url: '/assets/setup3.jpeg', filename: 'Policy_Violation_Proof.jpg' }
+]
+
+// --- FILE SLIDER COMPONENT ---
+function FileSlider({ files }: { files: any[] }) {
+  const [index, setIndex] = useState(0)
+
+  const nextSlide = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIndex((prev) => (prev + 1) % files.length)
+  }
+
+  const prevSlide = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIndex((prev) => (prev - 1 + files.length) % files.length)
+  }
+
+  return (
+    <div className="w-full h-[220px] bg-[#f8f9fa] rounded-xl shadow-lg border border-gray-100 relative overflow-hidden flex flex-col group">
+      {/* Slide Content */}
+      <div className="flex-1 relative flex items-center justify-center bg-white/50 p-2">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full h-full flex items-center justify-center p-1"
+          >
+            {files[index].type === 'image' && (
+              <img src={files[index].url} alt={files[index].filename} className="max-w-full max-h-full object-contain rounded-lg shadow-sm" />
+            )}
+            {files[index].type === 'video' && (
+              <video controls className="max-w-full max-h-full rounded-lg shadow-sm">
+                <source src={files[index].url} type="video/mp4" />
+              </video>
+            )}
+            {files[index].type === 'pdf' && (
+              <div className="flex flex-col items-center justify-center gap-3">
+                <div className="w-16 h-20 bg-red-50 rounded flex items-center justify-center border-2 border-red-100 relative">
+                  <FileText size={32} className="text-red-500" />
+                  <div className="absolute bottom-1 right-1 bg-red-500 text-white text-[6px] px-1 font-black rounded">PDF</div>
+                </div>
+                <div className="text-center">
+                  <span className="text-[10px] font-bold text-gray-500 truncate max-w-[150px] block">{files[index].filename}</span>
+                  <button className="text-[9px] text-blue-500 font-black uppercase tracking-wider mt-1 hover:underline">Download Proof</button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation Controls */}
+      {files.length > 1 && (
+        <>
+          <button
+            onClick={prevSlide}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60 z-10"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/60 z-10"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </>
+      )}
+
+      {/* Counter/Label */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/5 backdrop-blur-sm px-3 py-0.5 rounded-full z-10">
+        <span className="text-[8px] font-black text-gray-500 tracking-widest uppercase">
+          {files[index].type} {index + 1} / {files.length}
+        </span>
+      </div>
+    </div>
+  )
+}
 
 export function SceneTimeline({ isActive, progress }: SceneProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -110,7 +201,6 @@ export function SceneTimeline({ isActive, progress }: SceneProps) {
 
           <div className="max-w-5xl mx-auto space-y-16 relative">
 
-            {/* Event 1: In Process (Left) */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: normalized >= 0.1 ? 1 : 0, x: normalized >= 0.1 ? 0 : -30 }}
@@ -139,7 +229,7 @@ export function SceneTimeline({ isActive, progress }: SceneProps) {
                   </div>
                 </div>
                 {/* Connector Arrow */}
-                <div className="absolute right-[-8px] top-1/2 -translate-y-1/2 w-4 h-4 bg-[#60BA81] rotate-45" />
+                <div className="absolute right-[-10px] top-12 w-5 h-5 bg-[#60BA81] rotate-45" />
               </div>
 
               {/* Node and Timestamp */}
@@ -155,21 +245,30 @@ export function SceneTimeline({ isActive, progress }: SceneProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Proof Slider Side (Opposite Event) */}
+              <div className="w-[44%] ml-auto pr-4">
+                <FileSlider files={PROOF_FILES_IN_PROCESS} />
+              </div>
             </motion.div>
 
-            {/* Event 2: RCA (Right) */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: normalized >= 0.4 ? 1 : 0, x: normalized >= 0.4 ? 0 : 30 }}
               className="relative flex justify-end items-center"
             >
+              {/* Proof Slider Side (Opposite Event) */}
+              <div className="w-[44%] mr-auto pl-4">
+                <FileSlider files={PROOF_FILES_RCA} />
+              </div>
+
               {/* Node and Timestamp */}
               <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
                 <div className="w-4 h-4 rounded-full bg-white border-2 border-[#284952] z-20" />
                 <div className="absolute right-8 w-max">
-                  <div className="bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2">
+                  <div className="bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-2" style={{ flexDirection: 'row-reverse' }}>
                     <Clock size={10} className="text-[#284952]" />
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col items-start mr-2">
                       <span className="text-[9px] font-black text-gray-500">Wed, 28 Jan</span>
                       <span className="text-[8px] font-bold text-gray-400">2026 06:42 PM</span>
                     </div>
@@ -199,7 +298,7 @@ export function SceneTimeline({ isActive, progress }: SceneProps) {
                   </div>
                 </div>
                 {/* Connector Arrow */}
-                <div className="absolute left-[-8px] top-1/2 -translate-y-1/2 w-4 h-4 bg-[#284952] rotate-45" />
+                <div className="absolute left-[-10px] top-12 w-5 h-5 bg-[#284952] rotate-45" />
               </div>
             </motion.div>
 

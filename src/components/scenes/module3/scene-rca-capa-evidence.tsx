@@ -465,12 +465,12 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center mb-8 z-10"
+          className="text-center mb-6 z-10"
         >
-          <h1 className="text-2xl font-bold text-[#284952]">Root Cause Analysis</h1>
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <FileSearch size={16} className="text-teal-600" />
-            <span className="text-teal-600 font-mono text-sm">Complaint #XX211117-11XXXX</span>
+          <h1 className="text-xl font-bold text-[#284952]">Root Cause Analysis</h1>
+          <div className="flex items-center justify-center gap-2 mt-1">
+            <FileSearch size={14} className="text-teal-600" />
+            <span className="text-teal-600 font-mono text-xs">Complaint #XX211117-11XXXX</span>
           </div>
         </motion.div>
 
@@ -479,7 +479,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
           {/* Row 1: Worker Interviews (Stage 2+) */}
           <motion.div
-            className="flex items-center justify-center gap-6"
+            className="flex items-center justify-center gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: stage >= 2 ? 1 : 0 }}
             transition={{ duration: 0.4 }}
@@ -501,21 +501,21 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                 }}
                 className="flex flex-col items-center"
               >
-                <div className="w-36 bg-white rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: "#60BA81" }}>
-                  <div className="px-3 py-2 flex items-center gap-2 bg-[#60BA81]">
-                    <User size={14} className="text-white" />
-                    <span className="text-white font-bold text-[10px]">Worker Interview</span>
+                <div className="w-32 bg-white rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: "#60BA81" }}>
+                  <div className="px-2 py-1.5 flex items-center gap-2 bg-[#60BA81]">
+                    <User size={12} className="text-white" />
+                    <span className="text-white font-bold text-[9px]">Worker Interview</span>
                   </div>
-                  <div className="px-3 py-2 bg-white">
-                    <div className="text-gray-800 font-semibold text-xs">{worker.name}</div>
-                    <div className="text-gray-500 text-[10px]">{worker.role}</div>
+                  <div className="px-2.5 py-1.5 bg-white">
+                    <div className="text-gray-800 font-semibold text-[11px]">{worker.name}</div>
+                    <div className="text-gray-500 text-[9px]">{worker.role}</div>
                   </div>
                 </div>
                 {/* Connection line down to IO */}
                 <motion.div
                   className="w-0.5 bg-gradient-to-b from-[#60BA81] to-transparent"
                   initial={{ height: 0 }}
-                  animate={stage >= 2 ? { height: 24 } : { height: 0 }}
+                  animate={stage >= 2 ? { height: 20 } : { height: 0 }}
                   transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
                 />
               </motion.div>
@@ -539,29 +539,29 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
             {/* IO Avatar Card */}
             <motion.div
-              className="bg-white rounded-2xl shadow-2xl p-5 flex flex-col items-center border-2"
+              className="bg-white rounded-xl shadow-2xl p-4 flex flex-col items-center border-2"
               style={{ borderColor: COLORS.teal }}
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              <div className="w-20 h-20 rounded-xl overflow-hidden border-2 shadow-md mb-2" style={{ borderColor: COLORS.teal }}>
+              <div className="w-16 h-16 rounded-xl overflow-hidden border-2 shadow-md mb-2" style={{ borderColor: COLORS.teal }}>
                 <img src={ASSETS.officer_pc} alt="Investigation Officer" className="w-full h-full object-cover" />
               </div>
-              <span className="text-[#284952] font-bold text-sm">Investigation Officer</span>
-              <span className="text-teal-600 text-[10px] font-mono mb-2">IO-MULTAN47</span>
+              <span className="text-[#284952] font-bold text-xs">Investigation Officer</span>
+              <span className="text-teal-600 text-[9px] font-mono mb-2">IO-MULTAN47</span>
 
               {/* Status Badge */}
               <div
-                className="px-4 py-1.5 rounded-full flex items-center gap-2"
+                className="px-3 py-1 rounded-full flex items-center gap-2"
                 style={{ backgroundColor: `${COLORS.teal}12` }}
               >
                 <motion.div
-                  className="w-2 h-2 rounded-full"
+                  className="w-1.5 h-1.5 rounded-full"
                   style={{ backgroundColor: stage === 4 ? "#60BA81" : COLORS.teal }}
                   animate={{ opacity: [1, 0.4, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 />
-                <span className="text-teal-700 text-[10px] font-medium">
+                <span className="text-teal-700 text-[9px] font-medium">
                   {stage === 1 && "Examining Complaint..."}
                   {stage === 2 && "Conducting Interviews"}
                   {stage === 3 && "Cross-Checking Records"}
@@ -573,7 +573,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
           {/* Row 3: Department Records (Stage 3+) */}
           <motion.div
-            className="flex items-start justify-center gap-6"
+            className="flex items-start justify-center gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: stage >= 3 ? 1 : 0 }}
             transition={{ duration: 0.4 }}
@@ -600,22 +600,22 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                   className="w-0.5 bg-gradient-to-t from-transparent"
                   style={{ background: `linear-gradient(to top, transparent, ${record.color})` }}
                   initial={{ height: 0 }}
-                  animate={stage >= record.showAt ? { height: 24 } : { height: 0 }}
+                  animate={stage >= record.showAt ? { height: 20 } : { height: 0 }}
                   transition={{ duration: 0.4, delay: 0.2 + idx * 0.1 }}
                 />
-                <div className="w-40 bg-white rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: record.color }}>
-                  <div className="px-3 py-2 flex items-center gap-2" style={{ backgroundColor: record.color }}>
-                    <record.icon size={14} className="text-white" />
-                    <span className="text-white font-bold text-[10px]">{record.label}</span>
+                <div className="w-36 bg-white rounded-xl overflow-hidden border-2 shadow-lg" style={{ borderColor: record.color }}>
+                  <div className="px-2 py-1.5 flex items-center gap-2" style={{ backgroundColor: record.color }}>
+                    <record.icon size={12} className="text-white" />
+                    <span className="text-white font-bold text-[9px]">{record.label}</span>
                   </div>
-                  <div className="px-3 py-2 bg-white">
-                    <div className="flex items-center gap-2 text-[10px] text-gray-600">
+                  <div className="px-2.5 py-1.5 bg-white">
+                    <div className="flex items-center gap-2 text-[9px] text-gray-600">
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={stage >= record.showAt ? { scale: 1 } : { scale: 0 }}
                         transition={{ type: "spring", delay: 0.5 + idx * 0.1 }}
                       >
-                        <CheckCircle2 size={12} style={{ color: record.color }} />
+                        <CheckCircle2 size={10} style={{ color: record.color }} />
                       </motion.div>
                       <span>{record.detail}</span>
                     </div>
@@ -630,37 +630,39 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
         <AnimatePresence>
           {stage === 4 && (
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
               transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.6 }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-xl px-6 py-3 border-2 shadow-xl z-20"
+              className="absolute top-1/2 -translate-y-1/2 right-6 bg-white/95 backdrop-blur-sm rounded-2xl p-4 border-2 shadow-2xl z-20 w-44"
               style={{ borderColor: COLORS.green }}
             >
-              <div className="flex items-center gap-5">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${COLORS.green}20` }}>
-                    <CheckCircle2 size={18} className="text-green-600" />
+              <div className="flex flex-col gap-4">
+                {/* Row 1: Status Header */}
+                <div className="flex flex-col items-center text-center gap-2 pb-3 border-b border-gray-100">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center bg-green-50 shadow-inner">
+                    <CheckCircle2 size={24} className="text-green-600" />
                   </div>
-                  <span className="text-gray-800 font-bold text-sm">Evidence Review Complete</span>
+                  <span className="text-gray-800 font-bold text-xs leading-tight">Evidence Review<br />Complete</span>
                 </div>
-                <div className="h-6 w-px bg-gray-200" />
-                <div className="flex gap-4 text-center">
-                  <div>
-                    <div className="text-base font-black text-[#60BA81]">3</div>
-                    <div className="text-gray-500 text-[8px] uppercase">Interviews</div>
+
+                {/* Row 2: Stats Grid */}
+                <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+                  <div className="text-center">
+                    <div className="text-lg font-black text-[#60BA81] leading-none mb-1">3</div>
+                    <div className="text-gray-400 text-[7px] font-bold uppercase tracking-wider">Interviews</div>
                   </div>
-                  <div>
-                    <div className="text-base font-black text-[#0f9690]">✓</div>
-                    <div className="text-gray-500 text-[8px] uppercase">Attendance</div>
+                  <div className="text-center">
+                    <div className="text-lg font-black text-[#0f9690] leading-none mb-1">✓</div>
+                    <div className="text-gray-400 text-[7px] font-bold uppercase tracking-wider">Attendance</div>
                   </div>
-                  <div>
-                    <div className="text-base font-black text-[#F5A83C]">✓</div>
-                    <div className="text-gray-500 text-[8px] uppercase">Payroll</div>
+                  <div className="text-center">
+                    <div className="text-lg font-black text-[#F5A83C] leading-none mb-1">✓</div>
+                    <div className="text-gray-400 text-[7px] font-bold uppercase tracking-wider">Payroll</div>
                   </div>
-                  <div>
-                    <div className="text-base font-black text-[#284952]">✓</div>
-                    <div className="text-gray-500 text-[8px] uppercase">Security</div>
+                  <div className="text-center">
+                    <div className="text-lg font-black text-[#284952] leading-none mb-1">✓</div>
+                    <div className="text-gray-400 text-[7px] font-bold uppercase tracking-wider">Security</div>
                   </div>
                 </div>
               </div>
@@ -744,7 +746,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
           mass: 1
         }}
       >
-        <div className="w-[90%] h-[90%] max-w-[850px] max-h-[550px]">
+        <div className="w-[90%] h-[90%] max-w-[700px] max-h-[480px]">
           {/* Apple-style Card Container */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -753,7 +755,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
             className="w-full h-full bg-[#F8F8F8] rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden border border-gray-200 flex flex-col"
           >
             {/* Timeline Content - Matching Original Layout */}
-            <div className="relative flex-1 p-4 overflow-hidden">
+            <div className="relative flex-1 p-3 overflow-hidden">
               {/* Central Timeline Line - Vertical Dashed */}
               <div className="absolute left-1/2 top-4 bottom-16 w-0 -translate-x-1/2 border-l-2 border-dashed border-gray-300" />
 
@@ -766,7 +768,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
               />
 
               {/* Content Layout - Two Columns with Timeline in Center */}
-              <div className="relative grid grid-cols-[1fr_50px_1fr] gap-3 h-full">
+              <div className="relative grid grid-cols-[1fr_50px_1fr] gap-2 h-full">
                 {/* Left Column - CAPA at bottom */}
                 <div className="flex flex-col justify-end pb-4">
                   {/* CAPA Card - Bottom Left */}
@@ -789,12 +791,12 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                     >
                       {/* Card Header */}
                       <div
-                        className="px-3 py-2 flex items-center justify-between"
+                        className="px-2.5 py-1.5 flex items-center justify-between"
                         style={{ backgroundColor: COLORS.teal }}
                       >
-                        <span className="font-bold text-white text-xs">CAPA-Corrective & Preventive Actions</span>
-                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                          <List size={12} className="text-white" />
+                        <span className="font-bold text-white text-[11px]">CAPA-Corrective & Preventive Actions</span>
+                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                          <List size={11} className="text-white" />
                         </div>
                       </div>
 
@@ -803,20 +805,20 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                         <div className="text-[10px] text-gray-500 font-medium mb-1">Detail:</div>
 
                         {/* Rich Text Toolbar */}
-                        <div className="flex items-center gap-0.5 p-1.5 bg-gray-50 rounded mb-2 border border-gray-200">
+                        <div className="flex items-center gap-0.5 p-1 bg-gray-50 rounded mb-2 border border-gray-200">
                           {[Bold, Italic, Underline, List, ListOrdered, LinkIcon].map((Icon, i) => (
                             <button
                               key={i}
-                              className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                              className="w-3.5 h-3.5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
                             >
-                              <Icon size={10} />
+                              <Icon size={8} />
                             </button>
                           ))}
                         </div>
 
                         {/* Text Content */}
-                        <div className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50 relative">
-                          <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
+                        <div className="min-h-[100px] max-h-[120px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50 relative">
+                          <div className="text-[9px] text-gray-600 leading-relaxed whitespace-pre-line">
                             {capaText ? (
                               <>
                                 {capaText.split("\n").map((line, idx) => (
@@ -836,7 +838,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                 ))}
                               </>
                             ) : (
-                              <span className="text-gray-400 italic text-[10px]">
+                              <span className="text-gray-400 italic text-[9px]">
                                 Outline the specific actions taken to resolve the issue (Corrective Actions) and steps
                                 to prevent similar complaints in the future (Preventive Actions). Include:
                                 <br />
@@ -851,7 +853,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                               <motion.span
                                 animate={{ opacity: [1, 0] }}
                                 transition={{ repeat: Infinity, duration: 0.6 }}
-                                className={`inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle ${!capaText ? "absolute top-2 left-2" : ""}`}
+                                className={`inline-block w-0.5 h-2.5 bg-[#0f9690] ml-0.5 align-middle ${!capaText ? "absolute top-2 left-2" : ""}`}
                               />
                             )}
                           </div>
@@ -929,11 +931,11 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                       }}
                     >
                       {/* Card Header */}
-                      <div className="px-3 py-2 flex items-center gap-2" style={{ backgroundColor: COLORS.teal }}>
-                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                          <AlertTriangle size={12} className="text-white" />
+                      <div className="px-2.5 py-1.5 flex items-center gap-2" style={{ backgroundColor: COLORS.teal }}>
+                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                          <AlertTriangle size={11} className="text-white" />
                         </div>
-                        <span className="font-bold text-white text-xs">RCA-Root Cause Analysis</span>
+                        <span className="font-bold text-white text-[11px]">RCA-Root Cause Analysis</span>
                       </div>
 
                       {/* Card Body */}
@@ -941,20 +943,20 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                         <div className="text-[10px] text-gray-500 font-medium mb-1">Detail</div>
 
                         {/* Rich Text Toolbar */}
-                        <div className="flex items-center gap-0.5 p-1.5 bg-gray-50 rounded mb-2 border border-gray-200">
+                        <div className="flex items-center gap-0.5 p-1 bg-gray-50 rounded mb-2 border border-gray-200">
                           {[Bold, Italic, Underline, List, ListOrdered, LinkIcon].map((Icon, i) => (
                             <button
                               key={i}
-                              className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                              className="w-3.5 h-3.5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
                             >
-                              <Icon size={10} />
+                              <Icon size={8} />
                             </button>
                           ))}
                         </div>
 
                         {/* Text Content */}
-                        <div className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50 relative">
-                          <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
+                        <div className="min-h-[70px] max-h-[90px] overflow-y-auto p-2 border border-gray-200 rounded bg-gray-50/50 relative">
+                          <div className="text-[9px] text-gray-600 leading-relaxed whitespace-pre-line">
                             {rcaText ? (
                               <>
                                 {rcaText.split("\n").map((line, idx) => (
@@ -972,7 +974,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                 ))}
                               </>
                             ) : (
-                              <span className="text-gray-400 italic text-[10px]">
+                              <span className="text-gray-400 italic text-[9px]">
                                 Explain why the complaint happened. Identify the reason behind the problem—Answer
                                 questions like:
                                 <br />
@@ -987,7 +989,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                               <motion.span
                                 animate={{ opacity: [1, 0] }}
                                 transition={{ repeat: Infinity, duration: 0.6 }}
-                                className={`inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle ${!rcaText ? 'absolute top-2 left-2' : ''}`}
+                                className={`inline-block w-0.5 h-2.5 bg-[#0f9690] ml-0.5 align-middle ${!rcaText ? 'absolute top-2 left-2' : ''}`}
                               />
                             )}
                           </div>
@@ -1002,19 +1004,19 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                         >
                           <div className="text-[10px] text-gray-500 font-medium mb-1">Capa Deadline</div>
                           <motion.div
-                            className="flex items-center gap-2 px-2 py-1.5 border-2 rounded bg-white"
+                            className="flex items-center gap-2 px-2 py-1 border-2 rounded bg-white"
                             animate={{
                               borderColor: stage === 8 ? COLORS.teal : "#e5e7eb",
                               boxShadow: stage === 8 ? `0 0 10px ${COLORS.teal}40` : "none",
                             }}
                           >
-                            <span className="text-[10px] text-gray-700 font-medium">
+                            <span className="text-[9px] text-gray-700 font-medium">
                               {deadlineText || <span className="text-gray-400">dd/mm/yyyy --:--</span>}
                               {stage === 8 && deadlineText.length < deadlineFullText.length && (
                                 <motion.span
                                   animate={{ opacity: [1, 0] }}
                                   transition={{ repeat: Infinity, duration: 0.5 }}
-                                  className="inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle"
+                                  className="inline-block w-0.5 h-2.5 bg-[#0f9690] ml-0.5 align-middle"
                                 />
                               )}
                             </span>
@@ -1044,15 +1046,15 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                       }}
                     >
                       {/* Upload Area */}
-                      <div className="p-3" style={{ backgroundColor: COLORS.teal }}>
+                      <div className="p-2.5" style={{ backgroundColor: COLORS.teal }}>
                         <div className="flex items-center gap-3">
                           {/* Select Files Button */}
-                          <div className="flex items-center gap-2 px-3 py-2 bg-white/20 rounded">
-                            <Upload size={14} className="text-white" />
-                            <span className="text-[10px] text-white font-medium">Select Files</span>
+                          <div className="flex items-center gap-2 px-2.5 py-1.5 bg-white/20 rounded">
+                            <Upload size={12} className="text-white" />
+                            <span className="text-[9px] text-white font-medium">Select Files</span>
                           </div>
                           {/* Drop Zone Text */}
-                          <span className="text-[10px] text-white">
+                          <span className="text-[9px] text-white">
                             Drag and drop files here or click to select files
                           </span>
                         </div>
@@ -1066,23 +1068,23 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                                   key={file}
                                   initial={{ opacity: 0, scale: 0.8 }}
                                   animate={{ opacity: 1, scale: 1 }}
-                                  className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded text-[9px] text-white"
+                                  className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded text-[8px] text-white"
                                 >
-                                  {file.includes("jpg") && <ImageIcon size={10} />}
-                                  {file.includes("pdf") && <FileText size={10} />}
-                                  {file.includes("mp3") && <Mic size={10} />}
+                                  {file.includes("jpg") && <ImageIcon size={9} />}
+                                  {file.includes("pdf") && <FileText size={9} />}
+                                  {file.includes("mp3") && <Mic size={9} />}
                                   {file}
                                 </motion.div>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-[10px] text-white/60 italic">No files selected</span>
+                            <span className="text-[9px] text-white/60 italic">No files selected</span>
                           )}
                         </div>
 
                         {/* File Types Info */}
-                        <div className="flex items-center gap-1 mt-2 text-[9px] text-white/80">
-                          <Info size={10} />
+                        <div className="flex items-center gap-1 mt-2 text-[8px] text-white/80">
+                          <Info size={9} />
                           <span>
                             You can upload multiple files (PNG, JPG, JPEG, PDF, MP4, AVI, MKV, MOV, MP3, OPUS)
                           </span>
@@ -1095,18 +1097,18 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
             </div>
 
             {/* Footer Buttons */}
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-2">
+            <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-2">
               <motion.button
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-medium text-white"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded text-[9px] font-medium text-white"
                 style={{ backgroundColor: "#0095da" }}
               >
-                <Printer size={12} />
+                <Printer size={10} />
                 Print Timeline
               </motion.button>
-              <button className="px-3 py-1.5 rounded text-[10px] font-medium text-white bg-gray-500">Close</button>
+              <button className="px-2.5 py-1 rounded text-[9px] font-medium text-white bg-gray-500">Close</button>
               <div className="relative">
                 <motion.button
-                  className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
+                  className="px-2.5 py-1 rounded text-[9px] font-medium text-white"
                   style={{ backgroundColor: stage === 19 ? "#0095da" : "#0095da" }}
                   animate={{
                     boxShadow: stage === 19 ? `0 0 12px ${COLORS.teal}40` : "none",
@@ -1161,7 +1163,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                 )}
               </div>
               <motion.button
-                className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
+                className="px-2.5 py-1 rounded text-[9px] font-medium text-white"
                 style={{ backgroundColor: "#0095da" }}
                 animate={{
                   scale: stage === 18 ? [1, 1.1, 1] : 1,
@@ -1184,46 +1186,46 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       <AnimatePresence>
         {stage >= 5 && (
           <motion.div
-            initial={{ x: -120, opacity: 0 }}
+            initial={{ x: 120, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -120, opacity: 0 }}
+            exit={{ x: 120, opacity: 0 }}
             transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
-            className="absolute bottom-6 left-6 z-30"
+            className="absolute bottom-6 right-6 z-30"
           >
             {/* Officer Card Container */}
             <div className="relative">
               {/* Main Card */}
-              <div className="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden w-48">
+              <div className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] border border-gray-200 overflow-hidden w-40">
                 {/* Header */}
                 <div
-                  className="px-3 py-2 flex items-center gap-2"
+                  className="px-2.5 py-1.5 flex items-center gap-2"
                   style={{ backgroundColor: COLORS.darkTeal }}
                 >
-                  <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                    <User size={14} className="text-white" />
+                  <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                    <User size={12} className="text-white" />
                   </div>
-                  <span className="text-[10px] font-bold text-white">Investigation Officer</span>
+                  <span className="text-[9px] font-bold text-white">Investigation Officer</span>
                 </div>
 
                 {/* Officer Avatar */}
-                <div className="p-3 bg-gradient-to-br from-gray-50 to-white">
+                <div className="p-2.5 bg-gradient-to-br from-gray-50 to-white">
                   <div className="relative">
                     {/* Computer/Browser Frame */}
                     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
                       {/* Browser Header */}
-                      <div className="h-4 bg-gray-700 flex items-center px-2 gap-1">
-                        <div className="flex gap-1">
-                          <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                      <div className="h-4 bg-gray-700 flex items-center px-1.5 gap-1">
+                        <div className="flex gap-0.5">
+                          <div className="w-1 h-1 rounded-full bg-red-400" />
+                          <div className="w-1 h-1 rounded-full bg-yellow-400" />
+                          <div className="w-1 h-1 rounded-full bg-green-400" />
                         </div>
                         <div className="flex-1 flex items-center justify-center">
-                          <Monitor size={8} className="text-gray-400" />
+                          <Monitor size={7} className="text-gray-400" />
                         </div>
                       </div>
 
                       {/* Screen Content - Officer Working */}
-                      <div className="relative bg-[#F8F8F8] h-32 flex items-center justify-center overflow-hidden">
+                      <div className="relative bg-[#F8F8F8] h-28 flex items-center justify-center overflow-hidden">
                         {/* Miniature version of the form (blurred background) */}
                         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-teal-50 opacity-60" />
 
@@ -1236,20 +1238,20 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                             duration: 2,
                             repeat: stage >= 6 && stage < 18 ? Number.POSITIVE_INFINITY : 0,
                           }}
-                          className="absolute top-2 right-2 flex gap-0.5"
+                          className="absolute top-1.5 right-1.5 flex gap-0.5"
                         >
                           {[0, 1, 2].map((i) => (
                             <motion.div
                               key={i}
                               animate={{
-                                y: stage >= 6 && stage < 18 ? [0, -3, 0] : 0,
+                                y: stage >= 6 && stage < 18 ? [0, -2, 0] : 0,
                               }}
                               transition={{
                                 duration: 0.6,
                                 repeat: stage >= 6 && stage < 18 ? Number.POSITIVE_INFINITY : 0,
                                 delay: i * 0.15,
                               }}
-                              className="w-1 h-1 rounded-full"
+                              className="w-0.5 h-0.5 rounded-full"
                               style={{ backgroundColor: COLORS.teal }}
                             />
                           ))}
@@ -1257,7 +1259,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
                         {/* Officer Avatar Overlay */}
                         <div className="relative z-10">
-                          <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg bg-gradient-to-br from-gray-50 to-white">
+                          <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white shadow-lg bg-gradient-to-br from-gray-50 to-white">
                             <img
                               src={ASSETS.officer_pc}
                               alt="Investigation Officer"
@@ -1276,7 +1278,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
                     {/* Status Indicator */}
                     <motion.div
-                      className="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[8px] font-bold text-white shadow-md flex items-center gap-1"
+                      className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full text-[7px] font-bold text-white shadow-md flex items-center gap-1"
                       style={{ backgroundColor: COLORS.green }}
                       animate={{
                         scale: stage >= 6 && stage < 18 ? [1, 1.1, 1] : 1,
@@ -1287,7 +1289,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                       }}
                     >
                       <motion.div
-                        className="w-1.5 h-1.5 rounded-full bg-white"
+                        className="w-1 h-1 rounded-full bg-white"
                         animate={{
                           opacity: stage >= 6 && stage < 18 ? [1, 0.3, 1] : 1,
                         }}
@@ -1308,8 +1310,8 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                   </div>
 
                   {/* Progress Info */}
-                  <div className="mt-2 text-center">
-                    <p className="text-[9px] text-gray-600 font-medium">
+                  <div className="mt-1.5 text-center">
+                    <p className="text-[8px] text-gray-600 font-medium leading-tight">
                       {stage >= 6 && stage < 9 && "Documenting Root Cause Analysis"}
                       {stage >= 9 && stage < 13 && "Creating Action Plan"}
                       {stage >= 13 && stage < 18 && "Attaching Evidence Files"}
@@ -1340,15 +1342,15 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-white rounded-xl shadow-2xl w-[500px] max-w-[90%] overflow-hidden"
+              className="bg-white rounded-xl shadow-2xl w-[400px] max-w-[90%] overflow-hidden"
             >
               {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-bold" style={{ color: COLORS.teal }}>
+              <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+                <h2 className="text-base font-bold" style={{ color: COLORS.teal }}>
                   Route Complaint #XX011131-47XXXX
                 </h2>
                 <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                  <X size={20} />
+                  <X size={16} />
                 </button>
               </div>
 
@@ -1356,42 +1358,42 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
               <div className="px-6 py-5 space-y-5">
                 {/* Route Method */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.teal }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: COLORS.teal }}>
                     Route Method:
                   </label>
                   <motion.div
-                    className="flex items-center justify-between px-3 py-2.5 border-2 rounded bg-white"
+                    className="flex items-center justify-between px-2.5 py-2 border-2 rounded bg-white"
                     animate={{
                       borderColor: COLORS.teal,
                     }}
                   >
                     <div className="flex items-center gap-2">
-                      <Mail size={16} style={{ color: COLORS.teal }} />
-                      <span className="text-sm text-gray-700">Via Email</span>
+                      <Mail size={14} style={{ color: COLORS.teal }} />
+                      <span className="text-xs text-gray-700">Via Email</span>
                     </div>
-                    <ChevronDown size={16} className="text-gray-400" />
+                    <ChevronDown size={14} className="text-gray-400" />
                   </motion.div>
                 </div>
 
                 {/* Recipient Email */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.teal }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: COLORS.teal }}>
                     Recipient Email:
                   </label>
                   <motion.div
-                    className="flex items-center px-3 py-2.5 border-2 rounded bg-white"
+                    className="flex items-center px-2.5 py-2 border-2 rounded bg-white"
                     animate={{
                       borderColor: routeEmail.length > 0 ? COLORS.teal : "#e5e7eb",
                       boxShadow: routeEmail.length > 0 && routeEmail.length < routeEmailFull.length ? `0 0 8px ${COLORS.teal}30` : "none",
                     }}
                   >
-                    <span className="text-sm text-gray-700">
+                    <span className="text-xs text-gray-700">
                       {routeEmail || <span className="text-gray-400">Enter email address</span>}
                       {routeEmail.length > 0 && routeEmail.length < routeEmailFull.length && (
                         <motion.span
                           animate={{ opacity: [1, 0] }}
                           transition={{ repeat: Infinity, duration: 0.5 }}
-                          className="inline-block w-0.5 h-4 bg-[#0f9690] ml-0.5 align-middle"
+                          className="inline-block w-0.5 h-3.5 bg-[#0f9690] ml-0.5 align-middle"
                         />
                       )}
                     </span>
@@ -1400,23 +1402,23 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
                 {/* Message */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.teal }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: COLORS.teal }}>
                     Message:
                   </label>
                   <motion.div
-                    className="px-3 py-2.5 border-2 rounded bg-white min-h-[100px]"
+                    className="px-2.5 py-2 border-2 rounded bg-white min-h-[80px]"
                     animate={{
                       borderColor: routeMessage.length > 0 ? COLORS.teal : "#e5e7eb",
                       boxShadow: routeMessage.length > 0 && routeMessage.length < routeMessageFull.length ? `0 0 8px ${COLORS.teal}30` : "none",
                     }}
                   >
-                    <span className="text-sm text-gray-700 leading-relaxed">
+                    <span className="text-xs text-gray-700 leading-relaxed">
                       {routeMessage || <span className="text-gray-400">Add any additional instructions</span>}
                       {routeMessage.length > 0 && routeMessage.length < routeMessageFull.length && (
                         <motion.span
                           animate={{ opacity: [1, 0] }}
                           transition={{ repeat: Infinity, duration: 0.5 }}
-                          className="inline-block w-0.5 h-4 bg-[#0f9690] ml-0.5 align-middle"
+                          className="inline-block w-0.5 h-3.5 bg-[#0f9690] ml-0.5 align-middle"
                         />
                       )}
                     </span>
@@ -1425,12 +1427,12 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
                 {/* Submit Rights */}
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" style={{ color: COLORS.teal }}>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: COLORS.teal }}>
                     Submit Rights:
                   </label>
-                  <div className="flex items-center justify-between px-3 py-2.5 border border-gray-300 rounded bg-white">
-                    <span className="text-sm text-gray-400">-- Select an option --</span>
-                    <ChevronDown size={16} className="text-gray-400" />
+                  <div className="flex items-center justify-between px-2.5 py-2 border border-gray-300 rounded bg-white">
+                    <span className="text-xs text-gray-400">-- Select an option --</span>
+                    <ChevronDown size={14} className="text-gray-400" />
                   </div>
                 </div>
 
@@ -1442,13 +1444,13 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
-                <button className="px-5 py-2 rounded text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors">
+              <div className="flex items-center justify-end gap-3 px-5 py-3 border-t border-gray-100 bg-gray-50">
+                <button className="px-4 py-1.5 rounded text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors">
                   Cancel
                 </button>
                 <div className="relative">
                   <motion.button
-                    className="flex items-center gap-2 px-5 py-2 rounded text-sm font-medium text-white"
+                    className="flex items-center gap-2 px-4 py-1.5 rounded text-xs font-medium text-white"
                     style={{ backgroundColor: COLORS.teal }}
                     animate={{
                       boxShadow: routeMessage.length >= routeMessageFull.length ? `0 0 12px ${COLORS.teal}40` : "none",

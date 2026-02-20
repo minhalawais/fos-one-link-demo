@@ -1,6 +1,7 @@
 "use client"
 
 import { AnimatePresence } from "framer-motion"
+import { AssetPreloader } from "../components/common/AssetPreloader.tsx"
 
 import { SceneIntro } from "../components/scenes/module2/scene-intro.tsx"
 import SceneOmnichannel from "../components/scenes/module2/scene-omnichannel.tsx"
@@ -15,7 +16,7 @@ const SCENES = [
   { name: "complaint-filing", start: 28, end: 77, component: SceneComplaintFiling },
   { name: "review", start: 77, end: 95, component: SceneReview },
   { name: "ticket", start: 95, end: 113, component: SceneTicket },
-  { name: "notification", start: 113, end: 132, component: SceneNotification },
+  { name: "notification", start: 113, end: 141, component: SceneNotification },
 ]
 
 interface Module2PlayerProps {
@@ -27,12 +28,14 @@ export default function Module2Player({ progress }: Module2PlayerProps) {
   const CurrentSceneComponent = currentSceneConfig.component
 
   return (
-    <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
-        </AnimatePresence>
+    <AssetPreloader>
+      <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
+        <div className="absolute inset-0 z-0">
+          <AnimatePresence mode="wait">
+            <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </AssetPreloader>
   )
 }

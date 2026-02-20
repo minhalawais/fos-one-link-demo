@@ -53,7 +53,7 @@ const EASE = [0.32, 0.72, 0, 1]
 
 // --- ORIGINAL CHART COMPONENTS ---
 const DonutChart = () => (
-  <svg width="180" height="180" viewBox="0 0 200 200" className="mx-auto">
+  <svg width="150" height="150" viewBox="0 0 200 200" className="mx-auto">
     <circle cx="100" cy="100" r="70" fill="none" stroke={COLORS.deepTeal} strokeWidth="22" opacity="0.9" />
     <circle
       cx="100"
@@ -107,23 +107,23 @@ const StackedBarChart = () => {
   ]
 
   return (
-    <svg width="100%" height="180" viewBox="0 0 700 180" className="w-full">
+    <svg width="100%" height="150" viewBox="0 0 700 150" className="w-full">
       {[0, 10, 20, 30].map((val) => (
         <g key={val}>
-          <text x="30" y={160 - val * 4.5} textAnchor="end" className="text-[9px] fill-gray-400">
+          <text x="30" y={130 - val * 4} textAnchor="end" className="text-[9px] fill-gray-400">
             {val}
           </text>
-          <line x1="40" y1={160 - val * 4.5} x2="650" y2={160 - val * 4.5} stroke="#f0f0f0" strokeWidth="1" />
+          <line x1="40" y1={130 - val * 4} x2="650" y2={130 - val * 4} stroke="#f0f0f0" strokeWidth="1" />
         </g>
       ))}
       {categories.map((bar, i) => {
         const x = 65 + i * 50
-        let yOffset = 160
+        let yOffset = 130
         return (
           <g key={i}>
             {bar.heights.map((h, j) => {
               const colors = [COLORS.deepTeal, COLORS.freshGreen, COLORS.warmOrange]
-              const height = h * 4.5
+              const height = h * 4
               yOffset -= height
               return (
                 <rect key={j} x={x - 12} y={yOffset} width="24" height={height} fill={colors[j]} opacity="0.9" rx="2" />
@@ -132,7 +132,7 @@ const StackedBarChart = () => {
           </g>
         )
       })}
-      <line x1="40" y1="160" x2="650" y2="160" stroke={COLORS.border} strokeWidth="2" />
+      <line x1="40" y1="130" x2="650" y2="130" stroke={COLORS.border} strokeWidth="2" />
     </svg>
   )
 }
@@ -203,8 +203,8 @@ const IntroScreen = () => {
           transition={{ duration: 0.8, ease: EASE }}
           className="mb-8 relative"
         >
-          <div className="w-24 h-24 bg-white rounded-3xl shadow-xl flex items-center justify-center border border-[#DEE2E6] relative z-10">
-            <ListFilter size={48} className="text-[#284952]" strokeWidth={1.5} />
+          <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center border border-[#DEE2E6] relative z-10">
+            <ListFilter size={36} className="text-[#284952]" strokeWidth={1.5} />
           </div>
         </motion.div>
 
@@ -212,7 +212,7 @@ const IntroScreen = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.8, ease: EASE }}
-          className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1d1d1f] tracking-tight mb-4"
+          className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1d1d1f] tracking-tight mb-4"
         >
           Investigation Framework
         </motion.h1>
@@ -221,7 +221,7 @@ const IntroScreen = () => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.8, ease: EASE }}
-          className="text-[#767676] text-lg md:text-xl max-w-2xl leading-relaxed"
+          className="text-[#767676] text-base md:text-lg max-w-2xl leading-relaxed"
         >
           A structured, transparent workflow for resolving every complaint.
         </motion.p>
@@ -279,13 +279,13 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
       <div className="scale-[0.58] origin-top-left p-6 w-[172%] h-[172%]">
 
         {/* --- HEADER (Original) --- */}
-        <div className="bg-white px-8 h-[70px] flex items-center justify-between shadow-sm relative z-20 rounded-xl mb-6">
+        <div className="bg-white px-8 h-[60px] flex items-center justify-between shadow-sm relative z-20 rounded-xl mb-6">
           <div className="flex items-center gap-3">
-            <img src="assets/vertical_logo.png" alt="Logo" className="w-32 h-32 object-contain" />
+            <img src="assets/vertical_logo.png" alt="Logo" className="w-28 h-28 object-contain" />
           </div>
           <div className="absolute left-1/2 -translate-x-1/2 text-center">
-            <div className="text-[11px] font-bold uppercase tracking-[0.2em] mb-0.5" style={{ color: COLORS.freshGreen }}>MULTAN47</div>
-            <div className="text-xl font-bold" style={{ color: COLORS.deepTeal }}>Grievance Management Portal</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5" style={{ color: COLORS.freshGreen }}>MULTAN47</div>
+            <div className="text-lg font-bold" style={{ color: COLORS.deepTeal }}>Grievance Management Portal</div>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 rounded text-white flex items-center justify-center shadow" style={{ backgroundColor: COLORS.freshGreen }}>
@@ -299,7 +299,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
 
         {/* --- CHARTS ROW (Restored) --- */}
         <div className="grid grid-cols-5 gap-6 mb-6">
-          <div className="col-span-2 bg-white rounded-2xl p-5" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
+          <div className="col-span-2 bg-white rounded-2xl p-4" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: COLORS.mediumGray }}>Complaint Status</h3>
             <DonutChart />
             <div className="flex justify-center gap-4 mt-4 text-[10px]">
@@ -309,7 +309,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
             </div>
           </div>
 
-          <div className="col-span-3 bg-white rounded-2xl p-5" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
+          <div className="col-span-3 bg-white rounded-2xl p-4" style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
             <h3 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: COLORS.mediumGray }}>Complaints By Categories</h3>
             <StackedBarChart />
           </div>
@@ -350,7 +350,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
               return (
                 <motion.div
                   key={i}
-                  className="grid grid-cols-7 gap-4 px-6 py-4 items-center transition-all duration-300"
+                  className="grid grid-cols-7 gap-4 px-6 py-3 items-center transition-all duration-300"
                   style={{
                     borderBottom: `1px solid ${COLORS.border}`,
                     borderLeft: isTargetRow ? `4px solid ${COLORS.freshGreen}` : "4px solid transparent",
@@ -363,7 +363,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
                   <div>
                     <motion.span
                       layout
-                      className="px-3 py-1.5 rounded-full text-[10px] font-bold inline-block"
+                      className="px-3 py-1.5 rounded-full text-[9px] font-bold inline-block"
                       style={{
                         backgroundColor: currentStatus === "Unprocessed" ? "rgba(40, 73, 82, 0.15)" :
                           currentStatus === "Bounced" ? "rgba(245, 168, 60, 0.2)" :
@@ -399,7 +399,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-[950px] shadow-2xl rounded-sm overflow-hidden flex flex-col font-sans"
+              className="bg-white w-[800px] shadow-2xl rounded-sm overflow-hidden flex flex-col font-sans"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-300 bg-white">
@@ -415,7 +415,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
               </div>
 
               {/* Body */}
-              <div className="px-6 py-10 bg-white flex items-center">
+              <div className="px-6 py-8 bg-white flex items-center">
                 <p className="text-[16px] text-gray-700 font-normal">Are you sure, you want to process this complaint?</p>
               </div>
 
@@ -424,7 +424,7 @@ const DashboardScreen = ({ progress, showCursor, showModal, statusChanged, isSub
                 <button className="px-5 py-2 rounded bg-[#6c757d] text-white text-[15px] font-medium">Close</button>
                 <motion.button
                   animate={isSubmitClicked ? { scale: 0.95 } : {}}
-                  className="px-5 py-2 rounded bg-[#0d6efd] text-white text-[15px] font-medium shadow-sm"
+                  className="px-5 py-2 rounded bg-[#0d6efd] text-white text-sm font-medium shadow-sm"
                 >
                   Submit Changes
                 </motion.button>

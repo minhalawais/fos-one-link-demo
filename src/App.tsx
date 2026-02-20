@@ -20,8 +20,8 @@ import SplashScreen from "./components/SplashScreen.tsx"
 
 // --- DESIGN SYSTEM CONSTANTS ---
 export const SPRING_PHYSICS = { type: "spring", stiffness: 120, damping: 20, mass: 1.1 }
-const SLIDE_GAP_IDLE = 24
-const SLIDE_GAP_EXPANDED = 32
+const SLIDE_GAP_IDLE = 16
+const SLIDE_GAP_EXPANDED = 26
 
 // --- LIGHTWEIGHT CINEMATIC ENTRANCE ANIMATIONS ---
 // Using CSS animations for GPU acceleration and smooth performance
@@ -79,7 +79,7 @@ const LightRays = () => (
 // Logo - Simplified elegant animation
 const AnimatedLogo = () => (
   <div
-    className="pointer-events-auto flex items-center gap-3 bg-white/80 backdrop-blur-lg px-6 py-2.5 rounded-full border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.12)] relative logo-entrance"
+    className="pointer-events-auto flex items-center gap-3 bg-white/80 backdrop-blur-lg px-4 py-1.5 rounded-full border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.12)] relative logo-entrance"
     style={{ animationDelay: '0.2s' }}
   >
     {/* Subtle glow pulse */}
@@ -89,13 +89,13 @@ const AnimatedLogo = () => (
     <img
       src="/assets/FOS-01.png"
       alt="Fruit of Sustainability (FOS)"
-      className="w-10 h-10 object-contain relative z-10 logo-spin"
+      className="w-7 h-7 object-contain relative z-10 logo-spin"
       style={{ animationDelay: '0.4s' }}
     />
 
     {/* Text with fade slide */}
     <span
-      className="text-sm font-bold tracking-wider text-[#284952] uppercase relative z-10 text-reveal"
+      className="text-xs font-bold tracking-wider text-[#284952] uppercase relative z-10 text-reveal"
       style={{ animationDelay: '0.7s' }}
     >
       Fruit of Sustainability
@@ -110,7 +110,7 @@ const AnimatedHeading = () => {
   const mainTitle = ["FOS", "Digital", "Grievance", "Management", "System"]
 
   return (
-    <h1 className="text-2xl md:text-3xl lg:text-4xl text-[#284952] text-center w-full leading-tight relative whitespace-nowrap flex items-center justify-center gap-3" >
+    <h1 className="text-xl md:text-2xl lg:text-3xl text-[#284952] text-center w-full leading-tight relative whitespace-nowrap flex items-center justify-center gap-3" >
       {/* Subtle background glow */}
       <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-[#60BA81]/15 via-[#284952]/10 to-[#F5A83C]/15 heading-glow" />
 
@@ -248,17 +248,6 @@ const EtherealBackground = ({ activeSlide }: { activeSlide: number | null }) => 
         }}
       />
 
-      {/* Premium subtle grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(40,73,82,0.5) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(40,73,82,0.5) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
 
       {/* Vignette effect for depth */}
       <div
@@ -278,6 +267,39 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(0)
   const [volume, setVolume] = useState(1)
   const [isMuted, setIsMuted] = useState(false)
+  const [isMouseActive, setIsMouseActive] = useState(true)
+
+  const mouseTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // --- Mouse Inactivity Tracking ---
+  useEffect(() => {
+    const handleMouseMove = () => {
+      setIsMouseActive(true)
+      if (mouseTimerRef.current) clearTimeout(mouseTimerRef.current)
+
+      if (isPlaying && activeSlide !== null) {
+        mouseTimerRef.current = setTimeout(() => {
+          setIsMouseActive(false)
+        }, 3000) // 3 seconds of inactivity
+      }
+    }
+
+    if (isPlaying && activeSlide !== null) {
+      window.addEventListener("mousemove", handleMouseMove)
+      // Initial timer start
+      mouseTimerRef.current = setTimeout(() => {
+        setIsMouseActive(false)
+      }, 3000)
+    } else {
+      setIsMouseActive(true)
+      if (mouseTimerRef.current) clearTimeout(mouseTimerRef.current)
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      if (mouseTimerRef.current) clearTimeout(mouseTimerRef.current)
+    }
+  }, [isPlaying, activeSlide])
 
   const handleSplashComplete = useCallback(() => setShowSplash(false), [])
 
@@ -290,7 +312,7 @@ export default function App() {
       shortTitle: "Deploy",
       headline: "Deployment & Onboarding",
       subtext: "Smooth rollout to empower every employee from day one.",
-      duration: 102,
+      duration: 155,
       audioPath: "/assets/Module 1 Script.mp3",
       icon: Zap,
       playerComponent: <Module1Player progress={currentTime} />,
@@ -301,7 +323,7 @@ export default function App() {
       shortTitle: "Intake",
       headline: "Complaint Intake & Registration",
       subtext: "Multiple grievance reporting channels—confidential, accessible, and worker-friendly.",
-      duration: 98,
+      duration: 141,
       audioPath: "/assets/Module 2 Script.mp3",
       icon: ShieldCheck,
       playerComponent: <Module2Player progress={currentTime} />,
@@ -312,7 +334,7 @@ export default function App() {
       shortTitle: "Investigate",
       headline: "Investigation-Remediation-Satisfaction Framework",
       subtext: "Systematic resolution workflows with verified employee satisfaction.",
-      duration: 177,
+      duration: 176,
       audioPath: "/assets/Module 3 Script.mp3",
       icon: Search,
       playerComponent: <Module3Player progress={currentTime} />,
@@ -323,7 +345,7 @@ export default function App() {
       shortTitle: "Surveys",
       headline: "Digital Surveys",
       subtext: "Proactive employee engagement through in-app surveys.",
-      duration: 115,
+      duration: 116,
       audioPath: "/assets/Module 4 Script.mp3",
       icon: ClipboardList,
       playerComponent: <Module4Player progress={currentTime} />,
@@ -334,7 +356,7 @@ export default function App() {
       shortTitle: "Insights",
       headline: "Dashboards & Risk Insights",
       subtext: "Data Intelligence for HRDD reporting and risk monitoring.",
-      duration: 180,
+      duration: 165,
       audioPath: "/assets/Module 5 Script.mp3",
       icon: Activity,
       playerComponent: <Module5Player progress={currentTime} />,
@@ -473,7 +495,7 @@ export default function App() {
       <CinematicGrain />
 
       {/* Floating Header "Island" */}
-      <nav className="w-full pt-8 pb-4 flex flex-col items-center justify-center z-50 relative pointer-events-none gap-6">
+      <nav className="w-full pt-6 pb-2 flex flex-col items-center justify-center z-50 relative pointer-events-none gap-4">
         <AnimatedLogo />
         <AnimatePresence mode="wait">
           {activeSlide === null || (!isPlaying && currentTime === 0) ? (
@@ -558,7 +580,7 @@ export default function App() {
       </main>
 
       <NavigationPill
-        visible={activeSlide !== null}
+        visible={activeSlide !== null && (isMouseActive || !isPlaying)}
         isPlaying={isPlaying}
         currentTime={currentTime}
         totalDuration={currentSlideData?.duration || 120}

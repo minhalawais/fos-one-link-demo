@@ -57,7 +57,7 @@ const MOCK_DATA = [
 
 const Avatar = ({ initials, isValidated }: { initials: string, isValidated: boolean }) => (
   <div
-    className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-2 ring-white"
+    className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white shadow-sm ring-2 ring-white"
     style={{
       background: isValidated
         ? `linear-gradient(135deg, ${THEME.secondary}, ${THEME.primary})`
@@ -98,38 +98,38 @@ const GlassCard = ({ children, className = "", title, subtitle, logoSrc, isActiv
     </AnimatePresence>
 
     {/* Header */}
-    <div className="relative px-6 py-4 border-b border-gray-100 flex flex-col items-center gap-2 bg-gradient-to-b from-white to-gray-50/50 flex-shrink-0 rounded-t-3xl">
+    <div className="relative px-4 py-3 border-b border-gray-100 flex flex-col items-center gap-2 bg-gradient-to-b from-white to-gray-50/50 flex-shrink-0 rounded-t-3xl">
       <div className="absolute top-4 left-4 flex gap-1.5">
         <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
       </div>
 
-      <div className="relative h-24 w-full flex items-center justify-center mt-2 mb-1">
+      <div className="relative h-20 w-full flex items-center justify-center mt-2 mb-1">
         {/* Wave Effect - Pulse */}
         <motion.div
-          className="absolute w-20 h-20 rounded-full border-2 border-[#60BA81]"
+          className="absolute w-14 h-14 rounded-full border-2 border-[#60BA81]"
           animate={{ scale: [1, 1.25], opacity: [0.5, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
         />
         <motion.div
-          className="absolute w-20 h-20 rounded-full border border-[#60BA81]/30"
+          className="absolute w-14 h-14 rounded-full border border-[#60BA81]/30"
           animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
           transition={{ duration: 2, repeat: Infinity, delay: 0.4, ease: "easeOut" }}
         />
 
         {/* Circular Logo Container */}
-        <div className="relative z-10 w-20 h-20 rounded-full bg-white shadow-lg border border-slate-100 flex items-center justify-center p-3 overflow-hidden">
+        <div className="relative z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-slate-100 flex items-center justify-center p-2 overflow-hidden">
           <img src={logoSrc} alt={title} className="w-full h-full object-contain" />
         </div>
       </div>
 
       <div className="flex flex-col items-center">
-        <div className="text-sm font-bold tracking-tight" style={{ color: THEME.primary }}>
+        <div className="text-xs font-bold tracking-tight" style={{ color: THEME.primary }}>
           {title}
         </div>
         {subtitle && (
-          <div className="text-[10px] font-medium text-slate-500 mt-0.5">
+          <div className="text-[9px] font-medium text-slate-500 mt-0.5">
             {subtitle}
           </div>
         )}
@@ -137,7 +137,7 @@ const GlassCard = ({ children, className = "", title, subtitle, logoSrc, isActiv
     </div>
 
     {/* Content */}
-    <div className="p-5 relative z-10 flex-1 overflow-visible">
+    <div className="p-4 relative z-10 flex-1 overflow-visible">
       {children}
     </div>
   </motion.div>
@@ -182,7 +182,7 @@ const EmployeeRow = ({ data, status = "idle" }: any) => {
       }}
       exit={{ opacity: 0, x: 10 }}
       className={`
-        flex items-center gap-3 p-3 rounded-xl border relative bg-white
+        flex items-center gap-1.5 p-2 rounded-xl border relative bg-white
         ${isValidated ? "bg-green-50/80" : ""}
       `}
     >
@@ -190,21 +190,21 @@ const EmployeeRow = ({ data, status = "idle" }: any) => {
 
       {/* Name and ID */}
       <div className="flex-shrink-0 w-32">
-        <h4 className="text-xs font-bold truncate" style={{ color: THEME.text }}>
+        <h4 className="text-[10px] font-bold truncate" style={{ color: THEME.text }}>
           {data.name}
         </h4>
-        <span className="text-[9px] font-mono text-slate-400 block">{data.id}</span>
+        <span className="text-[8px] font-mono text-slate-400 block">{data.id}</span>
       </div>
 
       {/* Details Grid */}
       <div className="flex-1 grid grid-cols-2 gap-x-2 gap-y-0.5 min-w-0 border-l border-slate-100 pl-3">
-        <div className="text-[9px] text-slate-500 truncate" title="Role">
+        <div className="text-[8px] text-slate-500 truncate" title="Role">
           <span className="font-semibold text-slate-400 mr-1">Role:</span>{data.role}
         </div>
-        <div className="text-[9px] text-slate-500 truncate" title="Department">
+        <div className="text-[8px] text-slate-500 truncate" title="Department">
           <span className="font-semibold text-slate-400 mr-1">Dept:</span>{data.dept}
         </div>
-        <div className="col-span-2 text-[9px] text-slate-500 truncate" title="Branch">
+        <div className="col-span-2 text-[8px] text-slate-500 truncate" title="Branch">
           <span className="font-semibold text-slate-400 mr-1">Branch:</span>{data.branch}
         </div>
       </div>
@@ -244,9 +244,9 @@ const DataSourceSelector = ({ isConnected }: { isConnected: boolean }) => (
     initial={{ opacity: 0, x: 20 }}
     animate={{ opacity: 1, x: 0 }}
     exit={{ opacity: 0, x: 20 }}
-    className="absolute -right-64 top-1/2 -translate-y-1/2 w-56 bg-white/90 backdrop-blur-xl rounded-2xl border border-white shadow-2xl p-4 z-50"
+    className="absolute -right-48 top-1/2 -translate-y-1/2 w-40 bg-white/90 backdrop-blur-xl rounded-2xl border border-white shadow-2xl p-4 z-50"
   >
-    <h3 className="text-xs font-bold text-slate-500 mb-3 px-1">SELECT DATA SOURCE</h3>
+    <h3 className="text-[10px] font-bold text-slate-500 mb-3 px-1">SELECT DATA SOURCE</h3>
 
     <div className="space-y-2">
       {/* CSV Option - Disabled */}
@@ -254,7 +254,7 @@ const DataSourceSelector = ({ isConnected }: { isConnected: boolean }) => (
         <div className="p-2 bg-slate-200 rounded-lg text-slate-500">
           <Database size={14} />
         </div>
-        <div className="text-[10px] font-bold text-slate-600">CSV Bulk Upload</div>
+        <div className="text-[9px] font-bold text-slate-600">CSV Bulk Upload</div>
       </div>
 
       {/* OR Separator */}
@@ -277,8 +277,8 @@ const DataSourceSelector = ({ isConnected }: { isConnected: boolean }) => (
             <Server size={14} />
           </div>
           <div className="flex-1">
-            <div className="text-[10px] font-bold" style={{ color: THEME.primary }}>HRMS Integration</div>
-            <div className="text-[9px] text-slate-400">Direct API Sync</div>
+            <div className="text-[9px] font-bold" style={{ color: THEME.primary }}>HRMS Integration</div>
+            <div className="text-[8px] text-slate-400">Direct API Sync</div>
           </div>
           {isConnected && (
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
@@ -323,7 +323,7 @@ const DataSourceSelector = ({ isConnected }: { isConnected: boolean }) => (
 
 const DataPipeline = ({ active }: { active: boolean }) => {
   return (
-    <div className="relative w-full h-32 flex items-center justify-center -mt-8">
+    <div className="relative w-full h-24 flex items-center justify-center -mt-8">
       <svg className="w-full h-full overflow-visible" viewBox="0 0 200 120">
         <defs>
           <linearGradient id="curveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -415,10 +415,10 @@ const SyncSchedule = () => (
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.3 }}
-    className="mt-6 p-4 bg-white/50 rounded-2xl border border-slate-100 shadow-sm"
+    className="mt-6 p-2.5 bg-white/50 rounded-2xl border border-slate-100 shadow-sm"
   >
     <div className="flex items-center gap-2 mb-3 px-1">
-      <RefreshCcw size={12} className="text-slate-400" />
+      <RefreshCcw size={11} className="text-slate-400" />
       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Auto-Sync Schedule</span>
     </div>
 
@@ -456,7 +456,7 @@ const OnboardingInit = () => (
     exit={{ opacity: 0, scale: 0.9 }}
     className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm z-20 p-6 text-center"
   >
-    <div className="relative w-16 h-16 mb-4 flex items-center justify-center">
+    <div className="relative w-12 h-12 mb-4 flex items-center justify-center">
       <motion.div
         className="absolute inset-0 rounded-full border-4 border-slate-100"
       />
@@ -465,9 +465,9 @@ const OnboardingInit = () => (
         animate={{ rotate: 360 }}
         transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
       />
-      <Zap size={24} className="text-[#284952]" />
+      <Zap size={20} className="text-[#284952]" />
     </div>
-    <h3 className="text-sm font-bold text-[#284952] mb-1">Initiating Onboarding</h3>
+    <h3 className="text-xs font-bold text-[#284952] mb-1">Initiating Onboarding</h3>
     <p className="text-[10px] text-slate-500 font-medium">Establishing secure connection...</p>
   </motion.div>
 )
@@ -519,7 +519,7 @@ export const SceneUpload = ({ isActive = true, progress = 0 }: any) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 1 }} // Keep visible during layout transition
-        className={`relative z-10 w-full max-w-6xl px-12 h-[600px] flex items-center
+        className={`relative z-10 w-full max-w-6xl px-8 h-[450px] flex items-center scale-[0.85] origin-center
             ${(showCentered || isFinalCentering) ? "justify-center" : "justify-between"}`}
       >
 
@@ -536,7 +536,7 @@ export const SceneUpload = ({ isActive = true, progress = 0 }: any) => {
                 title="Company A"
                 subtitle="Sialkot Region Pakistan"
                 logoSrc="/assets/images/company_a.png"
-                className="w-[400px] shrink-0 h-auto min-h-[500px]"
+                className="w-[280px] shrink-0 h-auto min-h-[400px]"
                 isHRMSConnected={isSourceConnected}
               >
                 <div className="flex justify-between items-center text-xs pb-3 border-b border-gray-100 mb-3">
@@ -617,7 +617,7 @@ export const SceneUpload = ({ isActive = true, progress = 0 }: any) => {
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: "auto" }}
               exit={{ opacity: 0, width: 0 }}
-              className="flex-shrink-0 w-40 relative z-0 flex flex-col items-center justify-center"
+              className="flex-shrink-0 w-32 relative z-0 flex flex-col items-center justify-center"
             >
               <DataPipeline active={isTransferring && !isComplete} />
             </motion.div>
@@ -629,7 +629,7 @@ export const SceneUpload = ({ isActive = true, progress = 0 }: any) => {
           {!showCentered && (
             <motion.div
               layoutId="fos-card-view-container" // Anchor for the move
-              className={`shrink-0 flex items-center relative z-20 ${isFinalCentering ? "w-[500px]" : "w-[400px]"}`}
+              className={`shrink-0 flex items-center relative z-20 ${isFinalCentering ? "w-[340px]" : "w-[280px]"}`}
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0, scale: isFinalCentering ? 1 : 1 }}
               transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -642,11 +642,11 @@ export const SceneUpload = ({ isActive = true, progress = 0 }: any) => {
                 isActive={true}
                 isHRMSConnected={isSourceConnected}
                 badgeLabel="SYNC ACTIVE: COMPANY A"
-                className={`w-full border-green-200 ${isFinalCentering ? "min-h-[600px]" : "min-h-[500px]"}`}
+                className={`w-full border-green-200 ${isFinalCentering ? "min-h-[420px]" : "min-h-[400px]"}`}
                 exit={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               >
-                <div className="flex justify-between items-center text-xs pb-3 border-b border-gray-100 mb-3">
-                  <div className="flex items-center gap-2">
+                <div className="flex justify-between items-center text-[10px] pb-2 border-b border-gray-100 mb-2">
+                  <div className="flex items-center gap-1">
                     <span className="font-bold text-slate-500">Validated Records</span>
                     {isSourceConnected && (
                       <motion.div

@@ -72,8 +72,8 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
       scale: 0.8
     },
     scanning: {
-      x: 178, // Moved further right
-      y: 160, // Moved further down
+      x: 260, // Further adjusted for larger card
+      y: 200, // Further adjusted
       rotateX: 20,
       rotateZ: -5,
       opacity: 1,
@@ -86,7 +86,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
       rotateX: 0,
       rotateZ: -90, // ROTATE TO LANDSCAPE (Counter-Clockwise)
       opacity: 1,
-      scale: 1.1, // Larger for viewing
+      scale: 1.2, // Larger for viewing
       transition: {
         type: "spring",
         stiffness: 60,
@@ -118,7 +118,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
 
       {/* --- 2. THE CARD (Background) --- */}
       <motion.div
-        className="relative z-10 w-full max-w-[620px] mx-6"
+        className="relative z-10 w-full max-w-[640px] mx-6"
         initial={{ y: 0, rotateX: 0, opacity: 1, scale: 1 }}
         animate={{
           y: elapsed < 1 ? 120 : 0,
@@ -139,26 +139,26 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
           />
 
           {/* HEADER */}
-          <div className="px-6 pt-6 pb-2 flex justify-between items-start gap-4 z-20 relative">
-            <motion.div className="w-[72px] h-[64px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
+          <div className="px-5 pt-5 pb-2 flex justify-between items-start gap-3 z-20 relative">
+            <motion.div className="w-[56px] h-[48px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
               <img src="/assets/images/FOS-01.png" alt="FOS" className="w-[85%] h-[85%] object-contain" />
             </motion.div>
             <motion.div className="flex-1 flex flex-col items-center pt-1" animate={getFocusStyle(isFocusId)}>
-              <div className="bg-[#3E3B38] text-white px-4 py-1.5 rounded-lg shadow-sm mb-3">
-                <span className="text-[10px] font-bold tracking-widest uppercase">فوس شکایت آگاہی کارڈ</span>
+              <div className="bg-[#3E3B38] text-white px-3 py-1 rounded-lg shadow-sm mb-2">
+                <span className="text-[9px] font-bold tracking-widest uppercase">فوس شکایت آگاہی کارڈ</span>
               </div>
               <div className="flex items-baseline gap-2">
-                <span className="text-sm font-bold text-[#3E3B38] opacity-60">ID - فوس</span>
-                <span className="text-4xl font-black text-[#284952] tracking-tight">475002</span>
+                <span className="text-xs font-bold text-[#3E3B38] opacity-60">ID - فوس</span>
+                <span className="text-2xl font-black text-[#284952] tracking-tight">475002</span>
               </div>
             </motion.div>
-            <motion.div className="w-[72px] h-[64px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
+            <motion.div className="w-[56px] h-[48px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
               <img src="/assets/images/company_a.png" alt="Co" className="w-[85%] h-[85%] object-contain" />
             </motion.div>
           </div>
 
           {/* DATA GRID */}
-          <motion.div className="px-6 py-2 z-20 relative" animate={getFocusStyle(isFocusInstructions)}>
+          <motion.div className="px-5 py-2 z-20 relative" animate={getFocusStyle(isFocusInstructions)}>
             <div className={`border rounded-lg overflow-hidden flex flex-col text-xs transition-colors duration-500 ${isFocusInstructions ? 'border-[#60BA81]' : 'border-gray-300'}`}>
               <div className="flex w-full border-b border-gray-300">
                 <div className="flex-1 bg-gray-200 p-2 text-center font-semibold text-[#17161A]">Lahore</div>
@@ -174,24 +174,24 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
           </motion.div>
 
           {/* CHANNELS & QR */}
-          <div className="px-6 pt-2 pb-6 flex gap-8 items-end z-20 relative">
+          <div className="px-5 pt-2 pb-5 flex gap-6 items-end z-20 relative">
             <motion.div className="flex-1 flex flex-col gap-2" animate={getFocusStyle(isFocusChannels)}>
               {[
                 { icon: Phone, text: "ٹول فری نمبر - 080091299" },
                 { icon: MessageSquare, text: "موبائل ایس ایم ایس - 03299129999" },
                 { icon: Mail, text: "hotline@fruitofsustainability.com" }
               ].map((item, i) => (
-                <div key={i} className={`rounded-md p-2 pl-3 flex items-center gap-3 shadow-sm ${isFocusChannels ? 'bg-[#284952]' : 'bg-[#3E3B38]'}`}>
-                  <item.icon size={14} className="text-[#60BA81]" />
-                  <span className="text-[10px] font-medium tracking-wide text-white truncate">{item.text}</span>
+                <div key={i} className={`rounded-md p-1.5 pl-2.5 flex items-center gap-2.5 shadow-sm ${isFocusChannels ? 'bg-[#284952]' : 'bg-[#3E3B38]'}`}>
+                  <item.icon size={12} className="text-[#60BA81]" />
+                  <span className="text-[9px] font-medium tracking-wide text-white truncate">{item.text}</span>
                 </div>
               ))}
             </motion.div>
 
-            <motion.div className="w-[100px] shrink-0 flex flex-col items-center gap-2" animate={getFocusStyle(isFocusQr)}>
-              <div className="text-[10px] font-bold text-[#767676] text-center">اسکین کریں</div>
-              <div className="relative bg-white p-1.5 rounded-lg border-2 border-[#60BA81] border-dashed shadow-md">
-                <QrCode size={72} className="text-[#17161A]" />
+            <motion.div className="w-[90px] shrink-0 flex flex-col items-center gap-2" animate={getFocusStyle(isFocusQr)}>
+              <div className="text-[9px] font-bold text-[#767676] text-center">اسکین کریں</div>
+              <div className="relative bg-white p-1 rounded-lg border-2 border-[#60BA81] border-dashed shadow-md">
+                <QrCode size={60} className="text-[#17161A]" />
                 {/* QR Corners */}
                 <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#60BA81]" />
                 <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#60BA81]" />
@@ -213,7 +213,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
             variants={phoneVariants}
           >
             {/* PHONE CHASSIS */}
-            <div className="w-[280px] h-[580px] bg-[#121212] rounded-[45px] border-[6px] border-[#2d2d2d] shadow-[0_40px_80px_rgba(0,0,0,0.6)] overflow-hidden relative ring-1 ring-white/10">
+            <div className="w-[240px] h-[480px] bg-[#121212] rounded-[40px] border-[5px] border-[#2d2d2d] shadow-[0_40px_80px_rgba(0,0,0,0.6)] overflow-hidden relative ring-1 ring-white/10">
 
               {/* STATUS BAR (Hide when video is playing for immersion) */}
               <motion.div
@@ -229,7 +229,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
               </motion.div>
 
               {/* DYNAMIC ISLAND / NOTCH */}
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[80px] h-[22px] bg-black rounded-full z-30 pointer-events-none" />
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[70px] h-[18px] bg-black rounded-full z-30 pointer-events-none" />
 
               {/* SCREEN CONTENT */}
               <div className="w-full h-full bg-black relative">
@@ -280,9 +280,9 @@ const CameraView = () => (
       <div className="absolute inset-0 bg-black opacity-[0.1]" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'1\'/%3E%3C/svg%3E")' }}></div>
     </div>
 
-    {/* HUD */}
-    <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-      <div className="w-[180px] h-[180px] relative border border-white/50 rounded-xl">
+    {/* HUD - Moved upside */}
+    <div className="absolute inset-0 flex flex-col items-center justify-start pt-20 z-10">
+      <div className="w-[150px] h-[150px] relative border border-white/50 rounded-xl">
         <motion.div
           className="absolute left-0 right-0 h-[2px] bg-[#F5A83C] shadow-[0_0_15px_#F5A83C]"
           animate={{ top: ["10%", "90%", "10%"] }}
@@ -332,8 +332,8 @@ const VideoPlayer = () => {
       <div
         className="absolute"
         style={{
-          width: "590px",
-          height: "290px",
+          width: "490px",
+          height: "230px",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%) rotate(90deg)",

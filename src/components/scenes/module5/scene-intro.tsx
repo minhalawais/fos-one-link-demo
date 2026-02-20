@@ -28,23 +28,23 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
             <div className="relative z-10 flex flex-col items-center justify-center">
 
                 {/* Main Icon Composition */}
-                <div className="relative mb-8">
+                <div className="relative mb-6">
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-                        className="relative z-20 w-32 h-32 bg-gradient-to-br from-[#17161A] to-[#284952] rounded-[2.5rem] shadow-2xl shadow-[#17161A]/30 flex items-center justify-center text-white"
+                        className="relative z-20 w-24 h-24 bg-gradient-to-br from-[#17161A] to-[#284952] rounded-2xl shadow-2xl shadow-[#17161A]/30 flex items-center justify-center text-white"
                     >
-                        <BarChart3 size={56} strokeWidth={1.5} />
+                        <BarChart3 size={44} strokeWidth={1.5} />
 
                         {/* Insights Badge */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.6, type: "spring" }}
-                            className="absolute -top-3 -right-3 w-10 h-10 bg-[#F5A83C] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
+                            className="absolute -top-2 -right-2 w-8 h-8 bg-[#F5A83C] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
                         >
-                            <TrendingUp size={16} className="text-white" />
+                            <TrendingUp size={13} className="text-white" />
                         </motion.div>
 
                         {/* Analytics Badge */}
@@ -52,15 +52,15 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.8, type: "spring" }}
-                            className="absolute -bottom-3 -left-3 w-10 h-10 bg-[#60BA81] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
+                            className="absolute -bottom-2 -left-2 w-8 h-8 bg-[#60BA81] rounded-full flex items-center justify-center border-4 border-[#F5F5F7] shadow-lg"
                         >
-                            <Activity size={16} className="text-white" />
+                            <Activity size={13} className="text-white" />
                         </motion.div>
                     </motion.div>
 
                     {/* Ripple Effect */}
                     <motion.div
-                        className="absolute inset-0 bg-[#17161A]/10 rounded-[2.5rem] blur-xl"
+                        className="absolute inset-0 bg-[#17161A]/10 rounded-2xl blur-xl"
                         animate={{ scale: [0.8, 1.4, 0.8], opacity: [0.3, 0, 0.3] }}
                         transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
                     />
@@ -72,7 +72,7 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#17161A]/5 text-[#17161A] text-xs font-bold uppercase tracking-widest mb-2"
+                        className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-[#17161A]/5 text-[#17161A] text-[10px] font-bold uppercase tracking-widest mb-2"
                     >
                         Module 05
                     </motion.div>
@@ -81,7 +81,7 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         initial={{ y: 20, opacity: 0, filter: "blur(10px)" }}
                         animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
                         transition={{ delay: 0.3, duration: 0.8, ease: IOS_EASE }}
-                        className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#17161A]"
+                        className="text-3xl md:text-4xl lg:text-4xl font-bold tracking-tight text-[#17161A]"
                     >
                         Dashboards & Risk Insights
                     </motion.h1>
@@ -90,15 +90,15 @@ export const SceneIntro = ({ isActive, progress }: SceneIntroProps) => {
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.5, duration: 0.8, ease: IOS_EASE }}
-                        className="flex items-center justify-center gap-6 mt-4"
+                        className="flex items-center justify-center gap-4 mt-3"
                     >
                         <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#F5A83C]" />
-                            <span className="text-lg font-medium text-[#767676]">Visible</span>
+                            <div className="w-1 h-1 rounded-full bg-[#F5A83C]" />
+                            <span className="text-base font-medium text-[#767676]">Visible</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#60BA81]" />
-                            <span className="text-lg font-medium text-[#767676]">Interactive</span>
+                            <div className="w-1 h-1 rounded-full bg-[#60BA81]" />
+                            <span className="text-base font-medium text-[#767676]">Interactive</span>
                         </div>
                     </motion.div>
                 </div>

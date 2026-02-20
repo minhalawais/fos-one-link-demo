@@ -233,30 +233,30 @@ const LoginScreen = ({ stage }: { stage: number }) => {
     >
       <motion.div
         initial={{ scale: 0.92, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
+        animate={{ scale: 0.85, opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-        className="w-[360px] bg-white rounded-[32px] overflow-hidden"
+        className="w-[280px] bg-white rounded-[28px] overflow-hidden origin-center"
         style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.1)" }}
       >
         {/* Logo Section */}
-        <div className="px-8 pt-8 pb-6 bg-gradient-to-b from-[#FAFAFA] to-white">
+        <div className="px-6 pt-6 pb-4 bg-gradient-to-b from-[#FAFAFA] to-white">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.4 }}
             className="text-center"
           >
-            <div className="w-28 h-28 mx-auto mb-4 relative rounded-2xl bg-white flex items-center justify-center shadow-lg border border-gray-100 overflow-hidden">
+            <div className="w-24 h-24 mx-auto mb-3 relative rounded-2xl bg-white flex items-center justify-center shadow-lg border border-gray-100 overflow-hidden">
               <img src="/assets/images/FOS-01.png" alt="FOS Logo" className="w-[100%] h-[100%] object-contain" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight mb-2" style={{ color: COLORS.charcoal }}>
+            <h1 className="text-lg font-bold tracking-tight mb-2" style={{ color: COLORS.charcoal }}>
               Login
             </h1>
           </motion.div>
         </div>
 
         {/* Form Section */}
-        <div className="px-8 py-6 space-y-4">
+        <div className="px-6 py-4 space-y-4">
           {/* Username */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <label className="block text-xs font-semibold mb-2 tracking-tight" style={{ color: COLORS.deepTeal }}>
@@ -272,7 +272,7 @@ const LoginScreen = ({ stage }: { stage: number }) => {
                 type="text"
                 value={username}
                 readOnly
-                className="w-full h-10 pl-10 pr-3 text-sm font-medium rounded-2xl border-2 transition-all"
+                className="w-full h-9 pl-9 pr-3 text-xs font-medium rounded-xl border-2 transition-all"
                 style={{
                   backgroundColor: COLORS.lightGray,
                   borderColor: username ? COLORS.freshGreen : COLORS.border,
@@ -297,7 +297,7 @@ const LoginScreen = ({ stage }: { stage: number }) => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 readOnly
-                className="w-full h-10 pl-10 pr-10 text-sm font-medium rounded-2xl border-2 transition-all tracking-widest"
+                className="w-full h-9 pl-9 pr-10 text-xs font-medium rounded-xl border-2 transition-all tracking-widest"
                 style={{
                   backgroundColor: COLORS.lightGray,
                   borderColor: password ? COLORS.freshGreen : COLORS.border,
@@ -334,7 +334,7 @@ const LoginScreen = ({ stage }: { stage: number }) => {
               backgroundColor: isButtonHovered ? "#1E3A42" : "#007AFF",
             }}
             transition={{ duration: 0.2 }}
-            className="w-full h-10 rounded-2xl text-white font-semibold text-sm flex items-center justify-center gap-2"
+            className="w-full h-9 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2"
             style={{
               backgroundColor: "#007AFF",
               boxShadow: "0 8px 20px rgba(0, 122, 255, 0.3)",
@@ -351,7 +351,7 @@ const LoginScreen = ({ stage }: { stage: number }) => {
 
         {/* Footer */}
         <div
-          className="px-8 py-3 text-center text-[10px]"
+          className="px-6 py-3 text-center text-[10px]"
           style={{ color: COLORS.mediumGray, borderColor: COLORS.border, backgroundColor: "#FAFAFA" }}
         >
           Copyright © 2023 — Fruit of Sustainability
@@ -407,21 +407,21 @@ const PortalDashboard = ({ stage }: { stage: number }) => {
       initial="initial"
       animate="animate"
       exit="exit"
-      className="absolute inset-0 overflow-auto"
+      className="absolute inset-0 overflow-hidden"
       style={{ backgroundColor: COLORS.lightGray }}
     >
-      <div className="scale-[0.65] origin-top-left p-6 w-[154%]">
+      <div className="scale-[0.58] origin-top-left p-6 w-[173%]">
         {/* Header / Topbar */}
         <div
-          className="flex items-center justify-between mb-8 px-8 py-4 bg-white rounded-3xl shadow-sm border border-gray-100 relative"
-          style={{ height: "90px" }}
+          className="flex items-center justify-between mb-6 px-6 py-3 bg-white rounded-2xl shadow-sm border border-gray-100 relative"
+          style={{ height: "70px" }}
         >
           {/* Left Section (Logo) */}
           <div className="w-1/4 flex justify-start">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="w-24 h-16 flex items-center justify-center p-1"
+              className="w-20 h-14 flex items-center justify-center p-1"
             >
               <img src="/assets/images/vertical_logo.png" alt="FOS Logo" className="w-full h-full object-contain" />
             </motion.div>
@@ -437,7 +437,7 @@ const PortalDashboard = ({ stage }: { stage: number }) => {
               <p className="text-[11px] font-black tracking-[0.3em] mb-0.5 leading-none" style={{ color: COLORS.freshGreen }}>
                 MULTAN47
               </p>
-              <h1 className="text-2xl font-black tracking-tight leading-tight" style={{ color: COLORS.charcoal }}>
+              <h1 className="text-xl font-black tracking-tight leading-tight" style={{ color: COLORS.charcoal }}>
                 Grievance Management Portal
               </h1>
             </motion.div>
@@ -466,7 +466,7 @@ const PortalDashboard = ({ stage }: { stage: number }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5, ease: EASE }}
-            className="col-span-2 bg-white rounded-3xl p-6"
+            className="col-span-2 bg-white rounded-2xl p-5"
             style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}
           >
             <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.mediumGray }}>
@@ -493,7 +493,7 @@ const PortalDashboard = ({ stage }: { stage: number }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5, ease: EASE }}
-            className="col-span-3 bg-white rounded-3xl p-6"
+            className="col-span-3 bg-white rounded-2xl p-5"
             style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}
           >
             <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.mediumGray }}>
@@ -522,7 +522,7 @@ const PortalDashboard = ({ stage }: { stage: number }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.5, ease: EASE }}
-          className="bg-white rounded-3xl overflow-hidden"
+          className="bg-white rounded-2xl overflow-hidden"
           style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}
         >
           <div
@@ -746,7 +746,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       initial="initial"
       animate="animate"
       exit="exit"
-      className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex items-center justify-center font-sans"
+      className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex items-center justify-center font-sans scale-[0.8] origin-center"
     >
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-[0.02]">
@@ -788,7 +788,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
         }}
         transition={{ type: "spring", stiffness: 80, damping: 25 }}
       >
-        <div className="w-full h-full p-12 lg:p-16">
+        <div className="w-full h-full p-8 lg:p-10">
           {/* Apple-style Card Container - Removed border-gray-200 */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -865,7 +865,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
                         {/* Text Content - Using inline style for border instead of border-gray-200 */}
                         <div
-                          className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 rounded bg-gray-50/50"
+                          className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 rounded bg-gray-50/50 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                           style={{ border: `1px solid ${COLORS.border}` }}
                         >
                           <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
@@ -1001,7 +1001,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
 
                         {/* Text Content - Using inline style for border */}
                         <div
-                          className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 rounded bg-gray-50/50"
+                          className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 rounded bg-gray-50/50 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                           style={{ border: `1px solid ${COLORS.border}` }}
                         >
                           <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
@@ -1264,27 +1264,27 @@ export function ScenePortal({ isActive, progress }: { isActive: boolean; progres
       {/* IO Avatar Card - Persistent Overlay */}
       <motion.div
         initial={{ x: -100, opacity: 0 }}
-        animate={{ x: stage >= 1 ? 24 : -100, opacity: stage >= 1 ? 1 : 0 }}
+        animate={{ x: stage >= 1 ? 16 : -100, opacity: stage >= 1 ? 1 : 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="absolute bottom-6 left-6 z-[100]"
+        className="absolute bottom-4 left-4 z-[100]"
       >
         <motion.div
-          className="bg-white rounded-2xl shadow-2xl p-4 flex flex-col items-center border border-gray-100"
+          className="bg-white rounded-2xl shadow-2xl p-3 flex flex-col items-center border border-gray-100"
           style={{
-            boxShadow: "0 20px 50px rgba(0,0,0,0.15), 0 0 1px rgba(0,0,0,0.1)"
+            boxShadow: "0 15px 40px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.1)"
           }}
           animate={{ y: [0, -4, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          <div className="w-16 h-16 rounded-xl overflow-hidden border-2 shadow-sm mb-2" style={{ borderColor: COLORS.teal }}>
+          <div className="w-12 h-12 rounded-xl overflow-hidden border shadow-sm mb-1.5" style={{ borderColor: COLORS.teal }}>
             <img src={ASSETS.officer_pc} alt="Investigation Officer" className="w-full h-full object-cover" />
           </div>
-          <span className="text-[#284952] font-black text-xs">Investigation Officer</span>
-          <span className="text-teal-600 text-[9px] font-mono mb-2">IO-MULTAN47</span>
+          <span className="text-[#284952] font-black text-[10px]">Investigation Officer</span>
+          <span className="text-teal-600 text-[8px] font-mono mb-1.5">IO-MULTAN47</span>
 
           {/* Status Badge */}
           <div
-            className="px-3 py-1.5 rounded-full flex items-center gap-2"
+            className="px-2.5 py-1 rounded-full flex items-center gap-1.5"
             style={{ backgroundColor: `${COLORS.teal}08`, border: `1px solid ${COLORS.teal}15` }}
           >
             <motion.div

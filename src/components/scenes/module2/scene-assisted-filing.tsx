@@ -164,7 +164,7 @@ const FormInput = ({ value, isTyping, placeholder, icon, className = "", multili
   <div className={`relative group ${className}`}>
     <motion.div
       className={`
-        w-full px-3 py-2.5 rounded-lg text-xs transition-all duration-300 border
+        w-full px-3 py-1.5 rounded-lg text-xs transition-all duration-300 border
         flex ${multiline ? 'items-start' : 'items-center'}
         ${value
           ? "bg-white border-[#60BA81]/50 shadow-[0_2px_12px_-4px_rgba(96,186,129,0.2)] text-[#17161A]"
@@ -297,7 +297,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
       <div className="relative z-10 w-full max-w-[1400px] h-full flex items-center justify-center px-8">
 
         <motion.div
-          className="flex items-center gap-2"
+          className="flex items-center gap-1.5"
           layout
           transition={{ duration: 1.2, ease: IOS_EASE }}
         >
@@ -318,7 +318,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
               {/* Avatar */}
               <motion.div
                 layout
-                className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-2xl relative z-10 bg-white"
+                className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-2xl relative z-10 bg-white"
                 animate={stage < 2 ? {
                   scale: [1, 1.05, 1],
                   transition: { duration: 2, repeat: Infinity }
@@ -372,7 +372,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
               </AnimatePresence>
             </div>
 
-            <motion.div layout className="mt-8 text-center bg-white/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/50 shadow-sm z-30 relative">
+            <motion.div layout className="mt-6 text-center bg-white/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/50 shadow-sm z-30 relative">
               <h3 className="text-sm font-black text-[#284952] tracking-tight">Factory Worker</h3>
               <p className="text-[10px] text-[#767676] font-extrabold uppercase tracking-widest opacity-60">Complainant</p>
             </motion.div>
@@ -410,7 +410,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
 
                   <motion.div
                     layout
-                    className="w-44 h-44 rounded-full border-[6px] border-white shadow-2xl overflow-hidden bg-white/80 relative z-10"
+                    className="w-32 h-32 rounded-full border-[6px] border-white shadow-2xl overflow-hidden bg-white/80 relative z-10"
                   >
                     <img src={ASSETS.officer} alt="Officer" className="w-full h-full object-cover scale-105" />
                   </motion.div>
@@ -419,13 +419,13 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                     initial={{ scale: 0, rotate: -45 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.5, type: "spring" }}
-                    className="absolute bottom-2 right-2 bg-gradient-to-br from-[#284952] to-[#1e363d] p-3 rounded-full shadow-2xl border-2 border-white z-20"
+                    className="absolute bottom-2 right-2 bg-gradient-to-br from-[#284952] to-[#1e363d] p-2 rounded-full shadow-2xl border-2 border-white z-20"
                   >
                     <Headset size={20} className="text-white" />
                   </motion.div>
                 </div>
 
-                <motion.div layout className="mt-6 text-center bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/50 shadow-sm relative z-10">
+                <motion.div layout className="mt-4 text-center bg-white/60 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/50 shadow-sm relative z-10">
                   <h3 className="text-lg font-black text-[#284952] tracking-tight">Grievance Officer</h3>
                   <p className="text-[10px] text-[#767676] font-extrabold uppercase tracking-widest opacity-60">FOS System Support</p>
                 </motion.div>
@@ -461,7 +461,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                 style={{ perspective: 1000 }}
               >
                 {/* BROWSER FRAME */}
-                <div className="w-[420px] bg-white rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] overflow-hidden border border-[#DEE2E6] flex flex-col">
+                <div className="w-[340px] bg-white rounded-2xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] overflow-hidden border border-[#DEE2E6] flex flex-col">
 
                   {/* HEADER CHROME */}
                   <div className="bg-[#F3F4F6] px-4 py-3.5 flex items-center gap-4 border-b border-[#DEE2E6] shrink-0">
@@ -484,9 +484,9 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                     <div className="flex flex-col max-h-[460px]">
 
                       {/* Brand Header */}
-                      <div className="bg-[#284952] p-6 text-center text-white relative overflow-hidden shrink-0">
+                      <div className="bg-[#284952] p-3 text-center text-white relative overflow-hidden shrink-0">
                         <div className="absolute inset-0 bg-gradient-to-br from-[#60BA81]/20 to-transparent opacity-40" />
-                        <h1 className="text-xl font-black relative z-10 tracking-tight">Case Filing Assistant</h1>
+                        <h1 className="text-lg font-black relative z-10 tracking-tight">Case Filing Assistant</h1>
                         <div className="flex items-center justify-center gap-2 mt-2">
                           <motion.div
                             animate={{ opacity: [0.4, 1, 0.4] }}
@@ -500,10 +500,10 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                       {/* Scrollable Content */}
                       <div
                         ref={scrollContainerRef}
-                        className="p-6 bg-white overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] scroll-smooth"
+                        className="p-4 bg-white overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] scroll-smooth"
                       >
                         {/* Lookup Section */}
-                        <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 mb-6">
+                        <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 mb-4">
                           <FormField label="Identity Verification">
                             <div className="flex gap-2">
                               <FormInput
@@ -524,7 +524,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                         </div>
 
                         {/* Main Data Grid */}
-                        <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="grid grid-cols-2 gap-4 mb-4">
                           {[
                             { label: "Worker Name", key: "name", placeholder: "Name" },
                             { label: "Factory Unit", key: "company", placeholder: "Company" },
@@ -563,7 +563,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                                 key={i}
                                 whileHover={{ scale: 1.05 }}
                                 className={`
-                                p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all duration-500
+                                p-1.5 rounded-xl border flex flex-col items-center gap-2 text-center transition-all duration-500
                                 ${selectedCategory === i
                                     ? "bg-[#60BA81] border-[#60BA81] text-white shadow-xl shadow-[#60BA81]/30 scale-105"
                                     : "bg-white border-gray-100 text-[#284952]/40"}
@@ -580,7 +580,7 @@ export const SceneAssistedFiling = ({ isActive }: { isActive: boolean }) => {
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: stage >= 4 ? 1 : 0 }}
-                          className="space-y-4 mb-8"
+                          className="space-y-4 mb-6"
                         >
                           <FormField label="Case Description">
                             <FormInput

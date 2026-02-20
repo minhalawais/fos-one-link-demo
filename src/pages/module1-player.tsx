@@ -11,6 +11,8 @@ import SceneTraining from "../components/scenes/module1/scene-training.tsx"
 import SceneIOTraining from "../components/scenes/module1/scene-io-training.tsx"
 import SceneClosing from "../components/scenes/module1/scene-closing.tsx"
 
+import { AssetPreloader } from "../components/common/AssetPreloader.tsx"
+
 const SCENES = [
   { name: "hero", start: 0, end: 2, component: SceneHero },
   { name: "upload", start: 2, end: 22, component: SceneUpload },
@@ -32,12 +34,14 @@ export default function Module1Player({ progress }: Module1PlayerProps) {
   const CurrentSceneComponent = currentSceneConfig.component
 
   return (
-    <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence>
-          <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
-        </AnimatePresence>
+    <AssetPreloader>
+      <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
+        <div className="absolute inset-0 z-0">
+          <AnimatePresence>
+            <CurrentSceneComponent key={currentSceneConfig.name} isActive={true} progress={progress} />
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </AssetPreloader>
   )
 }
