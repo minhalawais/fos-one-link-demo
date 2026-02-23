@@ -5,7 +5,6 @@ import { AssetPreloader } from "../components/common/AssetPreloader.tsx"
 
 // Import all scene components from module5 folder
 import { SceneIntro } from "../components/scenes/module5/scene-intro.tsx"
-import { SceneExport } from "../components/scenes/module5/scene-export.tsx"
 import { SceneConclusion } from "../components/scenes/module5/scene-conclusion.tsx"
 import { SceneDashboard } from "../components/scenes/module5/scene-dashboard.tsx"
 
