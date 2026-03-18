@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Questions Management</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#60BA81',
+                        primary1: '#284952',
+                        secondary: '#f5a83c',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-out',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                        'bounce-subtle': 'bounceSubtle 1s ease-in-out',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'shimmer': 'shimmer 3s linear infinite',
+                        'scale-in': 'scaleIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(50px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        bounceSubtle: {
+                            '0%, 20%, 50%, 80%, 100%': { transform: 'translateY(0)' },
+                            '40%': { transform: 'translateY(-8px)' },
+                            '60%': { transform: 'translateY(-4px)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 20px rgba(96, 186, 129, 0.3)' },
+                            '100%': { boxShadow: '0 0 30px rgba(96, 186, 129, 0.6)' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            min-height: 100vh;
+        }
+
+        /* Advanced Glass Effect */
+        .glass-effect {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        /* Enhanced Card Hover Effects */
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(96, 186, 129, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .card-hover:hover::before {
+            left: 100%;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(96, 186, 129, 0.1);
+        }
+
+        /* Enhanced Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #60BA81 0%, #4a9d66 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4a9d66 0%, #60BA81 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(96, 186, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f5a83c 0%, #e6941f 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e6941f 0%, #f5a83c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 168, 60, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #284952 0%, #1e3a42 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #1e3a42 0%, #284952 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(40, 73, 82, 0.4);
+        }
+
+        /* Hero Gradient */
+        .hero-gradient {
+            background: linear-gradient(135deg, #284952 0%, #60BA81 50%, #f5a83c 100%);
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Enhanced Status Badges */
+        .status-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .active-badge {
+            background: linear-gradient(135deg, rgba(96, 186, 129, 0.9), rgba(96, 186, 129, 0.7));
+            color: white;
+        }
+
+        .expired-badge {
+            background: linear-gradient(135deg, rgba(40, 73, 82, 0.9), rgba(40, 73, 82, 0.7));
+            color: white;
+        }
+
+        /* Enhanced Stat Cards */
+        .stat-card {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card-primary:hover {
+            border-color: rgba(96, 186, 129, 0.3);
+        }
+
+        .stat-card-secondary:hover {
+            border-color: rgba(245, 168, 60, 0.3);
+        }
+
+        /* Enhanced Gradient Borders */
+        .gradient-border {
+            position: relative;
+            border-radius: 24px;
+            padding: 2px;
+            background: linear-gradient(135deg, #60BA81, #f5a83c, #284952);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .gradient-border:hover {
+            background: linear-gradient(135deg, #f5a83c, #60BA81, #284952);
+            transform: scale(1.02);
+        }
+
+        .gradient-border-inner {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-radius: 22px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Enhanced Modal Styles */
+        .modal-backdrop {
+            background: rgba(40, 73, 82, 0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Enhanced Form Styles */
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #60BA81;
+            box-shadow: 0 0 0 3px rgba(96, 186, 129, 0.1);
+        }
+
+        /* Select2 Custom Styling */
+        .select2-container--default .select2-selection--multiple {
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            padding: 8px;
+            min-height: 48px;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #60BA81;
+            box-shadow: 0 0 0 3px rgba(96, 186, 129, 0.1);
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #60BA81;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 4px 8px;
+        }
+
+        /* Enhanced Animations */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(96, 186, 129, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        /* Line Clamp Utility */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Enhanced Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #60BA81, #f5a83c);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f5a83c, #60BA81);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Pattern -->
+    <div class="fixed inset-0 opacity-5 pointer-events-none">
+        <div class="absolute inset-0"
+            style="background-image: radial-gradient(circle at 25% 25%, #60BA81 0%, transparent 50%), radial-gradient(circle at 75% 75%, #f5a83c 0%, transparent 50%);">
+        </div>
+    </div>
+
+    <nav class="bg-primary1 shadow-2xl sticky top-0 z-40 backdrop-filter backdrop-blur-lg bg-opacity-95">
+        <div class="max-w-full mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <a href="{{ url_for('tracking_dashboard.personal_tracking_dashboard') }}">
+                        <img src="{{ url_for('static', filename='images/vertical_logo.png') }}" alt="FOS Logo"
+                            class="h-10 w-auto mr-3">
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-1">
+                    {% if not is_dashboard %}
+                    <a href="{{ url_for('manage_logs') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Logs</a>
+                    <a href="{{ url_for('manage_company') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Company</a>
+                    <a href="{{ url_for('manage_employee') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Employees</a>
+                    <a href="{{ url_for('manage_buyer') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Buyers</a>
+                    <a href="{{ url_for('manage_offices') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Offices</a>
+                    <a href="{{ url_for('manage_complaints') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Complaints</a>
+                    <a href="{{ url_for('manage_counseling_sessions') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Counseling</a>
+                    <a href="{{ url_for('survey') }}"
+                        class="bg-white bg-opacity-20 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">Surveys</a>
+                    <a href="{{ url_for('user_management') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Users</a>
+                    <a href="{{ url_for('sms_management') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">SMS</a>
+                    <a href="{{ url_for('manage_backups') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Backups</a>
+
+                    {% endif %}
+                    <a href="{{ url_for('logout') }}"
+                        class="text-white hover:bg-white hover:bg-opacity-10 px-3 py-2 rounded-md text-sm font-medium transition-colors">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-full mx-auto py-10 px-4 sm:px-6 lg:px-8 relative">
+        <!-- Enhanced Hero Section -->
+        <div
+            class="relative overflow-hidden hero-gradient rounded-3xl p-10 mb-10 text-white animate-fade-in shadow-2xl">
+            <!-- Floating Background Elements -->
+            <div class="absolute top-10 right-10 w-32 h-32 bg-white opacity-10 rounded-full floating-element"></div>
+            <div class="absolute bottom-5 left-10 w-24 h-24 bg-white opacity-5 rounded-full floating-element"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between">
+                <div class="flex items-center mb-8 md:mb-0">
+                    <div class="bg-white bg-opacity-20 p-6 rounded-2xl mr-8 backdrop-filter backdrop-blur-lg">
+                        <i class="fas fa-question-circle text-5xl animate-bounce-subtle"></i>
+                    </div>
+                    <div>
+                        <h1
+                            class="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-200 bg-clip-text">
+                            Survey Questions Management
+                        </h1>
+                        <p class="text-xl md:text-2xl opacity-90 font-light">Create, manage, and organize your survey
+                            questions with elegance and precision</p>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
+                    <button id="addSurveyButton"
+                        class="btn-primary px-8 py-4 rounded-xl font-semibold flex items-center justify-center shadow-lg hover:shadow-2xl transition-all duration-300">
+                        <i class="fas fa-plus mr-3 text-lg"></i>Add New Survey
+                    </button>
+                    {% if not is_dashboard %}
+                    <a href="{{ url_for('survey_reports') }}"
+                        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-300 backdrop-filter backdrop-blur-lg border border-white border-opacity-20">
+                        <i class="fas fa-chart-bar mr-3 text-lg"></i>Reports
+                    </a>
+                    <a href="{{ url_for('digital_library.management_page') }}"
+                        class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-8 py-4 rounded-xl font-semibold flex items-center justify-center transition-all duration-300 backdrop-filter backdrop-blur-lg border border-white border-opacity-20">
+                        <i class="fas fa-book mr-3 text-lg"></i>Digital Library
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div class="stat-card stat-card-primary rounded-2xl p-8 animate-slide-up shadow-xl">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-br from-primary to-primary p-4 rounded-xl text-white shadow-lg">
+                        <i class="fas fa-poll text-2xl"></i>
+                    </div>
+                    <div class="ml-6">
+                        <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Surveys</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ surveys|length }}</p>
+                        <div class="w-12 h-1 bg-gradient-to-r from-primary to-primary rounded-full mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-secondary rounded-2xl p-8 animate-slide-up shadow-xl"
+                style="animation-delay: 0.1s">
+                <div class="flex items-center">
+                    <div
+                        class="w-14 text-center bg-gradient-to-br from-secondary to-secondary p-4 rounded-xl text-white shadow-lg">
+                        <i class="fas fa-question text-2xl"></i>
+                    </div>
+                    <div class="ml-6">
+                        <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Total Questions</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ surveys|sum(attribute='question_count') or 0
+                            }}</p>
+                        <div class="w-12 h-1 bg-gradient-to-r from-secondary to-secondary rounded-full mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-2xl p-8 animate-slide-up shadow-xl" style="animation-delay: 0.2s">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-br from-primary1 to-primary1 p-4 rounded-xl text-white shadow-lg">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                    <div class="ml-6">
+                        <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Avg. Time</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">5 min</p>
+                        <div class="w-12 h-1 bg-gradient-to-r from-primary1 to-primary1 rounded-full mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card rounded-2xl p-8 animate-slide-up shadow-xl" style="animation-delay: 0.3s">
+                <div class="flex items-center">
+                    <div class="bg-gradient-to-br from-primary to-primary p-4 rounded-xl text-white shadow-lg">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                    <div class="ml-6">
+                        <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Active</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-1">{{ surveys|length }}</p>
+                        <div class="w-12 h-1 bg-gradient-to-r from-primary to-primary rounded-full mt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Surveys Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {% for survey in surveys %}
+            <div class="gradient-border card-hover animate-scale-in" style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                <div class="gradient-border-inner p-8 h-full flex flex-col relative">
+                    <!-- Enhanced Status Badge -->
+                    <div
+                        class="status-badge {% if survey.expiry_date and survey.expiry_date < today %}expired-badge{% else %}active-badge{% endif %}">
+                        <i class="fas fa-circle text-xs mr-2"></i>
+                        {% if survey.expiry_date and survey.expiry_date < today %}Expired{% else %}Active{% endif %}
+                            </div>
+
+                            <div class="flex-1">
+                                <div class="flex items-center mb-4">
+                                    <div
+                                        class="w-4 h-4 bg-gradient-to-r from-primary to-primary rounded-full mr-3 animate-pulse-slow">
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-primary to-primary text-white shadow-lg">
+                                        <i class="fas fa-hashtag mr-2"></i>ID: {{ survey.id }}
+                                    </span>
+                                </div>
+                                <h3
+                                    class="text-2xl font-bold text-gray-900 mb-2 leading-tight hover:text-primary transition-colors duration-300">
+                                    {{ survey.title }}</h3>
+                                {% if not is_dashboard and survey.buyer_name %}
+                                <div class="mb-4">
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
+                                        <i class="fas fa-building mr-1"></i>{{ survey.buyer_name }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                                <p class="text-base text-gray-600 mb-6 leading-relaxed line-clamp-3">{{
+                                    survey.description[:120] }}{% if survey.description|length > 120 %}...{% endif %}
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-8">
+                                <div
+                                    class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 text-center border border-gray-200 hover:border-primary transition-colors duration-300">
+                                    <div
+                                        class="text-3xl font-bold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
+                                        {{ survey.question_count or 0 }}</div>
+                                    <div class="text-xs text-gray-500 font-semibold uppercase tracking-wide mt-1">
+                                        Questions</div>
+                                </div>
+                                <div
+                                    class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 text-center border border-gray-200 hover:border-secondary transition-colors duration-300">
+                                    <div
+                                        class="text-3xl font-bold bg-gradient-to-r from-secondary to-secondary bg-clip-text text-transparent">
+                                        {{ survey.estimated_time or 'N/A' }}</div>
+                                    <div class="text-xs text-gray-500 font-semibold uppercase tracking-wide mt-1">Est.
+                                        Time</div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-center justify-between text-sm text-gray-500 mb-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
+                                <span class="flex items-center font-medium">
+                                    <i class="fas fa-calendar-alt mr-2 text-primary"></i>
+                                    {{ survey.created_at.strftime('%b %d, %Y') if survey.created_at else 'N/A' }}
+                                </span>
+                                {% if survey.expiry_date %}
+                                <span class="flex items-center font-medium">
+                                    <i class="fas fa-hourglass-end mr-2 text-secondary"></i>
+                                    {{ survey.expiry_date.strftime('%b %d, %Y') }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="space-y-4">
+                                <button onclick="viewSurveyDetails({{ survey.id }})"
+                                    class="w-full bg-gradient-to-r from-primary to-primary hover:from-primary1 hover:to-primary1 text-white px-6 py-4 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-2xl flex items-center justify-center relative overflow-hidden">
+                                    <span class="relative z-10 flex items-center">
+                                        <i class="fas fa-eye mr-3"></i>View Details
+                                    </span>
+                                </button>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <a href="{{ url_for('edit_survey_questions_page', survey_id=survey.id) }}"
+                                        class="btn-secondary bg-gradient-to-r from-secondary to-secondary px-4 py-3 rounded-xl text-sm font-semibold flex items-center justify-center shadow-lg hover:shadow-2xl">
+                                        <i class="fas fa-edit mr-2"></i>Edit Questions
+                                    </a>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button onclick="editSurvey({{ survey.id }})"
+                                        class="bg-gradient-to-r from-primary to-primary hover:from-primary1 hover:to-primary1 text-white px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center shadow-lg hover:shadow-2xl relative overflow-hidden">
+                                        <span class="relative z-10 flex items-center">
+                                            <i class="fas fa-edit mr-2"></i>Edit Survey
+                                        </span>
+                                    </button>
+                                    <button onclick="deleteSurvey({{ survey.id }})"
+                                        class="btn-danger px-4 py-3 rounded-xl text-sm font-semibold flex items-center justify-center shadow-lg hover:shadow-2xl">
+                                        <i class="fas fa-trash mr-2"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if not surveys %}
+            <div class="text-center py-20">
+                <div class="glass-effect rounded-3xl p-16 max-w-lg mx-auto animate-fade-in shadow-2xl">
+                    <div
+                        class="bg-gradient-to-br from-primary to-primary w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg animate-bounce-subtle">
+                        <i class="fas fa-poll text-4xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">No Surveys Found</h3>
+                    <p class="text-gray-600 mb-8 text-lg leading-relaxed">Get started by creating your first survey and
+                        unlock the power of data collection.</p>
+                    <button id="addSurveyButtonEmpty"
+                        class="btn-primary px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-2xl">
+                        <i class="fas fa-plus mr-3"></i>Create Survey
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Enhanced Survey Details Modal -->
+        <div class="fixed inset-0 modal-backdrop hidden z-50 transition-all duration-500" id="surveyDetailsModal">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="modal-content rounded-3xl shadow-2xl max-w-8xl w-full max-h-screen overflow-y-auto transform transition-all duration-500 scale-95 border border-white border-opacity-30"
+                    id="detailsModalContent">
+                    <div class="hero-gradient text-white p-8 rounded-t-3xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16">
+                        </div>
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-3xl font-bold mb-3 flex items-center">
+                                    <i class="fas fa-poll mr-4 text-3xl"></i>Survey Details
+                                </h2>
+                                <p class="opacity-90 text-xl font-light">Comprehensive survey information and statistics
+                                </p>
+                            </div>
+                            <button onclick="closeSurveyDetails()"
+                                class="text-white hover:text-gray-200 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-3 transition-all duration-300 backdrop-filter backdrop-blur-lg">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="surveyDetailsContent" class="p-10">
+                        <!-- Content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Add Survey Modal -->
+        <div class="fixed inset-0 modal-backdrop hidden z-50 transition-all duration-500" id="addSurveyModal">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="modal-content rounded-3xl shadow-2xl max-w-5xl w-full max-h-screen overflow-y-auto transform transition-all duration-500 scale-95 border border-white border-opacity-30"
+                    id="addModalContent">
+                    <div class="hero-gradient text-white p-8 rounded-t-3xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -mr-12 -mt-12">
+                        </div>
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-3xl font-bold mb-3 flex items-center">
+                                    <i class="fas fa-plus mr-4 text-3xl"></i>Add New Survey
+                                </h2>
+                                <p class="opacity-90 text-xl font-light">Create a new survey with advanced filters and
+                                    settings</p>
+                            </div>
+                            <button onclick="closeAddSurveyModal()"
+                                class="text-white hover:text-gray-200 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-3 transition-all duration-300 backdrop-filter backdrop-blur-lg">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <div class="form-group mb-6">
+                            <label for="newSurveyTitle"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Survey
+                                Title:</label>
+                            <input type="text" id="newSurveyTitle"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                placeholder="Enter survey title..." required>
+                        </div>
+                        <div class="form-group mb-6">
+                            <label for="newSurveyDescription"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Description:</label>
+                            <textarea id="newSurveyDescription"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                rows="4" placeholder="Describe your survey..."></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="form-group">
+                                <label for="newQuestionCount"
+                                    class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Question
+                                    Count:</label>
+                                <input type="number" id="newQuestionCount"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                    placeholder="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newEstimatedTime"
+                                    class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Estimated
+                                    Time (minutes):</label>
+                                <input type="number" id="newEstimatedTime"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                    placeholder="5" required>
+                            </div>
+                        </div>
+                        <div class="form-group mb-6">
+                            <label for="newDateExpiry"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Expiry
+                                Date:</label>
+                            <input type="date" id="newDateExpiry"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg">
+                        </div>
+                        {% if not is_dashboard %}
+                        <div class="form-group mb-6">
+                            <label for="newBuyerId"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Buyer:</label>
+                            <select id="newBuyerId"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                required>
+                                <option value="">Select a buyer...</option>
+                                <option value="1">FOS Admin</option>
+                                {% for buyer in buyers %}
+                                <option value="{{ buyer.buyer_id }}">{{ buyer.buyer_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+
+                        <div class="filter-section">
+                            <h6 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-filter mr-3 text-primary text-2xl"></i>Survey Filters
+                            </h6>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-6">
+                                    <div class="filter-type">
+                                        <label for="newOfficeIds"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Offices:</label>
+                                        <select id="newOfficeIds" class="w-full select2" multiple>
+                                            {% for office in offices %}
+                                            <option value="{{ office.office_id }}">{{ office.office_name }} -
+                                                {{office.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="newEmployeeIds"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Employee
+                                            IDs:</label>
+                                        <textarea id="newEmployeeIds"
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                                            placeholder="Enter employee IDs, one per line" rows="4"></textarea>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="newCompanyIds"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Company
+                                            IDs:</label>
+                                        <textarea id="newCompanyIds"
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                                            placeholder="Enter company IDs, one per line" rows="4"></textarea>
+                                    </div>
+                                </div>
+                                <div class="space-y-6">
+                                    <div class="filter-type">
+                                        <label for="newGender"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Gender:</label>
+                                        <select id="newGender" class="w-full select2" multiple>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="newDepartment"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Department:</label>
+                                        <select id="newDepartment" class="w-full select2" multiple>
+                                            {% for department in departments %}
+                                            <option value="{{ department }}">{{ department }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="newCnics"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">CNICs:</label>
+                                        <textarea id="newCnics"
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                                            placeholder="Enter CNICs, one per line" rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-4 mt-8">
+                            <button type="button" onclick="closeAddSurveyModal()"
+                                class="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-semibold">
+                                Cancel
+                            </button>
+                            <button type="button" id="addSurveyBtn"
+                                class="btn-primary px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-2xl">
+                                <i class="fas fa-save mr-3"></i>Add Survey
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Edit Survey Modal -->
+        <div class="fixed inset-0 modal-backdrop hidden z-50 transition-all duration-500" id="editSurveyModal">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="modal-content rounded-3xl shadow-2xl max-w-5xl w-full max-h-screen overflow-y-auto transform transition-all duration-500 scale-95 border border-white border-opacity-30"
+                    id="editModalContent">
+                    <div class="hero-gradient text-white p-8 rounded-t-3xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-white opacity-10 rounded-full -mr-12 -mt-12">
+                        </div>
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-3xl font-bold mb-3 flex items-center">
+                                    <i class="fas fa-edit mr-4 text-3xl"></i>Edit Survey
+                                </h2>
+                                <p class="opacity-90 text-xl font-light">Update survey details and configuration</p>
+                            </div>
+                            <button onclick="closeEditSurveyModal()"
+                                class="text-white hover:text-gray-200 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-3 transition-all duration-300 backdrop-filter backdrop-blur-lg">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-8">
+                        <div class="form-group mb-6">
+                            <label for="editSurveyTitle"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Survey
+                                Title:</label>
+                            <input type="text" id="editSurveyTitle"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                required>
+                        </div>
+                        <div class="form-group mb-6">
+                            <label for="editSurveyDescription"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Description:</label>
+                            <textarea id="editSurveyDescription"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                rows="4"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div class="form-group">
+                                <label for="editQuestionCount"
+                                    class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Question
+                                    Count:</label>
+                                <input type="number" id="editQuestionCount"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEstimatedTime"
+                                    class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Estimated
+                                    Time (minutes):</label>
+                                <input type="number" id="editEstimatedTime"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group mb-6">
+                            <label for="editDateExpiry"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Expiry
+                                Date:</label>
+                            <input type="date" id="editDateExpiry"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg">
+                        </div>
+                        {% if not is_dashboard %}
+                        <div class="form-group mb-6">
+                            <label for="editBuyerId"
+                                class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Buyer:</label>
+                            <select id="editBuyerId"
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 text-lg"
+                                required>
+                                <option value="">Select a buyer...</option>
+                                <option value="1">FOS Admin</option>
+                                {% for buyer in buyers %}
+                                <option value="{{ buyer.buyer_id }}">{{ buyer.buyer_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+
+                        <div class="filter-section">
+                            <h6 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <i class="fas fa-filter mr-3 text-primary text-2xl"></i>Survey Filters
+                            </h6>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-6">
+                                    <div class="filter-type">
+                                        <label for="editOfficeIds"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Offices:</label>
+                                        <select id="editOfficeIds" class="w-full select2" multiple>
+                                            {% for office in offices %}
+                                            <option value="{{ office.office_id }}">{{ office.office_name }} -
+                                                {{office.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="editEmployeeIds"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Employee
+                                            IDs:</label>
+                                        <textarea id="editEmployeeIds"
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                                            placeholder="Enter employee IDs, one per line" rows="4"></textarea>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="editCompanyIds"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Company
+                                            IDs:</label>
+                                        <textarea id="editCompanyIds"
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                                            placeholder="Enter company IDs, one per line" rows="4"></textarea>
+                                    </div>
+                                </div>
+                                <div class="space-y-6">
+                                    <div class="filter-type">
+                                        <label for="editGender"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Gender:</label>
+                                        <select id="editGender" class="w-full select2" multiple>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="editDepartment"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Department:</label>
+                                        <select id="editDepartment" class="w-full select2" multiple>
+                                            {% for department in departments %}
+                                            <option value="{{ department }}">{{ department }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="filter-type">
+                                        <label for="editCnics"
+                                            class="block text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">CNICs:</label>
+                                        <textarea id="editCnics"
+                                            class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300"
+                                            placeholder="Enter CNICs, one per line" rows="4"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-4 mt-8">
+                            <button type="button" onclick="closeEditSurveyModal()"
+                                class="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-semibold">
+                                Cancel
+                            </button>
+                            <button type="button" id="saveChangesBtn"
+                                class="bg-gradient-to-r from-primary to-primary text-white px-8 py-3 rounded-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] font-semibold shadow-lg">
+                                <i class="fas fa-save mr-3"></i>Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Delete Confirmation Modal -->
+        <div class="fixed inset-0 modal-backdrop hidden z-50 transition-all duration-500" id="deleteConfirmModal">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="modal-content rounded-3xl shadow-2xl max-w-md w-full transform transition-all duration-500 scale-95 border border-white border-opacity-30"
+                    id="deleteModalContent">
+                    <div
+                        class="bg-gradient-to-r from-primary1 to-primary1 text-white p-8 rounded-t-3xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -mr-10 -mt-10">
+                        </div>
+                        <div class="relative z-10 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold mb-2 flex items-center">
+                                    <i class="fas fa-exclamation-triangle mr-3 text-2xl"></i>Confirm Deletion
+                                </h2>
+                                <p class="opacity-90 text-sm font-light">This action cannot be undone</p>
+                            </div>
+                            <button onclick="closeDeleteModal()"
+                                class="text-white hover:text-gray-200 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full p-2 transition-all duration-300 backdrop-filter backdrop-blur-lg">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-8 text-center">
+                        <div
+                            class="bg-gradient-to-br from-primary1 to-primary1 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg opacity-20">
+                            <i class="fas fa-exclamation-triangle text-primary1 text-3xl animate-bounce-subtle"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">Are you sure you want to delete this survey?
+                        </h3>
+                        <p class="text-gray-600 mb-8 leading-relaxed">This will permanently delete the survey and all
+                            its questions. This action cannot be reversed.</p>
+                        <div class="flex justify-center space-x-4">
+                            <button type="button" onclick="closeDeleteModal()"
+                                class="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-semibold">
+                                Cancel
+                            </button>
+                            <button type="button" id="confirmDeleteBtn"
+                                class="btn-danger px-8 py-3 rounded-xl font-semibold shadow-lg hover:shadow-2xl">
+                                <i class="fas fa-trash mr-3"></i>Delete Survey
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const IS_DASHBOARD = {{ 'true' if is_dashboard else 'false' }};
+            let currentSurveyId = null;
+            let currentEditSurveyId = null;
+
+            function getLoadingSkeleton() {
+                return `
+                <div class="animate-pulse space-y-8">
+                    <!-- Header Skeleton -->
+                    <div class="mb-10">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-1/2"></div>
+                            <div class="flex space-x-4">
+                                <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-32"></div>
+                                <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-32"></div>
+                                <div class="h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded-xl w-32"></div>
+                            </div>
+                        </div>
+                        <div class="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-full mb-4"></div>
+                        <div class="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-5/6"></div>
+                    </div>
+
+                    <!-- Stats Skeleton -->
+                    <div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl p-8 h-48"></div>
+
+                    <!-- Participants Skeleton -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-100 rounded-2xl p-6 h-64"></div>
+                        <div class="bg-gray-100 rounded-2xl p-6 h-64"></div>
+                    </div>
+
+                    <!-- Survey Stats Cards Skeleton -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                        ${Array(5).fill(0).map(() => '<div class="bg-gradient-to-r from-gray-200 to-gray-300 rounded-2xl p-6 h-32"></div>').join('')}
+                    </div>
+
+                    <!-- Questions Skeleton -->
+                    <div class="space-y-6">
+                        ${Array(3).fill(0).map(() => `
+                            <div class="border border-gray-200 rounded-2xl p-8">
+                                <div class="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-3/4 mb-4"></div>
+                                <div class="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-full mb-4"></div>
+                                <div class="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-lg w-5/6"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- Loading Indicator -->
+                <div class="flex items-center justify-center py-8">
+                    <div class="flex space-x-2">
+                        <div class="w-3 h-3 bg-primary rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                        <div class="w-3 h-3 bg-primary rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-3 h-3 bg-primary rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
+                    <span class="ml-4 text-gray-600 font-semibold">Loading survey details...</span>
+                </div>
+            `;
+            }
+
+            // Initialize Select2 when document is ready
+            $(document).ready(function () {
+                $('.select2').select2({
+                    placeholder: "Select options...",
+                    allowClear: true,
+                    width: '100%'
+                });
+            });
+
+            // Add Survey Modal Functions
+            function openAddSurveyModal() {
+                document.getElementById('addSurveyModal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('addModalContent').classList.remove('scale-95');
+                    document.getElementById('addModalContent').classList.add('scale-100');
+                }, 10);
+            }
+
+            function closeAddSurveyModal() {
+                document.getElementById('addModalContent').classList.remove('scale-100');
+                document.getElementById('addModalContent').classList.add('scale-95');
+                setTimeout(() => {
+                    document.getElementById('addSurveyModal').classList.add('hidden');
+                }, 300);
+            }
+
+            // Edit Survey Modal Functions
+            function openEditSurveyModal() {
+                document.getElementById('editSurveyModal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('editModalContent').classList.remove('scale-95');
+                    document.getElementById('editModalContent').classList.add('scale-100');
+                }, 10);
+            }
+
+            function closeEditSurveyModal() {
+                document.getElementById('editModalContent').classList.remove('scale-100');
+                document.getElementById('editModalContent').classList.add('scale-95');
+                setTimeout(() => {
+                    document.getElementById('editSurveyModal').classList.add('hidden');
+                }, 300);
+            }
+
+            // Delete Modal Functions
+            function openDeleteModal(surveyId) {
+                currentSurveyId = surveyId;
+                document.getElementById('deleteConfirmModal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('deleteModalContent').classList.remove('scale-95');
+                    document.getElementById('deleteModalContent').classList.add('scale-100');
+                }, 10);
+            }
+
+            function closeDeleteModal() {
+                document.getElementById('deleteModalContent').classList.remove('scale-100');
+                document.getElementById('deleteModalContent').classList.add('scale-95');
+                setTimeout(() => {
+                    document.getElementById('deleteConfirmModal').classList.add('hidden');
+                }, 300);
+            }
+
+            // Survey Details Modal Functions
+            function openSurveyDetailsModal() {
+                document.getElementById('surveyDetailsModal').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('detailsModalContent').classList.remove('scale-95');
+                    document.getElementById('detailsModalContent').classList.add('scale-100');
+                }, 10);
+            }
+
+            function closeSurveyDetails() {
+                document.getElementById('detailsModalContent').classList.remove('scale-100');
+                document.getElementById('detailsModalContent').classList.add('scale-95');
+                setTimeout(() => {
+                    document.getElementById('surveyDetailsModal').classList.add('hidden');
+                    document.getElementById('surveyDetailsContent').innerHTML = '';
+                }, 300);
+            }
+
+            // Event Listeners
+            document.getElementById('addSurveyButton').addEventListener('click', openAddSurveyModal);
+            document.getElementById('addSurveyButtonEmpty')?.addEventListener('click', openAddSurveyModal);
+
+            function viewSurveyDetails(surveyId) {
+                const modal = document.getElementById('surveyDetailsModal');
+                const modalContent = document.getElementById('detailsModalContent');
+                const contentDiv = document.getElementById('surveyDetailsContent');
+
+                // Clear old content and show loading skeleton
+                contentDiv.innerHTML = getLoadingSkeleton();
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95');
+                    modalContent.classList.add('scale-100');
+                }, 10);
+
+                // Stage 1: Load basic survey data (questions, filters)
+                Promise.all([
+                    fetch(`/survey/${surveyId}/questions`).then(res => res.json()),
+                    fetch(`/survey/${surveyId}/statistics`).then(res => res.json())
+                ])
+                    .then(([surveyData, statsData]) => {
+                        const survey = surveyData.survey;
+                        const questions = surveyData.questions;
+                        const filters = surveyData.filters || [];
+                        const statistics = statsData.statistics;
+                        const participants = statsData.participants;
+
+                        // Build complete content
+                        const content = buildSurveyContent(survey, questions, filters, statistics, participants);
+                        contentDiv.innerHTML = content;
+
+                        // Stage 2: Load full participant data in background (if needed)
+                        if (statistics.total_filtered_employees > 0) {
+                            loadFullParticipants(surveyId, contentDiv);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching survey details:', error);
+                        contentDiv.innerHTML = `
+            <div class="text-center py-16">
+                <div class="bg-gradient-to-br from-red-100 to-red-200 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500"></i>
+                </div>
+                <p class="text-red-600 text-xl font-semibold">Error loading survey details. Please try again.</p>
+            </div>
+        `;
+                    });
+            }
+
+            function loadFullParticipants(surveyId, contentDiv) {
+                // This can load in background for export functionality
+                fetch(`/survey/${surveyId}/participants/full`)
+                    .then(res => res.json())
+                    .then(data => {
+                        // Store for later use, but don't update UI immediately
+                        console.log('Full participants data loaded in background');
+                    })
+                    .catch(error => {
+                        console.error('Error loading full participants:', error);
+                    });
+            }
+
+            function buildSurveyContent(survey, questions, filters, statistics, participants) {
+                let content = `
+        <div class="mb-10">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">${survey.title}</h3>
+                <div class="flex space-x-4">
+                    <a href="/survey/${survey.id}/report" target="_blank" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-chart-bar mr-2"></i>View Full Report
+                    </a>
+                    <button onclick="editSurvey(${survey.id})" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-edit mr-2"></i>Edit Survey
+                    </button>
+                    <button onclick="deleteSurvey(${survey.id})" class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl">
+                        <i class="fas fa-trash mr-2"></i>Delete Survey
+                    </button>
+                </div>
+            </div>
+            <p class="text-gray-600 mb-8 text-xl leading-relaxed">${survey.description || 'No description available'}</p>
+            
+            <!-- Enhanced Response Statistics Section -->
+            ${statistics ? `
+                <div class="bg-gradient-to-r from-primary via-green-500 to-green-600 rounded-2xl p-8 mb-8 text-white shadow-2xl">
+                    <h4 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-chart-pie mr-3 text-3xl"></i>Response Statistics
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+                            <div class="text-4xl font-bold mb-2">${statistics.total_filtered_employees}</div>
+                            <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Total Invited</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+                            <div class="text-4xl font-bold mb-2 text-green-200">${statistics.employees_with_responses}</div>
+                            <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Completed</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+                            <div class="text-4xl font-bold mb-2 text-orange-200">${statistics.remaining_employees}</div>
+                            <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Pending</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-lg rounded-xl p-6 text-center transform hover:scale-105 transition-all duration-300">
+                            <div class="text-4xl font-bold mb-2">${statistics.completion_percentage}%</div>
+                            <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Completion Rate</div>
+                            <div class="mt-3 bg-white bg-opacity-20 rounded-full h-2 overflow-hidden">
+                                <div class="bg-white h-full rounded-full transition-all duration-500" style="width: ${statistics.completion_percentage}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Export Buttons -->
+                    <!-- Export Buttons -->
+                    <div class="flex flex-wrap gap-4 justify-center pt-4 border-t border-white border-opacity-20">
+                        ${!IS_DASHBOARD ? `
+                        <a href="/survey/${survey.id}/export/filled" class="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center shadow-lg">
+                            <i class="fas fa-check-circle mr-2"></i>Export Completed (${statistics.employees_with_responses})
+                        </a>
+                        <a href="/survey/${survey.id}/export/pending" class="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center shadow-lg">
+                            <i class="fas fa-clock mr-2"></i>Export Pending (${statistics.remaining_employees})
+                        </a>
+                        ` : ''}
+                        <a href="/survey/${survey.id}/export/all" class="bg-white bg-opacity-20 hover:bg-opacity-30 backdrop-blur-lg px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center shadow-lg">
+                            <i class="fas fa-users mr-2"></i>Export All (${statistics.total_filtered_employees})
+                        </a>
+                    </div>
+                </div>
+            ` : `
+                <div class="bg-gradient-to-r from-blue-100 to-blue-200 rounded-2xl p-8 mb-8 text-blue-900 shadow-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-spinner fa-spin text-3xl mr-4"></i>
+                        <div>
+                            <h4 class="text-xl font-bold">Loading Statistics...</h4>
+                            <p class="text-sm opacity-90">Survey details are ready, fetching response statistics</p>
+                        </div>
+                    </div>
+                </div>
+            `}
+            
+            <!-- Survey Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-12">
+                <div class="bg-gradient-to-br from-primary via-green-500 to-green-600 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300">
+                    <div class="text-3xl font-bold">${survey.id}</div>
+                    <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Survey ID</div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300">
+                    <div class="text-3xl font-bold">${questions.length}</div>
+                    <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Questions</div>
+                </div>
+                <div class="bg-gradient-to-br from-secondary via-orange-500 to-red-500 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300">
+                    <div class="text-3xl font-bold">${survey.estimated_time || 'N/A'}</div>
+                    <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Est. Time</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-500 via-purple-600 to-pink-600 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300">
+                    <div class="text-3xl font-bold">${new Date(survey.created_at).toLocaleDateString()}</div>
+                    <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Created</div>
+                </div>
+                <div class="bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 text-white p-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300">
+                    <div class="text-3xl font-bold">${survey.expiry_date ? new Date(survey.expiry_date).toLocaleDateString() : 'No Expiry'}</div>
+                    <div class="text-sm opacity-90 font-medium uppercase tracking-wide">Expires</div>
+                </div>
+            </div>
+    `;
+
+
+                // Enhanced Survey Filters Section
+                if (filters.length > 0) {
+                    content += `
+                    <div class="mb-12">
+                        <h4 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                            <i class="fas fa-filter mr-4 text-primary text-3xl"></i>
+                            Survey Filters (${filters.length})
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                `;
+
+                    const filterTypeColors = {
+                        'department': 'from-blue-500 to-blue-600',
+                        'office_id': 'from-green-500 to-green-600',
+                        'employee_company_id': 'from-purple-500 to-purple-600',
+                        'employee_id': 'from-indigo-500 to-indigo-600',
+                        'gender': 'from-pink-500 to-pink-600',
+                        'cnic': 'from-teal-500 to-teal-600'
+                    };
+
+                    filters.forEach((filter) => {
+                        content += `
+                        <div class="glass-effect border border-gray-200 rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r ${filterTypeColors[filter.filter_type] || 'from-gray-500 to-gray-600'} text-white shadow-lg">
+                                    <i class="fas fa-tag mr-2"></i>${filter.filter_type.charAt(0).toUpperCase() + filter.filter_type.slice(1).replace('_', ' ')}
+                                </span>
+                                <span class="text-sm text-gray-500 font-semibold bg-gray-100 px-3 py-1 rounded-full">${filter.filter_values.length} items</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                                ${filter.filter_values.map(value => `
+                                    <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-semibold bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 border border-gray-300 shadow-sm">
+                                        ${value}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    });
+
+                    content += `
+                        </div>
+                    </div>
+                `;
+                }
+
+                // Enhanced Questions Section
+                if (questions.length > 0) {
+                    content += `
+                    <div>
+                        <h4 class="text-3xl font-bold text-gray-900 mb-8 flex items-center">
+                            <i class="fas fa-list-ul mr-4 text-primary text-3xl"></i>
+                            Questions (${questions.length})
+                        </h4>
+                        <div class="space-y-8">
+                `;
+
+                    const typeColors = {
+                        'text': 'from-blue-500 to-blue-600',
+                        'textarea': 'from-green-500 to-green-600',
+                        'radio': 'from-purple-500 to-purple-600',
+                        'checkbox': 'from-pink-500 to-pink-600',
+                        'select': 'from-indigo-500 to-indigo-600',
+                        'file': 'from-yellow-500 to-yellow-600'
+                    };
+
+                    questions.forEach((question, index) => {
+                        content += `
+                        <div class="question-card border border-gray-200 rounded-2xl p-8 shadow-xl">
+                            <div class="flex items-start justify-between mb-6">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-primary to-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold shadow-lg">
+                                        ${question.order || index + 1}
+                                    </div>
+                                    <span class="text-base font-bold text-primary bg-primary bg-opacity-10 px-4 py-2 rounded-full border border-primary border-opacity-20">Question ${question.order || index + 1}</span>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r ${typeColors[question.question_type] || 'from-gray-500 to-gray-600'} text-white shadow-lg">
+                                        ${question.question_type}
+                                    </span>
+                                    ${question.is_required ? '<span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg"><i class="fas fa-asterisk mr-2"></i>Required</span>' : ''}
+                                </div>
+                            </div>
+                            <h5 class="font-bold text-gray-900 mb-4 text-xl leading-tight">${question.question_text}</h5>
+                            ${question.help_text ? `<p class="text-base text-gray-600 mb-6 bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-xl border-l-4 border-blue-500"><i class="fas fa-info-circle mr-3 text-blue-500"></i>${question.help_text}</p>` : ''}
+                            ${question.options && question.options.length > 0 ? `
+                                <div class="mt-6">
+                                    <span class="text-base font-bold text-gray-700 mb-4 block">Options:</span>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        ${question.options.map((option, optIndex) => `
+                                            <div class="flex items-center p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:border-primary transition-colors duration-300">
+                                                <span class="w-8 h-8 bg-gradient-to-br from-primary to-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 shadow-lg">${optIndex + 1}</span>
+                                                <span class="text-base font-medium">${option}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    });
+
+                    content += `
+                        </div>
+                    </div>
+                `;
+                } else {
+                    content += `
+                    <div class="text-center py-16">
+                        <div class="glass-effect rounded-3xl p-16 max-w-lg mx-auto">
+                            <div class="bg-gradient-to-br from-primary to-green-600 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-bounce-subtle">
+                                <i class="fas fa-question-circle text-3xl text-white"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">No Questions Yet</h3>
+                            <p class="text-gray-500 mb-8 text-lg leading-relaxed">This survey doesn't have any questions added yet.</p>
+                            <a href="/edit_survey_questions/${survey.id}" class="bg-gradient-to-r from-primary to-green-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                <i class="fas fa-plus mr-3"></i>Add Questions
+                            </a>
+                        </div>
+                    </div>
+                `;
+                }
+
+                content += `</div>`;
+
+                return content;
+            }
+
+            function editSurvey(surveyId) {
+                currentSurveyId = surveyId;
+                const modal = document.getElementById('editSurveyModal');
+                const modalContent = document.getElementById('editModalContent');
+
+                // Fetch survey data and populate form
+                fetch(`/survey/${surveyId}/questions`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const survey = data.survey;
+                        const filters = data.filters || [];
+
+                        document.getElementById('editSurveyTitle').value = survey.title || '';
+                        document.getElementById('editSurveyDescription').value = survey.description || '';
+                        document.getElementById('editQuestionCount').value = survey.question_count || '';
+                        document.getElementById('editEstimatedTime').value = survey.estimated_time || '';
+                        document.getElementById('editDateExpiry').value = survey.expiry_date || '';
+
+                        // Populate buyer dropdown if it exists (admin mode)
+                        const editBuyerSelect = document.getElementById('editBuyerId');
+                        if (editBuyerSelect) {
+                            editBuyerSelect.value = survey.buyer_id || '';
+                        }
+
+                        // Populate filters
+                        const officeIds = filters.filter(f => f.filter_type === 'office_id').flatMap(f => f.filter_values);
+                        const genders = filters.filter(f => f.filter_type === 'gender').flatMap(f => f.filter_values);
+                        const departments = filters.filter(f => f.filter_type === 'department').flatMap(f => f.filter_values);
+                        const employeeIds = filters.filter(f => f.filter_type === 'employee_id').flatMap(f => f.filter_values);
+                        const companyIds = filters.filter(f => f.filter_type === 'employee_company_id').flatMap(f => f.filter_values);
+                        const cnics = filters.filter(f => f.filter_type === 'cnic').flatMap(f => f.filter_values);
+
+                        $('#editOfficeIds').val(officeIds).trigger('change');
+                        $('#editGender').val(genders).trigger('change');
+                        $('#editDepartment').val(departments).trigger('change');
+                        document.getElementById('editEmployeeIds').value = employeeIds.join('\n');
+                        document.getElementById('editCompanyIds').value = companyIds.join('\n');
+                        document.getElementById('editCnics').value = cnics.join('\n');
+
+                        modal.classList.remove('hidden');
+                        setTimeout(() => {
+                            modalContent.classList.remove('scale-95');
+                            modalContent.classList.add('scale-100');
+                        }, 10);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching survey details:', error);
+                        alert('Error loading survey details. Please try again.');
+                    });
+            }
+
+            function deleteSurvey(surveyId) {
+                closeSurveyDetails();
+                openDeleteModal(surveyId);
+            }
+
+            // Form Submissions
+            document.getElementById('addSurveyBtn').addEventListener('click', function () {
+                const formData = {
+                    title: document.getElementById('newSurveyTitle').value,
+                    description: document.getElementById('newSurveyDescription').value,
+                    question_count: document.getElementById('newQuestionCount').value,
+                    estimated_time: document.getElementById('newEstimatedTime').value,
+                    date_expiry: document.getElementById('newDateExpiry').value,
+                    filters: {
+                        office_id: $('#newOfficeIds').val() || [],
+                        employee_id: document.getElementById('newEmployeeIds').value.split('\n').filter(id => id.trim() !== ''),
+                        employee_company_id: document.getElementById('newCompanyIds').value.split('\n').filter(id => id.trim() !== ''),
+                        gender: $('#newGender').val() || [],
+                        department: $('#newDepartment').val() || [],
+                        cnic: document.getElementById('newCnics').value.split('\n').filter(cnic => cnic.trim() !== '')
+                    }
+                };
+
+                // Include buyer_id if the element exists (admin mode)
+                const buyerSelect = document.getElementById('newBuyerId');
+                if (buyerSelect) {
+                    formData.buyer_id = buyerSelect.value;
+                }
+
+
+                fetch('/add_survey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error adding survey');
+                    });
+            });
+
+            document.getElementById('saveChangesBtn').addEventListener('click', function () {
+                if (!currentSurveyId) return;
+
+                const updatedSurvey = {
+                    title: document.getElementById('editSurveyTitle').value,
+                    description: document.getElementById('editSurveyDescription').value,
+                    question_count: document.getElementById('editQuestionCount').value,
+                    estimated_time: document.getElementById('editEstimatedTime').value,
+                    date_expiry: document.getElementById('editDateExpiry').value,
+                    surveyId: currentSurveyId,
+                    filters: {
+                        office_id: $('#editOfficeIds').val() || [],
+                        employee_id: document.getElementById('editEmployeeIds').value.split('\n').filter(id => id.trim() !== ''),
+                        employee_company_id: document.getElementById('editCompanyIds').value.split('\n').filter(id => id.trim() !== ''),
+                        gender: $('#editGender').val() || [],
+                        department: $('#editDepartment').val() || [],
+                        cnic: document.getElementById('editCnics').value.split('\n').filter(cnic => cnic.trim() !== '')
+                    }
+                };
+
+                // Include buyer_id if the element exists (admin mode)
+                const editBuyerSelect = document.getElementById('editBuyerId');
+                if (editBuyerSelect) {
+                    updatedSurvey.buyer_id = editBuyerSelect.value;
+                }
+
+
+                fetch('/edit_survey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedSurvey)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Survey updated successfully!');
+                        location.reload();
+                    })
+                    .catch(error => {
+                        console.error('Error updating survey:', error);
+                        alert('Error updating survey. Please try again.');
+                    });
+
+                closeEditSurveyModal();
+            });
+
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+                fetch(`/delete_survey/${currentSurveyId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Refresh or update UI
+                            alert('Survey deleted successfully!');
+                            location.reload();
+                        } else {
+                            throw new Error(data.error || 'Failed to delete survey');
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            });
+
+            // Prevent clicks inside modal content from closing it
+            function enableOutsideClickClose(modalId, contentId, closeFn) {
+                const modal = document.getElementById(modalId);
+                const modalContent = document.getElementById(contentId);
+
+                if (!modal || !modalContent) return;
+
+                modal.addEventListener('click', function (event) {
+                    if (!modalContent.contains(event.target)) {
+                        closeFn();
+                    }
+                });
+            }
+
+            // Enable outside-click closing for all modals
+            enableOutsideClickClose('surveyDetailsModal', 'detailsModalContent', closeSurveyDetails);
+            enableOutsideClickClose('addSurveyModal', 'addModalContent', closeAddSurveyModal);
+            enableOutsideClickClose('editSurveyModal', 'editModalContent', closeEditSurveyModal);
+            enableOutsideClickClose('deleteConfirmModal', 'deleteModalContent', closeDeleteModal);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    closeAddSurveyModal();
+                    closeEditSurveyModal();
+                    closeDeleteModal();
+                    closeSurveyDetails();
+                }
+            });
+        </script>
+</body>
+
+</html>

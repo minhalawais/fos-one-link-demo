@@ -26,6 +26,11 @@ interface OfficerData {
   icon: React.ElementType
   stats: { label: string; value: string }[]
   avatar: string
+  credentials: {
+    username: string
+    password: string
+    email: string
+  }
 }
 
 const OFFICERS: OfficerData[] = [
@@ -40,11 +45,16 @@ const OFFICERS: OfficerData[] = [
       { label: "Scope", value: "Production Floor" },
       { label: "Focus", value: "Resolution" },
     ],
+    credentials: {
+      username: "io.unit01",
+      password: "FOS@Unit01",
+      email: "io.unit01@fruitofsustainability.com"
+    }
   },
   {
     id: "IO-GENDER-02",
     role: "Harassment Officer",
-    category: "Harassment",
+    category: "Gender",
     color: "#F5A83C", // Orange
     icon: Users,
     avatar: "/assets/avatars/female_io.png",
@@ -52,6 +62,11 @@ const OFFICERS: OfficerData[] = [
       { label: "Scope", value: "Harassment Cases" },
       { label: "Focus", value: "Sensitivity" },
     ],
+    credentials: {
+      username: "io.gender02",
+      password: "FOS@Gender02",
+      email: "io.gender02@fruitofsustainability.com"
+    }
   },
   {
     id: "IO-CAT-03",
@@ -64,6 +79,11 @@ const OFFICERS: OfficerData[] = [
       { label: "Scope", value: "HSE Incidents" },
       { label: "Focus", value: "Compliance" },
     ],
+    credentials: {
+      username: "io.category03",
+      password: "FOS@Category03",
+      email: "io.category03@fruitofsustainability.com"
+    }
   },
 ]
 
@@ -85,11 +105,11 @@ const cardVariants = {
     scale: 1,
     transition: { type: "spring", stiffness: 100, damping: 20 }
   },
-  hover: { y: -10, scale: 1.05, boxShadow: "0px 20px 40px rgba(0,0,0,0.1)" }
+  hover: { y: -6, scale: 1.02, boxShadow: "0px 16px 30px rgba(0,0,0,0.08)" }
 }
 
 export default function SceneOfficers({ isActive }: { isActive: boolean }) {
-  const [phase, setPhase] = useState<"APPOINTMENT" | "EXPANSION" | "RESPONSIBILITY" | "PORTAL">("APPOINTMENT")
+  const [phase, setPhase] = useState<"APPOINTMENT" | "EXPANSION" | "PORTAL">("APPOINTMENT")
 
   // Script Timing Sync
   useEffect(() => {
@@ -99,13 +119,11 @@ export default function SceneOfficers({ isActive }: { isActive: boolean }) {
     setPhase("APPOINTMENT")
 
     const t1 = setTimeout(() => setPhase("EXPANSION"), 7000) // 7s: "Multiple officers..."
-    const t2 = setTimeout(() => setPhase("RESPONSIBILITY"), 12000) // 12s: "...responsible for managing..."
-    const t3 = setTimeout(() => setPhase("PORTAL"), 18000) // 18s: "Portals Generated..."
+    const t2 = setTimeout(() => setPhase("PORTAL"), 16000) // 16s: transition to secure portal access stage
 
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
-      clearTimeout(t3)
     }
   }, [isActive])
 
@@ -138,10 +156,9 @@ export default function SceneOfficers({ isActive }: { isActive: boolean }) {
             <AppointmentPhase key="appointment" />
           )}
 
-          {(phase === "EXPANSION" || phase === "RESPONSIBILITY" || phase === "PORTAL") && (
+          {(phase === "EXPANSION" || phase === "PORTAL") && (
             <ExpansionPhase
               key="expansion"
-              showDuties={phase === "RESPONSIBILITY"}
               showPortal={phase === "PORTAL"}
             />
           )}
@@ -193,8 +210,8 @@ const AppointmentPhase = () => {
         />
 
         {/* Avatar */}
-        <div className="w-28 h-28 rounded-full border-4 border-gray-100 shadow-inner overflow-hidden mb-6 relative z-10 bg-gray-50 flex items-center justify-center shrink-0">
-          <img src="/assets/avatars/male_io.png" className="w-full h-full object-cover opacity-80" alt="Candidate" />
+        <div className="w-[120px] h-[120px] min-w-[120px] min-h-[120px] rounded-full border-4 border-gray-100 shadow-inner overflow-hidden mb-6 relative z-10 bg-gray-50 flex items-center justify-center shrink-0 aspect-square">
+          <img src="/assets/avatars/male_io.png" className="w-full h-full object-contain scale-[1.55] translate-y-1 opacity-85" alt="Candidate" />
         </div>
 
         {/* Candidate Info */}
@@ -281,19 +298,27 @@ const AppointmentPhase = () => {
 
 // --- PHASE 2 & 3: EXPANSION & RESPONSIBILITY ---
 // --- PHASE 2, 3 & 4: EXPANSION, RESPONSIBILITY & PORTAL ---
-const ExpansionPhase = ({ showDuties, showPortal }: { showDuties: boolean, showPortal: boolean }) => {
+const ExpansionPhase = ({ showPortal }: { showPortal: boolean }) => {
   return (
     <motion.div
-      className="flex flex-col md:flex-row gap-6 items-center justify-center w-full"
+      className="flex flex-col gap-4 items-center justify-center w-full"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="px-5 py-2.5 rounded-full bg-white/80 border border-white/60 shadow-lg"
+      >
+        <span className="text-[10px] font-black text-[#284952] tracking-[0.16em] uppercase">Officer Assignment Matrix</span>
+      </motion.div>
+
+      <div className="flex flex-col md:flex-row gap-5 items-center justify-center w-full">
       {OFFICERS.map((officer, index) => (
         <div key={officer.id} className="relative group">
           <OfficerCard
             officer={officer}
-            showDuties={showDuties}
             showPortal={showPortal}
             delay={index * 0.1}
           />
@@ -304,18 +329,20 @@ const ExpansionPhase = ({ showDuties, showPortal }: { showDuties: boolean, showP
           )}
         </div>
       ))}
+      </div>
     </motion.div>
   )
 }
 
-const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: OfficerData, showDuties: boolean, showPortal: boolean, delay: number }) => {
+const OfficerCard = ({ officer, showPortal, delay }: { officer: OfficerData, showPortal: boolean, delay: number }) => {
   const Icon = officer.icon
+  const isUnitOfficer = officer.category === "Unit"
 
   return (
     <motion.div
       variants={cardVariants}
       whileHover="hover"
-      className="w-72 bg-white rounded-2xl shadow-xl border border-white/60 overflow-hidden relative flex flex-col items-center backdrop-blur-sm"
+      className="w-72 bg-white rounded-2xl shadow-[0_18px_36px_-22px_rgba(15,23,42,0.35)] border border-white/60 overflow-hidden relative flex flex-col items-center backdrop-blur-sm"
     >
       {/* Header Color Bar */}
       <div className="w-full h-2" style={{ backgroundColor: officer.color }} />
@@ -338,9 +365,11 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
         </div>
 
         {/* Avatar Box */}
-        <div className="relative mb-6 group-hover:scale-105 transition-transform duration-300 shrink-0">
+        <div className="relative mb-5 group-hover:scale-[1.02] transition-transform duration-300 shrink-0">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/20 rounded-full blur-md" />
-          <img src={officer.avatar} alt={officer.role} className="w-20 h-20 object-contain drop-shadow-lg" />
+          <div className={`${isUnitOfficer ? "w-24 h-24 min-w-24 min-h-24" : "w-20 h-20 min-w-20 min-h-20"} rounded-full overflow-hidden bg-gradient-to-br from-white to-gray-50 border-2 border-gray-100 shadow-inner flex items-center justify-center p-1.5 aspect-square`}>
+            <img src={officer.avatar} alt={officer.role} className={`w-full h-full object-contain ${isUnitOfficer ? "scale-[1.45] translate-y-1" : ""}`} />
+          </div>
 
           {/* Verification Tick */}
           <motion.div
@@ -353,7 +382,7 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
           </motion.div>
         </div>
 
-        <h3 className="text-base font-bold text-[#284952] mb-1">{officer.role}</h3>
+        <h3 className="text-base font-bold text-[#284952] mb-1 text-center">{officer.role}</h3>
 
         {/* Stats Grid */}
         <div className="w-full grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-dashed border-gray-200">
@@ -364,38 +393,15 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
             </div>
           ))}
         </div>
+
+        <div className="w-full mt-3 rounded-xl bg-[#f8fafc] border border-gray-100 p-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[8px] uppercase font-bold tracking-wider text-gray-400">Assigned Responsibility</span>
+            <Briefcase size={12} style={{ color: officer.color }} />
+          </div>
+          <p className="mt-1.5 text-[10px] font-semibold text-[#284952]">Manage grievance resolution and documentation.</p>
+        </div>
       </div>
-
-      {/* --- RESPONSIBILITY OVERLAY (Phase 3) --- --- */}
-      <AnimatePresence>
-        {showDuties && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-[#284952]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-20"
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-              className="mb-3 p-3 rounded-full border-2 border-dashed border-white/30"
-            >
-              <FileCheck2 className="text-white" size={24} />
-            </motion.div>
-            <h4 className="text-white font-bold text-sm mb-1">Active Duty</h4>
-            <p className="text-white/80 text-xs mb-4">Grievance Resolution & Documentation</p>
-
-            <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-[#60BA81]"
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* --- PORTAL ACCESS OVERLAY (Phase 4) --- --- */}
       <AnimatePresence>
@@ -429,6 +435,21 @@ const OfficerCard = ({ officer, showDuties, showPortal, delay }: { officer: Offi
               <h4 className="text-[11px] font-bold text-[#284952] uppercase tracking-tighter mb-1 text-center">Portal Generated</h4>
               <div className="bg-[#60BA81]/10 px-2 py-0.5 rounded-full mb-3">
                 <span className="text-[9px] font-bold text-[#60BA81]">Credentials Assigned</span>
+              </div>
+
+              <div className="w-full space-y-1.5 bg-white border border-gray-100 rounded-lg p-2.5 mb-3 text-left">
+                <div className="flex justify-between gap-2 text-[8px]">
+                  <span className="text-gray-400 uppercase font-bold tracking-wide">Username</span>
+                  <span className="text-[#284952] font-mono font-bold break-all text-right">{officer.credentials.username}</span>
+                </div>
+                <div className="flex justify-between gap-2 text-[8px]">
+                  <span className="text-gray-400 uppercase font-bold tracking-wide">Password</span>
+                  <span className="text-[#284952] font-mono font-bold break-all text-right">{officer.credentials.password}</span>
+                </div>
+                <div className="flex justify-between gap-2 text-[8px]">
+                  <span className="text-gray-400 uppercase font-bold tracking-wide">Email</span>
+                  <span className="text-[#284952] font-mono font-bold break-all text-right">{officer.credentials.email}</span>
+                </div>
               </div>
 
               <div className="w-full space-y-1.5 opacity-60">

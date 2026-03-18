@@ -29,7 +29,8 @@ import {
   X,
   Mail,
   ChevronDown,
-  Send
+  Send,
+  Sparkles
 } from "lucide-react"
 
 // Assets
@@ -66,14 +67,23 @@ export function SceneRCACAPAEvidence({ isActive, progress = 0 }: SceneRCACAPAEvi
   const [deadlineText, setDeadlineText] = useState("")
   const [routeEmail, setRouteEmail] = useState("")
   const [routeMessage, setRouteMessage] = useState("")
+  const [routeMethodText, setRouteMethodText] = useState("")
+  const [submitRightsText, setSubmitRightsText] = useState("")
+  const [showSubmitToFOSModal, setShowSubmitToFOSModal] = useState(false)
+  const [hasShownSubmitToFOSModal, setHasShownSubmitToFOSModal] = useState(false)
+  const [postSubmitTimelineReset, setPostSubmitTimelineReset] = useState(false)
+  const [showTimelineSwitchCue, setShowTimelineSwitchCue] = useState(false)
+  const [timelineComplaintId, setTimelineComplaintId] = useState("XX211117-11XXXX")
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Full deadline text to type
   const deadlineFullText = "20/11/2025 10:00"
 
   // Route modal text content
+  const routeMethodFull = "Via Email"
   const routeEmailFull = "hr.manager@company.com"
   const routeMessageFull = "Please review the complaint regarding shift scheduling. The case requires HR intervention for policy clarification."
+  const submitRightsFull = "Submit Changes"
 
   // Voice-over synced text content
   const rcaFullText = `The complaint is VALID based on the investigation findings.
@@ -218,6 +228,8 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
   // Reset typing state before each typing section begins
   // This ensures typing animations replay correctly even after hot-reloads
   useEffect(() => {
+    if (postSubmitTimelineReset) return
+
     // Clear ALL text during overview/early stages
     if (stage <= 5) {
       setRcaText("")
@@ -229,12 +241,14 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
     else if (stage >= 6 && stage <= 8) {
       setCapaText("")
     }
-  }, [stage])
+  }, [stage, postSubmitTimelineReset])
 
   // RCA Typing Effect - Starts when RCA is focused (stage 21) and types across stages 21→6→7
   // ~320 chars over ~7 seconds = visible, human-readable typing speed
   // Pre-fill if we're past the typing window (stage 8+, but NOT stage 21 which is a focus stage)
   useEffect(() => {
+    if (postSubmitTimelineReset) return
+
     if (stage >= 8 && stage !== 21 && rcaText.length < rcaFullText.length) {
       setRcaText(rcaFullText)
     } else if ((stage === 21 || stage === 6 || stage === 7) && rcaText.length < rcaFullText.length) {
@@ -249,11 +263,13 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       }, 40) // 40ms per 2 chars ≈ 6.4 seconds for full text
       return () => clearInterval(interval)
     }
-  }, [stage, rcaText.length])
+  }, [stage, rcaText.length, postSubmitTimelineReset])
 
   // Deadline Typing Effect - Stage 8 (4 seconds: 51-55s)
   // Pre-fill if we're past stage 8
   useEffect(() => {
+    if (postSubmitTimelineReset) return
+
     if (stage > 8 && deadlineText.length < deadlineFullText.length) {
       setDeadlineText(deadlineFullText)
     } else if (stage === 8 && deadlineText.length < deadlineFullText.length) {
@@ -267,12 +283,14 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       }, 200) // Type 1 char every 200ms = ~3.2 seconds for full deadline
       return () => clearInterval(interval)
     }
-  }, [stage, deadlineText.length])
+  }, [stage, deadlineText.length, postSubmitTimelineReset])
 
   // CAPA Typing Effect - Starts when CAPA is focused (stage 9) and types across stages 9→10→11
   // ~310 chars over ~12 seconds = visible, human-readable typing speed
   // Pre-fill if we're past stage 11
   useEffect(() => {
+    if (postSubmitTimelineReset) return
+
     if (stage > 11 && capaText.length < capaFullText.length) {
       setCapaText(capaFullText)
     } else if (stage >= 9 && stage <= 11 && capaText.length < capaFullText.length) {
@@ -287,7 +305,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       }, 40) // 40ms per 2 chars ≈ 6.2 seconds for full text
       return () => clearInterval(interval)
     }
-  }, [stage, capaText.length])
+  }, [stage, capaText.length, postSubmitTimelineReset])
 
   // File upload animations - SLOWER (spread across 76-87s = 11 seconds)
   useEffect(() => {
@@ -322,11 +340,60 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
     }
   }, [stage])
 
+  // Stage 18 (94-98s): click Submit Changes, then show confirmation before stage 19 begins.
+  useEffect(() => {
+    if (stage === 18) {
+      setHasShownSubmitToFOSModal(false)
+      setPostSubmitTimelineReset(false)
+      setShowTimelineSwitchCue(false)
+      setShowSubmitToFOSModal(false)
+      const timer = setTimeout(() => {
+        setShowSubmitToFOSModal(true)
+        setHasShownSubmitToFOSModal(true)
+      }, 1200)
+      return () => clearTimeout(timer)
+    }
+
+    setShowSubmitToFOSModal(false)
+  }, [stage])
+
+  // After stage 18 confirmation appears, clear timeline form data when timeline returns at stage 19.
+  useEffect(() => {
+    if (stage === 19 && hasShownSubmitToFOSModal) {
+      setPostSubmitTimelineReset(true)
+      setTimelineComplaintId("XX011131-47XXXX")
+      setShowTimelineSwitchCue(true)
+      setRcaText("")
+      setCapaText("")
+      setDeadlineText("")
+      setUploadedFiles([])
+      setDraggingFile(null)
+
+      const timer = setTimeout(() => {
+        setShowTimelineSwitchCue(false)
+      }, 2200)
+
+      return () => clearTimeout(timer)
+    }
+  }, [stage, hasShownSubmitToFOSModal])
+
   // Route Modal Typing Effect - Stage 22 (6 seconds: 100-106s, after button click)
   useEffect(() => {
     if (stage === 22) {
-      // Type email first (2 seconds)
-      if (routeEmail.length < routeEmailFull.length) {
+      // 100-106s: Type one field at a time for clear, production-grade data-entry visualization.
+      if (routeMethodText.length < routeMethodFull.length) {
+        const interval = setInterval(() => {
+          setRouteMethodText((prev) => {
+            if (prev.length < routeMethodFull.length) {
+              return routeMethodFull.slice(0, prev.length + 1)
+            }
+            return prev
+          })
+        }, 90)
+        return () => clearInterval(interval)
+      }
+      // Type email next.
+      else if (routeEmail.length < routeEmailFull.length) {
         const interval = setInterval(() => {
           setRouteEmail((prev) => {
             if (prev.length < routeEmailFull.length) {
@@ -334,10 +401,10 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
             }
             return prev
           })
-        }, 80) // 80ms per char = ~1.8 seconds for email
+        }, 70)
         return () => clearInterval(interval)
       }
-      // Then type message (4 seconds)
+      // Then type message body.
       else if (routeMessage.length < routeMessageFull.length) {
         const interval = setInterval(() => {
           setRouteMessage((prev) => {
@@ -346,11 +413,33 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
             }
             return prev
           })
-        }, 60) // 60ms per 2 chars = ~3.5 seconds for message
+        }, 55)
+        return () => clearInterval(interval)
+      }
+      // Finally type submit rights selection.
+      else if (submitRightsText.length < submitRightsFull.length) {
+        const interval = setInterval(() => {
+          setSubmitRightsText((prev) => {
+            if (prev.length < submitRightsFull.length) {
+              return submitRightsFull.slice(0, prev.length + 1)
+            }
+            return prev
+          })
+        }, 65)
         return () => clearInterval(interval)
       }
     }
-  }, [stage, routeEmail.length, routeMessage.length])
+  }, [stage, routeMethodText.length, routeEmail.length, routeMessage.length, submitRightsText.length])
+
+  // Reset modal typing whenever we leave route modal stage so it can replay from start.
+  useEffect(() => {
+    if (stage !== 22) {
+      setRouteMethodText("")
+      setRouteEmail("")
+      setRouteMessage("")
+      setSubmitRightsText("")
+    }
+  }, [stage])
 
   // Reset on inactive
   useEffect(() => {
@@ -359,8 +448,15 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
       setRcaText("")
       setCapaText("")
       setDeadlineText("")
+      setRouteMethodText("")
       setRouteEmail("")
       setRouteMessage("")
+      setSubmitRightsText("")
+      setShowSubmitToFOSModal(false)
+      setHasShownSubmitToFOSModal(false)
+      setPostSubmitTimelineReset(false)
+      setShowTimelineSwitchCue(false)
+      setTimelineComplaintId("XX211117-11XXXX")
       setUploadedFiles([])
       setShowSuccess(false)
       setDraggingFile(null)
@@ -756,6 +852,40 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
           >
             {/* Timeline Content - Matching Original Layout */}
             <div className="relative flex-1 p-3 overflow-hidden">
+              {/* Complaint context chip to clearly indicate the active timeline */}
+              <div className="absolute top-2 left-3 z-20 flex items-center gap-1.5 rounded-full border border-[#cde4de] bg-[#eef8f5] px-2.5 py-1">
+                <span className="text-[8px] font-semibold text-[#3c6d64]">Complaint Timeline</span>
+                <span className="text-[8px] font-bold text-[#0f9690]">#{timelineComplaintId}</span>
+              </div>
+
+              <AnimatePresence>
+                {showTimelineSwitchCue && stage === 19 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 20 }}
+                    className="absolute inset-x-4 top-11 z-30 pointer-events-none"
+                  >
+                    <div className="rounded-xl border border-[#d4ece5] bg-white/95 backdrop-blur-sm px-3.5 py-2.5 shadow-[0_15px_35px_-18px_rgba(15,150,144,0.75)]">
+                      <div className="flex items-center gap-2.5">
+                        <motion.div
+                          animate={{ rotate: [0, 8, -8, 0] }}
+                          transition={{ duration: 0.9, repeat: Number.POSITIVE_INFINITY, repeatDelay: 0.4 }}
+                          className="w-6 h-6 rounded-lg bg-[#0f9690]/15 flex items-center justify-center"
+                        >
+                          <Sparkles size={14} className="text-[#0f9690]" />
+                        </motion.div>
+                        <div>
+                          <p className="text-[10px] font-bold text-[#1f3f47]">New Complaint Timeline Loaded</p>
+                          <p className="text-[9px] text-[#4f6f76]">Switched to complaint #{timelineComplaintId} for routing workflow.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {/* Central Timeline Line - Vertical Dashed */}
               <div className="absolute left-1/2 top-4 bottom-16 w-0 -translate-x-1/2 border-l-2 border-dashed border-gray-300" />
 
@@ -1162,29 +1292,118 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                   </motion.div>
                 )}
               </div>
-              <motion.button
-                className="px-2.5 py-1 rounded text-[9px] font-medium text-white"
-                style={{ backgroundColor: "#0095da" }}
-                animate={{
-                  scale: stage === 18 ? [1, 1.1, 1] : 1,
-                  boxShadow: stage === 18 ? `0 0 20px ${COLORS.teal}` : "none",
-                }}
-                transition={{
-                  duration: 0.4,
-                  repeat: stage === 18 ? Number.POSITIVE_INFINITY : 0,
-                  repeatDelay: 0.3,
-                }}
-              >
-                Submit Changes
-              </motion.button>
+              <div className="relative">
+                <motion.button
+                  className="px-2.5 py-1 rounded text-[9px] font-medium text-white"
+                  style={{ backgroundColor: "#0095da" }}
+                  animate={{
+                    boxShadow: stage === 18 ? `0 0 18px ${COLORS.teal}55` : "none",
+                  }}
+                >
+                  Submit Changes
+                </motion.button>
+
+                {/* Stage 18: explicit click visualization synced to narration */}
+                {stage === 18 && (
+                  <motion.div
+                    className="absolute z-50 pointer-events-none"
+                    initial={{ x: 72, y: 24, opacity: 0 }}
+                    animate={{
+                      x: [72, 18, 18, 18],
+                      y: [24, -3, -3, -3],
+                      opacity: [0, 1, 1, 1],
+                      scale: [1, 1, 0.86, 1],
+                    }}
+                    transition={{
+                      duration: 1.4,
+                      times: [0, 0.5, 0.72, 0.9],
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <svg width="20" height="24" viewBox="0 0 24 28" fill="none">
+                      <path
+                        d="M5 2L5 20L9.5 16L13.5 24L16.5 22.5L12.5 14.5L18 13L5 2Z"
+                        fill="white"
+                        stroke="#333"
+                        strokeWidth="1.5"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <motion.div
+                      className="absolute top-0 left-0 w-4 h-4 rounded-full border-2"
+                      style={{ borderColor: COLORS.teal }}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{
+                        scale: [0, 0, 2.5],
+                        opacity: [0, 0, 0.65, 0],
+                      }}
+                      transition={{
+                        duration: 1.4,
+                        times: [0, 0.66, 0.88, 1],
+                        ease: "easeOut",
+                      }}
+                    />
+                  </motion.div>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>
       </motion.div>
 
+      {/* Stage 18: complaint submitted confirmation modal */}
+      <AnimatePresence>
+        {showSubmitToFOSModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/25 backdrop-blur-[2px] flex items-center justify-center z-40"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 14 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              transition={{ type: "spring", stiffness: 260, damping: 24 }}
+              className="w-[470px] max-w-[90%] rounded-2xl overflow-hidden border border-white/80 bg-white shadow-[0_35px_90px_-22px_rgba(17,24,39,0.45)]"
+            >
+              <div className="px-5 py-4" style={{ background: "linear-gradient(135deg, #284952 0%, #0f9690 100%)" }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                    <CheckCircle2 size={22} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white text-base font-bold">Submitted To FOS Hotline Team</p>
+                    <p className="text-[11px] text-white/80">Case forwarded for complainant verification workflow</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-5 py-4 space-y-3.5 bg-gradient-to-b from-white to-[#f6fbfa]">
+                <div className="rounded-xl border border-[#d9ece8] bg-white px-3.5 py-3">
+                  <p className="text-[12px] leading-relaxed text-gray-700">
+                    This complaint has been submitted to <span className="font-bold" style={{ color: COLORS.teal }}>FOS Hotline Team</span>.
+                    They will now review the response and call the complainant for complaint closure.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5 text-[10px]">
+                  <div className="rounded-lg bg-[#eaf7f4] border border-[#d4ece5] px-2.5 py-2 text-[#2f5f56] font-semibold">
+                    Status: Sent For Verification
+                  </div>
+                  <div className="rounded-lg bg-[#eef4f7] border border-[#dbe6eb] px-2.5 py-2 text-[#3a5a66] font-semibold">
+                    Next Step: Hotline Call
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Investigation Officer Visualization - Bottom Left Corner */}
       <AnimatePresence>
-        {stage >= 5 && (
+        {stage >= 5 && stage !== 17 && stage !== 18 && stage !== 19 && stage !== 20 && (
           <motion.div
             initial={{ x: 120, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -1342,12 +1561,12 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-white rounded-xl shadow-2xl w-[400px] max-w-[90%] overflow-hidden"
+              className="bg-white rounded-xl shadow-2xl w-[360px] max-w-[86%] overflow-hidden"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-                <h2 className="text-base font-bold" style={{ color: COLORS.teal }}>
-                  Route Complaint #XX011131-47XXXX
+                <h2 className="text-sm font-bold" style={{ color: COLORS.teal }}>
+                  Route Complaint #{timelineComplaintId}
                 </h2>
                 <button className="text-gray-400 hover:text-gray-600 transition-colors">
                   <X size={16} />
@@ -1355,21 +1574,39 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
               </div>
 
               {/* Modal Body */}
-              <div className="px-6 py-5 space-y-5">
+              <div className="px-5 py-4 space-y-3.5">
                 {/* Route Method */}
                 <div>
                   <label className="block text-xs font-medium mb-1.5" style={{ color: COLORS.teal }}>
                     Route Method:
                   </label>
                   <motion.div
-                    className="flex items-center justify-between px-2.5 py-2 border-2 rounded bg-white"
+                    className="flex items-center justify-between px-2.5 py-1.5 border-2 rounded bg-white"
                     animate={{
-                      borderColor: COLORS.teal,
+                      borderColor:
+                        routeMethodText.length < routeMethodFull.length
+                          ? COLORS.teal
+                          : routeMethodText.length > 0
+                            ? "#b7ddd6"
+                            : "#e5e7eb",
+                      boxShadow:
+                        routeMethodText.length < routeMethodFull.length
+                          ? `0 0 8px ${COLORS.teal}30`
+                          : "none",
                     }}
                   >
                     <div className="flex items-center gap-2">
                       <Mail size={14} style={{ color: COLORS.teal }} />
-                      <span className="text-xs text-gray-700">Via Email</span>
+                      <span className="text-xs text-gray-700">
+                        {routeMethodText || <span className="text-gray-400">Select route method</span>}
+                        {routeMethodText.length > 0 && routeMethodText.length < routeMethodFull.length && (
+                          <motion.span
+                            animate={{ opacity: [1, 0] }}
+                            transition={{ repeat: Infinity, duration: 0.5 }}
+                            className="inline-block w-0.5 h-3.5 bg-[#0f9690] ml-0.5 align-middle"
+                          />
+                        )}
+                      </span>
                     </div>
                     <ChevronDown size={14} className="text-gray-400" />
                   </motion.div>
@@ -1381,7 +1618,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                     Recipient Email:
                   </label>
                   <motion.div
-                    className="flex items-center px-2.5 py-2 border-2 rounded bg-white"
+                    className="flex items-center px-2.5 py-1.5 border-2 rounded bg-white"
                     animate={{
                       borderColor: routeEmail.length > 0 ? COLORS.teal : "#e5e7eb",
                       boxShadow: routeEmail.length > 0 && routeEmail.length < routeEmailFull.length ? `0 0 8px ${COLORS.teal}30` : "none",
@@ -1406,7 +1643,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                     Message:
                   </label>
                   <motion.div
-                    className="px-2.5 py-2 border-2 rounded bg-white min-h-[80px]"
+                    className="px-2.5 py-1.5 border-2 rounded bg-white min-h-[64px]"
                     animate={{
                       borderColor: routeMessage.length > 0 ? COLORS.teal : "#e5e7eb",
                       boxShadow: routeMessage.length > 0 && routeMessage.length < routeMessageFull.length ? `0 0 8px ${COLORS.teal}30` : "none",
@@ -1430,8 +1667,17 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                   <label className="block text-xs font-medium mb-1.5" style={{ color: COLORS.teal }}>
                     Submit Rights:
                   </label>
-                  <div className="flex items-center justify-between px-2.5 py-2 border border-gray-300 rounded bg-white">
-                    <span className="text-xs text-gray-400">-- Select an option --</span>
+                  <div className="flex items-center justify-between px-2.5 py-1.5 border border-gray-300 rounded bg-white">
+                    <span className="text-xs text-gray-700">
+                      {submitRightsText || <span className="text-gray-400">-- Select an option --</span>}
+                      {submitRightsText.length > 0 && submitRightsText.length < submitRightsFull.length && (
+                        <motion.span
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ repeat: Infinity, duration: 0.5 }}
+                          className="inline-block w-0.5 h-3.5 bg-[#0f9690] ml-0.5 align-middle"
+                        />
+                      )}
+                    </span>
                     <ChevronDown size={14} className="text-gray-400" />
                   </div>
                 </div>
@@ -1461,7 +1707,7 @@ Assigned to: HR Manager | Deadline: 20 Nov 2025`
                   </motion.button>
 
                   {/* Animated Cursor - clicks the Route Complaint submit button */}
-                  {stage === 22 && routeMessage.length >= routeMessageFull.length && (
+                  {stage === 22 && submitRightsText.length >= submitRightsFull.length && (
                     <motion.div
                       className="absolute z-50 pointer-events-none"
                       initial={{ x: 60, y: 30, opacity: 0 }}

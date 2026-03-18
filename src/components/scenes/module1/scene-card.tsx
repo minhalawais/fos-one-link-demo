@@ -72,12 +72,12 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
       scale: 0.8
     },
     scanning: {
-      x: 260, // Further adjusted for larger card
-      y: 200, // Further adjusted
+      x: 320, // Rebalanced for larger main card and larger phone
+      y: 215,
       rotateX: 20,
       rotateZ: -5,
       opacity: 1,
-      scale: 0.9,
+      scale: 1,
       transition: { type: "spring", stiffness: 80, damping: 15 }
     },
     centered: {
@@ -86,7 +86,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
       rotateX: 0,
       rotateZ: -90, // ROTATE TO LANDSCAPE (Counter-Clockwise)
       opacity: 1,
-      scale: 1.2, // Larger for viewing
+      scale: 1.3, // Larger for viewing
       transition: {
         type: "spring",
         stiffness: 60,
@@ -118,7 +118,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
 
       {/* --- 2. THE CARD (Background) --- */}
       <motion.div
-        className="relative z-10 w-full max-w-[640px] mx-6"
+        className="relative z-10 w-full max-w-[760px] mx-6"
         initial={{ y: 0, rotateX: 0, opacity: 1, scale: 1 }}
         animate={{
           y: elapsed < 1 ? 120 : 0,
@@ -140,8 +140,8 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
 
           {/* HEADER */}
           <div className="px-5 pt-5 pb-2 flex justify-between items-start gap-3 z-20 relative">
-            <motion.div className="w-[56px] h-[48px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
-              <img src="/assets/images/FOS-01.png" alt="FOS" className="w-[85%] h-[85%] object-contain" />
+            <motion.div className="w-[100px] h-[100px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
+              <img src="/assets/images/FOS-01.png" alt="FOS" className="w-full h-full object-contain" />
             </motion.div>
             <motion.div className="flex-1 flex flex-col items-center pt-1" animate={getFocusStyle(isFocusId)}>
               <div className="bg-[#3E3B38] text-white px-3 py-1 rounded-lg shadow-sm mb-2">
@@ -152,8 +152,8 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
                 <span className="text-2xl font-black text-[#284952] tracking-tight">475002</span>
               </div>
             </motion.div>
-            <motion.div className="w-[56px] h-[48px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
-              <img src="/assets/images/company_a.png" alt="Co" className="w-[85%] h-[85%] object-contain" />
+            <motion.div className="w-[100px] h-[100px] border border-gray-100 rounded-xl flex items-center justify-center bg-white shadow-sm shrink-0" animate={getFocusStyle(false)}>
+              <img src="/assets/images/company_a.png" alt="Co" className="w-full h-full object-contain" />
             </motion.div>
           </div>
 
@@ -213,7 +213,7 @@ export const SceneCard = ({ isActive }: { isActive: boolean }) => {
             variants={phoneVariants}
           >
             {/* PHONE CHASSIS */}
-            <div className="w-[240px] h-[480px] bg-[#121212] rounded-[40px] border-[5px] border-[#2d2d2d] shadow-[0_40px_80px_rgba(0,0,0,0.6)] overflow-hidden relative ring-1 ring-white/10">
+            <div className="w-[280px] h-[560px] bg-[#121212] rounded-[44px] border-[5px] border-[#2d2d2d] shadow-[0_40px_80px_rgba(0,0,0,0.6)] overflow-hidden relative ring-1 ring-white/10">
 
               {/* STATUS BAR (Hide when video is playing for immersion) */}
               <motion.div
@@ -332,8 +332,8 @@ const VideoPlayer = () => {
       <div
         className="absolute"
         style={{
-          width: "490px",
-          height: "230px",
+          width: "570px",
+          height: "270px",
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%) rotate(90deg)",

@@ -216,7 +216,7 @@ export default function SceneIOTraining({ isActive, progress }: { isActive: bool
           className="w-44 h-44 rounded-full border-[8px] border-white shadow-2xl flex items-center justify-center bg-gray-100 overflow-hidden relative shrink-0"
           animate={{ boxShadow: stage === 4 ? "0 0 60px #60BA81" : "0 20px 40px rgba(0,0,0,0.1)" }}
         >
-          <img src="/assets/avatars/male_io_training.png" className="w-full h-full object-cover" alt="Officer" />
+          <img src="/assets/avatars/male_io_training.png" className="w-full h-full object-contain" alt="Officer" />
 
           {/* FOS Team Intro Overlay */}
           <AnimatePresence>

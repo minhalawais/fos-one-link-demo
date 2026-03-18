@@ -17,7 +17,8 @@ import {
     ShieldCheck,
     Smartphone as SmartphoneIcon,
     Monitor,
-    User
+    User,
+    MessageSquareMore
 } from "lucide-react"
 
 // --- THEME CONSTANTS ---
@@ -44,6 +45,9 @@ const MOCK_DATA = [
     { id: "31649", name: "Fatima Bibi", role: "HR", avatar: "FB", cnic: "34603-4432214-5", fosId: "151649" },
     { id: "90124", name: "Hassan Raza", role: "Logistics", avatar: "HR", cnic: "34603-8876651-6", fosId: "150124" },
 ]
+
+// Phase 3 delivery visualization intentionally focuses on 4 recipients.
+const SMS_RECIPIENTS = MOCK_DATA.slice(0, 4)
 
 // --- UTILITY COMPONENTS ---
 
@@ -151,7 +155,7 @@ const FOSIDGenerator = ({ text, Trigger, isLinked, className = "" }: any) => {
 }
 
 
-const IdentityRow = ({ data, showId, showLink, showSend }: any) => {
+const IdentityRow = ({ data, showId, showLink, showSend, dimmed = false, focus = false }: any) => {
 
     const companyId = "15"
     const highlightPart = data.cnic.slice(-5)
@@ -161,8 +165,10 @@ const IdentityRow = ({ data, showId, showLink, showSend }: any) => {
     return (
         <motion.div
             className={`
-                flex items-center gap-2 p-2 rounded-xl border relative bg-white mb-1 group
+                flex items-center gap-2 p-2 rounded-xl border relative bg-white mb-1 group transition-all duration-500
                 ${showLink ? "border-green-200 bg-green-50/20 shadow-sm" : "border-slate-100"}
+                ${dimmed ? "opacity-45 blur-[0.2px]" : "opacity-100"}
+                ${focus ? "ring-1 ring-green-300/70 shadow-[0_8px_20px_-12px_rgba(96,186,129,0.7)]" : ""}
             `}
         >
             <Avatar initials={data.avatar} />
@@ -362,48 +368,108 @@ const SMSBubble = ({ message, isReceived = true, delay = 0 }: any) => (
 
 // --- NEW ENHANCEMENT COMPONENTS ---
 
-const IDGenerationVisual = ({ active }: { active: boolean }) => (
-    <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: active ? 1 : 0 }}
-        transition={{ duration: 0.8 }}
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-    >
-        <div className="relative w-64 h-full overflow-hidden flex justify-center gap-6 mask-linear-fade">
-            {[...Array(5)].map((_, i) => (
+const IDGenerationVisual = ({ active, sceneTime, employee }: { active: boolean, sceneTime: number, employee: typeof MOCK_DATA[0] }) => {
+    const progress = Math.max(0, Math.min(1, (sceneTime - 1) / 6.6))
+    const companyId = "15"
+    const sourceId = employee.id
+    const lastFour = sourceId.slice(-4)
+    const revealCount = Math.floor(progress * lastFour.length)
+    const suffix = `${lastFour.slice(0, revealCount)}${"•".repeat(Math.max(0, lastFour.length - revealCount))}`
+    const generated = `${companyId}${lastFour}`
+
+    const stepA = progress >= 0.15
+    const stepB = progress >= 0.45
+    const stepC = progress >= 0.72
+    const stepD = progress >= 0.92
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 1 : 0 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        >
+            <div className="absolute inset-0">
                 <motion.div
-                    key={i}
-                    animate={{ y: [0, -800] }}
-                    transition={{ duration: 12 + i * 1.5, repeat: Infinity, ease: "linear" }}
-                    className="flex flex-col gap-3 items-center opacity-15"
-                >
-                    {[...Array(40)].map((_, j) => (
-                        <div key={j} className="text-[10px] font-mono font-bold text-green-500/60 transition-colors duration-500">
-                            {Math.random() > 0.8 ? `FOS-${Math.floor(Math.random() * 900) + 100}` : (Math.random() > 0.5 ? "1" : "0")}
+                    animate={{ opacity: [0.05, 0.12, 0.05], scale: [0.95, 1, 0.95] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-green-300/20 blur-3xl"
+                />
+            </div>
+
+            <div className="relative w-[300px] rounded-2xl border border-slate-200/90 bg-white/90 backdrop-blur-xl shadow-[0_20px_60px_-20px_rgba(15,23,42,0.35)] overflow-hidden">
+                <div className="px-4 py-3 border-b border-slate-100 bg-gradient-to-r from-[#284952]/10 to-green-500/10">
+                    <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-[#284952] flex items-center justify-center">
+                            <Key size={13} className="text-white" />
                         </div>
-                    ))}
-                </motion.div>
-            ))}
-        </div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                className="w-40 h-40 border-[1px] border-dashed border-green-300/20 rounded-full"
-            />
-            <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-2 border-[1px] border-dashed border-green-400/20 rounded-full"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-                <div className="p-4 bg-white/5 backdrop-blur-md rounded-2xl border border-green-500/10 shadow-2xl">
-                    <Key className="text-green-500/40" size={32} />
+                        <div>
+                            <div className="text-[10px] font-black uppercase tracking-[0.12em] text-[#284952]">Generating Unique FOS ID</div>
+                            <div className="text-[9px] text-slate-500">Focused walkthrough for one employee</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="px-4 pt-3 pb-2">
+                    <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg p-2">
+                        <Avatar initials={employee.avatar} />
+                        <div className="min-w-0">
+                            <div className="text-[10px] font-bold text-slate-700 truncate">{employee.name}</div>
+                            <div className="text-[8px] font-mono text-slate-400 truncate">{employee.role}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="px-4 pb-4 space-y-2">
+                    <div className={`rounded-lg border px-3 py-2 transition-all duration-500 ${stepA ? "border-green-300 bg-green-50/70" : "border-slate-200 bg-white"}`}>
+                        <div className="text-[8px] uppercase font-bold tracking-wide text-slate-400">Raw Company ID</div>
+                        <div className="text-[12px] font-mono font-bold text-slate-700 mt-0.5">{sourceId}</div>
+                    </div>
+
+                    <div className="flex items-center justify-center h-4">
+                        <motion.div
+                            animate={{ height: stepB ? 16 : 0, opacity: stepB ? 1 : 0.2 }}
+                            transition={{ duration: 0.35 }}
+                            className="w-[1px] bg-gradient-to-b from-green-400 to-green-200"
+                        />
+                    </div>
+
+                    <div className={`rounded-lg border px-3 py-2 transition-all duration-500 ${stepB ? "border-green-300 bg-green-50/70" : "border-slate-200 bg-white"}`}>
+                        <div className="text-[8px] uppercase font-bold tracking-wide text-slate-400">Extract Last 4 Digits</div>
+                        <div className="text-[12px] font-mono font-bold mt-0.5">
+                            <span className="text-slate-400">{sourceId.slice(0, -4)}</span>
+                            <span className="text-green-600 bg-green-100/80 px-1 rounded ml-1">{lastFour}</span>
+                        </div>
+                    </div>
+
+                    <div className="relative rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2 overflow-hidden">
+                        <motion.div
+                            initial={{ left: "-40%" }}
+                            animate={{ left: stepC ? "100%" : "-40%" }}
+                            transition={{ duration: 1.4, repeat: stepC ? Infinity : 0, ease: "linear" }}
+                            className="absolute inset-y-0 w-10 bg-gradient-to-r from-transparent via-white/70 to-transparent skew-x-12"
+                        />
+                        <div className="text-[8px] uppercase font-bold tracking-wide text-slate-400">Compose FOS ID</div>
+                        <div className="mt-1 flex items-center gap-1 text-[13px] font-mono font-black">
+                            <span className="text-slate-500">{companyId}</span>
+                            <span className="text-slate-400">+</span>
+                            <span className={`${stepC ? "text-green-600" : "text-slate-400"}`}>{suffix}</span>
+                        </div>
+                    </div>
+
+                    <motion.div
+                        animate={{ opacity: stepD ? [0.7, 1, 0.7] : 0.5, scale: stepD ? [1, 1.02, 1] : 1 }}
+                        transition={{ duration: 1.2, repeat: Infinity }}
+                        className={`rounded-lg border px-3 py-2 ${stepD ? "border-green-400 bg-green-100/80 shadow-[0_0_0_1px_rgba(96,186,129,0.35)]" : "border-slate-200 bg-white"}`}
+                    >
+                        <div className="text-[8px] uppercase font-bold tracking-wide text-slate-400">Final FOS ID</div>
+                        <div className={`text-[14px] font-mono font-black mt-0.5 ${stepD ? "text-[#284952]" : "text-slate-500"}`}>{generated}</div>
+                    </motion.div>
                 </div>
             </div>
-        </div>
-    </motion.div>
-)
+        </motion.div>
+    )
+}
 
 const MappingNexus = ({ active }: { active: boolean }) => (
     <motion.div
@@ -530,12 +596,10 @@ const CNICTransformationPipeline = ({ sceneTime, startIdGen, startMapping }: {
     sceneTime: number, startIdGen: boolean, startMapping: boolean
 }) => {
     // Determine which employee is currently being processed
-    const maxPipelineEmps = startMapping ? MOCK_DATA.length : 3 // Only show 3 in Act 1
+    const maxPipelineEmps = startMapping ? MOCK_DATA.length : 1 // Act 1 focuses on one employee for clarity
     const currentEmpIndex = startMapping
         ? Math.min(MOCK_DATA.length - 1, Math.floor((sceneTime - 8) / 3))
-        : startIdGen
-            ? Math.min(maxPipelineEmps - 1, Math.floor((sceneTime - 1) / 2.3))
-            : 0
+        : 0
 
     const emp = MOCK_DATA[Math.max(0, currentEmpIndex)]
     const empId = emp.id
@@ -544,21 +608,21 @@ const CNICTransformationPipeline = ({ sceneTime, startIdGen, startMapping }: {
     const fosId = companyId + lastFour // e.g. "152987"
 
     // Pipeline step timing (relative to each employee cycle)
-    const cycleDuration = startMapping ? 3 : 2.3
+    const cycleDuration = startMapping ? 3 : 6.6
     const cycleTime = startMapping
         ? (sceneTime - 8) % cycleDuration
-        : (sceneTime - 1) % cycleDuration
+        : Math.max(0, Math.min(cycleDuration, sceneTime - 1))
 
     const step1Active = cycleTime >= 0
-    const step1Complete = cycleTime >= 0.5
-    const step2Active = cycleTime >= 0.5
-    const step2Complete = cycleTime >= 1.0
-    const step3Active = cycleTime >= 1.0
-    const step3Complete = cycleTime >= 1.4
-    const step4Active = cycleTime >= 1.4
-    const step4Complete = cycleTime >= 1.8
-    const step5Active = cycleTime >= 1.8
-    const step5Complete = cycleTime >= 2.1
+    const step1Complete = cycleTime >= (startMapping ? 0.5 : 1.1)
+    const step2Active = cycleTime >= (startMapping ? 0.5 : 1.1)
+    const step2Complete = cycleTime >= (startMapping ? 1.0 : 2.3)
+    const step3Active = cycleTime >= (startMapping ? 1.0 : 2.3)
+    const step3Complete = cycleTime >= (startMapping ? 1.4 : 3.5)
+    const step4Active = cycleTime >= (startMapping ? 1.4 : 3.5)
+    const step4Complete = cycleTime >= (startMapping ? 1.8 : 4.9)
+    const step5Active = cycleTime >= (startMapping ? 1.8 : 4.9)
+    const step5Complete = cycleTime >= (startMapping ? 2.1 : 6.1)
 
     const isVisible = startIdGen && !startMapping ? true : (startMapping && sceneTime < 24)
 
@@ -571,7 +635,7 @@ const CNICTransformationPipeline = ({ sceneTime, startIdGen, startMapping }: {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -60, filter: "blur(8px)" }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="absolute left-8 top-1/2 -translate-y-1/2 w-48 z-30"
+                    className="absolute left-[30px] top-[30px] w-48 z-30"
                 >
                     {/* Glass card container */}
                     <div className="relative rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] overflow-hidden">
@@ -669,6 +733,7 @@ const CNICTransformationPipeline = ({ sceneTime, startIdGen, startMapping }: {
                             </div>
                         </div>
                     </div>
+
                 </motion.div>
             )}
         </AnimatePresence>
@@ -738,7 +803,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
                             ${isBroadcasting ? "bg-green-500/10 border-green-400/50" : "bg-slate-200/10 border-slate-300/30"}
                         `}
                     >
-                        <Wifi size={24} className={isBroadcasting ? "text-green-400" : "text-slate-400"} />
+                        <MessageSquareMore size={24} className={isBroadcasting ? "text-green-400" : "text-slate-400"} />
 
                         {/* Core pulse ring */}
                         {isBroadcasting && (
@@ -859,7 +924,7 @@ const FloatingDataChip = ({ emp, index, sceneTime }: {
 
     // Vertical offset: distribute chips along Y axis matching their row in the card
     // Card is at left (~x:-350 from center), gateway is at center
-    const yOffsets = [-100, -60, -20, 20, 60, 100]
+    const yOffsets = [-90, -30, 30, 90]
 
     return (
         <AnimatePresence>
@@ -922,13 +987,11 @@ const FloatingSMSBubble = ({ emp, index, sceneTime }: {
 
     if (!isLaunched || hasArrived) return null
 
-    // Target positions: phones are in a 2x3 grid at the right side
-    // Grid is positioned at right-20, roughly right side in the container
-    // Row 0: top pair, Row 1: middle pair, Row 2: bottom pair
+    // Target positions: phones are in a 2x2 grid at the right side
     const row = Math.floor(index / 2)
     const col = index % 2
     const targetX = 280 + col * 80  // Offset from center to right
-    const targetY = (row - 1) * 140  // -140, 0, +140 from center
+    const targetY = row === 0 ? -90 : 70
 
     return (
         <motion.div
@@ -999,17 +1062,17 @@ const SMSFlowVisualization = ({ active, sceneTime }: { active: boolean, sceneTim
     return (
         <div className="absolute inset-0 pointer-events-none z-35">
             {/* Act 1: Data chips flying from Platform → Gateway */}
-            {MOCK_DATA.map((emp, i) => (
+            {SMS_RECIPIENTS.map((emp, i) => (
                 <FloatingDataChip key={`chip-${emp.id}`} emp={emp} index={i} sceneTime={sceneTime} />
             ))}
 
             {/* Gateway absorption pulses */}
-            {MOCK_DATA.map((_, i) => (
+            {SMS_RECIPIENTS.map((_, i) => (
                 <GatewayAbsorptionPulse key={`pulse-${i}`} index={i} sceneTime={sceneTime} />
             ))}
 
             {/* Act 2: SMS bubbles flying from Gateway → Phones */}
-            {MOCK_DATA.map((emp, i) => (
+            {SMS_RECIPIENTS.map((emp, i) => (
                 <FloatingSMSBubble key={`sms-${emp.id}`} emp={emp} index={i} sceneTime={sceneTime} />
             ))}
         </div>
@@ -1123,7 +1186,7 @@ const EmployeeNetwork = ({ active, progress, isFocusing }: { active: boolean, pr
             }}
             transition={{ duration: 0.5 }}
         >
-            {MOCK_DATA.map((emp, i) => {
+            {SMS_RECIPIENTS.map((emp, i) => {
                 const isReceived = progress > (26 + i * 0.5);
                 const isHero = i === 0; // First phone is the hero that transitions
 
@@ -1209,16 +1272,21 @@ const EmployeeNetwork = ({ active, progress, isFocusing }: { active: boolean, pr
 
 // --- ACT 3: FOCUSED PHONE COMPONENT ---
 // The hero phone that slides to center and expands into the SMS app
-const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMSApp: boolean }) => {
+const FocusedPhoneView = ({ isActive, showSMSApp, sceneTime }: { isActive: boolean, showSMSApp: boolean, sceneTime: number }) => {
+    const focusProgress = Math.max(0, Math.min(1, (sceneTime - 30) / 2.2))
+    const featurePhoneCue = 33.2
+    const showFeaturePhone = showSMSApp && sceneTime >= featurePhoneCue
+
     return (
         <AnimatePresence>
             {isActive && (
                 <motion.div
                     key="focused-phone-container"
                     className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
                 >
                     {/* Background overlay - Fading blur in separately after move */}
                     <motion.div
@@ -1232,20 +1300,45 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                         className="absolute inset-0 bg-[#F5F5F7]/95 transform-gpu"
                     />
 
+                    {/* Cinematic focus layers */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 pointer-events-none"
+                    >
+                        <motion.div
+                            animate={{ scale: [0.92, 1.05, 0.95], opacity: [0.2, 0.35, 0.2] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-green-300/25 blur-3xl"
+                        />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(40,73,82,0.08),transparent_60%)]" />
+                    </motion.div>
+
                     {/* Unified Phone Shell: GPU-accelerated morphing via 'layout' engine */}
                     <motion.div
                         layout
                         layoutId="hero-phone"
-                        animate={{ scale: 1 }}
+                        initial={{ y: 24, rotateX: 8, scale: 0.9, opacity: 0.65 }}
+                        animate={{
+                            scale: 1,
+                            y: 0,
+                            rotateX: 0,
+                            opacity: 1,
+                            boxShadow: showSMSApp
+                                ? "0 60px 120px -25px rgba(2,6,23,0.65), 0 0 0 1px rgba(255,255,255,0.08)"
+                                : "0 40px 90px -20px rgba(2,6,23,0.55)"
+                        }}
                         transition={{
                             layout: { type: "spring", damping: 25, stiffness: 120, mass: 1 },
-                            opacity: { duration: 0.2 }
+                            opacity: { duration: 0.25 },
+                            y: { type: "spring", damping: 18, stiffness: 140 }
                         }}
-                        className={`relative z-10 pointer-events-auto bg-[#1a1a1a] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] border border-[#333] ring-4 ring-black/20 overflow-hidden transform-gpu flex flex-col items-center justify-center
-                            ${showSMSApp ? 'w-[260px] h-[520px] rounded-[44px] p-[7px]' : 'w-[100px] h-[200px] rounded-[24px] p-[2.5px]'}`}
+                        className={`relative z-10 pointer-events-auto bg-[#111215] border border-[#2e3238] ring-4 ring-black/20 overflow-hidden transform-gpu flex flex-col items-center justify-center
+                            ${showFeaturePhone ? 'w-[210px] h-[430px] rounded-[34px] p-[7px]' : (showSMSApp ? 'w-[260px] h-[520px] rounded-[44px] p-[7px]' : 'w-[100px] h-[200px] rounded-[24px] p-[2.5px]')}`}
                     >
                         {/* High-fidelity detail layers */}
                         <div className="absolute inset-0 rounded-[inherit] border-[2px] border-white/10 pointer-events-none z-10" />
+                        <div className="absolute inset-[1px] rounded-[inherit] bg-[linear-gradient(145deg,rgba(255,255,255,0.08),rgba(255,255,255,0)_25%,rgba(0,0,0,0.28))] pointer-events-none z-[9]" />
 
                         {/* Main Screen Content Area */}
                         <motion.div
@@ -1256,7 +1349,7 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                             <motion.div
                                 layout
                                 className={`absolute inset-x-0 mx-auto z-50 bg-black rounded-full shadow-lg
-                                    ${showSMSApp ? 'top-[7px] w-[80px] h-[20px]' : 'top-[4px] w-[36px] h-[11px]'}`}
+                                    ${showFeaturePhone ? 'hidden' : (showSMSApp ? 'top-[7px] w-[80px] h-[20px]' : 'top-[4px] w-[36px] h-[11px]')}`}
                             />
 
                             {/* Internal Content Cross-fade */}
@@ -1271,6 +1364,7 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                                         className="absolute inset-0 flex flex-col"
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-br from-[#1a3a4a] via-[#0d2b35] to-[#0a1f28]" />
+                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.18),transparent_45%)]" />
 
                                         <div className="absolute top-[22px] w-full text-center">
                                             <h1 className="text-lg font-thin text-white tracking-tighter drop-shadow-lg leading-none">09:41</h1>
@@ -1281,7 +1375,7 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                                             <motion.div
                                                 initial={{ y: 20, opacity: 0 }}
                                                 animate={{ y: 0, opacity: 1 }}
-                                                className="bg-white/80 backdrop-blur-xl p-2 rounded-xl shadow-xl border border-white/40"
+                                                className="bg-white/85 backdrop-blur-xl p-2 rounded-xl shadow-xl border border-white/40"
                                             >
                                                 <div className="flex justify-between items-center mb-0.5">
                                                     <span className="text-[5px] font-bold text-gray-400">MESSAGES</span>
@@ -1292,6 +1386,15 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                                                     Moaziz Company A Employee, Aap ka FOS ID hai: {MOCK_DATA[0].fosId}. For any complaint/feedback...
                                                 </p>
                                             </motion.div>
+
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 8 }}
+                                                animate={{ opacity: focusProgress > 0.45 ? 1 : 0, y: focusProgress > 0.45 ? 0 : 8 }}
+                                                transition={{ duration: 0.35 }}
+                                                className="bg-[#0f172a]/35 border border-white/20 rounded-lg px-2 py-1 backdrop-blur-sm"
+                                            >
+                                                <p className="text-[4px] uppercase tracking-[0.2em] text-emerald-200 font-bold">Secure Channel</p>
+                                            </motion.div>
                                         </div>
 
                                         <div className="absolute top-1 right-2 bg-green-500 text-white rounded-full p-1 border border-white/20 shadow-sm z-30 scale-50">
@@ -1299,63 +1402,130 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                                         </div>
                                     </motion.div>
                                 ) : (
-                                    /* Component: SMS App Content */
-                                    <motion.div
-                                        key="sms-app-content"
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.95 }}
-                                        transition={{ duration: 0.5 }}
-                                        className="absolute inset-0 flex flex-col pt-10 transform-gpu bg-[#F2F2F7]"
-                                    >
-                                        {/* Header */}
-                                        <div className="px-4 py-2.5 bg-white/80 backdrop-blur border-b flex items-center gap-3 shadow-sm z-10 shrink-0">
-                                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#60BA81] to-[#284952] flex items-center justify-center text-white shadow-sm">
-                                                <Users size={14} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-black">FOS Hotline</span>
-                                                <span className="text-[9px] text-gray-500">Verified Business</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Messages Thread */}
-                                        <div className="flex-1 p-3 space-y-3 overflow-y-auto">
-                                            <div className="text-[8px] text-gray-400 text-center font-bold uppercase tracking-widest my-1">Today 9:41 AM</div>
-
-                                            <SMSBubble
-                                                message={
-                                                    <>
-                                                        Moaziz Company A Employee, Aap ka FOS ID hai: <span className="text-[#60BA81] bg-[#60BA81]/10 px-1 rounded font-black">{MOCK_DATA[0].fosId}</span>.
-                                                        {"\n\n"}
-                                                        For any complaint/feedback:
-                                                        {"\n"}<span className="text-[#284952] font-semibold">Whatsapp:</span> <span className="text-[#007AFF]">0329-9129999</span>
-                                                        {"\n"}<span className="text-[#284952] font-semibold">Toll-free:</span> <span className="text-[#007AFF]">0800-91299</span>
-                                                        {"\n"}<span className="text-[#284952] font-semibold">Website:</span> <span className="text-[#007AFF]">www.fruitofsustainability.com</span>
-                                                    </>
-                                                }
-                                                delay={0.4}
-                                            />
-
+                                    <AnimatePresence mode="wait">
+                                        {!showFeaturePhone ? (
+                                            /* Component: Smartphone SMS App Content */
                                             <motion.div
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 1.2 }}
-                                                className="w-full bg-white p-3 rounded-2xl shadow-sm border border-gray-200 mt-3"
+                                                key="sms-app-content"
+                                                initial={{ opacity: 0, scale: 0.96, y: 8 }}
+                                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                exit={{ opacity: 0, scale: 0.95, y: 6, filter: "blur(6px)" }}
+                                                transition={{ duration: 0.45, ease: "easeOut" }}
+                                                className="absolute inset-0 flex flex-col pt-10 transform-gpu bg-[#F2F2F7]"
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                                        <Globe size={16} className="text-green-600" />
+                                                {/* Header */}
+                                                <div className="px-4 py-2.5 bg-white/85 backdrop-blur border-b flex items-center gap-3 shadow-sm z-10 shrink-0">
+                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#60BA81] to-[#284952] flex items-center justify-center text-white shadow-sm">
+                                                        <Users size={14} />
                                                     </div>
-                                                    <div>
-                                                        <h4 className="text-[10px] font-bold text-gray-800">Use Web Portal</h4>
-                                                        <p className="text-[9px] text-gray-500">Access your digital dashboard</p>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs font-bold text-black">FOS Hotline</span>
+                                                        <span className="text-[9px] text-gray-500">Verified Business</span>
                                                     </div>
-                                                    <ChevronRight size={14} className="ml-auto text-gray-300" />
+                                                    <div className="ml-auto rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[8px] font-bold text-green-700">
+                                                        DELIVERED
+                                                    </div>
+                                                </div>
+
+                                                {/* Messages Thread */}
+                                                <div className="flex-1 p-3 space-y-3 overflow-y-auto">
+                                                    <div className="text-[8px] text-gray-400 text-center font-bold uppercase tracking-widest my-1">Today 9:41 AM</div>
+
+                                                    <SMSBubble
+                                                        message={
+                                                            <>
+                                                                Moaziz Company A Employee, Aap ka FOS ID hai: <span className="text-[#60BA81] bg-[#60BA81]/10 px-1 rounded font-black">{MOCK_DATA[0].fosId}</span>.
+                                                                {"\n\n"}
+                                                                For any complaint/feedback:
+                                                                {"\n"}<span className="text-[#284952] font-semibold">Whatsapp:</span> <span className="text-[#007AFF]">0329-9129999</span>
+                                                                {"\n"}<span className="text-[#284952] font-semibold">Toll-free:</span> <span className="text-[#007AFF]">0800-91299</span>
+                                                                {"\n"}<span className="text-[#284952] font-semibold">Website:</span> <span className="text-[#007AFF]">www.fruitofsustainability.com</span>
+                                                            </>
+                                                        }
+                                                        delay={0.4}
+                                                    />
+
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 6 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: 0.9 }}
+                                                        className="w-full rounded-xl bg-emerald-50 border border-emerald-200 px-2.5 py-2"
+                                                    >
+                                                        <div className="flex items-center justify-between gap-2">
+                                                            <span className="text-[8px] font-bold text-emerald-700 uppercase tracking-wide">No Internet Required</span>
+                                                            <ShieldCheck size={11} className="text-emerald-600" />
+                                                        </div>
+                                                        <p className="text-[8px] text-emerald-800 mt-1">Accessible via SMS and toll-free channels for all workers.</p>
+                                                    </motion.div>
                                                 </div>
                                             </motion.div>
-                                        </div>
-                                    </motion.div>
+                                        ) : (
+                                            /* Component: Feature Phone SMS Content */
+                                            <motion.div
+                                                key="feature-phone-content"
+                                                initial={{ opacity: 0, scale: 0.88, y: 10, rotate: 2 }}
+                                                animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+                                                exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                                                transition={{ duration: 0.5, ease: EASE_IOS }}
+                                                className="absolute inset-0 bg-[#171717] flex flex-col"
+                                            >
+                                                {/* Earpiece */}
+                                                <div className="h-5 w-full flex justify-center items-center opacity-50">
+                                                    <div className="w-12 h-1 bg-[#3b3b3b] rounded-full" />
+                                                </div>
+
+                                                {/* LCD Screen */}
+                                                <div className="px-3 pt-1 pb-2">
+                                                    <div className="bg-[#d4ded4] h-[146px] rounded-sm border-2 border-black/15 shadow-inner flex flex-col font-mono text-[#1a1a1a] p-1.5 relative overflow-hidden">
+                                                        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_20%_20%,#000_0.5px,transparent_0.5px)] [background-size:2px_2px]" />
+                                                        <div className="flex justify-between items-center text-[7px] border-b border-[#1a1a1a]/10 pb-0.5 mb-1.5 opacity-70">
+                                                            <span>Telenor</span>
+                                                            <div className="flex gap-1">
+                                                                <SignalHigh size={8} />
+                                                                <Battery size={8} />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="text-[7px] leading-tight">
+                                                            <div className="bg-[#1a1a1a]/5 p-1 mb-1">
+                                                                <p className="font-bold">FOS Hotline</p>
+                                                                <p className="text-[6px] opacity-70">9:41 AM</p>
+                                                            </div>
+                                                            <p>Your FOS ID is <span className="font-bold text-[8px]">{MOCK_DATA[0].fosId}</span>.</p>
+                                                            <p className="mt-0.5">For complaint/feedback:</p>
+                                                            <p className="font-bold">0800-91299</p>
+                                                            <p className="opacity-80">www.fruitofsustainability.com</p>
+                                                        </div>
+
+                                                        <div className="mt-auto pt-1 border-t border-[#1a1a1a]/10 flex justify-between text-[7px] font-bold">
+                                                            <span>Options</span>
+                                                            <span>Back</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-center py-1.5">
+                                                    <span className="text-gray-500 text-[9px] font-bold tracking-[0.2em]">NOKIA</span>
+                                                </div>
+
+                                                {/* Navigation pad */}
+                                                <div className="h-11 flex justify-center items-center mb-1.5 relative">
+                                                    <div className="w-10 h-10 rounded-[10px] border-2 border-[#3f3f3f] bg-[#242424] flex items-center justify-center shadow-lg">
+                                                        <div className="w-4 h-4 bg-[#121212] rounded shadow-inner" />
+                                                    </div>
+                                                </div>
+
+                                                {/* Keypad */}
+                                                <div className="flex-1 px-3 pb-4 grid grid-cols-3 gap-1.5 content-start">
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, '*', 0, '#'].map((k) => (
+                                                        <div key={k} className="w-full h-7 bg-gradient-to-b from-[#2b2b2b] to-[#212121] rounded-[4px] flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.6)] text-gray-300 text-[12px] font-bold border-t border-white/10">
+                                                            {k}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 )}
                             </AnimatePresence>
 
@@ -1363,7 +1533,7 @@ const FocusedPhoneView = ({ isActive, showSMSApp }: { isActive: boolean, showSMS
                             <motion.div
                                 layout
                                 className={`absolute bottom-[4px] inset-x-0 mx-auto h-[3.5px] bg-black/10 rounded-full shrink-0
-                                    ${showSMSApp ? 'w-[80px]' : 'w-[32px]'}`}
+                                    ${showFeaturePhone ? 'hidden' : (showSMSApp ? 'w-[80px]' : 'w-[32px]')}`}
                             />
                         </motion.div>
                     </motion.div>
@@ -1403,7 +1573,7 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                 />
             </div>
 
-            <div className="relative z-10 w-full max-w-6xl h-[500px] flex items-center justify-center scale-[0.8] origin-center">
+            <div className="relative z-10 w-full max-w-6xl h-[560px] flex items-center justify-center scale-[0.9] origin-center">
 
                 {/* === PHASE 1 & 2: CARD VIEW & PHASE 3: SOURCE === */}
                 <AnimatePresence>
@@ -1429,7 +1599,7 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                                 title="FOS Platform"
                                 subtitle="FOS Onboarding System"
                                 logoSrc="/assets/images/FOS-01.png"
-                                className="w-[340px] h-[420px] border-green-100 transition-colors duration-500"
+                                className="w-[430px] h-[540px] border-green-100 transition-colors duration-500"
                             >
                                 <div className="flex justify-between items-center text-xs pb-3 border-b border-gray-100 mb-4">
                                     <div className="flex items-center gap-2">
@@ -1454,9 +1624,11 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                                         <IdentityRow
                                             key={emp.id}
                                             data={emp}
-                                            showId={startIdGen && sceneTime > (1 + i * 0.4)}
+                                            showId={startMapping ? (sceneTime > (8 + i * 0.5)) : (startIdGen && i === 0)}
                                             showLink={startMapping && sceneTime > (8 + i * 0.4)}
                                             showSend={startSend && sceneTime > (18 + i * 0.25)}
+                                            dimmed={!startMapping && startIdGen && i !== 0}
+                                            focus={!startMapping && startIdGen && i === 0}
                                         />
                                     ))}
                                 </div>
@@ -1489,7 +1661,7 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                             transition={{ duration: 0.5 }}
                             className="absolute inset-0"
                         >
-                            <IDGenerationVisual active={true} />
+                            <IDGenerationVisual active={true} sceneTime={sceneTime} employee={MOCK_DATA[0]} />
                         </motion.div>
                     )}
 
@@ -1534,7 +1706,7 @@ export const SceneSMS = ({ isActive, progress }: { isActive: boolean, progress: 
                 </div>
 
                 {/* === ACT 3: FOCUSED PHONE TRANSITION === */}
-                <FocusedPhoneView isActive={startFocusTransition} showSMSApp={showSMSApp} />
+                <FocusedPhoneView isActive={startFocusTransition} showSMSApp={showSMSApp} sceneTime={sceneTime} />
             </div>
 
             {/* === ACT 3: EMPLOYEE STATUS CARD (At root for true corner placement) === */}

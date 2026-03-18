@@ -55,110 +55,134 @@ const FOSDashboardView = ({ progress }: { progress: number }) => {
                 <SceneDashboard isActive={true} progress={0} />
             </div>
 
-            {/* RIGHT WALL SLIDING SIDEBAR - matching dashboard screenshot */}
+            {/* --- FOCUS OVERLAY --- */}
+            {/* Blurs and dims the entire dashboard to focus on the Survey action */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: expanded ? 1 : 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0 bg-[#17161A]/40 backdrop-blur-md z-[100] pointer-events-none"
+            />
 
-            {/* RIGHT WALL SIDEBAR - Separate Logic for Download & Launch */}
-            <div className="absolute right-0 top-0 bottom-0 z-[60] flex flex-col justify-center items-end pointer-events-none gap-3 pr-0">
-
-                {/* 1. DOWNLOAD DATA (Always Collapsed) */}
+            {/* --- DASHBOARD FRAME ALIGNMENT LAYER --- */}
+            {/* Invisibly matches the exact size and scale of the dashboard's BrowserFrame so the buttons dock perfectly to its edge */}
+            <div className="absolute inset-0 z-[110] flex items-center justify-center pointer-events-none">
                 <motion.div
-                    className="rounded-l-xl overflow-hidden shadow-lg bg-teal-600 cursor-pointer relative z-20"
-                    style={{ backgroundColor: COLORS.teal, writingMode: "vertical-rl" }}
-                    initial={{ x: 0 }} // Stays put
+                    initial={{ scale: 0.75, opacity: 0, y: 30 }}
+                    animate={{ scale: 0.85, opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+                    className="w-[125%] h-[110%] max-w-[2600px] max-h-[1100px] relative origin-center pointer-events-none"
                 >
-                    <div className="px-2 py-4 flex items-center gap-2 text-white">
-                        <Download size={12} />
-                        <span className="text-[9px] font-bold uppercase tracking-[0.2em]">Download Data</span>
+                    {/* RIGHT WALL SIDEBAR - Docked exactly to the inner right border of the frame */}
+                    <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-center items-end pointer-events-none gap-2 pr-0 z-50">
+
+                        {/* 1. DOWNLOAD DATA (Always Collapsed, gently dims when Survey expands) */}
+                        <motion.div
+                            className="rounded-l-xl overflow-hidden shadow-lg cursor-pointer relative z-20 transition-all duration-700 pointer-events-auto"
+                            style={{ backgroundColor: COLORS.teal, writingMode: "vertical-rl" }}
+                            initial={{ x: 0, opacity: 1, filter: "blur(0px)" }}
+                            animate={{
+                                opacity: expanded ? 0.3 : 1,
+                                filter: expanded ? "blur(2px)" : "blur(0px)"
+                            }}
+                        >
+                            <div className="px-2 py-4 flex items-center gap-2 text-white">
+                                <Download size={12} />
+                                <span className="text-[9px] font-bold uppercase tracking-[0.2em]">Download Data</span>
+                            </div>
+                        </motion.div>
+
+                        {/* 2. LAUNCH A SURVEY (Expands) */}
+                        <div className="relative flex items-center justify-end pointer-events-auto">
+
+                            {/* The Collapsed Vertical Tab (Visible only when NOT expanded, sits normally in flex layout) */}
+                            <motion.div
+                                initial={{ opacity: 1, x: 0 }}
+                                animate={{
+                                    opacity: expanded ? 0 : 1,
+                                    x: expanded ? 100 : 0, // Slide out as card slides in
+                                }}
+                                transition={{ duration: 0.3 }}
+                                className="rounded-l-xl overflow-hidden shadow-lg cursor-pointer z-30"
+                                style={{ backgroundColor: COLORS.orange, writingMode: "vertical-rl", pointerEvents: expanded ? 'none' : 'auto' }}
+                            >
+                                <div className="px-2 py-4 flex items-center gap-2 text-white">
+                                    <Edit size={12} />
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.2em]">Survey</span>
+                                </div>
+                            </motion.div>
+
+                            {/* The Expanded Card (Absolutely positioned over the collapsed one so it doesn't push layout) */}
+                            <motion.div
+                                initial={{ x: 160, opacity: 0 }} // Hidden off-screen right and fully invisible
+                                animate={{ x: expanded ? 0 : 160, opacity: expanded ? 1 : 0 }} // Fades in & Slides in to 0
+                                transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm shadow-2xl rounded-l-2xl border-l border-y border-gray-200 flex flex-col gap-4 p-3 w-[130px] z-10"
+                                style={{ pointerEvents: expanded ? 'auto' : 'none' }}
+                            >
+                                {/* Only Launch Survey Content Here */}
+                                <motion.div
+                                    animate={{
+                                        boxShadow: [
+                                            `0 4px 15px ${COLORS.orange}40`,
+                                            `0 8px 30px ${COLORS.orange}70`,
+                                            `0 4px 15px ${COLORS.orange}40`,
+                                        ],
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    className="rounded-xl p-3 flex flex-col items-center gap-2 text-white shadow-md relative overflow-hidden"
+                                    style={{ backgroundColor: COLORS.orange }}
+                                >
+                                    <Edit size={18} />
+                                    <span className="text-[9px] font-bold uppercase text-center leading-tight tracking-wide">
+                                        Launch A<br />Survey
+                                    </span>
+                                    {/* Shimmer */}
+                                    <motion.div
+                                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                                        animate={{ x: ["-100%", "200%"] }}
+                                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                    />
+                                </motion.div>
+                            </motion.div>
+
+                            {/* Cursor Animation for Launch Survey Button */}
+                            {showCursor && (
+                                <motion.div
+                                    className="absolute right-0 z-[120] pointer-events-none drop-shadow-md"
+                                    style={{ top: '50%' }} // Anchored at vertical center
+                                    initial={{ x: 150, y: 150, opacity: 0 }}
+                                    animate={{
+                                        x: [150, -65, -65, -65], // Targets center of the expanded 130px card (-65px from right)
+                                        y: [150, 0, 0, 0],       // Zero offset matches exact vertical center
+                                        opacity: [0, 1, 1, 1],
+                                    }}
+                                    transition={{
+                                        duration: 1.3,
+                                        times: [0, 0.5, 0.7, 0.85],
+                                        ease: "easeInOut",
+                                    }}
+                                >
+                                    {/* High-quality Mac-style cursor */}
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10">
+                                        <path d="M4 4L11.5 21L15 14L22 13L4 4Z" fill="black" stroke="white" strokeWidth="1.5" strokeLinejoin="round" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.2))" />
+                                    </svg>
+                                    
+                                    {/* Precision Click Ripple (Centered mathematically on cursor tip at 4,4) */}
+                                    {click && (
+                                        <motion.div
+                                            className="absolute w-6 h-6 rounded-full border-2"
+                                            style={{ borderColor: COLORS.orange, top: -8, left: -8 }} 
+                                            initial={{ scale: 0, opacity: 0.8 }}
+                                            animate={{ scale: 2.5, opacity: 0 }}
+                                            transition={{ duration: 0.5, ease: "easeOut" }}
+                                        />
+                                    )}
+                                </motion.div>
+                            )}
+                        </div>
                     </div>
                 </motion.div>
-
-                {/* 2. LAUNCH A SURVEY (Expands) */}
-                <div className="relative flex items-center justify-end">
-                    {/* The Expanded Card (slides in) */}
-                    <motion.div
-                        initial={{ x: 160 }} // Hidden off-screen right
-                        animate={{ x: expanded ? 0 : 160 }} // Slides in to 0
-                        transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-                        className="bg-white/95 backdrop-blur-sm shadow-2xl rounded-l-2xl border-l border-gray-200 flex flex-col gap-4 p-3 w-[130px] relative z-10"
-                    >
-                        {/* Only Launch Survey Content Here */}
-                        <motion.div
-                            animate={{
-                                boxShadow: [
-                                    `0 4px 15px ${COLORS.orange}40`,
-                                    `0 8px 30px ${COLORS.orange}70`,
-                                    `0 4px 15px ${COLORS.orange}40`,
-                                ],
-                            }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="rounded-xl p-3 flex flex-col items-center gap-2 text-white shadow-md relative overflow-hidden"
-                            style={{ backgroundColor: COLORS.orange }}
-                        >
-                            <Edit size={18} />
-                            <span className="text-[9px] font-bold uppercase text-center leading-tight tracking-wide">
-                                Launch A<br />Survey
-                            </span>
-                            {/* Shimmer */}
-                            <motion.div
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-                                animate={{ x: ["-100%", "200%"] }}
-                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            />
-                        </motion.div>
-                    </motion.div>
-
-                    {/* The Collapsed Vertical Tab (Visible only when NOT expanded) */}
-                    <motion.div
-                        initial={{ opacity: 1, x: 0 }}
-                        animate={{
-                            opacity: expanded ? 0 : 1,
-                            x: expanded ? 100 : 0, // Slide out as card slides in? Or just fade
-                            pointerEvents: expanded ? 'none' : 'auto'
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute right-0 rounded-l-xl overflow-hidden shadow-lg cursor-pointer z-30"
-                        style={{ backgroundColor: COLORS.orange, writingMode: "vertical-rl" }}
-                    >
-                        <div className="px-2 py-4 flex items-center gap-2 text-white">
-                            <Edit size={12} />
-                            <span className="text-[9px] font-bold uppercase tracking-[0.2em]">Launch A Survey</span>
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Cursor Animation */}
-                {showCursor && (
-
-                    <motion.div
-                        className="absolute z-[70] pointer-events-none drop-shadow-md"
-                        initial={{ x: -200, y: 100, opacity: 0 }}
-                        animate={{
-                            x: [-200, -80, -80, -80], // Target the center of the expanded card
-                            y: [100, 85, 85, 85], // Moved down to hit the button center
-                            opacity: [0, 1, 1, 1],
-                        }}
-                        transition={{
-                            duration: 1.3,
-                            times: [0, 0.5, 0.7, 0.85],
-                            ease: "easeInOut",
-                        }}
-                    >
-                        {/* High-quality Mac-style cursor */}
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 4L11.5 21L15 14L22 13L4 4Z" fill="black" stroke="white" strokeWidth="1.5" strokeLinejoin="round" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.2))" />
-                        </svg>
-                        {/* Click ripple */}
-                        {click && (
-                            <motion.div
-                                className="absolute top-0 left-0 w-5 h-5 rounded-full border-2"
-                                style={{ borderColor: COLORS.orange }}
-                                initial={{ scale: 0, opacity: 0.7 }}
-                                animate={{ scale: 3, opacity: 0 }}
-                                transition={{ duration: 0.5, ease: "easeOut" }}
-                            />
-                        )}
-                    </motion.div>
-                )}
             </div>
         </motion.div>
     )
@@ -187,7 +211,7 @@ const SurveyManagementView = ({ progress }: { progress: number }) => {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="mx-6 mt-5 rounded-xl px-5 py-3 flex items-center justify-between relative overflow-hidden"
-                style={{ background: `linear-gradient(135deg, ${COLORS.darkTeal} 0%, ${COLORS.orange}CC 100%)` }}
+                style={{ background: `linear-gradient(135deg, #284952 0%, #60BA81 50%, #f5a83c 100%)` }}
             >
                 {/* Background decorative circle */}
                 <div className="absolute right-0 top-0 w-48 h-48 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/4" />
@@ -224,7 +248,8 @@ const SurveyManagementView = ({ progress }: { progress: number }) => {
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.15 + i * 0.08 }}
                         key={i}
-                        className="bg-white rounded-xl p-3 shadow-sm flex items-center gap-4"
+                        className="bg-white rounded-xl p-3 shadow-xl flex items-center gap-4 border-xl"
+                        style={{background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)', border: '1px solid rgba(255, 255, 255, 0.3)'}}
                     >
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ backgroundColor: stat.col }}>
                             <stat.icon size={16} />
@@ -327,13 +352,13 @@ const SurveyManagementView = ({ progress }: { progress: number }) => {
                     </motion.div>
                 ))}
 
-                {/* CURSOR SIMULATION */}
+                {/* CURSOR SIMULATION TARGETING "VIEW DETAILS" IN MIDDLE CARD */}
                 {showCursor && (
                     <motion.div
-                        initial={{ x: 500, y: -100, opacity: 0 }}
+                        initial={{ left: "80%", top: "110%", opacity: 0 }}
                         animate={{
-                            x: [500, 195, 195, 195],
-                            y: [-100, 330, 330, 330],
+                            left: ["80%", "50%", "50%", "50%"], // 50% left precisely targets the middle card
+                            top: ["110%", "84%", "84%", "84%"], // 84% top precisely targets the bottom 'View Details' button
                             opacity: [0, 1, 1, 1],
                             scale: [1, 1, 0.85, 1],
                         }}
@@ -345,17 +370,18 @@ const SurveyManagementView = ({ progress }: { progress: number }) => {
                         className="absolute z-50 pointer-events-none drop-shadow-md"
                     >
                         {/* High-quality Mac-style cursor */}
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative z-10">
                             <path d="M4 4L11.5 21L15 14L22 13L4 4Z" fill="black" stroke="white" strokeWidth="1.5" strokeLinejoin="round" filter="drop-shadow(0 2px 2px rgba(0,0,0,0.2))" />
                         </svg>
-                        {/* Click ripple */}
+
+                        {/* Precision Click Ripple (Centered mathematically on cursor tip at 4,4) */}
                         <motion.div
-                            className="absolute top-0 left-0 w-4 h-4 rounded-full border-2"
-                            style={{ borderColor: COLORS.green }}
+                            className="absolute w-6 h-6 rounded-full border-2"
+                            style={{ borderColor: COLORS.green, top: -8, left: -8 }}
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{
                                 scale: [0, 0, 2.5],
-                                opacity: [0, 0, 0.6, 0],
+                                opacity: [0, 0, 0.8, 0],
                             }}
                             transition={{
                                 duration: 1.4,
@@ -374,35 +400,62 @@ const SurveyManagementView = ({ progress }: { progress: number }) => {
 // ==========================================
 // HELPER: QUESTION CARD
 // ==========================================
-const QuestionCard = ({ i, type, q, opts }: { i: number, type: string, q: string, opts?: string[] }) => (
-    <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-        <div className="flex justify-between mb-2">
-            <span className="text-[11px] font-bold text-gray-400 uppercase">Question {i}</span>
-            <span className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${type === 'radio' ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>{type}</span>
-        </div>
-        <h4 className="font-bold text-gray-800 mb-3 text-[13px]">{q}</h4>
-        {opts && (
-            <div className="space-y-1.5">
-                {opts.map((o, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                        <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center ${idx === 0 ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}>
-                            {idx === 0 && <div className="w-1.5 h-1.5 rounded-full bg-green-500" />}
-                        </div>
-                        <span className="text-[11px] text-gray-600">{o}</span>
+const QuestionCard = ({ i, type, q, opts }: { i: number, type: string, q: string, opts?: string[] }) => {
+    const typeColors: Record<string, string> = {
+        text: "from-blue-500 to-blue-600",
+        textarea: "from-green-500 to-green-600",
+        radio: "from-purple-500 to-purple-600",
+        checkbox: "from-pink-500 to-pink-600",
+        select: "from-indigo-500 to-indigo-600",
+        file: "from-yellow-500 to-yellow-600",
+        time: "from-orange-500 to-orange-600",
+    }
+
+    return (
+        <div className="border border-gray-200 rounded-xl p-4 shadow-lg bg-white">
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-[#60BA81] to-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-md">
+                        {i}
                     </div>
-                ))}
+                    <span className="text-[11px] font-bold text-[#60BA81] bg-[#60BA81]/10 px-2.5 py-1 rounded-full border border-[#60BA81]/20">
+                        Question {i}
+                    </span>
+                </div>
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-bold bg-gradient-to-r ${typeColors[type] || "from-gray-500 to-gray-600"} text-white shadow-md uppercase`}>
+                    {type}
+                </span>
             </div>
-        )}
-        {!opts && <div className="h-8 bg-gray-50 rounded border border-gray-200 border-dashed" />}
-    </div>
-)
+
+            <h5 className="font-bold text-gray-900 mb-3 text-base leading-tight">{q}</h5>
+
+            {opts && opts.length > 0 ? (
+                <div className="mt-3">
+                    <span className="text-xs font-bold text-gray-700 mb-2 block">Options:</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                        {opts.map((option, idx) => (
+                            <div key={idx} className="flex items-center p-2.5 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                                <span className="w-6 h-6 bg-gradient-to-br from-[#60BA81] to-green-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold mr-2.5 shadow-sm">
+                                    {idx + 1}
+                                </span>
+                                <span className="text-xs font-medium text-gray-700">{option}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div className="h-9 rounded-lg border border-dashed border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100" />
+            )}
+        </div>
+    )
+}
 
 // ==========================================
 // 3. DETAILS VIEW (10-17s)
 // ==========================================
 const DetailsView = ({ progress }: { progress: number }) => {
     const localT = Math.max(0, progress - 10)
-    const scrollY = Math.min(600, localT * 120)
+    const scrollY = Math.min(640, localT * 120)
 
     return (
         <motion.div
@@ -410,88 +463,131 @@ const DetailsView = ({ progress }: { progress: number }) => {
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full h-full flex flex-col absolute inset-0 overflow-hidden"
+            className="w-full h-full absolute inset-0 overflow-hidden"
             style={{ backgroundColor: COLORS.bg }}
         >
-            {/* FIXED HEADER */}
-            <div className="h-16 w-full flex items-center justify-between px-6 shadow-md z-30 relative flex-shrink-0"
-                style={{ background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.darkTeal})` }}
-            >
-                <div>
-                    <div className="flex items-center gap-2 text-white">
-                        <BarChart3 size={16} />
-                        <h1 className="text-lg font-bold">Survey Details</h1>
-                    </div>
-                    <p className="text-white/80 text-[11px] mt-0.5">Comprehensive survey information and statistics</p>
-                </div>
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"><X size={16} className="text-white" /></div>
-            </div>
+            {/* modal-backdrop style */}
+            <div className="absolute inset-0 bg-[#284952]/80 backdrop-blur-md" />
 
-            {/* SCROLLABLE CONTENT AREA */}
-            <div className="flex-1 overflow-hidden relative">
+            <div className="absolute inset-0 flex items-center justify-center p-3">
                 <motion.div
-                    className="p-8 space-y-8 pb-32"
-                    style={{ y: -scrollY }}
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.45, ease: "easeOut" }}
+                    className="relative w-[93%] max-w-[1160px] h-[86%] rounded-2xl overflow-hidden border border-white/30 shadow-2xl"
+                    style={{
+                        background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)",
+                        backdropFilter: "blur(20px)",
+                    }}
                 >
-                    {/* === TOP STATS SECTION === */}
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-gray-800 font-serif" style={{ direction: "rtl" }}>
-                                صداقت کے ملازمین کا سروے
-                            </h2>
-                            <div className="flex gap-3">
-                                <button className="px-3 py-1.5 rounded text-white text-[10px] font-bold flex items-center gap-2 shadow-sm" style={{ backgroundColor: "#2962FF" }}><FileText size={12} /> View Full Report</button>
-                                <button className="px-3 py-1.5 rounded text-white text-[10px] font-bold flex items-center gap-2 shadow-sm" style={{ backgroundColor: "#6200EA" }}><Edit size={12} /> Edit Survey</button>
-                                <button className="px-3 py-1.5 rounded text-white text-[10px] font-bold flex items-center gap-2 shadow-sm" style={{ backgroundColor: "#D50000" }}><Trash2 size={12} /> Delete Survey</button>
+                    {/* Hero header matching survey_crud style */}
+                    <div
+                        className="text-white px-6 py-4 rounded-t-2xl relative overflow-hidden"
+                        style={{ background: "linear-gradient(135deg, #284952 0%, #60BA81 50%, #f5a83c 100%)" }}
+                    >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-12 -mt-12" />
+                        <div className="relative z-10 flex justify-between items-center">
+                            <div>
+                                <h2 className="text-2xl font-bold mb-1.5 flex items-center">
+                                    <BarChart3 size={24} className="mr-3" />Survey Details
+                                </h2>
+                                <p className="opacity-90 text-sm font-light">Comprehensive survey information and statistics</p>
                             </div>
-                        </div>
-
-                        {/* Disclaimer */}
-                        <p className="text-xs text-gray-500 font-medium">
-                            This survey is being conducted to improve the quality of your work... (Anonymous)
-                        </p>
-
-                        <div className="rounded-xl p-4.5 shadow-lg text-white" style={{ backgroundColor: "#2E7D32" }}>
-                            <h3 className="flex items-center gap-2 font-bold text-base mb-6"><PieChart size={18} /> Response Statistics</h3>
-                            <div className="grid grid-cols-4 gap-4 mb-8">
-                                {[
-                                    { val: "6", lbl: "TOTAL INVITED" }, { val: "6", lbl: "COMPLETED" },
-                                    { val: "0", lbl: "PENDING" }, { val: "100.00%", lbl: "COMPLETION RATE", bar: true }
-                                ].map((item, i) => (
-                                    <div key={i} className="bg-white/10 rounded-lg p-6 flex flex-col items-center justify-center border border-white/10 relative overflow-hidden">
-                                        <span className="text-3xl font-bold mb-1">{item.val}</span>
-                                        <span className="text-[9px] uppercase font-bold text-white/70">{item.lbl}</span>
-                                        {item.bar && <div className="w-full h-1.5 bg-black/20 rounded-full mt-2"><div className="w-full h-full bg-white rounded-full" /></div>}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-5 gap-4">
-                            {[
-                                { val: "40", lbl: "SURVEY ID", bg: COLORS.teal, icon: Hash },
-                                { val: "31", lbl: "QUESTIONS", bg: "#2962FF", icon: HelpCircle },
-                                { val: "15", lbl: "EST. TIME", bg: COLORS.vibrantBlue, icon: Clock },
-                                { val: "12/1/2025", lbl: "CREATED", bg: "#7B1FA2", icon: Calendar },
-                                { val: "12/31/2025", lbl: "EXPIRES", bg: "#F44336", icon: Calendar },
-                            ].map((c, i) => (
-                                <div key={i} className="rounded-lg p-3 text-white shadow-md flex items-end justify-between overflow-hidden relative h-20" style={{ background: `linear-gradient(135deg, ${c.bg}, ${c.bg}dd)` }}>
-                                    <div><h4 className="text-2xl font-bold mb-1">{c.val}</h4><p className="text-[9px] font-bold uppercase opacity-80">{c.lbl}</p></div>
-                                </div>
-                            ))}
+                            <button className="text-white hover:text-gray-200 bg-white/20 hover:bg-white/30 rounded-full p-2.5 transition-all duration-300 backdrop-blur-lg">
+                                <X size={16} />
+                            </button>
                         </div>
                     </div>
 
-                    {/* === QUESTIONS LIST === */}
-                    <div className="space-y-4">
-                        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                            <ClipboardList size={20} style={{ color: COLORS.green }} /> Questions (31)
-                        </h3>
+                    {/* scrollable modal content */}
+                    <div className="h-[calc(100%-92px)] overflow-hidden relative">
+                        <motion.div className="p-6 space-y-6 pb-24" style={{ y: -scrollY }}>
+                            <div className="mb-2">
+                                <div className="flex items-center justify-between mb-5">
+                                    <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent" style={{ direction: "rtl" }}>
+                                        صداقت کے ملازمین کا سروے
+                                    </h3>
+                                    <div className="flex space-x-2.5">
+                                        <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center shadow-lg">
+                                            <FileText size={12} className="mr-1.5" />View Full Report
+                                        </button>
+                                        <button className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center shadow-lg">
+                                            <Edit size={12} className="mr-1.5" />Edit Survey
+                                        </button>
+                                        <button className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center shadow-lg">
+                                            <Trash2 size={12} className="mr-1.5" />Delete Survey
+                                        </button>
+                                    </div>
+                                </div>
 
-                        <QuestionCard i={1} type="radio" q="Branch:" opts={["Johar Town", "Bahria Town", "Emporium Branch", "Cloud Kitchen", "Phase 6 Branch", "DHA CC Branch"]} />
-                        <QuestionCard i={2} type="text" q="Time Duration as Branch Leader:" />
-                        <QuestionCard i={3} type="time" q="Total time with Johnny & Jugnu:" />
-                        <QuestionCard i={4} type="radio" q="I feel trusted and empowered by my Operations Leader..." opts={["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]} />
+                                <p className="text-gray-600 mb-5 text-sm leading-relaxed">
+                                    This survey is being conducted to improve workplace operations and gather anonymous employee feedback.
+                                </p>
+
+                                <div className="bg-gradient-to-r from-[#60BA81] via-green-500 to-green-600 rounded-xl p-5 mb-6 text-white shadow-xl">
+                                    <h4 className="text-xl font-bold mb-4 flex items-center">
+                                        <PieChart size={20} className="mr-2.5" />Response Statistics
+                                    </h4>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3.5 mb-4">
+                                        {[
+                                            { val: "6", lbl: "TOTAL INVITED" },
+                                            { val: "6", lbl: "COMPLETED", accent: "text-green-200" },
+                                            { val: "0", lbl: "PENDING", accent: "text-orange-200" },
+                                            { val: "100%", lbl: "COMPLETION RATE", bar: true },
+                                        ].map((item, i) => (
+                                            <div key={i} className="bg-white/20 backdrop-blur-lg rounded-lg p-3.5 text-center">
+                                                <div className={`text-3xl font-bold mb-1 ${item.accent || ""}`}>{item.val}</div>
+                                                <div className="text-[10px] opacity-90 font-medium uppercase tracking-wide">{item.lbl}</div>
+                                                {item.bar && (
+                                                    <div className="mt-3 bg-white/20 rounded-full h-2 overflow-hidden">
+                                                        <div className="bg-white h-full rounded-full w-full" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2.5 justify-center pt-3 border-t border-white/20">
+                                        <button className="bg-white/20 hover:bg-white/30 backdrop-blur-lg px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 flex items-center shadow-lg">
+                                            <CheckCircle2 size={12} className="mr-1.5" />Export Completed (6)
+                                        </button>
+                                        <button className="bg-white/20 hover:bg-white/30 backdrop-blur-lg px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 flex items-center shadow-lg">
+                                            <Clock size={12} className="mr-1.5" />Export Pending (0)
+                                        </button>
+                                        <button className="bg-white/20 hover:bg-white/30 backdrop-blur-lg px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 flex items-center shadow-lg">
+                                            <Users size={12} className="mr-1.5" />Export All (6)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5 mb-8">
+                                    {[
+                                        { val: "40", lbl: "SURVEY ID", grad: "from-[#60BA81] via-green-500 to-green-600" },
+                                        { val: "31", lbl: "QUESTIONS", grad: "from-blue-500 via-blue-600 to-indigo-600" },
+                                        { val: "15", lbl: "EST. TIME", grad: "from-[#f5a83c] via-orange-500 to-red-500" },
+                                        { val: "12/1/2025", lbl: "CREATED", grad: "from-purple-500 via-purple-600 to-pink-600" },
+                                        { val: "12/31/2025", lbl: "EXPIRES", grad: "from-pink-500 via-rose-500 to-red-500" },
+                                    ].map((item, i) => (
+                                        <div key={i} className={`bg-gradient-to-br ${item.grad} text-white p-3.5 rounded-xl shadow-lg`}>
+                                            <div className="text-xl font-bold">{item.val}</div>
+                                            <div className="text-[10px] opacity-90 font-medium uppercase tracking-wide">{item.lbl}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <h4 className="text-2xl font-bold text-gray-900 mb-1.5 flex items-center">
+                                    <ClipboardList size={22} className="mr-2.5 text-[#60BA81]" />Questions (31)
+                                </h4>
+
+                                <QuestionCard i={1} type="radio" q="Branch:" opts={["Johar Town", "Bahria Town", "Emporium Branch", "Cloud Kitchen", "Phase 6 Branch", "DHA CC Branch"]} />
+                                <QuestionCard i={2} type="text" q="Time Duration as Branch Leader:" />
+                                <QuestionCard i={3} type="time" q="Total time with Johnny & Jugnu:" />
+                                <QuestionCard i={4} type="radio" q="I feel trusted and empowered by my Operations Leader..." opts={["Strongly Disagree", "Disagree", "Agree", "Strongly Agree"]} />
+                            </div>
+                        </motion.div>
                     </div>
                 </motion.div>
             </div>

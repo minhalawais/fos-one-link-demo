@@ -357,7 +357,7 @@ const CentralCore = ({ isMerged }: { isMerged: boolean }) => (
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="flex flex-col items-center gap-1.5 mt-4"
+          className="flex flex-col items-center gap-1.5 mt-20"
         >
           <div className="flex items-center gap-2.5 text-[#284952] bg-white/95 backdrop-blur-md px-6 py-2 rounded-full border border-green-100 shadow-2xl">
             <ShieldCheck size={18} className="text-[#60BA81]" />

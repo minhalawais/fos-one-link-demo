@@ -1,40 +1,18 @@
-Overall Zoom Out Page
-Expanded slide heading on top
-Remove tags from expanded slides
-Pause and Start Facility
-Full name of light and left expanded slide
-Company A Logo Simple
-Module 1:
-Scene 1 For HRMS Show big employees card linked to FOS Validator Engine
-For CNIC and EMployee ID generator Display fos Validator engine visualization
-Replace Robot with Simple logo
-FOS SMS display employees around phones
-QR Code Scanning visualization
-Unit Officer - Harrasment Officer
-IO Cards big
-Last Scene IO Big
+Favicon FOS One Link Demonstration - Digital Grievance Management System
+Module 1 Right column visualization
+Keep Hrms Integration Constant
+SMS ICON
+Female avatars
+Nokia Phone
+FOS Card logos big
+Primary View
+IO portal view not needed in module 1. View Portal credentials
 
 Module 2
-FOS Multichannel Grievance Ecosystem
-FOS Grievance Officer
-Keep same screen for scene 2 and scene 3
+Move 100% protected down. Replace 100% employee Coverage
+Dont auto run next module
 
-Module 3 Intro heading
-RCA AND CAPA text entry not showing
-Remove Investigation Complete modal
-RCA1 CAPA1
-Email triggers on Remedition
-
-Module 4
-Launch a Survey Visualization
-IN survey Filter display OR
-Employee botton right modal
-Display AI Analysis within report
-
-Module 5
-Worker happiness charts not loading
-keep dashboard in one view
-Display cursor
-Display everything within dashboard
-Also display survey download and view buttons
-
+Module 3
+IO Left corner Avatar
+Separate timline for Route Complaint
+Survey Button in Dashboard blur

@@ -1,1309 +1,399 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  Lock,
   User,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  AlertTriangle,
-  List,
-  ListOrdered,
-  Bold,
-  Italic,
-  Underline,
-  LinkIcon,
-  Upload,
-  FileText,
-  ImageIcon,
-  Mic,
-  Printer,
+  Lock,
+  Mail,
+  ShieldCheck,
   CheckCircle2,
-  Calendar,
-  Info,
+  Chrome,
+  Fingerprint,
+  KeyRound,
 } from "lucide-react"
 
-// Brand Colors
 const COLORS = {
-  teal: "#0f9690",
   deepTeal: "#284952",
   freshGreen: "#60BA81",
-  green: "#60BA81",
-  charcoal: "#17161A",
   warmOrange: "#F5A83C",
-  orange: "#F5A83C",
-  white: "#FFFFFF",
-  lightGray: "#F5F5F7",
+  charcoal: "#17161A",
+  mediumGray: "#767676",
   bg: "#F5F5F7",
   border: "#DEE2E6",
-  mediumGray: "#767676",
-  softGreen: "rgba(96, 186, 129, 0.42)",
+  white: "#FFFFFF",
 }
 
-// Assets
-const ASSETS = {
-  officer_pc: "/assets/avatars/officer_pc.png",
-}
-
-
-// Apple-style easing
 const EASE = [0.32, 0.72, 0, 1]
 
-const pageTransitionVariants = {
-  initial: {
-    opacity: 0,
-    scale: 0.96,
-    filter: "blur(8px)",
+const OFFICERS = [
+  {
+    id: "IO-MULTAN47",
+    name: "Awais Khan",
+    role: "Unit Officer",
+    avatar: "/assets/avatars/male_io.png",
+    username: "io.multan47",
+    password: "FOS@Multan47",
+    email: "io.multan47@fruitofsustainability.com",
   },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    filter: "blur(0px)",
-    transition: {
-      duration: 0.6,
-      ease: EASE,
-    },
+  {
+    id: "IO-HR-21",
+    name: "Sara Ahmed",
+    role: "Harassment Officer",
+    avatar: "/assets/avatars/female_io.png",
+    username: "io.hr21",
+    password: "FOS@HR21",
+    email: "io.hr21@fruitofsustainability.com",
   },
-  exit: {
-    opacity: 0,
-    scale: 1.04,
-    filter: "blur(12px)",
-    transition: {
-      duration: 0.5,
-      ease: EASE,
-    },
+  {
+    id: "IO-HSE-09",
+    name: "Usman Raza",
+    role: "Safety Officer",
+    avatar: "/assets/avatars/investigation_officer_avatar.png",
+    username: "io.hse09",
+    password: "FOS@HSE09",
+    email: "io.hse09@fruitofsustainability.com",
   },
+]
+
+function revealMasked(value: string, local: number, start: number, duration: number, mask = "•") {
+  if (local <= start) return mask.repeat(value.length)
+  if (local >= start + duration) return value
+  const progress = (local - start) / duration
+  const count = Math.floor(progress * value.length)
+  return `${value.slice(0, count)}${mask.repeat(Math.max(0, value.length - count))}`
 }
 
-// --- CHART COMPONENTS ---
-const DonutChart = () => (
-  <svg width="200" height="200" viewBox="0 0 200 200" className="mx-auto">
-    <circle cx="100" cy="100" r="80" fill="none" stroke={COLORS.deepTeal} strokeWidth="24" opacity="0.9" />
-    <circle
-      cx="100"
-      cy="100"
-      r="80"
-      fill="none"
-      stroke={COLORS.freshGreen}
-      strokeWidth="24"
-      strokeDasharray="200 502"
-      strokeDashoffset="0"
-      transform="rotate(-90 100 100)"
-      opacity="0.85"
-    />
-    <circle
-      cx="100"
-      cy="100"
-      r="80"
-      fill="none"
-      stroke={COLORS.warmOrange}
-      strokeWidth="24"
-      strokeDasharray="50 502"
-      strokeDashoffset="-200"
-      transform="rotate(-90 100 100)"
-      opacity="0.9"
-    />
-    <text x="100" y="95" textAnchor="middle" className="fill-[#17161A] font-bold">
-      <tspan x="100" dy="0" fontSize="18">
-        Total
-      </tspan>
-      <tspan x="100" dy="20" fontSize="22">
-        (117)
-      </tspan>
-    </text>
-  </svg>
+const CredentialRow = ({ label, icon: Icon, value, active }: { label: string, icon: any, value: string, active: boolean }) => (
+  <motion.div
+    animate={{
+      borderColor: active ? "rgba(96,186,129,0.6)" : "rgba(222,226,230,1)",
+      backgroundColor: active ? "rgba(96,186,129,0.06)" : "rgba(255,255,255,0.9)",
+    }}
+    className="rounded-xl border px-3 py-2.5"
+  >
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        <div className="w-6 h-6 rounded-lg bg-white border border-gray-100 flex items-center justify-center">
+          <Icon size={12} style={{ color: COLORS.deepTeal }} />
+        </div>
+        <span className="text-[10px] uppercase font-bold tracking-[0.14em] text-gray-400">{label}</span>
+      </div>
+      <span className="text-[11px] font-mono font-bold" style={{ color: COLORS.deepTeal }}>{value}</span>
+    </div>
+  </motion.div>
 )
 
-const StackedBarChart = () => {
-  const categories = [
-    { heights: [4, 3, 1] },
-    { heights: [4, 3, 1] },
-    { heights: [4, 3, 1] },
-    { heights: [16, 5, 1] },
-    { heights: [3, 2, 1] },
-    { heights: [2, 2, 1] },
-    { heights: [4, 2, 1] },
-    { heights: [26, 6, 2] },
-    { heights: [3, 2, 1] },
-    { heights: [3, 2, 1] },
-    { heights: [2, 1, 0] },
-    { heights: [4, 2, 1] },
-  ]
-
-  return (
-    <svg width="100%" height="220" viewBox="0 0 700 220" className="w-full">
-      {[0, 5, 10, 15, 20, 25, 30, 35].map((val) => (
-        <g key={val}>
-          <text x="35" y={200 - val * 5} textAnchor="end" className="text-[10px] fill-gray-400">
-            {val}
-          </text>
-          <line x1="45" y1={200 - val * 5} x2="650" y2={200 - val * 5} stroke="#f0f0f0" strokeWidth="1" />
-        </g>
-      ))}
-      {categories.map((bar, i) => {
-        const x = 70 + i * 50
-        let yOffset = 200
-        return (
-          <g key={i}>
-            {bar.heights.map((h, j) => {
-              const colors = [COLORS.deepTeal, COLORS.freshGreen, COLORS.warmOrange]
-              const height = h * 5
-              yOffset -= height
-              return (
-                <rect key={j} x={x - 15} y={yOffset} width="30" height={height} fill={colors[j]} opacity="0.9" rx="2" />
-              )
-            })}
-          </g>
-        )
-      })}
-      <line x1="45" y1="200" x2="650" y2="200" stroke={COLORS.border} strokeWidth="2" />
-    </svg>
-  )
-}
-
-// --- SCREEN COMPONENTS ---
-
-// 1. Login Screen
-const LoginScreen = ({ stage }: { stage: number }) => {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-
-  const userTyped = useRef(false)
-  const passTyped = useRef(false)
-
-  useEffect(() => {
-    // Reset if back to start
-    if (stage === 0) {
-      setUsername("")
-      setPassword("")
-      userTyped.current = false
-      passTyped.current = false
-      return
-    }
-
-    // Type Username
-    if (stage >= 1 && !userTyped.current) {
-      userTyped.current = true
-      const user = "multan47"
-      let i = 0
-      const typeUser = setInterval(() => {
-        if (i < user.length) {
-          setUsername(user.slice(0, i + 1))
-          i++
-        } else {
-          clearInterval(typeUser)
-        }
-      }, 60)
-      return () => clearInterval(typeUser)
-    }
-  }, [stage])
-
-  useEffect(() => {
-    // Type Password
-    if (stage >= 2 && !passTyped.current) {
-      passTyped.current = true
-      const pass = "........"
-      let i = 0
-      const typePass = setInterval(() => {
-        if (i < pass.length) {
-          setPassword(pass.slice(0, i + 1))
-          i++
-        } else {
-          clearInterval(typePass)
-        }
-      }, 50)
-      return () => clearInterval(typePass)
-    }
-  }, [stage])
-
-  const isButtonHovered = stage >= 3
+const CredentialEngine = ({ local, officer }: { local: number, officer: (typeof OFFICERS)[0] }) => {
+  const user = revealMasked(officer.username, local, 0.7, 0.8)
+  const pass = revealMasked(officer.password, local, 1.5, 0.9)
+  const email = revealMasked(officer.email, local, 2.4, 1.0)
 
   return (
     <motion.div
-      key="login"
-      variants={pageTransitionVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="absolute inset-0 flex items-center justify-center p-8"
-      style={{ backgroundColor: COLORS.lightGray }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: EASE }}
+      className="w-[440px] rounded-3xl border border-white/70 bg-white/90 backdrop-blur-xl p-5 shadow-[0_20px_60px_-20px_rgba(15,23,42,0.25)]"
     >
-      <motion.div
-        initial={{ scale: 0.92, opacity: 0, y: 20 }}
-        animate={{ scale: 0.85, opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
-        className="w-[280px] bg-white rounded-[28px] overflow-hidden origin-center"
-        style={{ boxShadow: "0 20px 60px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.1)" }}
-      >
-        {/* Logo Section */}
-        <div className="px-6 pt-6 pb-4 bg-gradient-to-b from-[#FAFAFA] to-white">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.4 }}
-            className="text-center"
-          >
-            <div className="w-24 h-24 mx-auto mb-3 relative rounded-2xl bg-white flex items-center justify-center shadow-lg border border-gray-100 overflow-hidden">
-              <img src="/assets/images/FOS-01.png" alt="FOS Logo" className="w-[100%] h-[100%] object-contain" />
-            </div>
-            <h1 className="text-lg font-bold tracking-tight mb-2" style={{ color: COLORS.charcoal }}>
-              Login
-            </h1>
-          </motion.div>
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] font-black text-gray-400">Credential Engine</p>
+          <h3 className="text-lg font-black" style={{ color: COLORS.deepTeal }}>Generating Secure IO Access</h3>
         </div>
+        <div className="w-10 h-10 rounded-xl border border-green-100 bg-green-50 flex items-center justify-center">
+          <Fingerprint size={18} style={{ color: COLORS.freshGreen }} />
+        </div>
+      </div>
 
-        {/* Form Section */}
-        <div className="px-6 py-4 space-y-4">
-          {/* Username */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <label className="block text-xs font-semibold mb-2 tracking-tight" style={{ color: COLORS.deepTeal }}>
-              Username
-            </label>
-            <div className="relative">
-              <User
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2"
-                style={{ color: COLORS.mediumGray }}
-              />
-              <input
-                type="text"
-                value={username}
-                readOnly
-                className="w-full h-9 pl-9 pr-3 text-xs font-medium rounded-xl border-2 transition-all"
-                style={{
-                  backgroundColor: COLORS.lightGray,
-                  borderColor: username ? COLORS.freshGreen : COLORS.border,
-                  color: COLORS.charcoal,
-                }}
-              />
+      <div className="rounded-2xl border border-gray-100 bg-gray-50/80 p-3 mb-4 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200 bg-white p-1">
+          <img src={officer.avatar} alt={officer.role} className="w-full h-full object-contain" />
+        </div>
+        <div>
+          <p className="text-xs font-bold" style={{ color: COLORS.deepTeal }}>{officer.name}</p>
+          <p className="text-[10px] text-gray-400 font-mono">{officer.id}</p>
+        </div>
+      </div>
+
+      <div className="space-y-2.5">
+        <CredentialRow label="Username" icon={User} value={user} active={local > 0.8} />
+        <CredentialRow label="Password" icon={Lock} value={pass} active={local > 1.6} />
+        <CredentialRow label="Email" icon={Mail} value={email} active={local > 2.5} />
+      </div>
+    </motion.div>
+  )
+}
+
+const AssignmentView = ({ local }: { local: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.96 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.5 }}
+    className="w-full max-w-6xl px-6"
+  >
+    <div className="text-center mb-5">
+      <p className="text-[10px] uppercase tracking-[0.18em] font-black text-gray-400">Secure Distribution</p>
+      <h3 className="text-2xl font-black" style={{ color: COLORS.deepTeal }}>Credentials Assigned To Investigation Officers</h3>
+    </div>
+
+    <div className="relative flex flex-col md:flex-row justify-center items-center gap-5">
+      <div className="absolute left-1/2 top-10 -translate-x-1/2 hidden md:block">
+        <div className="w-24 h-24 rounded-full border border-dashed border-green-200 bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg">
+          <KeyRound size={28} style={{ color: COLORS.freshGreen }} />
+        </div>
+      </div>
+
+      {OFFICERS.map((officer, i) => {
+        const granted = local > 4.4 + i * 0.7
+        return (
+          <motion.div
+            key={officer.id}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.12 }}
+            className="w-72 rounded-2xl border border-white/70 bg-white/90 backdrop-blur-sm p-4 shadow-[0_14px_40px_-24px_rgba(15,23,42,0.4)] relative"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-200 bg-gray-50 p-1">
+                <img src={officer.avatar} alt={officer.role} className="w-full h-full object-contain" />
+              </div>
+              <div>
+                <p className="text-sm font-bold" style={{ color: COLORS.deepTeal }}>{officer.role}</p>
+                <p className="text-[10px] font-mono text-gray-400">{officer.id}</p>
+              </div>
+            </div>
+
+            <div className="mt-3 rounded-xl border border-gray-100 bg-gray-50/80 p-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] uppercase tracking-wider font-bold text-gray-400">Portal Access</span>
+                <motion.div
+                  animate={{ scale: granted ? [1, 1.1, 1] : 1 }}
+                  transition={{ duration: 0.8, repeat: granted ? Infinity : 0 }}
+                >
+                  {granted ? <CheckCircle2 size={14} className="text-green-500" /> : <ShieldCheck size={14} className="text-gray-300" />}
+                </motion.div>
+              </div>
+              <p className="text-[11px] font-mono font-bold mt-1" style={{ color: granted ? COLORS.deepTeal : COLORS.mediumGray }}>
+                {granted ? officer.username : "Pending secure assignment..."}
+              </p>
             </div>
           </motion.div>
+        )
+      })}
+    </div>
+  </motion.div>
+)
 
-          {/* Password */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <label className="block text-xs font-semibold mb-2 tracking-tight" style={{ color: COLORS.deepTeal }}>
-              Password
+const LoginPreview = ({ local }: { local: number }) => {
+  const officerIndex = Math.min(OFFICERS.length - 1, Math.floor((local - 8) / 2))
+  const officer = OFFICERS[Math.max(0, officerIndex)]
+
+  const username = revealMasked(officer.username, local, 8.2, 1.0, "_")
+  const password = revealMasked(officer.password, local, 9.5, 0.9, "•")
+  const canSubmit = local > 10.8
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16, scale: 0.74 }}
+      animate={{ opacity: 1, y: 0, scale: 0.78 }}
+      className="w-full max-w-[980px] rounded-[24px] border border-white/70 bg-white/65 backdrop-blur-xl px-2.5 py-3 md:px-4 md:py-4 shadow-[0_25px_50px_-12px_rgba(40,73,82,0.12)]"
+    >
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1.3fr_auto_1fr] items-stretch gap-0">
+        <div className="rounded-3xl lg:rounded-none lg:rounded-l-3xl bg-white/55 px-4 py-5 text-center lg:mt-[70px]">
+          <div className="w-12 h-12 mx-auto rounded-2xl border border-[#60BA81] bg-gradient-to-br from-[#60BA81]/10 to-[#284952]/5 flex items-center justify-center mb-4 transition-all duration-300">
+            <Fingerprint size={22} color={COLORS.freshGreen} />
+          </div>
+          <h4 className="font-black text-[19px] leading-tight mb-2" style={{ color: COLORS.deepTeal, fontFamily: "'Space Grotesk', sans-serif" }}>
+            Login Via OTP
+          </h4>
+          <p className="text-xs leading-relaxed mb-4" style={{ color: COLORS.mediumGray }}>
+            Sign in without a password. You’ll receive a one-time code at your registered email.
+          </p>
+
+          <div className="text-left mb-3">
+            <label className="block text-[10px] uppercase tracking-[2px] font-black mb-2" style={{ color: COLORS.freshGreen }}>
+              Email Address
             </label>
-            <div className="relative">
-              <Lock
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2"
-                style={{ color: COLORS.mediumGray }}
-              />
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                readOnly
-                className="w-full h-9 pl-9 pr-10 text-xs font-medium rounded-xl border-2 transition-all tracking-widest"
-                style={{
-                  backgroundColor: COLORS.lightGray,
-                  borderColor: password ? COLORS.freshGreen : COLORS.border,
-                  color: COLORS.charcoal,
-                }}
-              />
-              <button
-                className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
-                style={{ color: COLORS.mediumGray }}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+            <div className="h-10 rounded-xl border border-[#DEE2E6] bg-white/95 px-3 flex items-center">
+              <span className="text-xs" style={{ color: COLORS.mediumGray }}>name@abc.com</span>
             </div>
-          </motion.div>
-
-          {/* Remember Me */}
-          <div className="flex items-center gap-2 pt-1">
-            <input
-              type="checkbox"
-              id="remember"
-              className="w-3.5 h-3.5 rounded accent-[#284952]"
-              style={{ accentColor: COLORS.deepTeal }}
-            />
-            <label htmlFor="remember" className="text-xs select-none" style={{ color: COLORS.mediumGray }}>
-              Remember Me
-            </label>
           </div>
 
-          {/* Login Button */}
+          <button
+            type="button"
+            className="w-full h-10 rounded-xl border-2 border-[#DEE2E6] bg-white/90 text-xs font-bold tracking-[0.05em] uppercase transition-all"
+            style={{ color: COLORS.deepTeal }}
+          >
+            Send Code
+          </button>
+        </div>
+
+        <div className="hidden lg:flex flex-col items-center justify-center px-3 min-h-[360px]">
+          <div className="flex-1 w-[2px] bg-gradient-to-b from-transparent via-[#DEE2E6] to-transparent" />
+          <span className="w-12 h-12 rounded-full bg-white border-2 border-[#60BA81]/35 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] text-xs font-black uppercase tracking-[0.05em] text-[#284952] flex items-center justify-center">
+            or
+          </span>
+          <div className="flex-1 w-[2px] bg-gradient-to-b from-transparent via-[#DEE2E6] to-transparent" />
+        </div>
+
+        <div className="px-4 py-4 text-center">
+          <div className="mb-4 relative">
+            <div className="w-[112px] h-[112px] mx-auto mb-4 rounded-full border-2 border-[#60BA81] bg-white shadow-2xl p-3">
+              <img src="/assets/images/FOS-01.png" alt="FOS" className="w-full h-full object-contain" />
+            </div>
+            <h2 className="font-black text-[21px] leading-tight mb-1" style={{ color: COLORS.deepTeal, fontFamily: "'Space Grotesk', sans-serif" }}>
+              Login Via Credentials
+            </h2>
+            <p className="text-xs" style={{ color: COLORS.mediumGray }}>Sign in using your username or email</p>
+          </div>
+
+          <div className="w-full max-w-[360px] mx-auto text-left mb-3">
+            <label className="block text-[10px] uppercase tracking-[2px] font-black mb-2" style={{ color: COLORS.freshGreen }}>
+              Username Or Email
+            </label>
+            <div className="h-11 rounded-xl border border-[#DEE2E6] bg-white/95 px-3 flex items-center">
+              <span className="text-[13px] font-mono" style={{ color: COLORS.charcoal }}>{username}</span>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[360px] mx-auto text-left mb-3">
+            <label className="block text-[10px] uppercase tracking-[2px] font-black mb-2" style={{ color: COLORS.freshGreen }}>
+              Password
+            </label>
+            <div className="h-11 rounded-xl border border-[#DEE2E6] bg-white/95 px-3 flex items-center justify-between">
+              <span className="text-[13px] font-mono" style={{ color: COLORS.charcoal }}>{password}</span>
+              <Lock size={14} className="text-slate-400" />
+            </div>
+          </div>
+
+          <div className="w-full max-w-[360px] mx-auto flex items-center justify-between mb-4 px-1">
+            <label className="flex items-center gap-3">
+              <div className="w-4 h-4 rounded border border-slate-200 bg-white" />
+              <span className="text-xs font-semibold text-slate-500">Keep me logged in</span>
+            </label>
+            <div className="px-3 py-1.5 rounded-full border text-[10px] font-bold" style={{ color: canSubmit ? "#166534" : COLORS.mediumGray, borderColor: canSubmit ? "#bbf7d0" : "#e2e8f0", backgroundColor: canSubmit ? "#f0fdf4" : "#f8fafc" }}>
+              {canSubmit ? "AUTH READY" : "WAITING"}
+            </div>
+          </div>
+
           <motion.button
+            type="button"
             animate={{
-              scale: isButtonHovered ? 0.97 : 1,
-              backgroundColor: isButtonHovered ? "#1E3A42" : "#007AFF",
+              y: canSubmit ? [0, -2, 0] : 0,
+              boxShadow: canSubmit
+                ? ["0 10px 15px -3px rgba(96,186,129,0.3)", "0 20px 25px -5px rgba(96,186,129,0.5)", "0 10px 15px -3px rgba(96,186,129,0.3)"]
+                : "0 10px 15px -3px rgba(96,186,129,0.3)",
             }}
-            transition={{ duration: 0.2 }}
-            className="w-full h-9 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-2"
-            style={{
-              backgroundColor: "#007AFF",
-              boxShadow: "0 8px 20px rgba(0, 122, 255, 0.3)",
-            }}
+            transition={{ duration: 1.2, repeat: canSubmit ? Infinity : 0 }}
+            className="w-full max-w-[360px] h-11 rounded-xl text-white font-bold text-xs uppercase tracking-[2px]"
+            style={{ background: "linear-gradient(to bottom right, #60BA81, #60BA81, #4a9965)" }}
           >
             Login
-            {isButtonHovered && (
-              <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }}>
-                <ArrowRight size={16} />
-              </motion.div>
-            )}
           </motion.button>
         </div>
 
-        {/* Footer */}
-        <div
-          className="px-6 py-3 text-center text-[10px]"
-          style={{ color: COLORS.mediumGray, borderColor: COLORS.border, backgroundColor: "#FAFAFA" }}
-        >
-          Copyright © 2023 — Fruit of Sustainability
-        </div>
-      </motion.div>
-
-      {/* Animated Cursor */}
-      <motion.div
-        initial={{ x: 600, y: 300, opacity: 0 }}
-        animate={{
-          x: stage >= 3 ? 350 : stage >= 2 ? 400 : 600,
-          y: stage >= 3 ? 480 : stage >= 2 ? 420 : 300,
-          opacity: stage >= 1 ? 1 : 0,
-        }}
-        transition={{ duration: 0.8, ease: EASE }}
-        className="absolute pointer-events-none z-50"
-      >
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-          <path d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z" fill="black" stroke="white" strokeWidth="2" />
-        </svg>
-      </motion.div>
-    </motion.div>
-  )
-}
-
-// 2. Portal Dashboard
-const PortalDashboard = ({ stage }: { stage: number }) => {
-  const selectedRow = stage >= 5 ? 0 : null
-
-  const complaints = [
-    {
-      sr: 462,
-      ticket: "XX0810010-16XXXX",
-      name: "Sana",
-      status: "Bounced",
-      date: "Mon, 24 Nov 2025 11:56 AM",
-      mobile: "923214864040",
-    },
-    {
-      sr: 461,
-      ticket: "XX241120-47XXXX",
-      name: "Sana",
-      status: "Completed",
-      date: "Mon, 24 Nov 2025 11:47 AM",
-      mobile: "03214864040",
-    },
-  ]
-
-  return (
-    <motion.div
-      key="dashboard"
-      variants={pageTransitionVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="absolute inset-0 overflow-hidden"
-      style={{ backgroundColor: COLORS.lightGray }}
-    >
-      <div className="scale-[0.58] origin-top-left p-6 w-[173%]">
-        {/* Header / Topbar */}
-        <div
-          className="flex items-center justify-between mb-6 px-6 py-3 bg-white rounded-2xl shadow-sm border border-gray-100 relative"
-          style={{ height: "70px" }}
-        >
-          {/* Left Section (Logo) */}
-          <div className="w-1/4 flex justify-start">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="w-20 h-14 flex items-center justify-center p-1"
-            >
-              <img src="/assets/images/vertical_logo.png" alt="FOS Logo" className="w-full h-full object-contain" />
-            </motion.div>
-          </div>
-
-          {/* Center Section (Heading) */}
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <p className="text-[11px] font-black tracking-[0.3em] mb-0.5 leading-none" style={{ color: COLORS.freshGreen }}>
-                MULTAN47
-              </p>
-              <h1 className="text-xl font-black tracking-tight leading-tight" style={{ color: COLORS.charcoal }}>
-                Grievance Management Portal
-              </h1>
-            </motion.div>
-          </div>
-
-          {/* Right Section (Logout Button) */}
-          <div className="w-1/4 flex justify-end">
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              whileHover={{ scale: 1.02 }}
-              className="px-5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-md"
-              style={{
-                backgroundColor: COLORS.freshGreen,
-                boxShadow: "0 4px 12px rgba(96, 186, 129, 0.2)",
-              }}
-            >
-              Logout
-            </motion.button>
-          </div>
+        <div className="hidden lg:flex flex-col items-center justify-center px-3 min-h-[360px]">
+          <div className="flex-1 w-[2px] bg-gradient-to-b from-transparent via-[#DEE2E6] to-transparent" />
+          <span className="w-12 h-12 rounded-full bg-white border-2 border-[#60BA81]/35 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] text-xs font-black uppercase tracking-[0.05em] text-[#284952] flex items-center justify-center">
+            or
+          </span>
+          <div className="flex-1 w-[2px] bg-gradient-to-b from-transparent via-[#DEE2E6] to-transparent" />
         </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-5 gap-6 mb-8 mt-4">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5, ease: EASE }}
-            className="col-span-2 bg-white rounded-2xl p-5"
-            style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}
-          >
-            <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.mediumGray }}>
-              Complaint Status
-            </h3>
-            <DonutChart />
-            <div className="flex justify-center gap-5 mt-6 text-[11px]">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.deepTeal }} />
-                <span style={{ color: COLORS.mediumGray }}>Unprocessed</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.freshGreen }} />
-                <span style={{ color: COLORS.mediumGray }}>In Process</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.warmOrange }} />
-                <span style={{ color: COLORS.mediumGray }}>Bounced</span>
-              </div>
-            </div>
-          </motion.div>
+        <div className="rounded-3xl lg:rounded-none lg:rounded-r-3xl bg-white/55 px-4 py-5 text-center lg:mt-[70px]">
+          <div className="w-12 h-12 mx-auto rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center mb-4 transition-all duration-300">
+            <Chrome size={22} color="#4285F4" />
+          </div>
+          <h4 className="font-black text-[19px] leading-tight mb-2" style={{ color: COLORS.deepTeal, fontFamily: "'Space Grotesk', sans-serif" }}>
+            Login Via Google
+          </h4>
+          <p className="text-xs leading-relaxed mb-3" style={{ color: COLORS.mediumGray }}>
+            Sign in using your Google account.
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5, ease: EASE }}
-            className="col-span-3 bg-white rounded-2xl p-5"
-            style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}
+          <div className="w-full bg-blue-50/80 border border-blue-100 rounded-xl p-3 mb-6 text-left">
+            <p className="text-[11px] leading-relaxed text-blue-700">
+              <strong>Not registered?</strong> Contact hrdd@fruitofsustainability.com to link your Gmail account.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="w-full h-10 rounded-xl border-2 border-[#DEE2E6] bg-white/90 text-xs font-bold tracking-[0.05em] flex items-center justify-center gap-2"
+            style={{ color: "#DB4437" }}
           >
-            <h3 className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: COLORS.mediumGray }}>
-              Complaints By Categories
-            </h3>
-            <StackedBarChart />
-            <div className="flex justify-center gap-5 mt-4 text-[11px]">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.deepTeal }} />
-                <span style={{ color: COLORS.mediumGray }}>Submitted</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.freshGreen }} />
-                <span style={{ color: COLORS.mediumGray }}>In Process</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS.warmOrange }} />
-                <span style={{ color: COLORS.mediumGray }}>Bounced</span>
-              </div>
+            <Chrome size={15} />
+            Continue with Google
+          </button>
+
+          <div className="mt-4 rounded-2xl border border-gray-100 bg-white/90 p-2.5 flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-200 bg-gray-50 p-1">
+              <img src={officer.avatar} alt={officer.role} className="w-full h-full object-contain" />
             </div>
-          </motion.div>
+            <div>
+              <p className="text-[11px] font-bold text-left" style={{ color: COLORS.deepTeal }}>{officer.role}</p>
+              <p className="text-[9px] font-mono text-left text-gray-400">Assigned: {officer.username}</p>
+            </div>
+          </div>
         </div>
-
-        {/* Complaints Table - Removed border-b classes to eliminate black borders */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.5, ease: EASE }}
-          className="bg-white rounded-2xl overflow-hidden"
-          style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}
-        >
-          <div
-            className="px-6 py-4 flex justify-between items-center"
-            style={{ borderBottom: `1px solid ${COLORS.border}` }}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-medium" style={{ color: COLORS.mediumGray }}>
-                Show
-              </span>
-              <select className="px-3 py-1.5 text-sm rounded-lg border" style={{ borderColor: COLORS.border }}>
-                <option>100</option>
-              </select>
-              <span className="text-xs font-medium" style={{ color: COLORS.mediumGray }}>
-                entries
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium" style={{ color: COLORS.mediumGray }}>
-                Search:
-              </span>
-              <input
-                type="text"
-                className="px-3 py-1.5 text-sm rounded-lg border"
-                style={{ borderColor: COLORS.border }}
-              />
-            </div>
-          </div>
-
-          <div
-            className="grid grid-cols-6 gap-4 px-6 py-3 text-[10px] font-bold uppercase tracking-wider"
-            style={{ color: COLORS.mediumGray, borderBottom: `1px solid ${COLORS.border}`, backgroundColor: "#FAFAFA" }}
-          >
-            <div>Sr.</div>
-            <div>Ticket Number</div>
-            <div>NAME</div>
-            <div>STATUS</div>
-            <div>COMPLAINT DATE</div>
-            <div>Mobile Number</div>
-          </div>
-
-          <div>
-            {complaints.map((complaint, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.4, ease: EASE }}
-                className="grid grid-cols-6 gap-4 px-6 py-4 items-center cursor-pointer transition-all duration-300"
-                style={{
-                  borderBottom: i < complaints.length - 1 ? `1px solid ${COLORS.border}` : "none",
-                  borderLeft: selectedRow === i ? `4px solid ${COLORS.freshGreen}` : "4px solid transparent",
-                  backgroundColor: selectedRow === i ? COLORS.softGreen : "transparent",
-                }}
-              >
-                <div className="text-xs font-medium" style={{ color: COLORS.mediumGray }}>
-                  {complaint.sr}
-                </div>
-                <div className="text-xs font-bold font-mono" style={{ color: COLORS.deepTeal }}>
-                  {complaint.ticket}
-                </div>
-                <div className="text-xs font-semibold" style={{ color: COLORS.charcoal }}>
-                  {complaint.name}
-                </div>
-                <div>
-                  <span
-                    className="px-3 py-1 rounded-full text-[10px] font-bold inline-block"
-                    style={{
-                      backgroundColor:
-                        complaint.status === "Bounced" ? "rgba(245, 168, 60, 0.2)" : "rgba(96, 186, 129, 0.2)",
-                      color: complaint.status === "Bounced" ? COLORS.warmOrange : COLORS.freshGreen,
-                    }}
-                  >
-                    {complaint.status}
-                  </span>
-                </div>
-                <div className="text-xs" style={{ color: COLORS.mediumGray }}>
-                  {complaint.date}
-                </div>
-                <div className="text-xs" style={{ color: COLORS.mediumGray }}>
-                  {complaint.mobile}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Animated Cursor */}
-        <motion.div
-          initial={{ x: 300, y: 500, opacity: 0 }}
-          animate={{
-            x: stage >= 5 ? 180 : 200,
-            y: stage >= 5 ? 750 : 700,
-            opacity: 1,
-          }}
-          transition={{ duration: 0.8, ease: EASE }}
-          className="absolute pointer-events-none z-50"
-        >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <path d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z" fill="black" stroke="white" strokeWidth="2" />
-          </svg>
-        </motion.div>
       </div>
-    </motion.div>
-  )
-}
-
-// 3. Timeline Form Screen - Matching scene-rca-capa-evidence layout
-const TimelineFormScreen = ({ stage }: { stage: number }) => {
-  const [rcaText, setRcaText] = useState("")
-  const [capaText, setCapaText] = useState("")
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([])
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [draggingFile, setDraggingFile] = useState<string | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  // Voice-over synced text content
-  const rcaFullText = `The complaint is VALID based on the investigation findings.
-
-• Worker statements confirm inconsistent shift rotations
-• HR records show policy was not followed for 3 employees
-• Root cause: Branch manager failed to update the rotation schedule
-
-This is a process issue requiring immediate corrective action.`
-
-  const capaFullText = `CORRECTIVE ACTIONS:
-• Revert affected workers to their original fixed shifts immediately
-• Issue formal warning to branch manager
-
-PREVENTIVE MEASURES:
-• Implement automated rotation software
-• Monthly compliance audits by HR
-• Staff training on new scheduling policy
-
-Assigned to: HR Manager | Deadline: 20 Nov 2025`
-
-  // RCA typing effect
-  useEffect(() => {
-    if (stage >= 8 && rcaText.length < rcaFullText.length) {
-      const interval = setInterval(() => {
-        setRcaText((prev) => {
-          if (prev.length < rcaFullText.length) {
-            return rcaFullText.slice(0, prev.length + 2)
-          }
-          return prev
-        })
-      }, 30)
-      return () => clearInterval(interval)
-    }
-  }, [stage, rcaText.length])
-
-  // CAPA typing effect
-  useEffect(() => {
-    if (stage >= 10 && capaText.length < capaFullText.length) {
-      const interval = setInterval(() => {
-        setCapaText((prev) => {
-          if (prev.length < capaFullText.length) {
-            return capaFullText.slice(0, prev.length + 2)
-          }
-          return prev
-        })
-      }, 25)
-      return () => clearInterval(interval)
-    }
-  }, [stage, capaText.length])
-
-  // File upload animation
-  useEffect(() => {
-    const files = ["photo_evidence.jpg", "worker_statement.pdf", "voice_recording.mp3", "policy_doc.pdf"]
-
-    if (stage === 13 && !draggingFile && !uploadedFiles.includes(files[0])) {
-      setDraggingFile(files[0])
-      setTimeout(() => {
-        setDraggingFile(null)
-        setUploadedFiles((prev) => [...prev, files[0]])
-      }, 600)
-    }
-    if (stage === 14 && !draggingFile && !uploadedFiles.includes(files[1])) {
-      setDraggingFile(files[1])
-      setTimeout(() => {
-        setDraggingFile(null)
-        setUploadedFiles((prev) => [...prev, files[1]])
-      }, 600)
-    }
-  }, [stage, draggingFile, uploadedFiles])
-
-  // Success state
-  useEffect(() => {
-    if (stage >= 17) {
-      setShowSuccess(true)
-    }
-  }, [stage])
-
-  // Zoom transforms matching scene-rca-capa-evidence
-  const getTransform = () => {
-    if (stage >= 7 && stage < 10) {
-      // Zoom to RCA
-      return { scale: 1.4, x: -140, y: 50 }
-    }
-    if (stage >= 10 && stage < 13) {
-      // Zoom to CAPA
-      return { scale: 1.4, x: 140, y: -40 }
-    }
-    if (stage >= 13 && stage < 15) {
-      // Zoom to Evidence
-      return { scale: 1.4, x: -100, y: -50 }
-    }
-    if (stage >= 15 && stage < 17) {
-      // Zoom to Submit button
-      return { scale: 1.2, x: 0, y: -80 }
-    }
-    return { scale: 1, x: 0, y: 0 }
-  }
-
-  const transform = getTransform()
-
-  return (
-    <motion.div
-      key="timeline-form"
-      variants={pageTransitionVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      className="absolute inset-0 overflow-hidden bg-gradient-to-br from-[#F5F5F7] to-[#E8E8EA] flex items-center justify-center font-sans scale-[0.8] origin-center"
-    >
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div
-          className="w-full h-full"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, ${COLORS.deepTeal} 1px, transparent 0)`,
-            backgroundSize: "40px 40px",
-          }}
-        />
-      </div>
-
-      {/* Dragging File Animation */}
-      <AnimatePresence>
-        {draggingFile && (
-          <motion.div
-            initial={{ x: 200, y: -100, opacity: 0, scale: 0.5 }}
-            animate={{ x: 60, y: 40, opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="absolute z-[100] flex flex-col items-center gap-2 p-3 bg-white rounded-xl shadow-2xl border-2 border-dashed"
-            style={{ borderColor: COLORS.teal }}
-          >
-            {draggingFile.includes("jpg") && <ImageIcon size={24} className="text-[#F5A83C]" />}
-            {draggingFile.includes("pdf") && <FileText size={24} className="text-[#60BA81]" />}
-            {draggingFile.includes("mp3") && <Mic size={24} className="text-[#284952]" />}
-            <span className="text-[10px] font-medium text-gray-600">{draggingFile}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        ref={containerRef}
-        className="relative w-full h-full flex items-center justify-center"
-        animate={{
-          scale: transform.scale,
-          x: transform.x,
-          y: transform.y,
-        }}
-        transition={{ type: "spring", stiffness: 80, damping: 25 }}
-      >
-        <div className="w-full h-full p-8 lg:p-10">
-          {/* Apple-style Card Container - Removed border-gray-200 */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full h-full bg-[#F8F8F8] rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col"
-            style={{ border: `1px solid ${COLORS.border}` }}
-          >
-            {/* Timeline Content */}
-            <div className="relative flex-1 p-4 overflow-hidden">
-              {/* Central Timeline Line - Vertical Dashed */}
-              <div
-                className="absolute left-1/2 top-4 bottom-16 w-0 -translate-x-1/2 border-l-2 border-dashed"
-                style={{ borderColor: COLORS.border }}
-              />
-
-              {/* Timeline Progress Line */}
-              <motion.div
-                className="absolute left-1/2 top-4 w-0.5 -translate-x-1/2 bg-gradient-to-b from-[#0f9690] to-[#60BA81]"
-                initial={{ height: "0%" }}
-                animate={{ height: stage >= 7 ? "80%" : "0%" }}
-                transition={{ duration: 3, ease: "easeOut" }}
-              />
-
-              {/* Content Layout - Two Columns with Timeline in Center */}
-              <div className="relative grid grid-cols-[1fr_50px_1fr] gap-3 h-full">
-                {/* Left Column - CAPA at bottom */}
-                <div className="flex flex-col justify-end pb-4">
-                  {/* CAPA Card - Bottom Left */}
-                  <motion.div
-                    animate={{
-                      scale: stage >= 10 && stage < 13 ? 1.02 : 1,
-                    }}
-                  >
-                    <motion.div
-                      className="rounded-lg overflow-hidden shadow-lg transition-all duration-300"
-                      style={{
-                        border: stage >= 10 && stage < 13 ? `2px solid ${COLORS.teal}` : `2px solid transparent`,
-                        boxShadow:
-                          stage >= 10 && stage < 13
-                            ? `0 10px 40px -10px ${COLORS.teal}60`
-                            : "0 4px 20px -5px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      {/* Card Header */}
-                      <div
-                        className="px-3 py-2 flex items-center justify-between"
-                        style={{ backgroundColor: COLORS.teal }}
-                      >
-                        <span className="font-bold text-white text-xs">CAPA-Corrective & Preventive Actions</span>
-                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                          <List size={12} className="text-white" />
-                        </div>
-                      </div>
-
-                      {/* Card Body */}
-                      <div className="bg-white p-3">
-                        <div className="text-[10px] text-gray-500 font-medium mb-1">Detail:</div>
-
-                        {/* Rich Text Toolbar */}
-                        <div
-                          className="flex items-center gap-0.5 p-1.5 bg-gray-50 rounded mb-2"
-                          style={{ border: `1px solid ${COLORS.border}` }}
-                        >
-                          {[Bold, Italic, Underline, List, ListOrdered, LinkIcon].map((Icon, i) => (
-                            <button
-                              key={i}
-                              className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-                            >
-                              <Icon size={10} />
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Text Content - Using inline style for border instead of border-gray-200 */}
-                        <div
-                          className="min-h-[120px] max-h-[140px] overflow-y-auto p-2 rounded bg-gray-50/50 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                          style={{ border: `1px solid ${COLORS.border}` }}
-                        >
-                          <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
-                            {capaText ? (
-                              <>
-                                {capaText.split("\n").map((line, idx) => (
-                                  <motion.div
-                                    key={idx}
-                                    animate={{
-                                      backgroundColor:
-                                        (stage === 11 && line.includes("CORRECTIVE")) ||
-                                          (stage === 12 && line.includes("PREVENTIVE"))
-                                          ? COLORS.softGreen
-                                          : "transparent",
-                                    }}
-                                    className="px-1 -mx-1 rounded transition-colors"
-                                  >
-                                    {line}
-                                  </motion.div>
-                                ))}
-                                {stage >= 10 && stage < 13 && (
-                                  <motion.span
-                                    animate={{ opacity: [1, 0] }}
-                                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6 }}
-                                    className="inline-block w-0.5 h-3 bg-[#0f9690] ml-0.5 align-middle"
-                                  />
-                                )}
-                              </>
-                            ) : (
-                              <span className="text-gray-400 italic text-[10px]">
-                                Outline the specific actions taken to resolve the issue (Corrective Actions) and steps
-                                to prevent similar complaints in the future (Preventive Actions).
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                </div>
-
-                {/* Center Column - Timeline Nodes */}
-                <div className="flex flex-col items-center justify-between py-6">
-                  {/* Node 1 - RCA */}
-                  <div className="flex flex-col items-center gap-1">
-                    <motion.div
-                      className="px-2 py-0.5 rounded text-[9px] font-bold text-white"
-                      style={{ backgroundColor: COLORS.orange }}
-                      animate={{
-                        scale: stage >= 7 && stage < 10 ? [1, 1.1, 1] : 1,
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        repeat: stage >= 7 && stage < 10 ? Number.POSITIVE_INFINITY : 0,
-                        repeatDelay: 1,
-                      }}
-                    >
-                      RCA
-                    </motion.div>
-                    <motion.div
-                      className="w-3 h-3 rounded-full bg-white shadow-md z-10"
-                      style={{ border: `3px solid ${stage >= 7 ? COLORS.teal : COLORS.border}` }}
-                    />
-                  </div>
-
-                  {/* Node 2 - CAPA/Evidence */}
-                  <div className="flex flex-col items-center gap-1">
-                    <motion.div
-                      className="px-2 py-0.5 rounded text-[9px] font-bold text-white"
-                      style={{ backgroundColor: COLORS.orange }}
-                      animate={{
-                        scale: stage >= 10 && stage < 15 ? [1, 1.1, 1] : 1,
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        repeat: stage >= 10 && stage < 15 ? Number.POSITIVE_INFINITY : 0,
-                        repeatDelay: 1,
-                      }}
-                    >
-                      CAPA
-                    </motion.div>
-                    <motion.div
-                      className="w-3 h-3 rounded-full bg-white shadow-md z-10"
-                      style={{ border: `3px solid ${stage >= 10 ? COLORS.teal : COLORS.border}` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Right Column - RCA at top, Evidence at bottom */}
-                <div className="flex flex-col gap-3 py-2">
-                  {/* RCA Card - Top Right */}
-                  <motion.div
-                    animate={{
-                      scale: stage >= 7 && stage < 10 ? 1.02 : 1,
-                    }}
-                  >
-                    <motion.div
-                      className="rounded-lg overflow-hidden shadow-lg transition-all duration-300"
-                      style={{
-                        border: stage >= 7 && stage < 10 ? `2px solid ${COLORS.green}` : `2px solid transparent`,
-                        boxShadow:
-                          stage >= 7 && stage < 10
-                            ? `0 10px 40px -10px ${COLORS.green}60`
-                            : "0 4px 20px -5px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      {/* Card Header */}
-                      <div className="px-3 py-2 flex items-center gap-2" style={{ backgroundColor: COLORS.teal }}>
-                        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                          <AlertTriangle size={12} className="text-white" />
-                        </div>
-                        <span className="font-bold text-white text-xs">RCA-Root Cause Analysis</span>
-                      </div>
-
-                      {/* Card Body */}
-                      <div className="bg-white p-3">
-                        <div className="text-[10px] text-gray-500 font-medium mb-1">Detail</div>
-
-                        {/* Rich Text Toolbar */}
-                        <div
-                          className="flex items-center gap-0.5 p-1.5 bg-gray-50 rounded mb-2"
-                          style={{ border: `1px solid ${COLORS.border}` }}
-                        >
-                          {[Bold, Italic, Underline, List, ListOrdered, LinkIcon].map((Icon, i) => (
-                            <button
-                              key={i}
-                              className="w-5 h-5 rounded flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-                            >
-                              <Icon size={10} />
-                            </button>
-                          ))}
-                        </div>
-
-                        {/* Text Content - Using inline style for border */}
-                        <div
-                          className="min-h-[80px] max-h-[100px] overflow-y-auto p-2 rounded bg-gray-50/50 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-                          style={{ border: `1px solid ${COLORS.border}` }}
-                        >
-                          <div className="text-[10px] text-gray-600 leading-relaxed whitespace-pre-line">
-                            {rcaText ? (
-                              <>
-                                {rcaText}
-                                {stage >= 8 && stage < 10 && (
-                                  <motion.span
-                                    animate={{ opacity: [1, 0] }}
-                                    transition={{ repeat: Number.POSITIVE_INFINITY, duration: 0.6 }}
-                                    className="inline-block w-0.5 h-3 bg-[#60BA81] ml-0.5 align-middle"
-                                  />
-                                )}
-                              </>
-                            ) : (
-                              <span className="text-gray-400 italic text-[10px]">
-                                Explain why the complaint happened. Identify the reason behind the problem.
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* CAPA Deadline */}
-                        <div className="mt-2">
-                          <div className="text-[10px] text-gray-500 font-medium mb-1">Capa Deadline</div>
-                          <div
-                            className="flex items-center gap-2 px-2 py-1.5 rounded bg-white"
-                            style={{ border: `1px solid ${COLORS.border}` }}
-                          >
-                            <span className="text-[10px] text-gray-400">dd/mm/yyyy --:--</span>
-                            <Calendar size={12} className="text-gray-400 ml-auto" />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-
-                  {/* Evidence Upload Card - Bottom Right */}
-                  <motion.div
-                    animate={{
-                      scale: stage >= 13 && stage < 15 ? 1.02 : 1,
-                    }}
-                  >
-                    <motion.div
-                      className="rounded-lg overflow-hidden shadow-lg transition-all duration-300"
-                      style={{
-                        border: stage >= 13 && stage < 15 ? `2px solid ${COLORS.teal}` : `2px solid transparent`,
-                        boxShadow:
-                          stage >= 13 && stage < 15
-                            ? `0 10px 40px -10px ${COLORS.teal}60`
-                            : "0 4px 20px -5px rgba(0,0,0,0.1)",
-                      }}
-                    >
-                      {/* Upload Area */}
-                      <div className="p-3" style={{ backgroundColor: COLORS.teal }}>
-                        <div className="flex items-center gap-3">
-                          {/* Select Files Button */}
-                          <div className="flex items-center gap-2 px-3 py-2 bg-white/20 rounded">
-                            <Upload size={14} className="text-white" />
-                            <span className="text-[10px] text-white font-medium">Select Files</span>
-                          </div>
-                          {/* Drop Zone Text */}
-                          <span className="text-[10px] text-white">
-                            Drag and drop files here or click to select files
-                          </span>
-                        </div>
-
-                        {/* Uploaded Files Display */}
-                        <div className="mt-2 min-h-[40px] bg-white/10 rounded p-2">
-                          {uploadedFiles.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                              {uploadedFiles.map((file) => (
-                                <motion.div
-                                  key={file}
-                                  initial={{ opacity: 0, scale: 0.8 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded text-[9px] text-white"
-                                >
-                                  {file.includes("jpg") && <ImageIcon size={10} />}
-                                  {file.includes("pdf") && <FileText size={10} />}
-                                  {file.includes("mp3") && <Mic size={10} />}
-                                  {file}
-                                </motion.div>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-[10px] text-white/60 italic">No files selected</span>
-                          )}
-                        </div>
-
-                        {/* File Types Info */}
-                        <div className="flex items-center gap-1 mt-2 text-[9px] text-white/80">
-                          <Info size={10} />
-                          <span>
-                            You can upload multiple files (PNG, JPG, JPEG, PDF, MP4, AVI, MKV, MOV, MP3, OPUS)
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Buttons - Using inline style for border */}
-            <div
-              className="px-4 py-3 bg-gray-50 flex items-center justify-end gap-2"
-              style={{ borderTop: `1px solid ${COLORS.border}` }}
-            >
-              <motion.button
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded text-[10px] font-medium text-white"
-                style={{ backgroundColor: "#0095da" }}
-                animate={{
-                  scale: stage >= 15 ? [1, 1.05, 1] : 1,
-                }}
-                transition={{
-                  duration: 0.3,
-                  repeat: stage >= 15 && stage < 17 ? Number.POSITIVE_INFINITY : 0,
-                  repeatDelay: 0.5,
-                }}
-              >
-                <Printer size={12} />
-                Print Timeline
-              </motion.button>
-              <button className="px-3 py-1.5 rounded text-[10px] font-medium text-white bg-gray-500">Close</button>
-              <button
-                className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
-                style={{ backgroundColor: "#0095da" }}
-              >
-                Route Complaint
-              </button>
-              <motion.button
-                className="px-3 py-1.5 rounded text-[10px] font-medium text-white"
-                style={{ backgroundColor: "#0095da" }}
-                animate={{
-                  scale: stage >= 16 ? [1, 1.1, 1] : 1,
-                  boxShadow: stage >= 16 ? `0 0 20px ${COLORS.teal}` : "none",
-                }}
-                transition={{
-                  duration: 0.4,
-                  repeat: stage >= 16 && stage < 17 ? Number.POSITIVE_INFINITY : 0,
-                  repeatDelay: 0.3,
-                }}
-              >
-                Submit Changes
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Success Overlay */}
-      <AnimatePresence>
-        {showSuccess && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 flex items-center justify-center z-50"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              className="bg-white rounded-2xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-sm mx-4"
-            >
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="w-16 h-16 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: COLORS.softGreen }}
-              >
-                <CheckCircle2 size={32} style={{ color: COLORS.green }} />
-              </motion.div>
-              <h3 className="text-lg font-bold text-gray-800">Investigation Complete</h3>
-              <p className="text-sm text-gray-600 text-center">
-                Case submitted to FOS for closure review. All evidence and documentation has been recorded.
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   )
 }
 
 export function ScenePortal({ isActive, progress }: { isActive: boolean; progress: number }) {
-  const [stage, setStage] = useState(0)
+  const sceneStart = 120
+  const local = isActive ? Math.max(0, Math.min(14, progress - sceneStart)) : 0
 
-  // Scene runs from 120s to 134s (14 seconds duration)
-  // Script: "Each investigation officer receives secure access to the I O portal..." (120-123)
-  // "...where they document root cause analysis..." (123-127)
-  // "...corrective and preventive actions..." (127-130)
-  // "...and upload evidence." (130-134)
-
-  useEffect(() => {
-    if (!isActive) {
-      setStage(0)
-      return
-    }
-
-    const sceneStart = 120
-    const localProgress = progress - sceneStart
-
-    if (localProgress < 0) {
-      setStage(0)
-      return
-    }
-
-    // --- TIMELINE MAPPING (0s to 14s) ---
-
-    // [0s - 3s] LOGIN PHASE (Matches "Secure access...")
-    if (localProgress < 0.5) setStage(0)      // Show Login
-    else if (localProgress < 1.5) setStage(1) // Type User
-    else if (localProgress < 2.5) setStage(2) // Type Pass
-    else if (localProgress < 3.0) setStage(3) // Button Hover/Click
-
-    // [3s - 4.5s] DASHBOARD PHASE (Transition context)
-    else if (localProgress < 3.5) setStage(4) // Dashboard Fade In
-    else if (localProgress < 4.5) setStage(5) // Select Row/Context
-
-    // [4.5s - 7.5s] RCA PHASE (Matches "document root cause analysis")
-    else if (localProgress < 5.0) setStage(6) // Transition to Timeline
-    else if (localProgress < 5.5) setStage(7) // Zoom RCA
-    else if (localProgress < 7.5) setStage(8) // Type RCA Text
-
-    // [7.5s - 10.5s] CAPA PHASE (Matches "corrective and preventive actions")
-    else if (localProgress < 8.0) setStage(9)  // Zoom CAPA
-    else if (localProgress < 10.0) setStage(10) // Type CAPA Text
-    else if (localProgress < 10.5) setStage(11) // Highlight Actions
-
-    // [10.5s - 14s] EVIDENCE PHASE (Matches "and upload evidence")
-    else if (localProgress < 11.0) setStage(12) // Highlight Preventive
-    else if (localProgress < 11.5) setStage(13) // Zoom Evidence
-    else if (localProgress < 12.5) setStage(14) // Drag Drop 1
-    else if (localProgress < 13.0) setStage(15) // Drag Drop 2
-    else if (localProgress < 13.5) setStage(16) // Submit Button Focus
-    else setStage(17)                           // Success Overlay
-
-  }, [isActive, progress])
-
-  // Determine which screen to show based on stage
-  const getScreen = () => {
-    if (stage < 4) return "login"
-    if (stage < 6) return "dashboard"
-    return "timeline"
-  }
-
-  const currentScreen = getScreen()
+  const phase = local < 4 ? "generate" : local < 8 ? "assign" : "login"
+  const activeOfficer = OFFICERS[Math.min(OFFICERS.length - 1, Math.floor(local / 1.5))]
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
-      <AnimatePresence mode="wait">
-        {currentScreen === "login" && <LoginScreen key="login" stage={stage} />}
-        {currentScreen === "dashboard" && <PortalDashboard key="dashboard" stage={stage} />}
-        {currentScreen === "timeline" && <TimelineFormScreen key="timeline" stage={stage} />}
-      </AnimatePresence>
-
-      {/* IO Avatar Card - Persistent Overlay */}
-      <motion.div
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: stage >= 1 ? 16 : -100, opacity: stage >= 1 ? 1 : 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="absolute bottom-4 left-4 z-[100]"
-      >
+    <div className="relative w-full h-full overflow-hidden" style={{ backgroundColor: COLORS.bg }}>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#284952 1px, transparent 1px), linear-gradient(90deg, #284952 1px, transparent 1px)", backgroundSize: "42px 42px" }} />
         <motion.div
-          className="bg-white rounded-2xl shadow-2xl p-3 flex flex-col items-center border border-gray-100"
-          style={{
-            boxShadow: "0 15px 40px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.1)"
-          }}
-          animate={{ y: [0, -4, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <div className="w-12 h-12 rounded-xl overflow-hidden border shadow-sm mb-1.5" style={{ borderColor: COLORS.teal }}>
-            <img src={ASSETS.officer_pc} alt="Investigation Officer" className="w-full h-full object-cover" />
-          </div>
-          <span className="text-[#284952] font-black text-[10px]">Investigation Officer</span>
-          <span className="text-teal-600 text-[8px] font-mono mb-1.5">IO-MULTAN47</span>
+          animate={{ scale: [1, 1.12, 1], x: [0, 30, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-20%] right-[-10%] w-[560px] h-[560px] rounded-full blur-[120px] bg-[#60BA81]/20"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.18, 1], x: [0, -25, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-25%] left-[-8%] w-[500px] h-[500px] rounded-full blur-[120px] bg-[#284952]/16"
+        />
+      </div>
 
-          {/* Status Badge */}
-          <div
-            className="px-2.5 py-1 rounded-full flex items-center gap-1.5"
-            style={{ backgroundColor: `${COLORS.teal}08`, border: `1px solid ${COLORS.teal}15` }}
-          >
-            <motion.div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: stage >= 17 ? "#60BA81" : COLORS.teal }}
-              animate={{ opacity: [1, 0.4, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-            />
-            <span className="text-teal-700 text-[9px] font-bold uppercase tracking-wider">
-              {stage < 4 && "Authenticating..."}
-              {stage >= 4 && stage < 6 && "Syncing Portal..."}
-              {stage >= 6 && stage <= 9 && "Examining Complaint..."}
-              {stage >= 10 && stage <= 12 && "Conducting Interviews"}
-              {stage >= 13 && stage <= 15 && "Cross-Checking Records"}
-              {stage >= 16 && "Analysis Complete"}
-            </span>
-          </div>
-        </motion.div>
-      </motion.div>
+      <div className="relative z-10 w-full h-full flex items-center justify-center px-6">
+        <AnimatePresence mode="wait">
+          {phase === "generate" && (
+            <motion.div key="generate" className="flex flex-col md:flex-row items-center gap-8">
+              <motion.div
+                initial={{ opacity: 0, x: -24 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="w-[290px] rounded-2xl border border-white/70 bg-white/85 backdrop-blur-sm p-4 shadow-[0_18px_45px_-26px_rgba(15,23,42,0.5)]"
+              >
+                <p className="text-[10px] uppercase tracking-[0.16em] font-black text-gray-400 mb-2">Officer Identity</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-200 bg-white p-1">
+                    <img src={activeOfficer.avatar} alt={activeOfficer.role} className="w-full h-full object-contain" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold" style={{ color: COLORS.deepTeal }}>{activeOfficer.name}</p>
+                    <p className="text-[10px] font-mono text-gray-400">{activeOfficer.id}</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              <CredentialEngine local={local} officer={activeOfficer} />
+            </motion.div>
+          )}
+
+          {phase === "assign" && <AssignmentView key="assign" local={local} />}
+
+          {phase === "login" && <LoginPreview key="login" local={local} />}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

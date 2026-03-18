@@ -9,6 +9,7 @@ import {
   Play,
   ShieldCheck,
   Activity,
+  ClipboardList,
   Fingerprint,
   Phone,
   Mail,
@@ -161,139 +162,129 @@ const FloatingContainer = ({ children, delay = 0 }: { children: React.ReactNode;
 // --- VISUALIZATIONS ---
 
 // === MODULE 1: DEPLOYMENT & ONBOARDING VISUAL ===
-// Content: Employee registration, FOS ID assignment, SMS delivery, awareness cards, IO appointments, training
-const DeploymentVisual = () => (
-  <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
-    {/* Premium gradient background */}
-    <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAF9] via-white to-[#F0F7F2]" />
+// Script-synced onboarding command flow:
+// employee list/API -> validation -> S-FOS ID + CNIC mapping -> SMS/cards -> IO assignment -> training/portal
+const DeploymentVisual = () => {
+  const rolloutSteps = [
+    { icon: Upload, label: "Upload & Validate", color: "#284952" },
+    { icon: Fingerprint, label: "S-FOS ID Mapping", color: "#60BA81" },
+    { icon: MessageSquare, label: "SMS Delivery", color: "#06B6D4" },
+    { icon: CreditCard, label: "Awareness Cards + QR", color: "#F5A83C" },
+    { icon: UserCheck, label: "IO Appointment", color: "#3B82F6" },
+    { icon: Activity, label: "Training + Portal Access", color: "#8B5CF6" },
+  ]
 
-    {/* Decorative grid */}
-    <div
-      className="absolute inset-0 opacity-[0.03]"
-      style={{
-        backgroundImage: 'radial-gradient(circle at 1px 1px, #284952 1px, transparent 0)',
-        backgroundSize: '32px 32px',
-      }}
-    />
+  return (
+    <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#F4FAF7] via-white to-[#EAF3EE]" />
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, #284952 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+        }}
+      />
 
-    {/* Floating background orbs */}
-    <motion.div
-      className="absolute top-16 right-20 w-48 h-48 rounded-full"
-      style={{ background: 'radial-gradient(circle, rgba(96,186,129,0.12), transparent 70%)', filter: 'blur(30px)' }}
-      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-      transition={{ duration: 5, repeat: Infinity }}
-    />
-
-    <div className="relative z-10 flex flex-col items-center gap-5">
-      {/* Onboarding Flow Steps */}
       <motion.div
-        className="flex items-center gap-3"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
+        className="relative z-10 w-[92%] max-w-[560px] rounded-3xl border border-[#DDE8E4] bg-white/90 backdrop-blur-md shadow-[0_24px_70px_-24px_rgba(40,73,82,0.35)] overflow-hidden"
+        initial={{ opacity: 0, y: 16, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        {[
-          { Icon: Users, label: 'Register', desc: 'Employee Data' },
-          { Icon: Fingerprint, label: 'Assign', desc: 'FOS ID' },
-          { Icon: MessageSquare, label: 'Deliver', desc: 'via SMS' },
-          { Icon: CreditCard, label: 'Create', desc: 'ID Cards' },
-        ].map((step, i) => (
-          <motion.div
-            key={step.label}
-            className="flex items-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 + i * 0.1 }}
-          >
-            <div className="flex flex-col items-center gap-1.5">
-              <motion.div
-                className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#60BA81] to-[#4CAF7A] flex items-center justify-center shadow-lg shadow-[#60BA81]/25"
-                animate={i === 3 ? {} : { scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-              >
-                <step.Icon size={20} className="text-white" strokeWidth={2} />
-              </motion.div>
-              <span className="text-[9px] font-bold text-[#284952] uppercase tracking-wider">{step.label}</span>
-              <span className="text-[8px] text-[#284952]/50">{step.desc}</span>
-            </div>
-            {i < 3 && (
-              <motion.div
-                className="w-6 h-0.5 bg-[#60BA81]/30 mx-1"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.5 + i * 0.15 }}
-              />
-            )}
-          </motion.div>
-        ))}
-      </motion.div>
+        <div className="absolute top-3 right-3 w-9 h-9 rounded-xl bg-white shadow-sm border border-[#dce9e4] flex items-center justify-center z-20">
+          <ShieldCheck size={16} className="text-[#284952]" />
+        </div>
 
-      {/* Main Card - Employee Onboarding */}
-      <motion.div
-        initial={{ y: 20, opacity: 0, scale: 0.95 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        transition={{ delay: 0.4, ...IOS_SPRING }}
-      >
-        <GlassSurface className="p-6 w-[380px]">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#284952] to-[#1a353d] flex items-center justify-center">
-                <UserCheck size={20} className="text-[#60BA81]" />
-              </div>
-              <div>
-                <div className="font-bold text-[#1A1D21] text-sm">Employee Onboarding</div>
-                <div className="text-[10px] text-[#8A9199]">Factory deployment in progress</div>
-              </div>
-            </div>
+        <div className="p-4 pt-5">
+          {/* Input sources + engine */}
+          <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center mb-4">
             <motion.div
-              className="px-2.5 py-1 rounded-full bg-[#60BA81]/15 text-[#60BA81] text-[10px] font-bold"
-              animate={{ opacity: [1, 0.7, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              className="rounded-xl border border-[#d5e7df] bg-[#f5fbf8] p-3"
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.15 }}
             >
-              Active
+              <div className="flex items-center gap-2 mb-1.5">
+                <Users size={14} className="text-[#284952]" />
+                <span className="text-[10px] font-bold text-[#284952] uppercase tracking-wide">Employee List</span>
+              </div>
+              <p className="text-[9px] text-[#4f6d67]">Company shares active workforce records</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="w-7 h-7 rounded-full bg-[#284952]/10 flex items-center justify-center"
+            >
+              <ArrowRight size={14} className="text-[#284952]" />
+            </motion.div>
+
+            <motion.div
+              className="rounded-xl border border-[#d4e8de] bg-white p-3 shadow-sm"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="flex items-center gap-2 mb-1.5">
+                <Sparkles size={14} className="text-[#60BA81]" />
+                <span className="text-[10px] font-bold text-[#2f5a4f] uppercase tracking-wide">Secure API</span>
+              </div>
+              <p className="text-[9px] text-[#5f7b73]">Direct HRMS integration for bulk onboarding</p>
             </motion.div>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            {[
-              { label: 'Employees', value: '2,847', color: '#60BA81' },
-              { label: 'IDs Sent', value: '2,654', color: '#284952' },
-              { label: 'IO Assigned', value: '12', color: '#F5A83C' },
-            ].map((stat, i) => (
+          {/* Pulse line */}
+          <div className="relative h-2 rounded-full bg-[#e7efeb] overflow-hidden mb-4">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{ background: "linear-gradient(90deg, #284952, #60BA81, #f5a83c)" }}
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 1.8, ease: "easeInOut", delay: 0.2 }}
+            />
+            <motion.div
+              className="absolute inset-y-0 w-1/4 bg-gradient-to-r from-transparent via-white/65 to-transparent"
+              initial={{ x: "-110%" }}
+              animate={{ x: "450%" }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "linear", delay: 1.2 }}
+            />
+          </div>
+
+          {/* Rollout steps */}
+          <div className="grid grid-cols-2 gap-2.5">
+            {rolloutSteps.map((step, index) => (
               <motion.div
-                key={stat.label}
-                className="bg-gray-50 rounded-xl p-3 text-center"
+                key={step.label}
+                className="rounded-xl border p-2.5 bg-white relative overflow-hidden"
+                style={{ borderColor: `${step.color}35` }}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 + i * 0.1 }}
+                transition={{ delay: 0.28 + index * 0.1 }}
               >
-                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
-                <div className="text-[9px] font-medium text-gray-400 uppercase">{stat.label}</div>
+                <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: step.color }} />
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: `${step.color}14` }}
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 2.4, repeat: Infinity, delay: index * 0.15 }}
+                  >
+                    <step.icon size={14} style={{ color: step.color }} />
+                  </motion.div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold leading-tight text-[#1f3f47] truncate">{step.label}</p>
+                    <p className="text-[8px] text-[#6b8380] mt-0.5">Step {String(index + 1).padStart(2, "0")}</p>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>
-
-          {/* Training Progress */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-[10px] font-bold text-[#284952]/60">
-              <span>IO Portal Training</span>
-              <span>85%</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-[#60BA81] to-[#4CAF7A] rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: '85%' }}
-                transition={{ delay: 0.8, duration: 1.2, ease: IOS_EASE }}
-              />
-            </div>
-          </div>
-        </GlassSurface>
+        </div>
       </motion.div>
     </div>
-  </div>
-)
+  )
+}
 
 // === MODULE 2: COMPLAINT INTAKE VISUAL ===
 // Content: Multi-channel intake (hotline, SMS, WhatsApp, email, app), anonymous complaints, ticket numbers, notifications
@@ -510,7 +501,6 @@ const InvestigationVisual = () => (
                 style={{
                   backgroundColor: step.status === 'pending' ? '#F5F5F5' : `${step.color}15`,
                   color: step.status === 'pending' ? '#9CA3AF' : step.color,
-                  ringColor: step.status === 'active' ? step.color : 'transparent',
                 }}
                 animate={step.status === 'active' ? { scale: [1, 1.08, 1] } : {}}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -701,7 +691,7 @@ const SurveyVisual = () => (
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 + i * 0.1 }}
               >
-                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.val || stat.value}</div>
+                <div className="text-lg font-bold" style={{ color: stat.color }}>{stat.value}</div>
                 <div className="text-[9px] font-semibold text-slate-400 uppercase tracking-tight">{stat.label}</div>
               </motion.div>
             ))}

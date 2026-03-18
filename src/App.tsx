@@ -270,6 +270,7 @@ export default function App() {
   const [isMouseActive, setIsMouseActive] = useState(true)
 
   const mouseTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const prevActiveSlideRef = useRef<number | null>(null)
 
   // --- Mouse Inactivity Tracking ---
   useEffect(() => {
@@ -386,8 +387,14 @@ export default function App() {
 
     const handleEnded = () => {
       if (activeSlide !== null && activeSlide < slides.length - 1) {
+        if (audioRef.current) {
+          audioRef.current.pause()
+          audioRef.current.currentTime = 0
+          audioRef.current = null
+        }
         setActiveSlide((prev) => (prev !== null ? prev + 1 : null));
-        setIsPlaying(true);
+        // Move to next module but wait for explicit user start.
+        setIsPlaying(false);
         setCurrentTime(0);
       } else {
         setIsPlaying(false);
@@ -451,6 +458,21 @@ export default function App() {
     if (isPlaying) animationFrame = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(animationFrame)
   }, [isPlaying])
+
+  // Whenever active module changes, hard reset timeline so next module opens on static start screen.
+  useEffect(() => {
+    if (prevActiveSlideRef.current === activeSlide) return
+
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      audioRef.current = null
+    }
+
+    setIsPlaying(false)
+    setCurrentTime(0)
+    prevActiveSlideRef.current = activeSlide
+  }, [activeSlide])
 
   // --- Interaction Handlers ---
   const handleSlideClick = (index: number) => {
