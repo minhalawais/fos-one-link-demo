@@ -9,11 +9,7 @@ import { MessageSquare, CheckCircle2, SignalHigh, Battery, Wifi } from "lucide-r
 const TIMING = {
   START: 95,
   TICKET_REVEAL: 95.5,     // Card appears
-  HIGHLIGHT_FOS: 96.5,     // Highlight "1121437"
-  HIGHLIGHT_CAT: 98.0,     // Highlight "WH"
-  HIGHLIGHT_DAY: 99.0,     // Highlight "02"
-  HIGHLIGHT_MONTH: 100.0,  // Highlight "02"
-  HIGHLIGHT_COMPLETE: 100.5, // Show complete ticket (no highlights)
+  SHOW_TAGS: 96.5,         // All tags and connector lines appear simultaneously
   SMS_TRANSITION: 101.5,   // Transition to Smartphone view
   NOTIFICATION: 102.5,     // Notification banner appears
   SMS_APP: 104.0,          // SMS app opens
@@ -32,7 +28,7 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
       animate={{
         opacity: active ? 1 : 0,
         scale: active ? (isCentered ? 1.1 : 0.8) : 0.8,
-        x: isCentered ? 0 : 0, // Simplified for this scene
+        x: isCentered ? 0 : 0,
       }}
       transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
       className="flex flex-col items-center justify-center relative z-40"
@@ -159,78 +155,79 @@ const UnifiedGateway = ({ active, isBroadcasting, isCentered }: { active: boolea
   )
 }
 
+// --- REUSABLE ORTHOGONAL (ELBOW) CALLOUT COMPONENT ---
+const TechCallout = ({
+  label,
+  value,
+  offsetX,
+  offsetY,
+  startY,
+  delay = 0
+}: {
+  label: string,
+  value: string,
+  offsetX: number,
+  offsetY: number,
+  startY: number,
+  delay?: number
+}) => {
 
-// --- REUSABLE TECH CALLOUT COMPONENT ---
-// Position is relative to the text center
-const TechCallout = ({ label, value, position }: { label: string, value: string, position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' }) => {
-
-  // Define offsets based on position preference
-  const offsets = {
-    'top-left': { x: -140, y: -90 },
-    'top-right': { x: 140, y: -90 },
-    'bottom-left': { x: -140, y: 90 },
-    'bottom-right': { x: 140, y: 90 },
-  }
-
-  const { x, y } = offsets[position]
+  // Mid Y point for the orthogonal "elbow" turn
+  const midY = (offsetY + startY) / 2
 
   return (
-    <div className="absolute left-1/2 top-1/2 z-50 pointer-events-none w-0 h-0 overflow-visible">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.5 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="absolute flex items-center justify-center"
-        style={{ x, y }} // Framer motion handles the transform translate
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute left-1/2 top-1/2 z-50 pointer-events-none"
+      style={{ width: 0, height: 0 }} // Exact 0x0 focal point
+    >
+      {/* Orthogonal Stepped Connector Line */}
+      <svg
+        className="absolute overflow-visible pointer-events-none"
+        style={{ top: 0, left: 0, width: 1, height: 1, overflow: 'visible' }}
       >
+        {/* Path: Start at Text Edge (0,startY) -> Vertical to Midpoint -> Horizontal -> Vertical to Box */}
+        <motion.path
+          d={`M 0,${startY} V ${midY} H ${offsetX} V ${offsetY}`}
+          stroke="#60BA81"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 0.8 }}
+          transition={{ duration: 0.8, delay: delay, ease: "easeInOut" }}
+        />
+        {/* Target Anchor (At text edge) */}
+        <motion.circle
+          cx="0" cy={startY} r="3" fill="#284952"
+          initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: delay }}
+        />
+        {/* Box Anchor */}
+        <motion.circle
+          cx={offsetX} cy={offsetY} r="3" fill="#60BA81"
+          initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: delay + 0.6 }}
+        />
+      </svg>
 
-        {/* The Connector Line (Draws from text center (0,0) to box center) */}
-        <svg
-          className="absolute overflow-visible"
-          style={{
-            // Position SVG to span between origin and target
-            left: -x,
-            top: -y,
-            width: 0,
-            height: 0
-          }}
-        >
-          {/* Line from (0,0) [Text Center] to (x,y) [Box Center] */}
-          {/* Note: In SVG coord space inside this container, we draw relative to the box */}
-          <motion.path
-            d={`M${-x},${-y} L0,0`}
-            stroke="#284952"
-            strokeWidth="1.5"
-            strokeDasharray="3 3"
-            fill="none"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.5 }}
-            transition={{ duration: 0.4 }}
-          />
-          {/* Dot at the text end */}
-          <motion.circle
-            cx={-x} cy={-y} r="3" fill="#60BA81"
-            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }}
-          />
-          {/* Dot at the box end */}
-          <motion.circle
-            cx="0" cy="0" r="3" fill="#284952"
-            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }}
-          />
-        </svg>
-
-        {/* The Content Box */}
-        <div
-          className="bg-[#284952]/95 backdrop-blur-xl text-white p-2 rounded-xl shadow-[0_10px_30px_rgba(40,73,82,0.3)] border border-white/20 min-w-[140px] text-center"
-          style={{ transform: 'translate(-50%, -50%)' }} // Center div on the coordinate
-        >
-          <div className="text-[9px] font-bold text-[#60BA81] uppercase tracking-wider mb-0.5">{label}</div>
-          <div className="text-xs font-bold leading-tight">{value}</div>
-        </div>
-
+      {/* Callout Box */}
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25, delay: delay + 0.6 }}
+        className="absolute bg-white text-[#284952] p-2.5 rounded-xl shadow-[0_15px_30px_-5px_rgba(0,0,0,0.15)] border border-gray-100 min-w-[130px] text-center"
+        style={{
+          left: offsetX,
+          top: offsetY,
+          x: "-50%", // Centers the HTML box exactly on the (x,y) coordinate point
+          y: "-50%"
+        }}
+      >
+        <div className="text-[8px] font-black text-[#60BA81] uppercase tracking-wider mb-0.5">{label}</div>
+        <div className="text-[10px] font-bold leading-tight">{value}</div>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -238,6 +235,7 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
 
   // Stages
   const showTicket = progress >= TIMING.TICKET_REVEAL && progress < TIMING.SMS_TRANSITION
+  const showTags = progress >= TIMING.SHOW_TAGS && progress < TIMING.SMS_TRANSITION
   const showSMS = progress >= TIMING.SMS_TRANSITION
 
   // Phone Stages
@@ -246,42 +244,6 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
   const showSMSApp = progress >= TIMING.SMS_APP
   const showFeaturePhone = progress >= TIMING.FEATURE_PHONE_TRANSITION
   const showZoomTicket = progress >= TIMING.ZOOM_TICKET
-
-  // Helper for text styling based on active state
-  const getTextStyle = (isActive: boolean, isDimmed: boolean) => {
-    if (isActive) return {
-      color: "#60BA81",
-      scale: 1.3,
-      fontWeight: 800,
-      y: -2,
-      filter: "blur(0px)",
-      opacity: 1
-    }
-    if (isDimmed) return {
-      color: "#212529",
-      scale: 1,
-      fontWeight: 400,
-      y: 0,
-      filter: "blur(1.5px)",
-      opacity: 0.25
-    }
-    return {
-      color: "#212529",
-      scale: 1,
-      fontWeight: 600,
-      y: 0,
-      filter: "blur(0px)",
-      opacity: 1
-    }
-  }
-
-  // Determine which part is highlighted (ends at HIGHLIGHT_COMPLETE)
-  const isFosActive = progress >= TIMING.HIGHLIGHT_FOS && progress < TIMING.HIGHLIGHT_CAT
-  const isCatActive = progress >= TIMING.HIGHLIGHT_CAT && progress < TIMING.HIGHLIGHT_DAY
-  const isDayActive = progress >= TIMING.HIGHLIGHT_DAY && progress < TIMING.HIGHLIGHT_MONTH
-  const isMonthActive = progress >= TIMING.HIGHLIGHT_MONTH && progress < TIMING.HIGHLIGHT_COMPLETE
-
-  const anyActive = isFosActive || isCatActive || isDayActive || isMonthActive
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-[#F5F5F7] perspective-[1000px] font-sans relative overflow-hidden p-4">
@@ -323,11 +285,11 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
                 y: 0,
                 rotateX: 0,
                 // Gentle sway during analysis
-                rotateY: anyActive ? (progress % 2 === 0 ? 2 : -2) : 0
+                rotateY: showTags ? (progress % 2 === 0 ? 2 : -2) : 0
               }}
               exit={{ opacity: 0, scale: 0.8, y: -30, filter: "blur(10px)" }}
               transition={{ type: "spring", stiffness: 200, damping: 22 }}
-              className="w-full max-w-[360px] bg-white shadow-[0_20px_60px_-10px_rgba(0,0,0,0.15)] rounded-2xl overflow-visible relative border-t-[6px] border-[#60BA81]"
+              className="w-full max-w-[380px] bg-white shadow-[0_20px_60px_-10px_rgba(0,0,0,0.15)] rounded-2xl overflow-visible relative border-t-[6px] border-[#60BA81]"
             >
               <div className="p-6 flex flex-col items-center relative z-20">
 
@@ -342,88 +304,76 @@ export const SceneTicket = ({ isActive, progress }: { isActive: boolean, progres
                 </motion.div>
 
                 {/* --- THE TICKET NUMBER DISPLAY --- */}
-                <div className="text-center w-full mb-6 relative">
-                  <div className="text-[22px] tracking-tight font-mono text-[#212529] flex items-center justify-center gap-[2px] relative cursor-default select-none">
+                {/* mt-12 and mb-20 added to give callout boxes structural space */}
+                <div className="text-center w-full mt-12 mb-20 relative">
+                  <div className="text-[26px] tracking-tight font-mono text-[#284952] flex items-center justify-center gap-[4px] relative cursor-default select-none font-black leading-none">
 
                     {/* 1. Category (WH) */}
-                    <div className="relative">
-                      <motion.span
-                        className="inline-block relative z-10"
-                        animate={getTextStyle(isCatActive, anyActive && !isCatActive)}
-                      >
-                        WH
-                      </motion.span>
+                    <div className="relative inline-flex items-center justify-center">
+                      <span className="inline-block relative z-10">WH</span>
                       <AnimatePresence>
-                        {isCatActive && (
+                        {showTags && (
                           <TechCallout
                             label="Category"
                             value="Workplace Health"
-                            position="top-left"
+                            offsetX={25}
+                            offsetY={-60}
+                            startY={-18}
+                            delay={0.1}
                           />
                         )}
                       </AnimatePresence>
                     </div>
 
                     {/* 2. Day (02) */}
-                    <div className="relative">
-                      <motion.span
-                        className="inline-block relative z-10"
-                        animate={getTextStyle(isDayActive, anyActive && !isDayActive)}
-                      >
-                        02
-                      </motion.span>
+                    <div className="relative inline-flex items-center justify-center">
+                      <span className="inline-block relative z-10">02</span>
                       <AnimatePresence>
-                        {isDayActive && (
+                        {showTags && (
                           <TechCallout
                             label="Day"
                             value="02"
-                            position="bottom-left"
+                            offsetX={-45}
+                            offsetY={65}
+                            startY={18}
+                            delay={0.2}
                           />
                         )}
                       </AnimatePresence>
                     </div>
 
                     {/* 3. Month (02) */}
-                    <div className="relative">
-                      <motion.span
-                        className="inline-block relative z-10"
-                        animate={getTextStyle(isMonthActive, anyActive && !isMonthActive)}
-                      >
-                        02
-                      </motion.span>
+                    <div className="relative inline-flex items-center justify-center">
+                      <span className="inline-block relative z-10">02</span>
                       <AnimatePresence>
-                        {isMonthActive && (
+                        {showTags && (
                           <TechCallout
                             label="Month"
                             value="February"
-                            position="bottom-right"
+                            offsetX={45}
+                            offsetY={65}
+                            startY={18}
+                            delay={0.3}
                           />
                         )}
                       </AnimatePresence>
                     </div>
 
                     {/* 4. Year/Dash (89-) */}
-                    <motion.span
-                      className="inline-block opacity-40"
-                      animate={{ opacity: anyActive ? 0.2 : 0.4, scale: 1, filter: anyActive ? "blur(1px)" : "blur(0px)" }}
-                    >
-                      89-
-                    </motion.span>
+                    <span className="inline-block opacity-40 font-medium">89-</span>
 
                     {/* 5. FOS ID (1121437) */}
-                    <div className="relative">
-                      <motion.span
-                        className="inline-block relative z-10"
-                        animate={getTextStyle(isFosActive, anyActive && !isFosActive)}
-                      >
-                        1121437
-                      </motion.span>
+                    <div className="relative inline-flex items-center justify-center">
+                      <span className="inline-block relative z-10 text-[#60BA81]">1121437</span>
                       <AnimatePresence>
-                        {isFosActive && (
+                        {showTags && (
                           <TechCallout
                             label="Legacy ID"
-                            value="Unique Complaint ID"
-                            position="top-right"
+                            value="Unique Complaint"
+                            offsetX={-25}
+                            offsetY={-60}
+                            startY={-18}
+                            delay={0.4}
                           />
                         )}
                       </AnimatePresence>

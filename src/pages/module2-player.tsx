@@ -9,6 +9,7 @@ import { SceneComplaintFiling } from "../components/scenes/module2/scene-complai
 import { SceneReview } from "../components/scenes/module2/scene-review.tsx"
 import { SceneTicket } from "../components/scenes/module2/scene-ticket.tsx"
 import { SceneNotification } from "../components/scenes/module2/scene-notification.tsx"
+import { MODULE_ASSET_CONFIG } from "../lib/module-assets.ts"
 
 const SCENES = [
   { name: "intro", start: 0, end: 5, component: SceneIntro },
@@ -28,7 +29,10 @@ export default function Module2Player({ progress }: Module2PlayerProps) {
   const CurrentSceneComponent = currentSceneConfig.component
 
   return (
-    <AssetPreloader>
+    <AssetPreloader
+      criticalAssets={MODULE_ASSET_CONFIG.module2.critical}
+      backgroundAssets={MODULE_ASSET_CONFIG.module2.background}
+    >
       <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
         <div className="absolute inset-0 z-0">
           <AnimatePresence mode="wait">

@@ -12,6 +12,7 @@ import { SceneClosure } from "../components/scenes/module3/scene-closure.tsx"
 import { SceneIntro } from "../components/scenes/module3/scene-intro.tsx"
 import { SceneInvestigation } from "../components/scenes/module3/scene-1-unprocessed.tsx"
 import { Scene2InProcess } from "../components/scenes/module3/scene-2-in-process.tsx"
+import { MODULE_ASSET_CONFIG } from "../lib/module-assets.ts"
 
 const SCENES = [
   { name: "intro", start: 0, end: 7, component: SceneIntro },
@@ -31,7 +32,10 @@ export default function Module3Player({ progress }: Module3PlayerProps) {
   const CurrentSceneComponent = currentSceneConfig.component
 
   return (
-    <AssetPreloader>
+    <AssetPreloader
+      criticalAssets={MODULE_ASSET_CONFIG.module3.critical}
+      backgroundAssets={MODULE_ASSET_CONFIG.module3.background}
+    >
       <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
         <div className="absolute inset-0 z-0">
           <AnimatePresence mode="wait">

@@ -12,6 +12,7 @@ import SceneIOTraining from "../components/scenes/module1/scene-io-training.tsx"
 import SceneClosing from "../components/scenes/module1/scene-closing.tsx"
 
 import { AssetPreloader } from "../components/common/AssetPreloader.tsx"
+import { MODULE_ASSET_CONFIG } from "../lib/module-assets.ts"
 
 const SCENES = [
   { name: "hero", start: 0, end: 2, component: SceneHero },
@@ -34,7 +35,10 @@ export default function Module1Player({ progress }: Module1PlayerProps) {
   const CurrentSceneComponent = currentSceneConfig.component
 
   return (
-    <AssetPreloader>
+    <AssetPreloader
+      criticalAssets={MODULE_ASSET_CONFIG.module1.critical}
+      backgroundAssets={MODULE_ASSET_CONFIG.module1.background}
+    >
       <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
         <div className="absolute inset-0 z-0">
           <AnimatePresence>
