@@ -570,6 +570,7 @@ export default function App() {
                   item={item}
                   status={getSlideStatus(index)}
                   onClick={() => handleSlideClick(index)}
+                  onClose={handleClose}
                   isPlaying={activeSlide === index && isPlaying}
                   playerComponent={item.playerComponent}
                   totalSlides={slides.length}

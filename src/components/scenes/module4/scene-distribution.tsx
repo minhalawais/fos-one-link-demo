@@ -143,7 +143,7 @@ export const SceneDistribution = ({ isActive, progress }: SceneProps) => {
 
                         {/* Title */}
                         <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center mb-6">
-                            <h2 className="text-3xl font-bold text-gray-800 mb-1">FOSSMS Service</h2>
+                            <h2 className="text-3xl font-bold text-gray-800 mb-1">FOS SMS Service</h2>
                             <p className="text-gray-500 text-base">Automated Survey Invitations</p>
                         </motion.div>
 

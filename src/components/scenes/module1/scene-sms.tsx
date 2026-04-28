@@ -49,6 +49,14 @@ const MOCK_DATA = [
 // Phase 3 delivery visualization intentionally focuses on 4 recipients.
 const SMS_RECIPIENTS = MOCK_DATA.slice(0, 4)
 
+// Avatar selection helper: use female avatar for known female names
+const avatarFor = (name: string) => {
+    const n = name.toLowerCase()
+    const femaleNames = ["sara", "fatima", "fatimah", "aisha", "zubia"]
+    if (femaleNames.some(fn => n.includes(fn))) return "/assets/avatars/female_worker_avatar.png"
+    return "/assets/avatars/worker_avatar.png"
+}
+
 // --- UTILITY COMPONENTS ---
 
 const Avatar = ({ initials }: { initials: string }) => (
@@ -1137,13 +1145,13 @@ const EmployeeStatusCard = ({ active }: { active: boolean }) => (
                                     ))}
                                 </div>
 
-                                {/* Avatar */}
+                                {/* Avatar (hero) */}
                                 <div className="relative z-10 px-4">
                                     <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg bg-white p-0.5">
                                         <img
                                             alt="Employee"
                                             className="w-full h-full object-cover rounded-full"
-                                            src="/assets/avatars/worker_avatar.png"
+                                            src={avatarFor(SMS_RECIPIENTS[0]?.name || "")}
                                         />
                                     </div>
                                 </div>
@@ -1211,7 +1219,7 @@ const EmployeeNetwork = ({ active, progress, isFocusing }: { active: boolean, pr
                                         <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-slate-200 to-white shadow-lg">
                                             <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden border-2 border-white bg-slate-100">
                                                 <img
-                                                    src="/assets/avatars/worker_avatar.png"
+                                                    src={avatarFor(emp.name)}
                                                     alt={emp.name}
                                                     className="w-full h-full object-cover"
                                                 />

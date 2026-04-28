@@ -37,14 +37,15 @@ import {
   Zap,
   CheckCircle,
   Smile,
+  X,
 } from "lucide-react"
 
 // --- PREMIUM PHYSICS ---
 const IOS_SPRING = {
   type: "spring",
-  stiffness: 300,
-  damping: 30,
-  mass: 1.2,
+  stiffness: 280,
+  damping: 32,
+  mass: 1.0,
 }
 
 const IOS_SOFT_SPRING = {
@@ -902,6 +903,7 @@ interface SlideProps {
   scenes?: SceneControl[]
   onSeek?: (time: number) => void
   onStartModule?: () => void
+  onClose?: () => void
   entranceDelay?: number
 }
 
@@ -917,6 +919,7 @@ const Slide: React.FC<SlideProps> = ({
   scenes,
   onSeek,
   onStartModule,
+  onClose,
   entranceDelay = 0,
 }) => {
   const cardRef = useRef<HTMLDivElement>(null)
@@ -1076,6 +1079,7 @@ const Slide: React.FC<SlideProps> = ({
           boxShadow: isExpanded
             ? "0 40px 100px -20px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05)"
             : `0 8px 32px -8px ${currentTheme.glow}, 0 0 0 1px rgba(0,0,0,0.05)`,
+          transition: "background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
         whileHover={isIdle ? {
           scale: 1.02,
@@ -1089,6 +1093,24 @@ const Slide: React.FC<SlideProps> = ({
           }
         } : undefined}
       >
+        {/* Top-right Close button (only visible when expanded). Rendered here so it always sits above internal player visuals. */}
+        {isExpanded && (
+          <motion.button
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose?.()
+            }}
+            initial={{ opacity: 0, scale: 0.8, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.75, y: -6, transition: { duration: 0.15, ease: [0.4, 0, 1, 1] } }}
+            transition={{ delay: 0.15, type: 'spring', stiffness: 420, damping: 26 }}
+            className="absolute right-4 top-4 z-50 w-10 h-10 rounded-lg flex items-center justify-center bg-white/96 border border-[#E6EEF0] shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1"
+            aria-label={`Close module ${item.id}`}
+          >
+            <X size={16} className="text-[#374151]" />
+          </motion.button>
+        )}
+
         {/* Shimmer removed for cleaner idle state */}
 
         <AnimatePresence initial={false}>
@@ -1097,10 +1119,10 @@ const Slide: React.FC<SlideProps> = ({
             <motion.div
               key="idle"
               className="w-full h-full absolute inset-0 flex flex-col overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
-              transition={{ duration: 0.4 }}
+              initial={{ opacity: 0, scale: 0.96, y: 6 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.14, ease: [0.4, 0, 1, 1] } }}
+              transition={{ duration: 0.45, ease: [0, 0, 0.2, 1], delay: 0.12 }}
             >
               {/* Gradient background */}
               <div className={`absolute inset-0 bg-gradient-to-br ${currentTheme.gradient}`} />
@@ -1330,10 +1352,15 @@ const Slide: React.FC<SlideProps> = ({
             <motion.div
               key="expanded"
               className="flex w-full h-full absolute inset-0 overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{
+                opacity: 0,
+                scale: 0.94,
+                y: 10,
+                transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+              }}
+              transition={{ duration: 0.35, ease: [0, 0, 0.2, 1] }}
             >
               {/* LEFT CONTENT SIDE */}
               <motion.div
@@ -1448,6 +1475,7 @@ const Slide: React.FC<SlideProps> = ({
                         >
                           Module {item.id}
                         </motion.span>
+                        {/* header content only - close button is rendered at container level */}
                       </>
                     )}
                   </motion.div>

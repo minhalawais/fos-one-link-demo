@@ -271,9 +271,9 @@ const CameraView = () => (
     exit={{ opacity: 0, filter: "blur(10px)", transition: { duration: 0.5 } }}
   >
     {/* Simulated Camera Feed */}
-    <div className="absolute inset-0 bg-white flex flex-col items-center justify-center">
+      <div className="absolute inset-0 bg-white flex flex-col items-center justify-center">
       <div className="absolute inset-0 bg-gray-100 opacity-20" />
-      <div className="p-4 bg-white rounded-lg scale-[2] shadow-sm blur-[1px]">
+      <div className="p-4 bg-white rounded-lg scale-[2] shadow-sm blur-[1px] -translate-y-6">
         <QrCode size={80} className="text-[#17161A] opacity-80" />
       </div>
       {/* Noise */}
@@ -281,7 +281,7 @@ const CameraView = () => (
     </div>
 
     {/* HUD - Moved upside */}
-    <div className="absolute inset-0 flex flex-col items-center justify-start pt-20 z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-start pt-44 z-10">
       <div className="w-[150px] h-[150px] relative border border-white/50 rounded-xl">
         <motion.div
           className="absolute left-0 right-0 h-[2px] bg-[#F5A83C] shadow-[0_0_15px_#F5A83C]"
