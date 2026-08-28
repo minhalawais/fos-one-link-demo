@@ -70,8 +70,8 @@ export const SceneTargeting = ({ isActive, progress }: SceneProps) => {
     const isUrduActive = localT >= 7.5 && localT < 12
     const showSuccessToast = localT >= 32 && localT < 34.5
 
-    const currentTitle = isUrduActive ? "ملازمین کی بہبود کا سروے - سہ ماہی 1 2026" : "Employee Wellbeing Survey - Q1 2026"
-    const currentDesc = isUrduActive ? "تمام برانچوں میں ہمارے ملازمین کے عمومی جذبات، بہبود اور حفاظت کی جانچ کرنے کے لیے ایک باقاعدہ نبض چیک۔" : "A regular pulse check to screen the general sentiment, wellbeing and safety of our employees across all branches."
+    const currentTitle = isUrduActive ? "ورکرز کی بہبود کا سروے - سہ ماہی 1 2026" : "Employee Wellbeing Survey - Q1 2026"
+    const currentDesc = isUrduActive ? "تمام برانچوں میں ہمارے ورکرز کے عمومی جذبات، بہبود اور حفاظت کی جانچ کرنے کے لیے ایک باقاعدہ نبض چیک۔" : "A regular pulse check to screen the general sentiment, wellbeing and safety of our employees across all branches."
 
     const currentIDs = localT > 21 ? "EMP-042, EMP-089, EMP-103, EMP-156, EMP-204".substring(0, Math.floor((localT - 21) * 12)) : ""
     const currentCNICs = localT > 26 ? "35202-1844932-1, 35201-9928374-3, 33100-9283711-2".substring(0, Math.floor((localT - 26) * 15)) : ""

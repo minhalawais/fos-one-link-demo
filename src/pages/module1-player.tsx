@@ -37,14 +37,14 @@ import type { SceneConfig } from "../hooks/useProgressivePreloader.tsx";
 // Assets that only appear at second 10+ of a 20-second scene = can omit
 // (they'll be fetched by the browser naturally when the <img> renders).
 //
-const SCENES: SceneConfig[] = [
+const SCENES_EN: SceneConfig[] = [
   {
     name: "hero",
     start: 0,
     end: 2,
     component: SceneHero,
     assets: [
-      "/assets/images/FOS-01.png", // The only asset in this scene
+      "/assets/images/FOS-01.png",
     ],
   },
   {
@@ -52,19 +52,14 @@ const SCENES: SceneConfig[] = [
     start: 2,
     end: 22,
     component: SceneUpload,
-    assets: [
-      // Add any images rendered immediately when upload scene starts
-      // e.g. "/assets/upload/hrms-logo.png",
-    ],
+    assets: [],
   },
   {
     name: "sms",
     start: 22,
     end: 58,
     component: SceneSMS,
-    assets: [
-      // e.g. "/assets/sms/phone-frame.png",
-    ],
+    assets: [],
   },
   {
     name: "card",
@@ -78,11 +73,7 @@ const SCENES: SceneConfig[] = [
     start: 83,
     end: 101,
     component: SceneOfficers,
-    assets: [
-      // Officer avatar images
-      // "/assets/avatars/officer-male.png",
-      // "/assets/avatars/officer-female.png",
-    ],
+    assets: [],
   },
   {
     name: "training",
@@ -110,7 +101,78 @@ const SCENES: SceneConfig[] = [
   {
     name: "closing",
     start: 149,
-    end: 152,
+    end: 155,
+    component: SceneClosing,
+    assets: [],
+  },
+];
+
+// Urdu timeline configuration scaled to match Module 1 Script Urdu.txt (total 218s)
+const SCENES_UR: SceneConfig[] = [
+  {
+    name: "hero",
+    start: 0,
+    end: 3,
+    component: SceneHero,
+    assets: [
+      "/assets/images/FOS-01.png",
+    ],
+  },
+  {
+    name: "upload",
+    start: 3,
+    end: 34,
+    component: SceneUpload,
+    assets: [],
+  },
+  {
+    name: "sms",
+    start: 34,
+    end: 72,
+    component: SceneSMS,
+    assets: [],
+  },
+  {
+    name: "card",
+    start: 72,
+    end: 108,
+    component: SceneCard,
+    assets: [],
+  },
+  {
+    name: "officers",
+    start: 108,
+    end: 135,
+    component: SceneOfficers,
+    assets: [],
+  },
+  {
+    name: "training",
+    start: 135,
+    end: 165,
+    component: SceneTraining,
+    assets: [],
+  },
+  {
+    name: "portal",
+    start: 165,
+    end: 185,
+    component: ScenePortal,
+    assets: [],
+  },
+  {
+    name: "io_training",
+    start: 185,
+    end: 212,
+    component: SceneIOTraining,
+    assets: [
+      "/assets/avatars/male_io_training.png",
+    ],
+  },
+  {
+    name: "closing",
+    start: 212,
+    end: 218,
     component: SceneClosing,
     assets: [],
   },
@@ -120,26 +182,44 @@ const SCENES: SceneConfig[] = [
 
 interface Module1PlayerProps {
   progress: number;
+  language?: "en" | "ur";
 }
 
-export default function Module1Player({ progress }: Module1PlayerProps) {
+export default function Module1Player({ progress, language = "en" }: Module1PlayerProps) {
+  const isUrdu = language === "ur";
+  const scenesList = isUrdu ? SCENES_UR : SCENES_EN;
+  const enScenesList = SCENES_EN;
+
+  const currentSceneIndex = scenesList.findIndex(
+    (scene) => progress >= scene.start && progress < scene.end
+  );
+
   const currentSceneConfig =
-    SCENES.find((scene) => progress >= scene.start && progress < scene.end) ??
-    SCENES[0];
+    currentSceneIndex !== -1 ? scenesList[currentSceneIndex] : scenesList[0];
+
+  // Calculate normalized relative progress within current scene, then map back to English scene duration
+  // so internal animations in every subcomponent automatically scale and slow down smoothly
+  let scaledProgress = progress;
+  if (isUrdu && currentSceneIndex !== -1) {
+    const urScene = scenesList[currentSceneIndex];
+    const enScene = enScenesList[currentSceneIndex] || urScene;
+    const urSceneDuration = Math.max(0.1, urScene.end - urScene.start);
+    const enSceneDuration = Math.max(0.1, enScene.end - enScene.start);
+    const localProgressRatio = Math.min(1, Math.max(0, (progress - urScene.start) / urSceneDuration));
+    scaledProgress = enScene.start + localProgressRatio * enSceneDuration;
+  }
 
   const CurrentSceneComponent = currentSceneConfig.component;
 
   return (
-    // SceneProgressiveShell replaces AssetPreloader.
-    // It loads assets progressively — current scene first, then lookahead.
-    <SceneProgressiveShell scenes={SCENES} progress={progress}>
+    <SceneProgressiveShell scenes={scenesList} progress={progress}>
       <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
         <div className="absolute inset-0 z-0">
           <AnimatePresence>
             <CurrentSceneComponent
               key={currentSceneConfig.name}
               isActive={true}
-              progress={progress}
+              progress={scaledProgress}
             />
           </AnimatePresence>
         </div>

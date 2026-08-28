@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, Lock, Shield, ArrowLeft, Signal, HelpCircle, Clock, Calendar, ChevronRight } from "lucide-react"
+import { CheckCircle, Lock, Shield, ArrowLeft, Signal, HelpCircle, Clock, Calendar } from "lucide-react"
 
 // --- SYSTEM COLORS (Matching App) ---
 const COLORS = {
@@ -316,7 +316,7 @@ export const SceneResponses = ({ isActive, progress }: SceneProps) => {
 
                                         {/* Urdu Banner */}
                                         <div className="py-1.5 px-4 text-right" style={{ backgroundColor: COLORS.teal, direction: 'rtl' }}>
-                                            <span className="text-white text-[13px] font-bold">ملازمین کی مصروفیت کا سروے</span>
+                                            <span className="text-white text-[13px] font-bold">ورکرز کی مصروفیت کا سروے</span>
                                         </div>
 
                                         {/* Scrollable Form Content */}

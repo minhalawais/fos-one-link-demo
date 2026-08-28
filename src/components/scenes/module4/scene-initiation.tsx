@@ -5,10 +5,8 @@ import {
     BarChart3, Edit, Trash2, PieChart,
     Download, FileText, Clock, Calendar, Hash, HelpCircle,
     X, ClipboardList, CheckCircle2,
-    LayoutDashboard, MousePointer2, Users, Shield,
-    AlertTriangle, TrendingUp, ExternalLink
+    LayoutDashboard, MousePointer2, Users
 } from "lucide-react"
-import { useMemo } from "react"
 import { SceneDashboard } from "../module5/scene-dashboard.tsx"
 
 // --- SYSTEM COLORS ---
@@ -267,7 +265,7 @@ const SurveyManagementView = ({ progress }: { progress: number }) => {
             <div className="grid grid-cols-3 gap-5 px-6 mt-4 relative">
                 {[
                     { id: 43, title: "Organizational Effectiveness & Engagement Survey", qs: 39, time: "20", status: "ACTIVE", startDate: "Jan 1, 2026", exp: "Feb 28, 2026" },
-                    { id: 42, title: "صداقت کے ملازمین کا سروے", qs: 25, time: "10", status: "ACTIVE", startDate: "Jan 15, 2026", exp: "Jan 31, 2026" },
+                    { id: 42, title: "صداقت کے ورکرز کا سروے", qs: 25, time: "10", status: "ACTIVE", startDate: "Jan 15, 2026", exp: "Jan 31, 2026" },
                     { id: 41, title: "Health & Safety Pulse Check Q1", qs: 36, time: "10", status: "EXPIRED", startDate: "Nov 1, 2025", exp: "Dec 31, 2025" },
                 ].map((survey, i) => (
                     <motion.div
@@ -505,7 +503,7 @@ const DetailsView = ({ progress }: { progress: number }) => {
                             <div className="mb-2">
                                 <div className="flex items-center justify-between mb-5">
                                     <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent" style={{ direction: "rtl" }}>
-                                        صداقت کے ملازمین کا سروے
+                                        صداقت کے ورکرز کا سروے
                                     </h3>
                                     <div className="flex space-x-2.5">
                                         <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center shadow-lg">

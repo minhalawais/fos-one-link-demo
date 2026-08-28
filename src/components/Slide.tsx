@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
 import { ControlPanel } from "./control-panel.tsx"
 import type { SceneControl } from "../lib/module-data"
@@ -41,11 +41,12 @@ import {
 } from "lucide-react"
 
 // --- PREMIUM PHYSICS ---
+// Heavier spring for card expand/collapse — more weight and snap
 const IOS_SPRING = {
   type: "spring",
-  stiffness: 280,
-  damping: 32,
-  mass: 1.0,
+  stiffness: 260,
+  damping: 30,
+  mass: 1.5,
 }
 
 const IOS_SOFT_SPRING = {
@@ -57,12 +58,20 @@ const IOS_SOFT_SPRING = {
 
 const IOS_EASE = [0.32, 0.72, 0, 1] as const
 
-// Optimized entrance - removed expensive blur filter
+// Separate lighter spring purely for card entrance — doesn't inherit the heavy width-resize spring
+const ENTRANCE_SPRING = {
+  type: "spring",
+  stiffness: 320,
+  damping: 28,
+  mass: 0.85,
+}
+
+// Card initial entrance: subtle upward rise + fade — keeps stagger fast and clean
 const SLIDE_ENTRANCE = {
   initial: {
     opacity: 0,
-    y: 60,
-    scale: 0.92,
+    y: 32,
+    scale: 0.96,
   },
   animate: {
     opacity: 1,
@@ -903,8 +912,10 @@ interface SlideProps {
   scenes?: SceneControl[]
   onSeek?: (time: number) => void
   onStartModule?: () => void
+  onSelectModule?: (index: number) => void
   onClose?: () => void
   entranceDelay?: number
+  language?: "en" | "ur"
 }
 
 const Slide: React.FC<SlideProps> = ({
@@ -919,10 +930,30 @@ const Slide: React.FC<SlideProps> = ({
   scenes,
   onSeek,
   onStartModule,
+  onSelectModule,
   onClose,
   entranceDelay = 0,
+  language = "en",
 }) => {
   const cardRef = useRef<HTMLDivElement>(null)
+  const [isHovered, setIsHovered] = useState(false)
+  const isExpanded = status === "expanded"
+  const [hasStarted, setHasStarted] = useState(false)
+
+  // Track if this module has transitioned into active player mode
+  useEffect(() => {
+    if (status !== "expanded") {
+      setHasStarted(false)
+    }
+  }, [status, item.id])
+
+  useEffect(() => {
+    if (isPlaying || currentTime > 0) {
+      setHasStarted(true)
+    }
+  }, [isPlaying, currentTime])
+
+  const isPlayerActive = isExpanded && (isPlaying || hasStarted || currentTime > 0)
 
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -930,8 +961,20 @@ const Slide: React.FC<SlideProps> = ({
   const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), { stiffness: 300, damping: 30 })
   const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), { stiffness: 300, damping: 30 })
 
+  // Ensure hover and tilt states are cleanly reset whenever status changes
+  useEffect(() => {
+    setIsHovered(false)
+    mouseX.set(0)
+    mouseY.set(0)
+  }, [status, mouseX, mouseY])
+
+  const handleMouseEnter = () => {
+    if (status === "idle") setIsHovered(true)
+  }
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current || status !== "idle") return
+    if (!isHovered) setIsHovered(true)
     const rect = cardRef.current.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width - 0.5
     const y = (e.clientY - rect.top) / rect.height - 0.5
@@ -940,6 +983,7 @@ const Slide: React.FC<SlideProps> = ({
   }
 
   const handleMouseLeave = () => {
+    setIsHovered(false)
     mouseX.set(0)
     mouseY.set(0)
   }
@@ -1000,9 +1044,9 @@ const Slide: React.FC<SlideProps> = ({
       cardBg: "#1F2830",
       textColor: "#FFFFFF",
       subtextColor: "rgba(255,255,255,0.7)",
-      accent: "#3B82F6", // Electric Blue
+      accent: "#3B82F6",
       accentLight: "rgba(59,130,246,0.15)",
-      secondaryAccent: "#06B6D4", // Cyan
+      secondaryAccent: "#06B6D4",
       iconBg: "rgba(59,130,246,0.2)",
       gradient: "from-[#1F2830] via-[#263238] to-[#1a2228]",
       glow: "rgba(59,130,246,0.45)",
@@ -1027,11 +1071,9 @@ const Slide: React.FC<SlideProps> = ({
       borderGradient: "linear-gradient(135deg, rgba(139,92,246,0.4) 0%, rgba(139,92,246,0.1) 50%, rgba(139,92,246,0.25) 100%)",
       isDark: true,
     },
-
   ]
   const currentTheme = themeColors[index % themeColors.length]
 
-  const isExpanded = status === "expanded"
   const isIdle = status === "idle"
   const isPeek = status === "peek"
   const isHidden = status === "hidden"
@@ -1050,17 +1092,30 @@ const Slide: React.FC<SlideProps> = ({
       ref={cardRef}
       className={`relative h-full cursor-pointer group flex-shrink-0 ${isExpanded ? "z-30" : isPeek ? "z-20" : "z-10"}`}
       onClick={onClick}
+      onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       layout
       initial={SLIDE_ENTRANCE.initial}
       animate={{
-        ...SLIDE_ENTRANCE.animate,
         width: getWidth(),
+        opacity: isExpanded ? 1 : isPeek ? 0.9 : 1,
+        scale: isExpanded ? 1 : isPeek ? 0.98 : 1,
+        y: 0,
+      }}
+      exit={{
+        opacity: 0,
+        y: 24,
+        scale: 0.97,
+        transition: { ...ENTRANCE_SPRING, duration: undefined }
       }}
       transition={{
+        // Layout (width) uses the heavy spring for weighted card expand/collapse
         ...IOS_SPRING,
-        delay: entranceDelay,
+        // Entrance uses lighter, faster spring with stagger
+        opacity: { ...ENTRANCE_SPRING, delay: isIdle ? index * 0.05 : 0 },
+        y: { ...ENTRANCE_SPRING, delay: isIdle ? index * 0.05 : 0 },
+        scale: { ...ENTRANCE_SPRING, delay: isIdle ? index * 0.05 : 0 },
       }}
       style={{
         willChange: "width, transform",
@@ -1069,31 +1124,25 @@ const Slide: React.FC<SlideProps> = ({
         rotateY: isIdle ? rotateY : 0,
       }}
     >
-      {/* GlowRing removed for cleaner, more graceful appearance */}
-
       <motion.div
         className="absolute inset-0 overflow-hidden rounded-[28px]"
+        initial={false}
+        animate={{
+          scale: isIdle && isHovered ? 1.02 : 1,
+          y: isIdle && isHovered ? -8 : 0,
+          boxShadow: isExpanded
+            ? "0 30px 90px -15px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.05)"
+            : isIdle && isHovered
+            ? `0 25px 60px -15px ${currentTheme.glow}, 0 0 50px -10px ${currentTheme.accent}30`
+            : `0 8px 32px -8px ${currentTheme.glow}, 0 0 0 1px rgba(0,0,0,0.05)`,
+        }}
         transition={IOS_SPRING}
         style={{
           backgroundColor: isIdle ? currentTheme.cardBg : '#FFFFFF',
-          boxShadow: isExpanded
-            ? "0 40px 100px -20px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05)"
-            : `0 8px 32px -8px ${currentTheme.glow}, 0 0 0 1px rgba(0,0,0,0.05)`,
-          transition: "background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
-        whileHover={isIdle ? {
-          scale: 1.02,
-          y: -8,
-          boxShadow: `0 25px 60px -15px ${currentTheme.glow}, 0 0 50px -10px ${currentTheme.accent}30`,
-          transition: {
-            type: "spring",
-            stiffness: 400,
-            damping: 25,
-            mass: 0.8,
-          }
-        } : undefined}
       >
-        {/* Top-right Close button (only visible when expanded). Rendered here so it always sits above internal player visuals. */}
+        {/* Close button (only visible when expanded). Relocates to left in Urdu */}
         {isExpanded && (
           <motion.button
             onClick={(e) => {
@@ -1104,14 +1153,12 @@ const Slide: React.FC<SlideProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.75, y: -6, transition: { duration: 0.15, ease: [0.4, 0, 1, 1] } }}
             transition={{ delay: 0.15, type: 'spring', stiffness: 420, damping: 26 }}
-            className="absolute right-4 top-4 z-50 w-10 h-10 rounded-lg flex items-center justify-center bg-white/96 border border-[#E6EEF0] shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1"
+            className={`absolute ${language === "ur" ? "left-4" : "right-4"} top-4 z-50 w-10 h-10 rounded-lg flex items-center justify-center bg-white/96 border border-[#E6EEF0] shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1`}
             aria-label={`Close module ${item.id}`}
           >
             <X size={16} className="text-[#374151]" />
           </motion.button>
         )}
-
-        {/* Shimmer removed for cleaner idle state */}
 
         <AnimatePresence initial={false}>
           {isIdle ? (
@@ -1119,6 +1166,7 @@ const Slide: React.FC<SlideProps> = ({
             <motion.div
               key="idle"
               className="w-full h-full absolute inset-0 flex flex-col overflow-hidden"
+              dir={language === "ur" ? "rtl" : "ltr"}
               initial={{ opacity: 0, scale: 0.96, y: 6 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.14, ease: [0.4, 0, 1, 1] } }}
@@ -1147,7 +1195,6 @@ const Slide: React.FC<SlideProps> = ({
 
               {/* Minimal decorative elements for graceful appearance */}
               <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {/* Single subtle decorative circle */}
                 <div
                   className="absolute -right-20 -top-20 w-52 h-52 rounded-full"
                   style={{
@@ -1157,20 +1204,20 @@ const Slide: React.FC<SlideProps> = ({
                 />
               </div>
 
-              {/* Content Container - Reduced padding for zoom-out effect */}
+              {/* Content Container */}
               <div className="relative z-10 h-full flex flex-col p-6">
                 {/* Top Section - Module indicator & Icon */}
-                <div className="flex justify-between items-start mb-auto">
+                <div className={`flex justify-between items-start mb-auto ${language === "ur" ? "flex-row-reverse" : ""}`}>
                   {/* Step indicator with connecting line */}
                   <div className="flex items-center gap-2.5">
                     <motion.div
-                      className="text-[10px] font-bold tracking-[0.2em] uppercase"
+                      className={`text-[10px] font-bold tracking-[0.2em] uppercase ${language === "ur" ? "font-urdu text-xs" : ""}`}
                       style={{ color: currentTheme.accent }}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.2 }}
                     >
-                      Module {item.id}
+                      {language === "ur" ? `ماڈیول ${item.id}` : `Module ${item.id}`}
                     </motion.div>
                     <motion.div
                       className="h-[1px] rounded-full"
@@ -1186,7 +1233,6 @@ const Slide: React.FC<SlideProps> = ({
 
                   {/* Icon with CSS animated glow ring */}
                   <div className="relative group">
-                    {/* CSS animated glow ring */}
                     <div
                       className="absolute -inset-2 rounded-2xl icon-glow-pulse"
                       style={{
@@ -1207,36 +1253,29 @@ const Slide: React.FC<SlideProps> = ({
                   </div>
                 </div>
 
-                {/* Middle Section - Premium Typography Showcase */}
-                <div className="flex-1 flex flex-col justify-center">
-                  {/* Subtle module number - watermark style - Repositioned for depth */}
+                {/* Middle Section */}
+                <div className={`flex-1 flex flex-col justify-center ${language === "ur" ? "text-right" : "text-left"}`}>
                   <div
-                    className="absolute -right-4 top-1/2 -translate-y-1/2 text-[60px] font-black leading-none select-none pointer-events-none z-0"
+                    className={`absolute ${language === "ur" ? "-left-4" : "-right-4"} top-1/2 -translate-y-1/2 text-[60px] font-black leading-none select-none pointer-events-none z-0`}
                     style={{
                       color: currentTheme.accent,
                       opacity: 0.04,
                       fontVariantNumeric: 'tabular-nums',
-                      transform: 'rotate(-5deg)',
+                      transform: language === "ur" ? 'rotate(5deg)' : 'rotate(-5deg)',
                     }}
                   >
                     0{item.id}
                   </div>
 
-                  {/* Headline - Rescaled for expert production-grade UI */}
+                  {/* Headline */}
                   <motion.h2
-                    className="text-[22px] leading-[1.1] mb-5 relative z-10"
+                    className={`text-[20px] leading-[1.2] mb-3 relative z-10 ${language === "ur" ? "font-urdu text-2xl lg:text-3xl leading-relaxed font-bold" : "font-extrabold"}`}
                     style={{
-                      fontWeight: 900,
-                      letterSpacing: '-0.01em',
-                      fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
-                      textRendering: 'optimizeLegibility',
-                      WebkitFontSmoothing: 'antialiased',
-                      // Premium gradient text
-                      background: `linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 50%, ${currentTheme.accent} 100%)`,
+                      fontWeight: 800,
+                      background: `linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 60%, ${currentTheme.accent} 100%)`,
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       backgroundClip: 'text',
-                      // Enhanced text shadow for premium depth
                       filter: `drop-shadow(0 4px 12px ${currentTheme.accent}30)`,
                     }}
                     initial={{ opacity: 0, y: 12 }}
@@ -1246,11 +1285,13 @@ const Slide: React.FC<SlideProps> = ({
                     {item.headline}
                   </motion.h2>
 
-                  {/* Accent underline - animated reveal */}
+                  {/* Accent underline */}
                   <motion.div
-                    className="h-[4px] rounded-full mb-6 relative z-10"
+                    className={`h-[4px] rounded-full mb-4 relative z-10 ${language === "ur" ? "ml-auto" : ""}`}
                     style={{
-                      background: `linear-gradient(90deg, ${currentTheme.accent}, ${currentTheme.accent}40, transparent)`,
+                      background: language === "ur"
+                        ? `linear-gradient(270deg, ${currentTheme.accent}, ${currentTheme.accent}40, transparent)`
+                        : `linear-gradient(90deg, ${currentTheme.accent}, ${currentTheme.accent}40, transparent)`,
                       boxShadow: `0 0 12px ${currentTheme.accent}40`
                     }}
                     initial={{ width: 0, opacity: 0 }}
@@ -1258,28 +1299,24 @@ const Slide: React.FC<SlideProps> = ({
                     transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   />
 
-                  {/* Subheading - Fine-tuned for breathability */}
+                  {/* Subheading */}
                   <motion.p
-                    className="text-[12px] leading-[1.7] line-clamp-3 max-w-[90%] relative z-10"
-                    style={{
-                      color: 'rgba(255, 255, 255, 0.75)',
-                      fontWeight: 500,
-                      letterSpacing: '0.01em',
-                      fontFeatureSettings: '"kern" 1, "liga" 1',
-                      textRendering: 'optimizeLegibility',
-                    }}
+                    className={`text-[12px] leading-[1.7] line-clamp-3 max-w-[95%] relative z-10 ${
+                      language === "ur" ? "font-urdu text-lg text-white/95 leading-relaxed font-normal" : "text-white/75 font-medium"
+                    }`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   >
                     {item.subtext}
                   </motion.p>
-
                 </div>
 
-                {/* Bottom Section - Premium CTA */}
+                {/* Bottom Section - CTA */}
                 <motion.div
-                  className="flex items-center justify-between rounded-2xl px-4 py-3 backdrop-blur-sm"
+                  className={`flex items-center justify-between rounded-2xl px-4 py-3 backdrop-blur-sm ${
+                    language === "ur" ? "flex-row-reverse" : ""
+                  }`}
                   style={{
                     backgroundColor: currentTheme.accentLight,
                     border: `1px solid ${currentTheme.accent}12`,
@@ -1289,10 +1326,10 @@ const Slide: React.FC<SlideProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
                 >
-                  <div className="flex items-center gap-3">
-                    {/* Progress indicator dots */}
-                    <div className="flex gap-1">
-                      {Array.from({ length: totalSlides }, (_, i) => i + 1).map((dot) => (
+                  {/* In Urdu: text on left, dots on far right. In English: dots on left, text on right */}
+                  <div className={`flex items-center gap-3 ${language === "ur" ? "flex-row-reverse" : "flex-row"}`}>
+                    <div className="flex gap-1" dir="ltr">
+                      {Array.from({ length: totalSlides }, (_, i) => language === "ur" ? totalSlides - i : i + 1).map((dot) => (
                         <motion.div
                           key={dot}
                           className="w-1.5 h-1.5 rounded-full transition-all duration-300"
@@ -1307,39 +1344,45 @@ const Slide: React.FC<SlideProps> = ({
                       ))}
                     </div>
                     <span
-                      className="text-[10px] font-bold uppercase tracking-[0.15em]"
-                      style={{ color: currentTheme.textColor, opacity: 0.6 }}
+                      className={`text-[10px] font-bold uppercase tracking-[0.15em] ${language === "ur" ? "font-urdu text-sm font-bold" : ""}`}
+                      style={{ color: currentTheme.textColor, opacity: 0.8 }}
                     >
-                      {item.id} of {totalSlides}
+                      {language === "ur" ? `ماڈیول ${item.id} از ${totalSlides}` : `${item.id} of ${totalSlides}`}
                     </span>
                   </div>
 
-                  {/* CTA Button with pulse animation */}
                   <motion.div
-                    className="relative"
+                    className="relative shrink-0"
                     whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    {/* Pulse ring */}
+                    {/* Continuous soft breathing glow layer */}
                     <motion.div
-                      className="absolute inset-0 rounded-full"
-                      style={{ backgroundColor: currentTheme.accent }}
+                      className="absolute inset-0 rounded-full pointer-events-none"
                       animate={{
-                        scale: [1, 1.4, 1.4],
-                        opacity: [0.4, 0, 0],
+                        boxShadow: [
+                          `0 0 4px 1px ${currentTheme.accent}40`,
+                          `0 0 14px 4px ${currentTheme.accent}80`,
+                          `0 0 4px 1px ${currentTheme.accent}40`,
+                        ],
+                        scale: [0.95, 1.12, 0.95],
                       }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                      transition={{
+                        duration: 2.6,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
                     />
                     <div
-                      className="relative w-8 h-8 rounded-full flex items-center justify-center"
+                      className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
                       style={{
                         backgroundColor: currentTheme.accent,
-                        boxShadow: `0 4px 12px -3px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
+                        boxShadow: `0 2px 8px -1px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.3)`,
                       }}
                     >
                       <ArrowRight
                         size={12}
-                        className={currentTheme.isDark ? "text-white" : "text-white"}
+                        className={`text-white ${language === "ur" ? "rotate-180" : ""}`}
                         strokeWidth={2.5}
                       />
                     </div>
@@ -1348,40 +1391,42 @@ const Slide: React.FC<SlideProps> = ({
               </div>
             </motion.div>
           ) : (
-            // === EXPANDED / PLAYING STATE - Premium Redesign ===
+            // === EXPANDED / PLAYING STATE ===
             <motion.div
               key="expanded"
-              className="flex w-full h-full absolute inset-0 overflow-hidden"
+              className={`flex w-full h-full absolute inset-0 overflow-hidden ${
+                language === "ur" ? "flex-row-reverse" : "flex-row"
+              }`}
               initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{
                 opacity: 0,
-                scale: 0.94,
-                y: 10,
-                transition: { duration: 0.22, ease: [0.4, 0, 1, 1] },
+                scale: 0.95,
+                transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] },
               }}
-              transition={{ duration: 0.35, ease: [0, 0, 0.2, 1] }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
-              {/* LEFT CONTENT SIDE */}
+              {/* CONTENT SIDE (Left in EN, Right in UR) */}
               <motion.div
                 layout
-                className="flex flex-col justify-between relative z-10 overflow-hidden"
+                className={`flex flex-col justify-between relative z-10 overflow-hidden ${
+                  language === "ur" ? "font-urdu text-right" : "text-left"
+                }`}
                 style={{
                   background: isExpanded
                     ? 'linear-gradient(135deg, #FAFBFC 0%, #F5F7F9 50%, #F0F4F7 100%)'
                     : '#FFFFFF',
                 }}
                 animate={{
-                  width: (isPlaying || (isExpanded && currentTime > 0)) ? "0%" : isExpanded ? "45%" : "100%",
-                  padding: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : isExpanded ? "2.5rem" : isPeek ? "1rem" : "2rem",
-                  opacity: (isPlaying || (isExpanded && currentTime > 0)) ? 0 : 1,
+                  width: isPlayerActive ? "0%" : isExpanded ? "45%" : "100%",
+                  padding: isPlayerActive ? 0 : isExpanded ? "2.5rem" : isPeek ? "1rem" : "2rem",
+                  opacity: isPlayerActive ? 0 : 1,
                 }}
                 transition={IOS_SPRING}
               >
-                {/* Decorative Background Elements for Expanded - Only when not playing and not paused mid-scene */}
-                {isExpanded && !isPlaying && currentTime === 0 && (
+                {/* Decorative Background Elements */}
+                {isExpanded && !isPlayerActive && (
                   <>
-                    {/* Floating accent orbs */}
                     <motion.div
                       className="absolute top-20 right-16 w-32 h-32 rounded-full pointer-events-none"
                       style={{
@@ -1400,131 +1445,67 @@ const Slide: React.FC<SlideProps> = ({
                       animate={{ y: [0, 10, 0], x: [0, 5, 0] }}
                       transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                     />
-
-                    {/* Subtle grid pattern */}
-                    <div
-                      className="absolute inset-0 opacity-[0.02] pointer-events-none"
-                      style={{
-                        backgroundImage: `
-                          linear-gradient(${currentTheme.accent}40 1px, transparent 1px),
-                          linear-gradient(90deg, ${currentTheme.accent}40 1px, transparent 1px)
-                        `,
-                        backgroundSize: '40px 40px',
-                      }}
-                    />
                   </>
                 )}
 
-                <motion.div layout className="flex flex-col h-full relative z-10">
-                  {/* Peek State - Enhanced with gradient bar and icon */}
-                  {isPeek && (
-                    <>
+                <motion.div layout className="flex flex-col h-full relative z-10" dir={language === "ur" ? "rtl" : "ltr"}>
+                  {/* Module Number Header (Hidden on peek so side bar title is perfectly centered) */}
+                  {!isPeek && (
+                    <motion.div layout className="flex items-center gap-4 mb-8">
                       <motion.div
-                        className="absolute top-0 left-0 w-full h-1.5 z-20 origin-left"
+                        layout="position"
+                        className="font-mono font-black tracking-tight text-xl"
                         style={{
-                          background: `linear-gradient(90deg, ${currentTheme.accent}, ${currentTheme.secondaryAccent || currentTheme.accent}80)`,
-                        }}
-                        layoutId={`accent-${item.id}`}
-                      />
-                      {/* Module number badge for peek */}
-                      <motion.div
-                        className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center border backdrop-blur-md"
-                        style={{
-                          backgroundColor: `${currentTheme.accent}15`,
                           color: currentTheme.accent,
-                          borderColor: `${currentTheme.accent}30`,
+                          textShadow: `0 2px 8px ${currentTheme.accent}20`,
                         }}
-                        initial={{ opacity: 0, x: 20 }}
+                      >
+                        {String(item.id).padStart(2, "0")}
+                      </motion.div>
+                      <motion.div
+                        initial={{ width: 0, opacity: 0 }}
+                        animate={{ width: 50, opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                        className="h-[2px] rounded-full"
+                        style={{ backgroundColor: currentTheme.accent }}
+                      />
+                      <motion.span
+                        initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
+                        className={`text-xs font-bold uppercase tracking-[0.2em] ${language === "ur" ? "font-urdu text-base font-bold" : ""}`}
+                        style={{ color: `${currentTheme.accent}90` }}
                       >
-                        <span className="text-xs font-black tracking-tight font-mono">
-                          {String(item.id).padStart(2, "0")}
-                        </span>
-                      </motion.div>
-                    </>
+                        {language === "ur" ? `ماڈیول ${item.id}` : `Module ${item.id}`}
+                      </motion.span>
+                    </motion.div>
                   )}
 
-                  {/* Module Number Header */}
-                  <motion.div layout className="flex items-center gap-4 mb-8">
-                    <motion.div
-                      layout="position"
-                      className={`font-mono font-black tracking-tight ${isPeek ? "text-2xl opacity-0" : "text-xl"}`}
-                      style={{
-                        color: currentTheme.accent,
-                        textShadow: `0 2px 8px ${currentTheme.accent}20`,
-                      }}
-                    >
-                      {String(item.id).padStart(2, "0")}
-                    </motion.div>
-                    {isExpanded && (
-                      <>
-                        <motion.div
-                          initial={{ width: 0, opacity: 0 }}
-                          animate={{ width: 50, opacity: 1 }}
-                          transition={{ delay: 0.2, duration: 0.5 }}
-                          className="h-[2px] rounded-full"
-                          style={{ backgroundColor: currentTheme.accent }}
-                        />
-                        <motion.span
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="text-xs font-bold uppercase tracking-[0.2em]"
-                          style={{ color: `${currentTheme.accent}90` }}
-                        >
-                          Module {item.id}
-                        </motion.span>
-                        {/* header content only - close button is rendered at container level */}
-                      </>
-                    )}
-                  </motion.div>
-
-                  <div className={`flex flex-col flex-1 ${isPeek ? "items-center h-full justify-center" : "items-start justify-center"}`}>
+                  <div className={`flex flex-col flex-1 h-full w-full ${isPeek ? "items-center justify-center" : "items-start justify-center"}`}>
                     {isPeek ? (
-                      <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                        <motion.h1
-                          className="text-sm font-bold tracking-widest uppercase max-h-[60vh] text-center"
-                          style={{
-                            color: currentTheme.accent,
-                            writingMode: "vertical-rl",
-                            transform: "rotate(180deg)",
-                            textShadow: `0 0 20px ${currentTheme.accent}30`,
-                            // Ensure wrapping for long titles in vertical mode
-                            wordBreak: "break-word",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {item.headline}
-                        </motion.h1>
-                      </motion.div>
+                      /* Peek Side Bar Title: Isolated non-motion wrapper guaranteeing 100% foolproof 180deg rotation facing right everywhere */
+                      <div className="h-full w-full flex items-center justify-center select-none pointer-events-none">
+                        <div className="flex items-center justify-center rotate-180 [writing-mode:vertical-rl]">
+                          <h1
+                            className={`font-bold tracking-widest uppercase text-center ${language === "ur" ? "font-urdu text-xl md:text-2xl" : "text-sm"}`}
+                            style={{
+                              color: currentTheme.accent,
+                              textShadow: `0 0 20px ${currentTheme.accent}30`,
+                              wordBreak: "break-word",
+                            }}
+                          >
+                            {item.headline}
+                          </h1>
+                        </div>
+                      </div>
                     ) : (
                       <motion.div layout className="space-y-4 max-w-lg">
-                        {/* Large Display Number - Background decoration */}
-                        {isExpanded && (
-                          <motion.div
-                            className="absolute -left-6 top-1/2 -translate-y-1/2 text-[100px] font-black leading-none select-none pointer-events-none"
-                            style={{
-                              background: `linear-gradient(180deg, ${currentTheme.accent}15, transparent)`,
-                              WebkitBackgroundClip: 'text',
-                              WebkitTextFillColor: 'transparent',
-                              backgroundClip: 'text',
-                            }}
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.1, duration: 0.6 }}
-                          >
-                            {item.id}
-                          </motion.div>
-                        )}
-
                         {/* Headline */}
                         <motion.h1
                           layout="position"
-                          className={`font-extrabold text-[#1A1D21] tracking-tight relative z-10 ${isExpanded ? "text-3xl lg:text-[2.25rem] leading-[1.1]" : "text-2xl"}`}
+                          className={`font-extrabold text-[#1A1D21] tracking-tight relative z-10 ${
+                            language === "ur" ? "font-urdu text-3xl lg:text-4xl leading-[1.5] font-bold" : isExpanded ? "text-3xl lg:text-[2.25rem] leading-[1.1]" : "text-2xl"
+                          }`}
                         >
                           {item.headline}
                         </motion.h1>
@@ -1536,15 +1517,15 @@ const Slide: React.FC<SlideProps> = ({
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15, duration: 0.5 }}
-                            className="text-[#5A6169] font-medium leading-relaxed text-base relative z-10"
+                            className={`leading-relaxed relative z-10 ${
+                              language === "ur" ? "font-urdu text-xl md:text-2xl text-[#374151] leading-relaxed font-normal" : "font-medium text-base text-[#5A6169]"
+                            }`}
                           >
                             {item.subtext}
                           </motion.p>
                         )}
 
-
-
-                        {/* Enhanced CTA Button */}
+                        {/* Start Module CTA Button */}
                         {isExpanded && !isPlaying && (
                           <motion.button
                             initial={{ opacity: 0, y: 20 }}
@@ -1556,20 +1537,16 @@ const Slide: React.FC<SlideProps> = ({
                               e.stopPropagation();
                               onStartModule?.();
                             }}
-                            className="flex items-center gap-4 pl-6 pr-5 py-3 text-white rounded-2xl mt-6 shadow-xl hover:shadow-2xl transition-all duration-300 group/btn relative overflow-hidden"
+                            className={`flex items-center gap-4 pl-6 pr-5 py-3 text-white rounded-2xl mt-6 shadow-xl hover:shadow-2xl transition-all duration-300 group/btn relative overflow-hidden ${
+                              language === "ur" ? "flex-row-reverse" : ""
+                            }`}
                             style={{
                               background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}DD)`,
                             }}
                           >
-                            {/* Shine effect */}
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
-                              initial={{ x: '-100%' }}
-                              whileHover={{ x: '100%' }}
-                              transition={{ duration: 0.6 }}
-                            />
-
-                            <span className="text-sm font-bold tracking-wide relative z-10">Start Module</span>
+                            <span className={`text-sm font-bold tracking-wide relative z-10 ${language === "ur" ? "font-urdu text-lg" : ""}`}>
+                              {language === "ur" ? "ماڈیول شروع کریں" : "Start Module"}
+                            </span>
                             <motion.div
                               className="bg-white/25 rounded-xl p-2 group-hover/btn:bg-white/35 transition-colors relative z-10"
                               whileHover={{ rotate: 90 }}
@@ -1583,75 +1560,90 @@ const Slide: React.FC<SlideProps> = ({
                     )}
                   </div>
 
-                  {/* Bottom progress indicator for expanded */}
+                  {/* Classic Clickable Module Dots: reversed so module 1 has highlighted dot on right, module 5 on left */}
                   {isExpanded && !isPlaying && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="flex items-center gap-3 mt-auto pt-4"
+                      className={`flex items-center gap-3 mt-auto pt-4 ${language === "ur" ? "flex-row-reverse" : "flex-row"}`}
                     >
-                      <div className="flex gap-2">
-                        {Array.from({ length: totalSlides }, (_, i) => i + 1).map((step) => (
-                          <motion.div
-                            key={step}
-                            className="h-1.5 rounded-full transition-all duration-300"
-                            style={{
-                              width: step === item.id ? 32 : 8,
-                              backgroundColor: step === item.id ? currentTheme.accent : '#E2E5E9',
-                            }}
-                            animate={step === item.id ? { scale: [1, 1.05, 1] } : {}}
-                            transition={{ duration: 2, repeat: Infinity }}
-                          />
-                        ))}
+                      <div className="flex gap-2 items-center" dir="ltr">
+                        {Array.from({ length: totalSlides }, (_, i) => language === "ur" ? totalSlides - i : i + 1).map((step) => {
+                          const isCurrent = step === item.id
+                          return (
+                            <motion.button
+                              key={step}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onSelectModule?.(step - 1)
+                              }}
+                              whileHover={{ scale: 1.25 }}
+                              whileTap={{ scale: 0.9 }}
+                              title={language === "ur" ? `ماڈیول ${step}` : `Module ${step}`}
+                              className="h-2 rounded-full transition-all duration-300 cursor-pointer focus:outline-none"
+                              style={{
+                                width: isCurrent ? 32 : 10,
+                                backgroundColor: isCurrent ? currentTheme.accent : 'rgba(0,0,0,0.15)',
+                                boxShadow: isCurrent ? `0 0 8px ${currentTheme.accent}60` : 'none',
+                              }}
+                            />
+                          )
+                        })}
                       </div>
-                      <span className="text-xs font-medium text-[#8A9199]">
-                        {item.id} of {totalSlides} modules
+                      <span className={`text-xs font-medium text-[#8A9199] ${language === "ur" ? "font-urdu text-base font-bold" : ""}`}>
+                        {language === "ur" ? `ماڈیول ${item.id} از ${totalSlides}` : `${item.id} of ${totalSlides} modules`}
                       </span>
                     </motion.div>
                   )}
                 </motion.div>
               </motion.div>
 
-              {/* RIGHT VISUAL SIDE - Enhanced */}
+              {/* VISUAL / PLAYER SIDE */}
               <motion.div
                 layout
                 className="h-full relative overflow-hidden"
                 initial={false}
                 animate={{
-                  width: (isPlaying || (isExpanded && currentTime > 0)) ? "100%" : isExpanded ? "55%" : "0%",
+                  width: isPlayerActive ? "100%" : isExpanded ? "55%" : "0%",
                   opacity: isExpanded ? 1 : 0,
                 }}
                 transition={IOS_SPRING}
               >
-                {/* Decorative border accent */}
-                {isExpanded && !isPlaying && (
+                {isExpanded && !isPlayerActive && (
                   <motion.div
-                    className="absolute left-0 top-8 bottom-8 w-[3px] z-20 rounded-full"
+                    className={`absolute ${language === "ur" ? "right-0" : "left-0"} top-8 bottom-8 w-[2px] z-20 rounded-full origin-center pointer-events-none`}
                     style={{
-                      background: `linear-gradient(180deg, ${currentTheme.accent}, ${currentTheme.accent}40, ${currentTheme.accent})`,
+                      background: `linear-gradient(180deg, transparent 0%, ${currentTheme.accent} 20%, ${currentTheme.accent} 80%, transparent 100%)`,
+                      boxShadow: `0 0 12px ${currentTheme.accent}40`,
                     }}
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: 1 }}
-                    transition={{ delay: 0.2, duration: 0.6 }}
+                    initial={{ scaleY: 0, opacity: 0 }}
+                    animate={{ scaleY: 1, opacity: 1 }}
+                    exit={{ scaleY: 0, opacity: 0 }}
+                    transition={IOS_SPRING}
                   />
                 )}
 
                 <AnimatePresence mode="wait">
-                  {(isPlaying || (isExpanded && currentTime > 0)) ? (
+                  {isPlayerActive ? (
                     <motion.div
                       key="player-container"
-                      className="absolute inset-0 w-full h-full flex bg-[#17161A]"
+                      className={`absolute inset-0 w-full h-full flex bg-[#17161A] ${
+                        language === "ur" ? "flex-row-reverse" : "flex-row"
+                      }`}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 1.05 }}
                       transition={{ duration: 0.4 }}
                     >
-                      {/* Control Panel - Left 25% */}
+                      {/* Control Panel - 25% (On Left in EN, On Right in UR) */}
                       {scenes && scenes.length > 0 && onSeek && (
                         <motion.div
-                          className="w-[25%] h-full flex-shrink-0 border-r border-white/5"
-                          initial={{ x: -20, opacity: 0 }}
+                          className={`w-[25%] h-full flex-shrink-0 ${
+                            language === "ur" ? "border-l border-white/5" : "border-r border-white/5"
+                          }`}
+                          initial={{ x: language === "ur" ? 20 : -20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: 0.2, ...IOS_SPRING }}
                         >
@@ -1661,11 +1653,12 @@ const Slide: React.FC<SlideProps> = ({
                             isPlaying={isPlaying}
                             moduleId={`module${item.id}`}
                             onSeek={onSeek}
+                            language={language}
                           />
                         </motion.div>
                       )}
 
-                      {/* Module Player - Right 75% (or 100% if no control panel) */}
+                      {/* Module Player Canvas - 75% */}
                       <div className={`${scenes && scenes.length > 0 ? 'w-[75%]' : 'w-full'} h-full`}>
                         {playerComponent || (
                           <div className="w-full h-full flex items-center justify-center text-white/50">
