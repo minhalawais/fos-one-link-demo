@@ -1,13 +1,12 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from "framer-motion"
 import {
     Phone,
     MessageCircle,
     Mail,
     Headset,
-    Calendar,
     HardHat,
     Users,
     Baby,
@@ -20,17 +19,13 @@ import {
     ShieldAlert,
     Gavel,
     MessageSquareQuote,
-    CheckCircle2,
     UploadCloud,
     Smartphone,
     Wifi,
     Lock,
     Search,
-    Eye,
     EyeOff,
-    Shield,
-    ShieldCheck,
-    Fingerprint
+    Shield
 } from "lucide-react"
 
 /* ───────────────────────── CONSTANTS ───────────────────────── */
@@ -38,18 +33,6 @@ import {
 const ASSETS = {
     worker: "/assets/avatars/worker_calling.png",
     officer: "/assets/avatars/fos_grievance_officer_complaint.png",
-}
-
-const PALETTE = {
-    teal: "#284952",
-    green: "#60BA81",
-    orange: "#F5A83C",
-    white: "#FFFFFF",
-    grayBg: "#F5F5F7",
-    charcoal: "#17161A",
-    border: "#e2e8f0",
-    textGray: "#4a5568",
-    lightBg: "#f8fafb",
 }
 
 const IOS_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
@@ -231,141 +214,110 @@ const FosFormField = ({
 
 /* ──────────────────────── MAIN COMPONENT ──────────────────── */
 
-export const SceneComplaintFiling = ({ isActive, progress }: { isActive: boolean; progress?: number }) => {
-    /* ── STATE ── */
-    const [phase, setPhase] = useState(0)
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
-    const [formData, setFormData] = useState<FormDataState>({
-        fosId: "", name: "", company: "", workerType: "", department: "", designation: "",
-        gender: "", mobile: "", date: "", additionalComments: "", complaintAgainst: "",
-        concernedDept: "", history: "", solution: "",
-    })
-    const [typingField, setTypingField] = useState<string | null>(null)
+export const SceneComplaintFiling = ({ isActive, progress = 0 }: { isActive: boolean; progress?: number }) => {
     const scrollRef = useRef<HTMLDivElement>(null)
 
-    // Anonymity state
-    const [isAnonymous, setIsAnonymous] = useState(false)
-    const [protectedFields, setProtectedFields] = useState<string[]>([])
-    const [trackingId, setTrackingId] = useState<string | null>(null)
-    const [workerSpeech, setWorkerSpeech] = useState(false)
-    const [officerSpeech, setOfficerSpeech] = useState(false)
+    /* ── DECLARATIVE PROGRESS STATE (Deterministic & Seek-proof) ── */
+    const t = Math.max(0, progress - 28) // Offset from scene start
 
-    /* ── TIMING (relative to scene start at 28s, so offset = currentTime - 28) ── */
+    // Phase calculation
+    let phase = 0
+    if (isActive) {
+        if (t >= 42) phase = 7
+        else if (t >= 36) phase = 6
+        else if (t >= 29) phase = 5
+        else if (t >= 22) phase = 4
+        else if (t >= 19.5) phase = 3.7
+        else if (t >= 14.5) phase = 3.5
+        else if (t >= 9.5) phase = 3
+        else if (t >= 6.0) phase = 2
+        else phase = 1
+    }
+
+    // Category selection
+    const selectedCategory = t >= 29 ? 9 : t >= 14.5 ? 3 : null
+
+    // Form data & typing field
+    const isAnonymityStage = t >= 29
+    const formData: FormDataState = isAnonymityStage
+        ? {
+            fosId: "FOS-35201-982",
+            name: "Muhammad Ali Hassan",
+            company: "Pearl Textiles Ltd",
+            workerType: "Stitching",
+            department: "Production",
+            designation: "Line Worker",
+            gender: "Male",
+            mobile: "+92 300 1234567",
+            date: "12 Dec 2024",
+            additionalComments: "Harassment by floor supervisor...",
+            complaintAgainst: "Mr. Idrees (Floor Manager)",
+            concernedDept: "HR",
+            history: "Reported verbally twice",
+            solution: "Immediate action required",
+        }
+        : {
+            fosId: t >= 10.5 ? "475002" : "",
+            name: t >= 11.5 ? "Ahmed Khan" : "",
+            company: t >= 12.0 ? "Pearl Textiles" : "",
+            workerType: t >= 12.3 ? "Operator" : "",
+            department: t >= 12.6 ? "Spinning" : "",
+            designation: t >= 12.9 ? "Senior Op" : "",
+            gender: t >= 13.2 ? "Male" : "",
+            mobile: t >= 13.5 ? "+92 300 123..." : "",
+            date: t >= 13.8 ? "15 Nov 2024" : "",
+            additionalComments: t >= 15.5 ? "Wages delayed for 2 months. Overtime not paid." : "",
+            complaintAgainst: t >= 16.5 ? "Mr. Asif (Supervisor)" : "",
+            concernedDept: t >= 17.2 ? "Accounts / HR" : "",
+            history: t >= 17.8 ? "First time" : "",
+            solution: t >= 18.5 ? "Release pending dues" : "",
+        }
+
+    const typingField: string | null = isAnonymityStage
+        ? null
+        : t >= 10.5 && t < 11.0 ? "fosId"
+        : t >= 11.0 && t < 11.5 ? "name"
+        : t >= 11.5 && t < 12.0 ? "company"
+        : t >= 12.0 && t < 12.3 ? "workerType"
+        : t >= 12.3 && t < 12.6 ? "department"
+        : t >= 12.6 && t < 12.9 ? "designation"
+        : t >= 12.9 && t < 13.2 ? "gender"
+        : t >= 13.2 && t < 13.5 ? "mobile"
+        : t >= 13.5 && t < 13.8 ? "date"
+        : t >= 15.0 && t < 16.5 ? "additionalComments"
+        : t >= 16.5 && t < 17.2 ? "complaintAgainst"
+        : t >= 17.2 && t < 17.8 ? "concernedDept"
+        : t >= 17.8 && t < 18.5 ? "history"
+        : null
+
+    // Anonymity variables
+    const isAnonymous = t >= 35.0
+    const protectedFields = t >= 40.0 ? ["id", "name", "mobile"] : t >= 38.5 ? ["id", "name"] : t >= 37.0 ? ["id"] : []
+    const trackingId = t >= 44.0 ? "XX020289-11XXXX" : null
+    const workerSpeech = t >= 32.0 && t < 42.0
+    const officerSpeech = t >= 34.0 && t < 42.0
+
+    // Auto-scroll sync
     useEffect(() => {
-        if (!isActive) return
-
-        // Reset all state
-        setPhase(0)
-        setSelectedCategory(null)
-        setFormData({
-            fosId: "", name: "", company: "", workerType: "", department: "", designation: "",
-            gender: "", mobile: "", date: "", additionalComments: "", complaintAgainst: "",
-            concernedDept: "", history: "", solution: "",
-        })
-        setTypingField(null)
-        setIsAnonymous(false)
-        setProtectedFields([])
-        setTrackingId(null)
-        setWorkerSpeech(false)
-        setOfficerSpeech(false)
-        if (scrollRef.current) scrollRef.current.scrollTop = 0
-
-        const t = (ms: number) => setTimeout(() => { }, ms) // placeholder — actual timers below
-
-        const timers = [
-            // ── Phase 1 (0s): Worker ringing ──
-            setTimeout(() => setPhase(1), 100),
-
-            // ── Phase 2 (6s): Officer enters ──
-            setTimeout(() => setPhase(2), 6000),
-
-            // ── Phase 3 (9.5s): Form slides in, data filling starts ──
-            setTimeout(() => setPhase(3), 9500),
-
-            // Form auto-fill sequence
-            setTimeout(() => { setTypingField("fosId"); setFormData(p => ({ ...p, fosId: "475002" })) }, 10500),
-            setTimeout(() => { setTypingField("name"); setFormData(p => ({ ...p, fosId: "475002" })) }, 11000),
-            setTimeout(() => { setFormData(p => ({ ...p, name: "Ahmed Khan" })); setTypingField("company") }, 11500),
-            setTimeout(() => { setFormData(p => ({ ...p, company: "Pearl Textiles" })); setTypingField("workerType") }, 12000),
-            setTimeout(() => { setFormData(p => ({ ...p, workerType: "Operator" })); setTypingField("department") }, 12300),
-            setTimeout(() => { setFormData(p => ({ ...p, department: "Spinning" })); setTypingField("designation") }, 12600),
-            setTimeout(() => { setFormData(p => ({ ...p, designation: "Senior Op" })); setTypingField("gender") }, 12900),
-            setTimeout(() => { setFormData(p => ({ ...p, gender: "Male" })); setTypingField("mobile") }, 13200),
-            setTimeout(() => { setFormData(p => ({ ...p, mobile: "+92 300 123..." })); setTypingField("date") }, 13500),
-            setTimeout(() => { setFormData(p => ({ ...p, date: "15 Nov 2024" })); setTypingField(null) }, 13800),
-
-            // Category selection + scroll
-            setTimeout(() => {
-                setPhase(3.5)
-                setSelectedCategory(3) // "Wages & Benefits"
-                if (scrollRef.current) scrollRef.current.scrollTo({ top: 160, behavior: "smooth" })
-            }, 14500),
-
-            // Additional fields
-            setTimeout(() => { setTypingField("additionalComments"); setFormData(p => ({ ...p, additionalComments: "Wages delayed for 2 months. Overtime not paid." })) }, 15500),
-            setTimeout(() => {
-                setTypingField("complaintAgainst")
-                setFormData(p => ({ ...p, complaintAgainst: "Mr. Asif (Supervisor)" }))
-                if (scrollRef.current) scrollRef.current.scrollTo({ top: 320, behavior: "smooth" })
-            }, 16500),
-            setTimeout(() => { setFormData(p => ({ ...p, concernedDept: "Accounts / HR" })); setTypingField("concernedDept") }, 17200),
-            setTimeout(() => { setFormData(p => ({ ...p, history: "First time" })); setTypingField("history") }, 17800),
-            setTimeout(() => { setFormData(p => ({ ...p, solution: "Release pending dues" })); setTypingField(null) }, 18500),
-
-            // File upload
-            setTimeout(() => {
-                setPhase(3.7)
-                if (scrollRef.current) scrollRef.current.scrollTo({ top: 500, behavior: "smooth" })
-            }, 19500),
-
-            // ── Phase 4 (22s): Ticket number success ──
-            setTimeout(() => setPhase(4), 22000),
-
-            // ── Phase 5 (29s = 57s-28s): Anonymity begins — avatars stay, form shows new data ──
-            setTimeout(() => {
-                setPhase(5)
-                // Reset form for anonymity demo with different person
-                setFormData({
-                    fosId: "FOS-35201-982", name: "Muhammad Ali Hassan", company: "Pearl Textiles Ltd",
-                    workerType: "Stitching", department: "Production", designation: "Line Worker",
-                    gender: "Male", mobile: "+92 300 1234567", date: "12 Dec 2024",
-                    additionalComments: "Harassment by floor supervisor...", complaintAgainst: "Mr. Idrees (Floor Manager)",
-                    concernedDept: "HR", history: "Reported verbally twice", solution: "Immediate action required",
-                })
-                setSelectedCategory(9) // Harassment
-                setTypingField(null)
-                if (scrollRef.current) scrollRef.current.scrollTop = 0
-            }, 29000),
-
-            // Worker speech bubble (synced: 60s = 32s offset)
-            setTimeout(() => setWorkerSpeech(true), 32000),
-
-            // Officer reply bubble (synced: 62s = 34s offset)
-            setTimeout(() => setOfficerSpeech(true), 34000),
-
-            // Anonymous toggle activates after officer acknowledges (synced: 63s = 35s offset)
-            setTimeout(() => setIsAnonymous(true), 35000),
-
-            // ── Phase 6 (36s = 64s): Field protection starts ──
-            setTimeout(() => setPhase(6), 36000),
-            setTimeout(() => setProtectedFields(["id"]), 37000),
-            setTimeout(() => setProtectedFields(["id", "name"]), 38500),
-            setTimeout(() => setProtectedFields(["id", "name", "mobile"]), 40000),
-
-            // ── Phase 7 (42s = 70s-28s): Tracking ID ──
-            setTimeout(() => { setPhase(7); setWorkerSpeech(false); setOfficerSpeech(false) }, 42000),
-            setTimeout(() => setTrackingId("XX020289-11XXXX"), 44000),
-        ]
-
-        return () => timers.forEach(clearTimeout)
-    }, [isActive])
+        if (!scrollRef.current) return
+        if (t >= 29) {
+            scrollRef.current.scrollTop = 0
+        } else if (t >= 19.5) {
+            scrollRef.current.scrollTop = 500
+        } else if (t >= 16.5) {
+            scrollRef.current.scrollTop = 320
+        } else if (t >= 14.5) {
+            scrollRef.current.scrollTop = 160
+        } else {
+            scrollRef.current.scrollTop = 0
+        }
+    }, [t])
 
     /* ── Derived booleans ── */
     const showWorker = phase >= 1
     const showOfficer = phase >= 2
     const showForm = phase >= 3
     const showTicket = phase === 4
-    const formZoomed = phase >= 5
     const showAnonymity = phase >= 5
     const showProtection = phase >= 6
     const showAnonymousTicket = phase >= 7

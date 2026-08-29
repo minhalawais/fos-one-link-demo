@@ -9,7 +9,6 @@ import {
   Play,
   ShieldCheck,
   Activity,
-  ClipboardList,
   Fingerprint,
   Phone,
   Mail,
@@ -25,13 +24,7 @@ import {
   ClipboardCheck,
   Upload,
   CheckCircle2,
-  AlertCircle,
-  Clock,
   BarChart3,
-  PieChart,
-  TrendingUp,
-  FileText,
-  Download,
   Inbox,
   Eye,
   Zap,
@@ -47,13 +40,6 @@ const IOS_SPRING = {
   stiffness: 260,
   damping: 30,
   mass: 1.5,
-}
-
-const IOS_SOFT_SPRING = {
-  type: "spring",
-  stiffness: 180,
-  damping: 25,
-  mass: 1,
 }
 
 const IOS_EASE = [0.32, 0.72, 0, 1] as const
@@ -97,73 +83,6 @@ const GlassSurface = ({
   <div
     className={`relative bg-white/98 backdrop-blur-md border border-[#DEE2E6] shadow-[0_20px_50px_-12px_rgba(40,73,82,0.15),inset_0_1px_0_rgba(255,255,255,0.8)] rounded-[32px] ${className}`}
     style={{ transform: 'translateZ(0)' }}
-  >
-    {children}
-  </div>
-)
-
-// Optimized shimmer with CSS animation instead of JS
-const ShimmerOverlay = () => (
-  <div
-    className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-[32px]"
-    style={{ transform: 'translateZ(0)' }}
-  >
-    <div
-      className="absolute inset-0 shimmer-effect"
-      style={{
-        background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.6) 50%, transparent 60%)",
-        animation: 'shimmer 4s ease-in-out infinite',
-        animationDelay: '2s',
-      }}
-    />
-  </div>
-)
-
-// Subtle glow ring for colored cards
-const GlowRing = ({ color }: { color: string; delay?: number }) => (
-  <div
-    className="absolute -inset-0.5 rounded-[30px] pointer-events-none z-0 opacity-50"
-    style={{
-      background: `linear-gradient(135deg, ${color}30, transparent 50%, ${color}20)`,
-      transform: 'translateZ(0)',
-    }}
-  />
-)
-
-// Simplified icon with brand styling
-const FloatingIcon = ({ Icon, color }: { Icon: React.ElementType; color: string }) => {
-  return (
-    <motion.div
-      className="relative"
-      whileHover={{ y: -4, scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      style={{ transform: 'translateZ(0)' }}
-    >
-      {/* Status accent dot */}
-      <div
-        className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
-        style={{ backgroundColor: '#60BA81' }}
-      />
-
-      <div
-        className="relative w-14 h-14 rounded-xl bg-white border border-[#DEE2E6] shadow-[0_4px_12px_-4px_rgba(40,73,82,0.12)] flex items-center justify-center"
-        style={{ color }}
-      >
-        <Icon size={26} strokeWidth={1.5} />
-      </div>
-    </motion.div>
-  )
-}
-
-// Optimized floating with CSS animation for GPU acceleration
-const FloatingContainer = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
-  <div
-    className="floating-element"
-    style={{
-      animation: 'float 5s ease-in-out infinite',
-      animationDelay: `${delay}s`,
-      transform: 'translateZ(0)',
-    }}
   >
     {children}
   </div>
@@ -942,18 +861,14 @@ const Slide: React.FC<SlideProps> = ({
 
   // Track if this module has transitioned into active player mode
   useEffect(() => {
-    if (status !== "expanded") {
+    if (status !== "expanded" || (!isPlaying && currentTime === 0)) {
       setHasStarted(false)
-    }
-  }, [status, item.id])
-
-  useEffect(() => {
-    if (isPlaying || currentTime > 0) {
+    } else if (isPlaying || currentTime > 0) {
       setHasStarted(true)
     }
-  }, [isPlaying, currentTime])
+  }, [status, item.id, isPlaying, currentTime])
 
-  const isPlayerActive = isExpanded && (isPlaying || hasStarted || currentTime > 0)
+  const isPlayerActive = isExpanded && (isPlaying || (hasStarted && currentTime > 0))
 
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -1314,9 +1229,8 @@ const Slide: React.FC<SlideProps> = ({
 
                 {/* Bottom Section - CTA */}
                 <motion.div
-                  className={`flex items-center justify-between rounded-2xl px-4 py-3 backdrop-blur-sm ${
-                    language === "ur" ? "flex-row-reverse" : ""
-                  }`}
+                  className="flex items-center justify-between rounded-2xl px-4 py-3 backdrop-blur-sm"
+                  dir="ltr"
                   style={{
                     backgroundColor: currentTheme.accentLight,
                     border: `1px solid ${currentTheme.accent}12`,
@@ -1326,67 +1240,137 @@ const Slide: React.FC<SlideProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
                 >
-                  {/* In Urdu: text on left, dots on far right. In English: dots on left, text on right */}
-                  <div className={`flex items-center gap-3 ${language === "ur" ? "flex-row-reverse" : "flex-row"}`}>
-                    <div className="flex gap-1" dir="ltr">
-                      {Array.from({ length: totalSlides }, (_, i) => language === "ur" ? totalSlides - i : i + 1).map((dot) => (
+                  {language === "ur" ? (
+                    <>
+                      {/* URDU: Arrow on LEFT */}
+                      <motion.div
+                        className="relative shrink-0"
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {/* Continuous soft breathing glow layer */}
                         <motion.div
-                          key={dot}
-                          className="w-1.5 h-1.5 rounded-full transition-all duration-300"
-                          style={{
-                            backgroundColor: dot === item.id ? currentTheme.accent : currentTheme.textColor,
-                            opacity: dot === item.id ? 1 : 0.15,
-                            boxShadow: dot === item.id ? `0 0 6px ${currentTheme.accent}50` : 'none',
+                          className="absolute inset-0 rounded-full pointer-events-none"
+                          animate={{
+                            boxShadow: [
+                              `0 0 4px 1px ${currentTheme.accent}40`,
+                              `0 0 14px 4px ${currentTheme.accent}80`,
+                              `0 0 4px 1px ${currentTheme.accent}40`,
+                            ],
+                            scale: [0.95, 1.12, 0.95],
                           }}
-                          animate={dot === item.id ? { scale: [1, 1.2, 1] } : {}}
-                          transition={{ duration: 1.5, repeat: Infinity }}
+                          transition={{
+                            duration: 2.6,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
                         />
-                      ))}
-                    </div>
-                    <span
-                      className={`text-[10px] font-bold uppercase tracking-[0.15em] ${language === "ur" ? "font-urdu text-sm font-bold" : ""}`}
-                      style={{ color: currentTheme.textColor, opacity: 0.8 }}
-                    >
-                      {language === "ur" ? `ماڈیول ${item.id} از ${totalSlides}` : `${item.id} of ${totalSlides}`}
-                    </span>
-                  </div>
+                        <div
+                          className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
+                          style={{
+                            backgroundColor: currentTheme.accent,
+                            boxShadow: `0 2px 8px -1px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.3)`,
+                          }}
+                        >
+                          <ArrowRight
+                            size={12}
+                            className="text-white rotate-180"
+                            strokeWidth={2.5}
+                          />
+                        </div>
+                      </motion.div>
 
-                  <motion.div
-                    className="relative shrink-0"
-                    whileHover={{ scale: 1.08 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {/* Continuous soft breathing glow layer */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full pointer-events-none"
-                      animate={{
-                        boxShadow: [
-                          `0 0 4px 1px ${currentTheme.accent}40`,
-                          `0 0 14px 4px ${currentTheme.accent}80`,
-                          `0 0 4px 1px ${currentTheme.accent}40`,
-                        ],
-                        scale: [0.95, 1.12, 0.95],
-                      }}
-                      transition={{
-                        duration: 2.6,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }}
-                    />
-                    <div
-                      className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
-                      style={{
-                        backgroundColor: currentTheme.accent,
-                        boxShadow: `0 2px 8px -1px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.3)`,
-                      }}
-                    >
-                      <ArrowRight
-                        size={12}
-                        className={`text-white ${language === "ur" ? "rotate-180" : ""}`}
-                        strokeWidth={2.5}
-                      />
-                    </div>
-                  </motion.div>
+                      {/* URDU: [ماڈیول 1 از 5] to the left of [dots] on the RIGHT */}
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="font-urdu text-sm font-bold uppercase tracking-[0.15em]"
+                          style={{ color: currentTheme.textColor, opacity: 0.8 }}
+                        >
+                          {`ماڈیول ${item.id} از ${totalSlides}`}
+                        </span>
+                        <div className="flex gap-1" dir="ltr">
+                          {Array.from({ length: totalSlides }, (_, i) => totalSlides - i).map((dot) => (
+                            <motion.div
+                              key={dot}
+                              className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                              style={{
+                                backgroundColor: dot === item.id ? currentTheme.accent : currentTheme.textColor,
+                                opacity: dot === item.id ? 1 : 0.15,
+                                boxShadow: dot === item.id ? `0 0 6px ${currentTheme.accent}50` : 'none',
+                              }}
+                              animate={dot === item.id ? { scale: [1, 1.2, 1] } : {}}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* ENGLISH: [dots] [1 of 5] on LEFT */}
+                      <div className="flex items-center gap-3">
+                        <div className="flex gap-1" dir="ltr">
+                          {Array.from({ length: totalSlides }, (_, i) => i + 1).map((dot) => (
+                            <motion.div
+                              key={dot}
+                              className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                              style={{
+                                backgroundColor: dot === item.id ? currentTheme.accent : currentTheme.textColor,
+                                opacity: dot === item.id ? 1 : 0.15,
+                                boxShadow: dot === item.id ? `0 0 6px ${currentTheme.accent}50` : 'none',
+                              }}
+                              animate={dot === item.id ? { scale: [1, 1.2, 1] } : {}}
+                              transition={{ duration: 1.5, repeat: Infinity }}
+                            />
+                          ))}
+                        </div>
+                        <span
+                          className="text-[10px] font-bold uppercase tracking-[0.15em]"
+                          style={{ color: currentTheme.textColor, opacity: 0.8 }}
+                        >
+                          {`${item.id} of ${totalSlides}`}
+                        </span>
+                      </div>
+
+                      {/* ENGLISH: Arrow on RIGHT */}
+                      <motion.div
+                        className="relative shrink-0"
+                        whileHover={{ scale: 1.08 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {/* Continuous soft breathing glow layer */}
+                        <motion.div
+                          className="absolute inset-0 rounded-full pointer-events-none"
+                          animate={{
+                            boxShadow: [
+                              `0 0 4px 1px ${currentTheme.accent}40`,
+                              `0 0 14px 4px ${currentTheme.accent}80`,
+                              `0 0 4px 1px ${currentTheme.accent}40`,
+                            ],
+                            scale: [0.95, 1.12, 0.95],
+                          }}
+                          transition={{
+                            duration: 2.6,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                          }}
+                        />
+                        <div
+                          className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
+                          style={{
+                            backgroundColor: currentTheme.accent,
+                            boxShadow: `0 2px 8px -1px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.3)`,
+                          }}
+                        >
+                          <ArrowRight
+                            size={12}
+                            className="text-white"
+                            strokeWidth={2.5}
+                          />
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
                 </motion.div>
               </div>
             </motion.div>

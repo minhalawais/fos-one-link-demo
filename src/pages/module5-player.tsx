@@ -58,25 +58,37 @@ const SCENES_UR: SceneConfig[] = [
 
 // Sub-scene timing mappings for fine-grained internal dashboard animation scaling
 const MODULE5_TIMINGS_EN = [
-  { start: 0, end: 24 },
-  { start: 24, end: 40 },
-  { start: 40, end: 88 },
-  { start: 88, end: 102 },
-  { start: 102, end: 114 },
-  { start: 114, end: 137 },
-  { start: 137, end: 155 },
-  { start: 155, end: 165 },
+  { start: 0, end: 24 },    // architecture / multi-layer
+  { start: 24, end: 40 },   // filters
+  // Scene 3 (Overview) subdivided into 5 synchronized animation phases:
+  { start: 40, end: 51 },   // Overview top stat cards & bounced metrics
+  { start: 51, end: 60 },   // Categories distribution part 1 (wages, hours)
+  { start: 60, end: 66 },   // Categories distribution part 2 (harassment, health, etc)
+  { start: 66, end: 76 },   // Date-wise complaints chart & Gender distribution
+  { start: 76, end: 88 },   // General employee suggestions / feedback slider
+  // Remaining scenes:
+  { start: 88, end: 102 },  // counseling
+  { start: 102, end: 114 }, // performance
+  { start: 114, end: 137 }, // drilldown / AI summaries
+  { start: 137, end: 155 }, // scores
+  { start: 155, end: 165 }, // surveys
 ]
 
 const MODULE5_TIMINGS_UR = [
-  { start: 0, end: 28 },
-  { start: 28, end: 61 },
-  { start: 61, end: 140 },
-  { start: 140, end: 161 },
-  { start: 161, end: 188 },
-  { start: 188, end: 230 },
-  { start: 230, end: 260 },
-  { start: 260, end: 280 },
+  { start: 0, end: 28 },    // architecture / multi-layer
+  { start: 28, end: 61 },   // filters
+  // Scene 3 (Overview) subdivided into 5 synchronized animation phases:
+  { start: 61, end: 91 },   // Overview top stat cards & bounced metrics (61-91)
+  { start: 91, end: 102 },  // Categories distribution part 1 (91-102)
+  { start: 102, end: 113 }, // Categories distribution part 2 (102-113)
+  { start: 113, end: 128 }, // Date-wise complaints chart & Gender distribution (113-128)
+  { start: 128, end: 140 }, // General employee suggestions / feedback slider (128-140)
+  // Remaining scenes:
+  { start: 140, end: 161 }, // counseling
+  { start: 161, end: 188 }, // performance
+  { start: 188, end: 230 }, // drilldown
+  { start: 230, end: 260 }, // scores
+  { start: 260, end: 280 }, // surveys
 ]
 
 interface Module5PlayerProps {

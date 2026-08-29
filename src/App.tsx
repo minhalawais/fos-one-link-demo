@@ -100,34 +100,20 @@ const AnimatedLogo = () => (
 
 const AnimatedHeading = ({ language = "en" }: { language?: "en" | "ur" }) => {
   if (language === "ur") {
-    const urduPrefix = ["تعارف:"]
-    const urduMain = ["ایف او ایس", "ڈیجیٹل", "شکایت", "مینجمنٹ", "سسٹم"]
+    const urduMain = ["ایف او ایس", "ڈیجیٹل", "شکایت", "مینجمنٹ", "سسٹم", "کا", "تعارف"]
 
     return (
       <h1 className="text-xl md:text-2xl lg:text-3xl text-[#284952] text-center w-full leading-relaxed relative whitespace-nowrap flex items-center justify-center gap-3 font-urdu" dir="rtl">
         {/* Subtle background glow */}
         <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-[#60BA81]/15 via-[#284952]/10 to-[#F5A83C]/15 heading-glow" />
 
-        {/* Prefix */}
-        <span className="relative z-10 flex gap-x-[0.35em] font-light tracking-wide opacity-80">
-          {urduPrefix.map((word, i) => (
-            <span
-              key={`up-${i}`}
-              className="inline-block word-reveal"
-              style={{ animationDelay: `${0.8 + i * 0.1}s` }}
-            >
-              {word}
-            </span>
-          ))}
-        </span>
-
-        {/* Main Title */}
+        {/* Main Title (All Bold) */}
         <span className="relative z-10 flex gap-x-[0.35em] font-bold tracking-tight">
           {urduMain.map((word, i) => (
             <span
               key={`um-${i}`}
-              className="inline-block word-reveal"
-              style={{ animationDelay: `${1.0 + i * 0.08}s` }}
+              className="inline-block word-reveal font-bold"
+              style={{ animationDelay: `${0.8 + i * 0.08}s` }}
             >
               {word}
             </span>
@@ -171,7 +157,6 @@ const AnimatedHeading = ({ language = "en" }: { language?: "en" | "ur" }) => {
   )
 }
 
-// Active Module Header
 const ActiveModuleHeader = ({
   id,
   title,
@@ -184,52 +169,109 @@ const ActiveModuleHeader = ({
   accentColor: string
   language?: "en" | "ur"
   onSelectModule?: (modId: number) => void
-}) => (
-  <motion.div
-    initial={{ y: -10, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    exit={{ y: 5, opacity: 0 }}
-    transition={SPRING_PHYSICS}
-    className={`flex items-center gap-4 bg-white/40 backdrop-blur-md px-5 py-2 rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.08)] pointer-events-auto ${
-      language === "ur" ? "flex-row-reverse font-urdu" : ""
-    }`}
-  >
-    <div className="flex items-center gap-2">
-      <span className={`text-[10px] font-black tracking-[0.2em] uppercase text-[#284952]/40 ${language === "ur" ? "font-urdu text-xs" : ""}`}>
-        {language === "ur" ? "ماڈیول" : "Module"}
-      </span>
-      <div className="flex items-center gap-1.5">
-        {[1, 2, 3, 4, 5].map((modNum) => {
-          const isActive = modNum === id
-          return (
-            <button
-              key={modNum}
-              type="button"
-              onClick={() => onSelectModule?.(modNum - 1)}
-              title={language === "ur" ? `ماڈیول ${modNum}` : `Module ${modNum}`}
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-black border-2 transition-all cursor-pointer ${
-                isActive ? "scale-110 shadow-sm" : "opacity-60 hover:opacity-100 hover:scale-105"
-              }`}
-              style={{
-                color: isActive ? accentColor : "#284952",
-                borderColor: isActive ? accentColor : "rgba(40,73,82,0.2)",
-                backgroundColor: isActive ? `${accentColor}20` : "rgba(255,255,255,0.6)",
-              }}
-            >
-              {modNum}
-            </button>
-          )
-        })}
+}) => {
+  if (language === "ur") {
+    return (
+      <motion.div
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 5, opacity: 0 }}
+        transition={SPRING_PHYSICS}
+        dir="ltr"
+        className="flex items-center gap-3 bg-white/40 backdrop-blur-md px-5 py-2 rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.08)] pointer-events-auto"
+      >
+        {/* Left: 5 4 3 2 1 circles */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {[5, 4, 3, 2, 1].map((modNum) => {
+            const isActive = modNum === id
+            return (
+              <button
+                key={modNum}
+                type="button"
+                onClick={() => onSelectModule?.(modNum - 1)}
+                title={`ماڈیول ${modNum}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-black border-2 transition-all cursor-pointer ${
+                  isActive ? "scale-110 shadow-sm" : "opacity-60 hover:opacity-100 hover:scale-105"
+                }`}
+                style={{
+                  color: isActive ? accentColor : "#284952",
+                  borderColor: isActive ? accentColor : "rgba(40,73,82,0.2)",
+                  backgroundColor: isActive ? `${accentColor}20` : "rgba(255,255,255,0.6)",
+                }}
+              >
+                {modNum}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="w-[1px] h-6 bg-[#284952]/10" />
+
+        {/* Center: Module label in Urdu */}
+        <span className="font-urdu text-sm font-bold text-[#284952]/60 shrink-0">
+          ماڈیول
+        </span>
+
+        <div className="w-[1px] h-6 bg-[#284952]/10" />
+
+        {/* Right: Module Title */}
+        <h2 className="font-urdu text-lg md:text-xl font-bold tracking-tight text-[#284952] shrink-0">
+          {title}
+        </h2>
+      </motion.div>
+    )
+  }
+
+  return (
+    <motion.div
+      initial={{ y: -10, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 5, opacity: 0 }}
+      transition={SPRING_PHYSICS}
+      className="flex items-center gap-4 bg-white/40 backdrop-blur-md px-5 py-2 rounded-2xl border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.08)] pointer-events-auto"
+    >
+      {/* Title on Left in English */}
+      <h2 className="text-lg md:text-xl font-extrabold tracking-tight text-[#284952]">
+        {title}
+      </h2>
+
+      <div className="w-[1px] h-6 bg-[#284952]/10" />
+
+      {/* Module 1 2 3 4 5 on Right in English */}
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] font-black tracking-[0.2em] uppercase text-[#284952]/40">
+          Module
+        </span>
+
+        <div className="w-[1px] h-6 bg-[#284952]/10" />
+
+        <div className="flex items-center gap-1.5">
+          {[1, 2, 3, 4, 5].map((modNum) => {
+            const isActive = modNum === id
+            return (
+              <button
+                key={modNum}
+                type="button"
+                onClick={() => onSelectModule?.(modNum - 1)}
+                title={`Module ${modNum}`}
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-mono font-black border-2 transition-all cursor-pointer ${
+                  isActive ? "scale-110 shadow-sm" : "opacity-60 hover:opacity-100 hover:scale-105"
+                }`}
+                style={{
+                  color: isActive ? accentColor : "#284952",
+                  borderColor: isActive ? accentColor : "rgba(40,73,82,0.2)",
+                  backgroundColor: isActive ? `${accentColor}20` : "rgba(255,255,255,0.6)",
+                }}
+              >
+                {modNum}
+              </button>
+            )
+          })}
+        </div>
       </div>
-    </div>
-
-    <div className="w-[1px] h-6 bg-[#284952]/10" />
-
-    <h2 className={`text-lg md:text-xl font-extrabold tracking-tight text-[#284952] ${language === "ur" ? "font-urdu text-xl font-bold" : ""}`}>
-      {title}
-    </h2>
-  </motion.div>
-)
+    </motion.div>
+  )
+}
 
 const CinematicGrain = () => (
   <div
@@ -287,6 +329,8 @@ const EtherealBackground = ({ activeSlide }: { activeSlide: number | null }) => 
   )
 }
 
+const SPEED_STEPS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0]
+
 export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [activeSlide, setActiveSlide] = useState<number | null>(null)
@@ -297,9 +341,47 @@ export default function App() {
   const [isMouseActive, setIsMouseActive] = useState(true)
   const [language, setLanguage] = useState<"en" | "ur">("en")
 
+  // Global Playback Speed State (Persists across all module transitions)
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0)
+  const [speedToast, setSpeedToast] = useState<{ speed: number; visible: boolean } | null>(null)
+  const speedToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const playbackSpeedRef = useRef(playbackSpeed)
+  playbackSpeedRef.current = playbackSpeed
+
   // Mouse timer ref for tracking user inactivity
   const mouseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const prevActiveSlideRef = useRef<number | null>(null)
+
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Speed changer handler with HUD toast
+  const changePlaybackSpeed = useCallback((delta: 1 | -1) => {
+    const currentSpeed = playbackSpeedRef.current
+    let curIdx = SPEED_STEPS.findIndex((s) => Math.abs(s - currentSpeed) < 0.01)
+    if (curIdx === -1) curIdx = 2 // default to 1.0
+
+    const nextIdx = Math.max(0, Math.min(SPEED_STEPS.length - 1, curIdx + delta))
+    const nextSpeed = SPEED_STEPS[nextIdx]
+
+    setPlaybackSpeed(nextSpeed)
+    if (audioRef.current) {
+      audioRef.current.playbackRate = nextSpeed
+    }
+
+    if (speedToastTimerRef.current) clearTimeout(speedToastTimerRef.current)
+    setSpeedToast({ speed: nextSpeed, visible: true })
+    speedToastTimerRef.current = setTimeout(() => {
+      setSpeedToast((prev) => (prev ? { ...prev, visible: false } : null))
+    }, 1200)
+  }, [])
+
+  // Synchronize audio element playbackRate with global playbackSpeed
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackSpeed
+    }
+  }, [playbackSpeed])
 
   // --- Mouse Inactivity Tracking ---
   useEffect(() => {
@@ -331,9 +413,6 @@ export default function App() {
   }, [isPlaying, activeSlide])
 
   const handleSplashComplete = useCallback(() => setShowSplash(false), [])
-
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
 
   // Dynamic slides data according to language
   const slides = useMemo(() => {
@@ -433,6 +512,7 @@ export default function App() {
       if (audioRef.current) {
         audioRef.current.pause()
         audioRef.current = new Audio(targetAudio)
+        audioRef.current.playbackRate = playbackSpeedRef.current
         audioRef.current.currentTime = restartTime
         audioRef.current.volume = isMuted ? 0 : volume
 
@@ -475,9 +555,11 @@ export default function App() {
           audioRef.current.pause()
         }
         audioRef.current = new Audio(targetSrc)
+        audioRef.current.playbackRate = playbackSpeedRef.current
         audioRef.current.currentTime = currentTime
       }
 
+      audioRef.current.playbackRate = playbackSpeedRef.current
       audioRef.current.volume = isMuted ? 0 : volume
       audioRef.current.play().catch((e) => console.warn("Playback blocked or interrupted:", e))
       audioRef.current.addEventListener("ended", handleEnded)
@@ -490,6 +572,7 @@ export default function App() {
         audioRef.current.removeEventListener("ended", handleEnded)
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, activeSlide, currentSlideData?.audioPath])
 
   useEffect(() => {
@@ -629,9 +712,22 @@ export default function App() {
       const slidesVal = slidesRef.current
       const isPlayingVal = isPlayingRef.current
       const currentTimeVal = currentTimeRef.current
-      const currentSlideDataVal = currentSlideDataRef.current
       // In Urdu, arrow directions are flipped to match RTL module orientation
       const isUrdu = languageRef.current === "ur"
+
+      // Speed adjustments: Ctrl + ArrowRight to increase, Ctrl + ArrowLeft to decrease
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === "ArrowRight") {
+          e.preventDefault()
+          changePlaybackSpeed(1)
+          return
+        }
+        if (e.key === "ArrowLeft") {
+          e.preventDefault()
+          changePlaybackSpeed(-1)
+          return
+        }
+      }
 
       // ArrowRight: next module in LTR, previous module in RTL (Urdu)
       if (e.key === "ArrowRight") {
@@ -735,7 +831,7 @@ export default function App() {
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [handleClose, handleSeek, selectModule])
+  }, [handleClose, handleSeek, selectModule, changePlaybackSpeed])
 
   const getSlideStatus = (index: number): string => {
     if (activeSlide === null) return "idle"
@@ -865,6 +961,40 @@ export default function App() {
         onSeek={handleSeek}
         language={language}
       />
+
+      {/* White Translucent Speed Indicator HUD Popup on Bottom-Left */}
+      <AnimatePresence>
+        {speedToast?.visible && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.88, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 10 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="fixed bottom-8 left-8 z-[9999] pointer-events-none"
+          >
+            <div
+              className="backdrop-blur-2xl px-4 py-2 rounded-2xl border flex items-center gap-3 select-none"
+              style={{
+                background: "rgba(255, 255, 255, 0.88)",
+                borderColor: "rgba(255, 255, 255, 0.95)",
+                boxShadow: "0 16px 36px -8px rgba(40,73,82,0.18), 0 0 0 1px rgba(40,73,82,0.06), 0 0 16px 2px rgba(96,186,129,0.18)",
+              }}
+            >
+              <div className="w-7 h-7 rounded-xl bg-[#60BA81]/15 border border-[#60BA81]/30 flex items-center justify-center text-[#60BA81]">
+                <Zap size={14} className="fill-[#60BA81]" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[9px] text-[#284952]/60 uppercase tracking-widest font-sans font-bold">
+                  {language === "ur" ? "رفتار" : "Speed"}
+                </span>
+                <span className="text-sm font-extrabold text-[#284952] font-mono tracking-wide">
+                  {speedToast.speed}x
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
