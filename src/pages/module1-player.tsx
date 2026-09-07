@@ -213,8 +213,8 @@ export default function Module1Player({ progress, language = "en" }: Module1Play
 
   return (
     <SceneProgressiveShell scenes={scenesList} progress={progress}>
-      <div className="w-full h-full bg-[#17161A] relative overflow-hidden font-sans select-none">
-        <div className="absolute inset-0 z-0">
+      <div className="w-full h-full bg-[#F5F5F7] relative overflow-hidden font-sans select-none flex items-center justify-center">
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
           <AnimatePresence>
             <CurrentSceneComponent
               key={currentSceneConfig.name}

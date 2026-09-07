@@ -18,6 +18,9 @@ import Slide from "./components/Slide.tsx"
 import NavigationPill from "./components/NavigationPill.tsx"
 import SplashScreen from "./components/SplashScreen.tsx"
 import LanguageToggle from "./components/LanguageToggle.tsx"
+import RotatePrompt from "./components/RotatePrompt.tsx"
+import { useDeviceInfo } from "./hooks/useDeviceInfo.ts"
+import { useSwipeable } from "react-swipeable"
 
 // --- DESIGN SYSTEM CONSTANTS ---
 // Heavier spring for main screen card expand/collapse transitions
@@ -75,9 +78,11 @@ const LightRays = () => (
 )
 
 // Logo - Remains un-translated as brand identity
-const AnimatedLogo = () => (
+const AnimatedLogo = ({ isMobileLandscape = false }: { isMobileLandscape?: boolean }) => (
   <div
-    className="pointer-events-auto flex items-center gap-3 bg-white/80 backdrop-blur-lg px-4 py-1.5 rounded-full border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.12)] relative logo-entrance"
+    className={`pointer-events-auto flex items-center gap-3 bg-white/85 backdrop-blur-lg ${
+      isMobileLandscape ? "p-1.5 rounded-full" : "px-4 py-1.5 rounded-full"
+    } border border-white/60 shadow-[0_8px_32px_rgba(40,73,82,0.12)] relative logo-entrance`}
     style={{ animationDelay: '0.2s' }}
   >
     <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#60BA81]/20 to-[#284952]/20 blur-xl logo-glow" />
@@ -89,23 +94,38 @@ const AnimatedLogo = () => (
       style={{ animationDelay: '0.4s' }}
     />
 
-    <span
-      className="text-xs font-bold tracking-wider text-[#284952] uppercase relative z-10 text-reveal"
-      style={{ animationDelay: '0.7s' }}
-    >
-      Fruit of Sustainability
-    </span>
+    {!isMobileLandscape && (
+      <span
+        className="text-xs font-bold tracking-wider text-[#284952] uppercase relative z-10 text-reveal"
+        style={{ animationDelay: '0.7s' }}
+      >
+        Fruit of Sustainability
+      </span>
+    )}
   </div>
 )
 
-const AnimatedHeading = ({ language = "en" }: { language?: "en" | "ur" }) => {
+const AnimatedHeading = ({
+  language = "en",
+  isMobileLandscape = false,
+}: {
+  language?: "en" | "ur"
+  isMobileLandscape?: boolean
+}) => {
   if (language === "ur") {
     const urduMain = ["ایف او ایس", "ڈیجیٹل", "شکایت", "مینجمنٹ", "سسٹم", "کا", "تعارف"]
 
     return (
-      <h1 className="text-xl md:text-2xl lg:text-3xl text-[#284952] text-center w-full leading-relaxed relative whitespace-nowrap flex items-center justify-center gap-3 font-urdu" dir="rtl">
+      <h1
+        className={`${
+          isMobileLandscape
+            ? "text-xs md:text-sm font-urdu leading-none"
+            : "text-xl md:text-2xl lg:text-3xl font-urdu leading-relaxed"
+        } text-[#284952] text-center w-full relative whitespace-nowrap flex items-center justify-center gap-2`}
+        dir="rtl"
+      >
         {/* Subtle background glow */}
-        <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-[#60BA81]/15 via-[#284952]/10 to-[#F5A83C]/15 heading-glow" />
+        <div className="absolute inset-0 blur-xl bg-gradient-to-r from-[#60BA81]/15 via-[#284952]/10 to-[#F5A83C]/15 heading-glow" />
 
         {/* Main Title (All Bold) */}
         <span className="relative z-10 flex gap-x-[0.35em] font-bold tracking-tight">
@@ -127,10 +147,16 @@ const AnimatedHeading = ({ language = "en" }: { language?: "en" | "ur" }) => {
   const mainTitle = ["FOS", "Digital", "Grievance", "Management", "System"]
 
   return (
-    <h1 className="text-xl md:text-2xl lg:text-3xl text-[#284952] text-center w-full leading-tight relative whitespace-nowrap flex items-center justify-center gap-3">
-      <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-[#60BA81]/15 via-[#284952]/10 to-[#F5A83C]/15 heading-glow" />
+    <h1
+      className={`${
+        isMobileLandscape
+          ? "text-[11.5px] sm:text-xs font-semibold leading-none gap-1.5"
+          : "text-xl md:text-2xl lg:text-3xl leading-tight gap-3"
+      } text-[#284952] text-center w-full relative whitespace-nowrap flex items-center justify-center`}
+    >
+      <div className="absolute inset-0 blur-xl bg-gradient-to-r from-[#60BA81]/15 via-[#284952]/10 to-[#F5A83C]/15 heading-glow" />
 
-      <span className="relative z-10 flex gap-x-[0.35em] font-light tracking-wide opacity-80">
+      <span className="relative z-10 flex gap-x-[0.3em] font-light tracking-wide opacity-80">
         {prefix.map((word, i) => (
           <span
             key={`p-${i}`}
@@ -142,7 +168,7 @@ const AnimatedHeading = ({ language = "en" }: { language?: "en" | "ur" }) => {
         ))}
       </span>
 
-      <span className="relative z-10 flex gap-x-[0.35em] font-bold tracking-tight">
+      <span className="relative z-10 flex gap-x-[0.3em] font-bold tracking-tight">
         {mainTitle.map((word, i) => (
           <span
             key={`m-${i}`}
@@ -340,6 +366,9 @@ export default function App() {
   const [isMuted, setIsMuted] = useState(false)
   const [isMouseActive, setIsMouseActive] = useState(true)
   const [language, setLanguage] = useState<"en" | "ur">("en")
+
+  // Device & orientation detection — desktop always returns isMobile=false
+  const { isMobile, isMobileLandscape, isMobilePortrait } = useDeviceInfo()
 
   // Global Playback Speed State (Persists across all module transitions)
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0)
@@ -840,127 +869,248 @@ export default function App() {
     return "hidden"
   }
 
+  // ── Touch swipe navigation (mobile only, desktop uses keyboard) ──────────
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (!isMobile) return
+      if (activeSlide !== null) {
+        if (language === "ur") {
+          // RTL: swipe left = go to previous module (lower index)
+          if (activeSlide > 0) selectModule(activeSlide - 1)
+        } else {
+          // LTR: swipe left = go forward
+          if (activeSlide < slides.length - 1) selectModule(activeSlide + 1)
+        }
+      }
+    },
+    onSwipedRight: () => {
+      if (!isMobile) return
+      if (activeSlide !== null) {
+        if (language === "ur") {
+          if (activeSlide < slides.length - 1) selectModule(activeSlide + 1)
+        } else {
+          if (activeSlide > 0) selectModule(activeSlide - 1)
+          else handleClose()
+        }
+      }
+    },
+    onSwipedDown: () => {
+      if (!isMobile) return
+      if (activeSlide !== null) handleClose()
+    },
+    delta: 50,
+    trackMouse: false,
+    trackTouch: activeSlide !== null,
+    preventScrollOnSwipe: activeSlide !== null,
+  })
+
   return (
-    <div className="h-screen w-full font-sans overflow-hidden flex flex-col relative text-[#17161A] bg-[#F5F5F7]">
-      {/* Splash Screen */}
-      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+    <>
+      {/* Portrait gate — only shown on mobile portrait; never on desktop */}
+      {isMobilePortrait && <RotatePrompt language={language} />}
 
-      <EtherealBackground activeSlide={activeSlide} />
-      <AmbientParticles />
-      <LightRays />
-      <CinematicGrain />
+      <div
+        className="h-screen w-full font-sans overflow-hidden flex flex-col relative text-[#17161A] bg-[#F5F5F7]"
+        {...(isMobile && activeSlide !== null ? swipeHandlers : {})}
+      >
+        {/* Splash Screen */}
+        {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
 
-      {/* Floating Top-Right Language Switcher */}
-      <div className="fixed top-6 right-8 z-50 pointer-events-auto">
-        <LanguageToggle language={language} onToggle={handleLanguageToggle} />
-      </div>
+        <EtherealBackground activeSlide={activeSlide} />
+        <AmbientParticles />
+        <LightRays />
+        <CinematicGrain />
 
-      {/* Floating Header "Island" */}
-      <nav className="w-full pt-6 pb-2 flex flex-col items-center justify-center z-40 relative pointer-events-none gap-4">
-        <AnimatedLogo />
-        <AnimatePresence mode="wait">
-          {activeSlide === null || (!isPlaying && currentTime === 0) ? (
-            <AnimatedHeading key={`main-heading-${language}`} language={language} />
-          ) : (
-            currentSlideData && (
-              <ActiveModuleHeader
-                key={`module-header-${currentSlideData.id}-${language}`}
-                id={currentSlideData.id}
-                title={currentSlideData.headline}
-                language={language}
-                onSelectModule={selectModule}
-                accentColor={
-                  currentSlideData.id === 1 ? "#60BA81" :
-                    currentSlideData.id === 2 ? "#F5A83C" :
-                      currentSlideData.id === 3 ? "#60BA81" :
-                        currentSlideData.id === 4 ? "#3B82F6" :
-                          "#8B5CF6"
-                }
-              />
-            )
-          )}
-        </AnimatePresence>
-      </nav>
-
-      {/* Main Content Stage */}
-      <main className="flex-1 w-full h-full flex flex-col justify-center relative z-10">
-        <LayoutGroup>
-          <motion.div
-            ref={containerRef}
-            className="w-full h-[80vh] flex items-center justify-center pb-10"
-            layout
+        {/* Floating Top-Left Logo on Mobile */}
+        {isMobile && (
+          <div
+            className="fixed z-50 pointer-events-auto"
+            style={{
+              top: "calc(0.6rem + var(--safe-top))",
+              left: "calc(0.75rem + var(--safe-left))",
+            }}
           >
+            <AnimatedLogo isMobileLandscape={true} />
+          </div>
+        )}
+
+        {/* Floating Top-Right Language Switcher (Desktop always / Mobile main screen only when all slides are collapsed) */}
+        <AnimatePresence>
+          {(!isMobile || activeSlide === null) && (
             <motion.div
-              className={`flex ${language === "ur" ? "flex-row-reverse" : "flex-row"} h-full items-center px-4 md:px-4`}
-              layout
-              initial={false}
-              animate={{
-                gap: activeSlide !== null ? `${SLIDE_GAP_EXPANDED}px` : `${SLIDE_GAP_IDLE}px`,
-              }}
-              transition={SPRING_PHYSICS}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
+              className="fixed z-50 pointer-events-auto"
               style={{
-                width: "100%",
-                maxWidth: "1800px",
-                justifyContent: activeSlide !== null ? "center" : "space-between",
+                top: isMobile ? "calc(0.6rem + var(--safe-top))" : "1.5rem",
+                right: isMobile ? "calc(0.75rem + var(--safe-right))" : "2rem",
               }}
             >
-              {slides.map((item, index) => (
-                <Slide
-                  key={`slide-${item.id}-${language}`}
-                  index={index}
-                  item={item}
-                  status={getSlideStatus(index)}
-                  onClick={() => handleSlideClick(index)}
-                  onClose={handleClose}
-                  isPlaying={activeSlide === index && isPlaying}
-                  playerComponent={item.playerComponent}
-                  totalSlides={slides.length}
-                  currentTime={currentTime}
-                  scenes={item.scenes}
-                  onSeek={handleSeek}
-                  onStartModule={() => setIsPlaying(true)}
-                  onSelectModule={selectModule}
+              <LanguageToggle
+                language={language}
+                onToggle={handleLanguageToggle}
+                isCompact={isMobile}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Top Center Heading on Mobile (Main Screen idle cards) */}
+        {isMobileLandscape && activeSlide === null && (
+          <div
+            className="fixed left-0 right-0 z-40 flex items-center justify-center pointer-events-none px-16 md:px-20"
+            style={{
+              top: "calc(0.6rem + var(--safe-top))",
+            }}
+          >
+            <AnimatedHeading
+              language={language}
+              isMobileLandscape={true}
+            />
+          </div>
+        )}
+
+        {/* Floating Header "Island" (Desktop only — on mobile landscape, logo is top-left and top title is removed) */}
+        {!isMobileLandscape ? (
+          <nav
+            className="w-full flex flex-col items-center justify-center z-40 relative pointer-events-none"
+            style={{
+              paddingTop: "1.5rem",
+              paddingBottom: "0.5rem",
+              gap: "1rem",
+            }}
+          >
+            <AnimatedLogo />
+            <AnimatePresence mode="wait">
+              {activeSlide === null || (!isPlaying && currentTime === 0) ? (
+                <AnimatedHeading
+                  key={`main-heading-${language}`}
                   language={language}
                 />
-              ))}
-            </motion.div>
-          </motion.div>
-        </LayoutGroup>
+              ) : (
+                currentSlideData && (
+                  <ActiveModuleHeader
+                    key={`module-header-${currentSlideData.id}-${language}`}
+                    id={currentSlideData.id}
+                    title={currentSlideData.headline}
+                    language={language}
+                    onSelectModule={selectModule}
+                    accentColor={
+                      currentSlideData.id === 1 ? "#60BA81" :
+                        currentSlideData.id === 2 ? "#F5A83C" :
+                          currentSlideData.id === 3 ? "#60BA81" :
+                            currentSlideData.id === 4 ? "#3B82F6" :
+                              "#8B5CF6"
+                    }
+                  />
+                )
+              )}
+            </AnimatePresence>
+          </nav>
+        ) : (
+          <div className="h-3 shrink-0 pointer-events-none" />
+        )}
 
-        {/* Floating Hint Text */}
-        <AnimatePresence>
-          {activeSlide === null && (
+        {/* Main Content Stage */}
+        <main className="flex-1 w-full h-full flex flex-col justify-center relative z-10">
+          <LayoutGroup>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10, transition: { duration: 0.2 } }}
-              transition={{ delay: 3.5, duration: 0.5 }}
-              className={`absolute ${language === "ur" ? "bottom-2" : "bottom-6"} left-0 right-0 text-center pointer-events-none`}
+              ref={containerRef}
+              className={`w-full flex items-center justify-center ${
+                isMobileLandscape
+                  ? (activeSlide !== null ? "h-[88vh] pb-1" : "h-[85vh] mt-1.5 pb-0")
+                  : "h-[80vh] pb-10"
+              }`}
+              layout
             >
-              <p className={`text-[#284952]/40 font-bold tracking-[0.3em] uppercase ${language === "ur" ? "font-urdu text-xl leading-relaxed" : "text-xs"}`}>
-                {language === "ur" ? "کسی ماڈیول کا انتخاب کریں" : "Select a Module"}
-              </p>
+              <motion.div
+                className={`flex ${language === "ur" ? "flex-row-reverse" : "flex-row"} h-full items-center px-4 md:px-4 ${
+                  isMobileLandscape && activeSlide === null
+                    ? "overflow-x-auto overflow-y-hidden no-scrollbar justify-start snap-x snap-mandatory py-1"
+                    : ""
+                }`}
+                layout
+                initial={false}
+                animate={{
+                  gap: activeSlide !== null ? `${SLIDE_GAP_EXPANDED}px` : isMobileLandscape ? "14px" : `${SLIDE_GAP_IDLE}px`,
+                }}
+                transition={SPRING_PHYSICS}
+                style={{
+                  width: "100%",
+                  maxWidth: isMobileLandscape && activeSlide === null ? "100%" : "1800px",
+                  justifyContent: activeSlide !== null ? "center" : isMobileLandscape ? "flex-start" : "space-between",
+                }}
+              >
+                {slides.map((item, index) => (
+                  <Slide
+                    key={`slide-${item.id}-${language}`}
+                    index={index}
+                    item={item}
+                    status={getSlideStatus(index)}
+                    onClick={() => handleSlideClick(index)}
+                    onClose={handleClose}
+                    isPlaying={activeSlide === index && isPlaying}
+                    playerComponent={item.playerComponent}
+                    totalSlides={slides.length}
+                    currentTime={currentTime}
+                    scenes={item.scenes}
+                    onSeek={handleSeek}
+                    onStartModule={() => setIsPlaying(true)}
+                    onSelectModule={selectModule}
+                    language={language}
+                  />
+                ))}
+              </motion.div>
             </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+          </LayoutGroup>
 
-      <NavigationPill
-        visible={activeSlide !== null && (isMouseActive || !isPlaying)}
-        isPlaying={isPlaying}
-        currentTime={currentTime}
-        totalDuration={currentSlideData?.duration || 120}
-        volume={volume}
-        isMuted={isMuted}
-        onPlayPause={() => setIsPlaying(!isPlaying)}
-        onVolumeChange={setVolume}
-        onMuteToggle={() => setIsMuted(!isMuted)}
-        onClose={handleClose}
-        activeSlideTitle={currentSlideData?.shortTitle}
-        scenes={currentSlideData?.scenes}
-        onSeek={handleSeek}
-        language={language}
-      />
+          {/* Floating Hint Text */}
+          <AnimatePresence>
+            {activeSlide === null && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10, transition: { duration: 0.2 } }}
+                transition={{ delay: 3.5, duration: 0.5 }}
+                className={`absolute ${
+                  language === "ur"
+                    ? isMobileLandscape ? "bottom-0.5" : "bottom-2"
+                    : isMobileLandscape ? "bottom-0.5" : "bottom-6"
+                } left-0 right-0 text-center pointer-events-none`}
+              >
+                <p className={`text-[#284952]/40 font-bold tracking-[0.3em] uppercase ${
+                  language === "ur"
+                    ? isMobileLandscape ? "font-urdu text-sm leading-relaxed" : "font-urdu text-xl leading-relaxed"
+                    : isMobileLandscape ? "text-[10px]" : "text-xs"
+                }`}>
+                  {language === "ur" ? "کسی ماڈیول کا انتخاب کریں" : isMobileLandscape ? "Swipe or Tap a Module" : "Select a Module"}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
+
+        <NavigationPill
+          visible={
+            activeSlide !== null &&
+            (isMobile ? (isPlaying || currentTime > 0) : (isMouseActive || !isPlaying))
+          }
+          isPlaying={isPlaying}
+          currentTime={currentTime}
+          totalDuration={currentSlideData?.duration || 120}
+          volume={volume}
+          isMuted={isMuted}
+          onPlayPause={() => setIsPlaying(!isPlaying)}
+          onVolumeChange={setVolume}
+          onMuteToggle={() => setIsMuted(!isMuted)}
+          onClose={handleClose}
+          activeSlideTitle={currentSlideData?.shortTitle}
+          scenes={currentSlideData?.scenes}
+          onSeek={handleSeek}
+          language={language}
+          isMobile={isMobile}
+        />
 
       {/* White Translucent Speed Indicator HUD Popup on Bottom-Left */}
       <AnimatePresence>
@@ -996,5 +1146,6 @@ export default function App() {
         )}
       </AnimatePresence>
     </div>
+  </>
   )
 }

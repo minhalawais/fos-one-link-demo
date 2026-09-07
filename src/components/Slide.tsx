@@ -5,6 +5,7 @@ import { useRef, useState, useEffect } from "react"
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
 import { ControlPanel } from "./control-panel.tsx"
 import type { SceneControl } from "../lib/module-data"
+import { useDeviceInfo } from "../hooks/useDeviceInfo.ts"
 import {
   Play,
   ShieldCheck,
@@ -859,6 +860,9 @@ const Slide: React.FC<SlideProps> = ({
   const isExpanded = status === "expanded"
   const [hasStarted, setHasStarted] = useState(false)
 
+  // Device info — desktop always returns isMobile=false, zero layout side-effects
+  const { isMobile, isMobileLandscape } = useDeviceInfo()
+
   // Track if this module has transitioned into active player mode
   useEffect(() => {
     if (status !== "expanded" || (!isPlaying && currentTime === 0)) {
@@ -994,18 +998,23 @@ const Slide: React.FC<SlideProps> = ({
   const isHidden = status === "hidden"
 
   const getWidth = () => {
-    if (isExpanded) return `${EXPANDED_WIDTH}vw`
+    if (isExpanded) return isMobileLandscape ? "94vw" : `${EXPANDED_WIDTH}vw`
     if (isPeek) return `${PEEK_WIDTH}vw`
-    if (isIdle) return `calc((100% - 2rem) / 5.1)`
+    if (isIdle) return isMobileLandscape ? "240px" : `calc((100% - 2rem) / 5.1)`
     return "0px"
   }
 
   if (isHidden) return null
+  // Issue 2 fix: Peek cards are completely broken (letter fragments) on narrow mobile-landscape
+  // The NavigationPill timeline already handles scene jumping — peek cards are redundant on mobile
+  if (isPeek && isMobileLandscape) return null
 
   return (
     <motion.div
       ref={cardRef}
-      className={`relative h-full cursor-pointer group flex-shrink-0 ${isExpanded ? "z-30" : isPeek ? "z-20" : "z-10"}`}
+      className={`relative h-full cursor-pointer group flex-shrink-0 ${
+        isMobileLandscape && isIdle ? "snap-center" : ""
+      } ${isExpanded ? "z-30" : isPeek ? "z-20" : "z-10"}`}
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
@@ -1035,16 +1044,18 @@ const Slide: React.FC<SlideProps> = ({
       style={{
         willChange: "width, transform",
         perspective: 1000,
-        rotateX: isIdle ? rotateX : 0,
-        rotateY: isIdle ? rotateY : 0,
+        // Disable 3D tilt on touch devices — mouse events don't fire on mobile
+        rotateX: isIdle && !isMobile ? rotateX : 0,
+        rotateY: isIdle && !isMobile ? rotateY : 0,
       }}
     >
       <motion.div
         className="absolute inset-0 overflow-hidden rounded-[28px]"
         initial={false}
         animate={{
-          scale: isIdle && isHovered ? 1.02 : 1,
-          y: isIdle && isHovered ? -8 : 0,
+          // Hover lift/scale only on desktop — no hover state on touch screens
+          scale: isIdle && isHovered && !isMobile ? 1.02 : 1,
+          y: isIdle && isHovered && !isMobile ? -8 : 0,
           boxShadow: isExpanded
             ? "0 30px 90px -15px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.05)"
             : isIdle && isHovered
@@ -1068,10 +1079,12 @@ const Slide: React.FC<SlideProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.75, y: -6, transition: { duration: 0.15, ease: [0.4, 0, 1, 1] } }}
             transition={{ delay: 0.15, type: 'spring', stiffness: 420, damping: 26 }}
-            className={`absolute ${language === "ur" ? "left-4" : "right-4"} top-4 z-50 w-10 h-10 rounded-lg flex items-center justify-center bg-white/96 border border-[#E6EEF0] shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1`}
+            className={`absolute ${language === "ur" ? "left-3" : "right-3"} top-3 z-50 ${
+              isMobileLandscape ? "w-8 h-8 rounded-lg" : isMobile ? "w-10 h-10 rounded-xl" : "w-10 h-10 rounded-lg"
+            } flex items-center justify-center bg-white/96 border border-[#E6EEF0] shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1`}
             aria-label={`Close module ${item.id}`}
           >
-            <X size={16} className="text-[#374151]" />
+            <X size={isMobileLandscape ? 14 : 16} className="text-[#374151]" />
           </motion.button>
         )}
 
@@ -1120,7 +1133,9 @@ const Slide: React.FC<SlideProps> = ({
               </div>
 
               {/* Content Container */}
-              <div className="relative z-10 h-full flex flex-col p-6">
+              <div className={`relative z-10 h-full flex flex-col ${
+                isMobileLandscape ? "p-3.5" : "p-6"
+              }`}>
                 {/* Top Section - Module indicator & Icon */}
                 <div className={`flex justify-between items-start mb-auto ${language === "ur" ? "flex-row-reverse" : ""}`}>
                   {/* Step indicator with connecting line */}
@@ -1155,7 +1170,9 @@ const Slide: React.FC<SlideProps> = ({
                       }}
                     />
                     <div
-                      className="relative w-10 h-10 rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-[5deg]"
+                      className={`relative rounded-xl flex items-center justify-center backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-[5deg] ${
+                        isMobileLandscape ? "w-7 h-7" : "w-10 h-10"
+                      }`}
                       style={{
                         backgroundColor: currentTheme.iconBg,
                         color: currentTheme.accent,
@@ -1163,7 +1180,7 @@ const Slide: React.FC<SlideProps> = ({
                         boxShadow: `0 4px 12px -2px ${currentTheme.accent}20`,
                       }}
                     >
-                      <item.icon size={20} strokeWidth={1.5} />
+                      <item.icon size={isMobileLandscape ? 14 : 20} strokeWidth={1.5} />
                     </div>
                   </div>
                 </div>
@@ -1184,7 +1201,15 @@ const Slide: React.FC<SlideProps> = ({
 
                   {/* Headline */}
                   <motion.h2
-                    className={`text-[20px] leading-[1.2] mb-3 relative z-10 ${language === "ur" ? "font-urdu text-2xl lg:text-3xl leading-relaxed font-bold" : "font-extrabold"}`}
+                    className={`leading-[1.2] mb-3 relative z-10 ${
+                      language === "ur"
+                        ? isMobileLandscape
+                          ? "font-urdu text-lg leading-relaxed font-bold"
+                          : "font-urdu text-2xl lg:text-3xl leading-relaxed font-bold"
+                        : isMobileLandscape
+                          ? "text-[14px] font-extrabold"
+                          : "text-[20px] font-extrabold"
+                    }`}
                     style={{
                       fontWeight: 800,
                       background: `linear-gradient(135deg, #FFFFFF 0%, #FFFFFF 60%, ${currentTheme.accent} 100%)`,
@@ -1214,11 +1239,15 @@ const Slide: React.FC<SlideProps> = ({
                     transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   />
 
-                  {/* Subheading */}
+                  {/* Subheading — display full text without ellipses */}
                   <motion.p
-                    className={`text-[12px] leading-[1.7] line-clamp-3 max-w-[95%] relative z-10 ${
-                      language === "ur" ? "font-urdu text-lg text-white/95 leading-relaxed font-normal" : "text-white/75 font-medium"
-                    }`}
+                    className={`leading-[1.5] relative z-10 ${
+                      language === "ur"
+                        ? "font-urdu text-base text-white/95 leading-relaxed font-normal"
+                        : isMobileLandscape
+                          ? "text-[11px] text-white/80 font-medium"
+                          : "text-[12px] text-white/75 font-medium"
+                    } max-w-[98%]`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -1227,9 +1256,11 @@ const Slide: React.FC<SlideProps> = ({
                   </motion.p>
                 </div>
 
-                {/* Bottom Section - CTA */}
+                {/* Bottom Section - CTA — compact on mobile-landscape */}
                 <motion.div
-                  className="flex items-center justify-between rounded-2xl px-4 py-3 backdrop-blur-sm"
+                  className={`flex items-center justify-between rounded-2xl backdrop-blur-sm ${
+                    isMobileLandscape ? "px-3 py-2" : "px-4 py-3"
+                  }`}
                   dir="ltr"
                   style={{
                     backgroundColor: currentTheme.accentLight,
@@ -1266,14 +1297,16 @@ const Slide: React.FC<SlideProps> = ({
                           }}
                         />
                         <div
-                          className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
+                          className={`relative rounded-full flex items-center justify-center z-10 ${
+                            isMobileLandscape ? "w-7 h-7" : "w-8 h-8"
+                          }`}
                           style={{
                             backgroundColor: currentTheme.accent,
                             boxShadow: `0 2px 8px -1px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.3)`,
                           }}
                         >
                           <ArrowRight
-                            size={12}
+                            size={isMobileLandscape ? 10 : 12}
                             className="text-white rotate-180"
                             strokeWidth={2.5}
                           />
@@ -1356,14 +1389,16 @@ const Slide: React.FC<SlideProps> = ({
                           }}
                         />
                         <div
-                          className="relative w-8 h-8 rounded-full flex items-center justify-center z-10"
+                          className={`relative rounded-full flex items-center justify-center z-10 ${
+                            isMobileLandscape ? "w-7 h-7" : "w-8 h-8"
+                          }`}
                           style={{
                             backgroundColor: currentTheme.accent,
                             boxShadow: `0 2px 8px -1px ${currentTheme.glow}, inset 0 1px 0 rgba(255,255,255,0.3)`,
                           }}
                         >
                           <ArrowRight
-                            size={12}
+                            size={isMobileLandscape ? 10 : 12}
                             className="text-white"
                             strokeWidth={2.5}
                           />
@@ -1402,8 +1437,9 @@ const Slide: React.FC<SlideProps> = ({
                     : '#FFFFFF',
                 }}
                 animate={{
-                  width: isPlayerActive ? "0%" : isExpanded ? "45%" : "100%",
-                  padding: isPlayerActive ? 0 : isExpanded ? "2.5rem" : isPeek ? "1rem" : "2rem",
+                  // On mobile-landscape and desktop, text panel occupies left side; visual panel occupies right side
+                  width: isPlayerActive ? "0%" : isExpanded ? (isMobileLandscape ? "46%" : "45%") : "100%",
+                  padding: isPlayerActive ? 0 : isExpanded ? (isMobileLandscape ? "1rem 1.25rem" : "2.5rem") : isPeek ? "1rem" : "2rem",
                   opacity: isPlayerActive ? 0 : 1,
                 }}
                 transition={IOS_SPRING}
@@ -1435,10 +1471,10 @@ const Slide: React.FC<SlideProps> = ({
                 <motion.div layout className="flex flex-col h-full relative z-10" dir={language === "ur" ? "rtl" : "ltr"}>
                   {/* Module Number Header (Hidden on peek so side bar title is perfectly centered) */}
                   {!isPeek && (
-                    <motion.div layout className="flex items-center gap-4 mb-8">
+                    <motion.div layout className={`flex items-center gap-4 ${isMobileLandscape ? "mb-2" : "mb-8"}`}>
                       <motion.div
                         layout="position"
-                        className="font-mono font-black tracking-tight text-xl"
+                        className={`font-mono font-black tracking-tight ${isMobileLandscape ? "text-base" : "text-xl"}`}
                         style={{
                           color: currentTheme.accent,
                           textShadow: `0 2px 8px ${currentTheme.accent}20`,
@@ -1448,7 +1484,7 @@ const Slide: React.FC<SlideProps> = ({
                       </motion.div>
                       <motion.div
                         initial={{ width: 0, opacity: 0 }}
-                        animate={{ width: 50, opacity: 1 }}
+                        animate={{ width: isMobileLandscape ? 28 : 50, opacity: 1 }}
                         transition={{ delay: 0.2, duration: 0.5 }}
                         className="h-[2px] rounded-full"
                         style={{ backgroundColor: currentTheme.accent }}
@@ -1457,7 +1493,7 @@ const Slide: React.FC<SlideProps> = ({
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.3 }}
-                        className={`text-xs font-bold uppercase tracking-[0.2em] ${language === "ur" ? "font-urdu text-base font-bold" : ""}`}
+                        className={`text-xs font-bold uppercase tracking-[0.2em] ${language === "ur" ? (isMobileLandscape ? "font-urdu text-xs font-bold" : "font-urdu text-base font-bold") : ""}`}
                         style={{ color: `${currentTheme.accent}90` }}
                       >
                         {language === "ur" ? `ماڈیول ${item.id}` : `Module ${item.id}`}
@@ -1466,7 +1502,7 @@ const Slide: React.FC<SlideProps> = ({
                   )}
 
                   <div className={`flex flex-col flex-1 h-full w-full ${isPeek ? "items-center justify-center" : "items-start justify-center"}`}>
-                    {isPeek ? (
+                    {isPeek && !isMobileLandscape ? (
                       /* Peek Side Bar Title: Isolated non-motion wrapper guaranteeing 100% foolproof 180deg rotation facing right everywhere */
                       <div className="h-full w-full flex items-center justify-center select-none pointer-events-none">
                         <div className="flex items-center justify-center rotate-180 [writing-mode:vertical-rl]">
@@ -1483,18 +1519,26 @@ const Slide: React.FC<SlideProps> = ({
                         </div>
                       </div>
                     ) : (
-                      <motion.div layout className="space-y-4 max-w-lg">
+                      <motion.div layout className={`${isMobileLandscape ? "space-y-1.5" : "space-y-4"} max-w-lg`}>
                         {/* Headline */}
                         <motion.h1
                           layout="position"
                           className={`font-extrabold text-[#1A1D21] tracking-tight relative z-10 ${
-                            language === "ur" ? "font-urdu text-3xl lg:text-4xl leading-[1.5] font-bold" : isExpanded ? "text-3xl lg:text-[2.25rem] leading-[1.1]" : "text-2xl"
+                            language === "ur"
+                              ? isMobileLandscape
+                                ? "font-urdu text-2xl leading-snug font-bold"
+                                : "font-urdu text-3xl lg:text-4xl leading-[1.5] font-bold"
+                              : isExpanded
+                                ? isMobileLandscape
+                                  ? "text-lg md:text-xl leading-snug"
+                                  : "text-3xl lg:text-[2.25rem] leading-[1.1]"
+                                : "text-2xl"
                           }`}
                         >
                           {item.headline}
                         </motion.h1>
 
-                        {/* Subtext */}
+                        {/* Subtext — display full text without ellipses */}
                         {isExpanded && (
                           <motion.p
                             layout="position"
@@ -1502,7 +1546,13 @@ const Slide: React.FC<SlideProps> = ({
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15, duration: 0.5 }}
                             className={`leading-relaxed relative z-10 ${
-                              language === "ur" ? "font-urdu text-xl md:text-2xl text-[#374151] leading-relaxed font-normal" : "font-medium text-base text-[#5A6169]"
+                              language === "ur"
+                                ? isMobileLandscape
+                                  ? "font-urdu text-base text-[#374151] leading-relaxed font-normal"
+                                  : "font-urdu text-xl md:text-2xl text-[#374151] leading-relaxed font-normal"
+                                : isMobileLandscape
+                                  ? "font-medium text-xs text-[#5A6169]"
+                                  : "font-medium text-base text-[#5A6169]"
                             }`}
                           >
                             {item.subtext}
@@ -1521,22 +1571,24 @@ const Slide: React.FC<SlideProps> = ({
                               e.stopPropagation();
                               onStartModule?.();
                             }}
-                            className={`flex items-center gap-4 pl-6 pr-5 py-3 text-white rounded-2xl mt-6 shadow-xl hover:shadow-2xl transition-all duration-300 group/btn relative overflow-hidden ${
+                            className={`flex items-center gap-3 ${
+                              isMobileLandscape ? "pl-4 pr-3 py-2 mt-2 rounded-xl shadow-md" : "pl-6 pr-5 py-3 mt-6 rounded-2xl shadow-xl hover:shadow-2xl"
+                            } text-white transition-all duration-300 group/btn relative overflow-hidden ${
                               language === "ur" ? "flex-row-reverse" : ""
                             }`}
                             style={{
                               background: `linear-gradient(135deg, ${currentTheme.accent}, ${currentTheme.accent}DD)`,
                             }}
                           >
-                            <span className={`text-sm font-bold tracking-wide relative z-10 ${language === "ur" ? "font-urdu text-lg" : ""}`}>
+                            <span className={`text-sm font-bold tracking-wide relative z-10 ${language === "ur" ? "font-urdu text-base" : ""}`}>
                               {language === "ur" ? "ماڈیول شروع کریں" : "Start Module"}
                             </span>
                             <motion.div
-                              className="bg-white/25 rounded-xl p-2 group-hover/btn:bg-white/35 transition-colors relative z-10"
+                              className="bg-white/25 rounded-lg p-1.5 group-hover/btn:bg-white/35 transition-colors relative z-10"
                               whileHover={{ rotate: 90 }}
                               transition={{ duration: 0.3 }}
                             >
-                              <Play size={14} fill="currentColor" />
+                              <Play size={isMobileLandscape ? 12 : 14} fill="currentColor" />
                             </motion.div>
                           </motion.button>
                         )}
@@ -1544,15 +1596,15 @@ const Slide: React.FC<SlideProps> = ({
                     )}
                   </div>
 
-                  {/* Classic Clickable Module Dots: reversed so module 1 has highlighted dot on right, module 5 on left */}
+                  {/* Classic Clickable Module Dots */}
                   {isExpanded && !isPlaying && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className={`flex items-center gap-3 mt-auto pt-4 ${language === "ur" ? "flex-row-reverse" : "flex-row"}`}
+                      className={`flex items-center gap-3 mt-auto ${isMobileLandscape ? "pt-1.5" : "pt-4"} ${language === "ur" ? "flex-row-reverse" : "flex-row"}`}
                     >
-                      <div className="flex gap-2 items-center" dir="ltr">
+                      <div className="flex gap-1.5 items-center" dir="ltr">
                         {Array.from({ length: totalSlides }, (_, i) => language === "ur" ? totalSlides - i : i + 1).map((step) => {
                           const isCurrent = step === item.id
                           return (
@@ -1566,9 +1618,9 @@ const Slide: React.FC<SlideProps> = ({
                               whileHover={{ scale: 1.25 }}
                               whileTap={{ scale: 0.9 }}
                               title={language === "ur" ? `ماڈیول ${step}` : `Module ${step}`}
-                              className="h-2 rounded-full transition-all duration-300 cursor-pointer focus:outline-none"
+                              className="h-1.5 rounded-full transition-all duration-300 cursor-pointer focus:outline-none"
                               style={{
-                                width: isCurrent ? 32 : 10,
+                                width: isCurrent ? (isMobileLandscape ? 22 : 32) : (isMobileLandscape ? 7 : 10),
                                 backgroundColor: isCurrent ? currentTheme.accent : 'rgba(0,0,0,0.15)',
                                 boxShadow: isCurrent ? `0 0 8px ${currentTheme.accent}60` : 'none',
                               }}
@@ -1576,7 +1628,7 @@ const Slide: React.FC<SlideProps> = ({
                           )
                         })}
                       </div>
-                      <span className={`text-xs font-medium text-[#8A9199] ${language === "ur" ? "font-urdu text-base font-bold" : ""}`}>
+                      <span className={`text-[10.5px] font-medium text-[#8A9199] ${language === "ur" ? (isMobileLandscape ? "font-urdu text-xs font-bold" : "font-urdu text-base font-bold") : ""}`}>
                         {language === "ur" ? `ماڈیول ${item.id} از ${totalSlides}` : `${item.id} of ${totalSlides} modules`}
                       </span>
                     </motion.div>
@@ -1584,13 +1636,14 @@ const Slide: React.FC<SlideProps> = ({
                 </motion.div>
               </motion.div>
 
-              {/* VISUAL / PLAYER SIDE */}
+              {/* VISUAL SIDE (Right in EN, Left in UR) */}
               <motion.div
                 layout
                 className="h-full relative overflow-hidden"
                 initial={false}
                 animate={{
-                  width: isPlayerActive ? "100%" : isExpanded ? "55%" : "0%",
+                  // On mobile-landscape and desktop, visual panel takes right side during expanded intro state, and expands to full width during playback
+                  width: isPlayerActive ? "100%" : isExpanded ? (isMobileLandscape ? "54%" : "55%") : "0%",
                   opacity: isExpanded ? 1 : 0,
                 }}
                 transition={IOS_SPRING}
@@ -1613,7 +1666,7 @@ const Slide: React.FC<SlideProps> = ({
                   {isPlayerActive ? (
                     <motion.div
                       key="player-container"
-                      className={`absolute inset-0 w-full h-full flex bg-[#17161A] ${
+                      className={`absolute inset-0 w-full h-full flex bg-white ${
                         language === "ur" ? "flex-row-reverse" : "flex-row"
                       }`}
                       initial={{ opacity: 0, scale: 0.95 }}
@@ -1621,11 +1674,13 @@ const Slide: React.FC<SlideProps> = ({
                       exit={{ opacity: 0, scale: 1.05 }}
                       transition={{ duration: 0.4 }}
                     >
-                      {/* Control Panel - 25% (On Left in EN, On Right in UR) */}
-                      {scenes && scenes.length > 0 && onSeek && (
+                      {/* Control Panel — hidden on mobile-landscape; NavigationPill timeline handles seeking */}
+                      {scenes && scenes.length > 0 && onSeek && !isMobileLandscape && (
                         <motion.div
-                          className={`w-[25%] h-full flex-shrink-0 ${
-                            language === "ur" ? "border-l border-white/5" : "border-r border-white/5"
+                          className={`${
+                            isMobileLandscape ? "w-[15%]" : "w-[25%]"
+                          } h-full flex-shrink-0 ${
+                            language === "ur" ? "border-l border-black/5" : "border-r border-black/5"
                           }`}
                           initial={{ x: language === "ur" ? 20 : -20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
@@ -1642,8 +1697,19 @@ const Slide: React.FC<SlideProps> = ({
                         </motion.div>
                       )}
 
-                      {/* Module Player Canvas - 75% */}
-                      <div className={`${scenes && scenes.length > 0 ? 'w-[75%]' : 'w-full'} h-full`}>
+                      {/* Module Player Canvas — full width on mobile (no ControlPanel sidebar), zoomed out & centered on mobile-landscape to fit all scenes inside card */}
+                      <div
+                        className={`${
+                          scenes && scenes.length > 0 && !isMobileLandscape ? 'w-[75%]' : 'w-full'
+                        } h-full relative overflow-hidden flex items-center justify-center bg-white`}
+                        style={
+                          isMobileLandscape
+                            ? {
+                                zoom: 0.62,
+                              }
+                            : undefined
+                        }
+                      >
                         {playerComponent || (
                           <div className="w-full h-full flex items-center justify-center text-white/50">
                             Module Player
@@ -1654,13 +1720,24 @@ const Slide: React.FC<SlideProps> = ({
                   ) : (
                     <motion.div
                       key="visual"
-                      className="absolute inset-0 w-full h-full"
+                      className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden"
                       initial={{ opacity: 0, scale: 1.02 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.98 }}
                       transition={{ duration: 0.5 }}
                     >
-                      <DynamicCoverArt id={item.id} />
+                      <div
+                        className="w-full h-full flex items-center justify-center"
+                        style={
+                          isMobileLandscape
+                            ? {
+                                zoom: 0.65,
+                              }
+                            : undefined
+                        }
+                      >
+                        <DynamicCoverArt id={item.id} />
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>

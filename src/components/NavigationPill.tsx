@@ -18,6 +18,8 @@ interface NavigationPillProps {
   scenes?: SceneControl[]
   onSeek?: (time: number) => void
   language?: "en" | "ur"
+  /** Passed from App — true on touch phones/tablets only, never on desktop */
+  isMobile?: boolean
 }
 
 const NavigationPill: React.FC<NavigationPillProps> = ({
@@ -35,6 +37,7 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
   scenes = [],
   onSeek,
   language = "en",
+  isMobile = false,
 }) => {
   const [hoveredSceneIndex, setHoveredSceneIndex] = useState<number | null>(null)
   const [mousePos, setMousePos] = useState<{ x: number; width: number } | null>(null)
@@ -153,7 +156,8 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
           {isMuted || volume === 0 ? <VolumeX size={14} /> : <Volume2 size={14} />}
         </motion.button>
 
-        {/* Volume Slider Popup */}
+        {/* Volume Slider Popup — desktop only; hover-based, not usable on touch */}
+        {!isMobile && (
         <div
           className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-10 h-28 rounded-xl flex flex-col justify-end items-center p-2 pb-2.5 opacity-0 group-hover/vol:opacity-100 transition-all duration-200 translate-y-2 group-hover/vol:translate-y-0 pointer-events-none group-hover/vol:pointer-events-auto z-50"
           style={{
@@ -191,6 +195,7 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
             />
           </div>
         </div>
+        )}
       </div>
 
       {/* Close Button */}
@@ -208,7 +213,11 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
 
   // Timeline & Center Progress Section
   const renderTimelineSection = () => (
-    <div className="flex flex-col justify-center min-w-[240px] md:min-w-[300px] max-w-[400px] px-2 gap-1">
+    <div className={`flex flex-col justify-center ${
+      isMobile
+        ? "min-w-[140px] max-w-[220px]"
+        : "min-w-[240px] md:min-w-[300px] max-w-[400px]"
+    } px-2 gap-1`}>
       {/* Title and Time Row */}
       <div className={`flex justify-between items-center ${isUrdu ? "flex-row-reverse" : "flex-row"}`}>
         <div className="flex items-center gap-1.5">
@@ -233,11 +242,15 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
               ))}
             </motion.div>
           )}
-          <span className={`text-xs font-semibold text-white tracking-tight truncate max-w-[190px] ${isUrdu ? "font-urdu text-sm" : ""}`}>
+          <span className={`font-semibold text-white tracking-tight truncate ${
+            isUrdu ? "font-urdu text-sm" : "text-xs"
+          } ${isMobile ? "max-w-[90px]" : "max-w-[190px]"}`}>
             {activeSlideTitle || (isUrdu ? "ماڈیول" : "Module")}
           </span>
         </div>
-        <span className="text-[9.5px] font-medium text-white/50 tabular-nums tracking-wide font-mono">
+        <span className={`font-medium text-white/50 tabular-nums tracking-wide font-mono ${
+          isMobile ? "text-[8px]" : "text-[9.5px]"
+        }`}>
           {formatTime(currentTime)} / {formatTime(totalDuration)}
         </span>
       </div>
@@ -340,7 +353,12 @@ const NavigationPill: React.FC<NavigationPillProps> = ({
           animate={{ y: 0, opacity: 1, x: "-50%", scale: 1 }}
           exit={{ y: 100, opacity: 0, x: "-50%", scale: 0.92 }}
           transition={{ type: "spring", stiffness: 320, damping: 28, mass: 0.9 }}
-          className="fixed bottom-6 left-1/2 z-[300] origin-bottom"
+          className="fixed left-1/2 z-[300] origin-bottom"
+          style={{
+            bottom: isMobile
+              ? "calc(0.75rem + var(--safe-bottom))"
+              : "1.5rem",
+          }}
         >
           {/* Multi-layered ambient glow effect */}
           <div className="absolute -inset-6 pointer-events-none">
